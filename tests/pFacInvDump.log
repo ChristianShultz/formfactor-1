@@ -1,0 +1,45 @@
+data = 0x7fafa3c01220
+key = J = 1
+helicity = -1
+pmu = indicies (1 means raised) 
+index[0] = 1 
+[2.31584e+77 , 0 , 0 , 2.00058]
+
+data = 0x7fafa3c01bc0
+key = J = 1
+helicity = -1
+pmu = indicies (1 means raised) 
+index[0] = 1 
+[2.31584e+77 , 1.67407 , 0.423633 , 1.01012]
+
+the factory contained 2tensors
+data = 0x7fd31a401220
+key = J = 1
+helicity = -1
+pmu = indicies (1 means raised) 
+index[0] = 1 
+[1.72723e-77 , 0 , 0 , 2.00058]
+
+data = 0x7fd31a401bc0
+key = J = 1
+helicity = -1
+pmu = indicies (1 means raised) 
+index[0] = 1 
+[1.72723e-77 , 1.67407 , 0.423633 , 1.01012]
+
+the factory contained 2tensors
+data = 0x7f8cf2c01220
+key = J = 1
+helicity = -1
+pmu = indicies (1 means raised) 
+index[0] = 1 
+[0 , 0 , 0 , 2.00058]
+
+data = 0x7f8cf2c01bc0
+key = J = 1
+helicity = -1
+pmu = indicies (1 means raised) 
+index[0] = 1 
+[0 , 1.67407 , 0.423633 , 1.01012]
+
+the factory contained 2tensors
