@@ -568,6 +568,10 @@ ac_subst_vars='am__EXEEXT_FALSE
 am__EXEEXT_TRUE
 LTLIBOBJS
 LIBOBJS
+SEMBLE_LIBS
+SEMBLE_LDFLAGS
+SEMBLE_CXXFLAGS
+SEMBLE_CONFIG
 ADAT_SINGLE_COMMS_FALSE
 ADAT_SINGLE_COMMS_TRUE
 ADAT_MPI_COMMS_FALSE
@@ -671,6 +675,7 @@ enable_dependency_tracking
 with_adat
 with_itpp
 enable_mpi
+with_semble
 '
       ac_precious_vars='build_alias
 host_alias
@@ -1309,6 +1314,8 @@ Optional Packages:
   --with-adat=DIR         Building on top of ADAT where ADAT is installed in
                           DIR
   --with-itpp=DIR         Use ITPP in DIR
+  --with-semble=DIR       Building on top of semble where semble is installed
+                          in DIR
 
 Some influential environment variables:
   CXX         C++ compiler command
@@ -3658,6 +3665,8 @@ fi
 
 
 
+
+
 # Check whether --with-adat was given.
 if test "${with_adat+set}" = set; then :
   withval=$with_adat; ADAT_HOME="$with_adat"
@@ -3969,6 +3978,123 @@ else
 fi
 
 
+
+# Check whether --with-semble was given.
+if test "${with_semble+set}" = set; then :
+  withval=$with_semble; SEMBLE_HOME="$with_semble"
+
+fi
+
+
+if test "X${SEMBLE_HOME}X" = "XX" ; then
+  # Extract the first word of "semble-config", so it can be a program name with args.
+set dummy semble-config; ac_word=$2
+{ $as_echo "$as_me:${as_lineno-$LINENO}: checking for $ac_word" >&5
+$as_echo_n "checking for $ac_word... " >&6; }
+if ${ac_cv_path_SEMBLE_CONFIG+:} false; then :
+  $as_echo_n "(cached) " >&6
+else
+  case $SEMBLE_CONFIG in
+  [\\/]* | ?:[\\/]*)
+  ac_cv_path_SEMBLE_CONFIG="$SEMBLE_CONFIG" # Let the user override the test with a path.
+  ;;
+  *)
+  as_save_IFS=$IFS; IFS=$PATH_SEPARATOR
+for as_dir in $PATH
+do
+  IFS=$as_save_IFS
+  test -z "$as_dir" && as_dir=.
+    for ac_exec_ext in '' $ac_executable_extensions; do
+  if { test -f "$as_dir/$ac_word$ac_exec_ext" && $as_test_x "$as_dir/$ac_word$ac_exec_ext"; }; then
+    ac_cv_path_SEMBLE_CONFIG="$as_dir/$ac_word$ac_exec_ext"
+    $as_echo "$as_me:${as_lineno-$LINENO}: found $as_dir/$ac_word$ac_exec_ext" >&5
+    break 2
+  fi
+done
+  done
+IFS=$as_save_IFS
+
+  ;;
+esac
+fi
+SEMBLE_CONFIG=$ac_cv_path_SEMBLE_CONFIG
+if test -n "$SEMBLE_CONFIG"; then
+  { $as_echo "$as_me:${as_lineno-$LINENO}: result: $SEMBLE_CONFIG" >&5
+$as_echo "$SEMBLE_CONFIG" >&6; }
+else
+  { $as_echo "$as_me:${as_lineno-$LINENO}: result: no" >&5
+$as_echo "no" >&6; }
+fi
+
+
+else
+  # Extract the first word of "semble-config", so it can be a program name with args.
+set dummy semble-config; ac_word=$2
+{ $as_echo "$as_me:${as_lineno-$LINENO}: checking for $ac_word" >&5
+$as_echo_n "checking for $ac_word... " >&6; }
+if ${ac_cv_path_SEMBLE_CONFIG+:} false; then :
+  $as_echo_n "(cached) " >&6
+else
+  case $SEMBLE_CONFIG in
+  [\\/]* | ?:[\\/]*)
+  ac_cv_path_SEMBLE_CONFIG="$SEMBLE_CONFIG" # Let the user override the test with a path.
+  ;;
+  *)
+  as_save_IFS=$IFS; IFS=$PATH_SEPARATOR
+as_dummy="${SEMBLE_HOME}/bin:${PATH}"
+for as_dir in $as_dummy
+do
+  IFS=$as_save_IFS
+  test -z "$as_dir" && as_dir=.
+    for ac_exec_ext in '' $ac_executable_extensions; do
+  if { test -f "$as_dir/$ac_word$ac_exec_ext" && $as_test_x "$as_dir/$ac_word$ac_exec_ext"; }; then
+    ac_cv_path_SEMBLE_CONFIG="$as_dir/$ac_word$ac_exec_ext"
+    $as_echo "$as_me:${as_lineno-$LINENO}: found $as_dir/$ac_word$ac_exec_ext" >&5
+    break 2
+  fi
+done
+  done
+IFS=$as_save_IFS
+
+  ;;
+esac
+fi
+SEMBLE_CONFIG=$ac_cv_path_SEMBLE_CONFIG
+if test -n "$SEMBLE_CONFIG"; then
+  { $as_echo "$as_me:${as_lineno-$LINENO}: result: $SEMBLE_CONFIG" >&5
+$as_echo "$SEMBLE_CONFIG" >&6; }
+else
+  { $as_echo "$as_me:${as_lineno-$LINENO}: result: no" >&5
+$as_echo "no" >&6; }
+fi
+
+
+fi
+
+if test "X${SEMBLE_CONFIG}X" = "XX" ; then
+  as_fn_error $? "semble configuration program semble-config not found.
+  		Cannot compile/linke without semble.
+		Use --with-semble=<dir> to select a working version." "$LINENO" 5
+fi
+
+{ $as_echo "$as_me:${as_lineno-$LINENO}: Found semble configuration program ${SEMBLE_CONFIG}" >&5
+$as_echo "$as_me: Found semble configuration program ${SEMBLE_CONFIG}" >&6;}
+CXX="`${SEMBLE_CONFIG} --cxx`"
+
+{ $as_echo "$as_me:${as_lineno-$LINENO}: semble compiler: ${CXX}" >&5
+$as_echo "$as_me: semble compiler: ${CXX}" >&6;}
+SEMBLE_CXXFLAGS="`${SEMBLE_CONFIG} --cxxflags`"
+
+{ $as_echo "$as_me:${as_lineno-$LINENO}: semble compile flags: ${SEMBLE_CXXFLAGS}" >&5
+$as_echo "$as_me: semble compile flags: ${SEMBLE_CXXFLAGS}" >&6;}
+SEMBLE_LDFLAGS="`${SEMBLE_CONFIG} --ldflags`"
+
+{ $as_echo "$as_me:${as_lineno-$LINENO}: semble linking flags: ${SEMBLE_LDFLAGS}" >&5
+$as_echo "$as_me: semble linking flags: ${SEMBLE_LDFLAGS}" >&6;}
+SEMBLE_LIBS="`${SEMBLE_CONFIG} --libs`"
+
+{ $as_echo "$as_me:${as_lineno-$LINENO}: semble libraries flags: ${SEMBLE_LIBS}" >&5
+$as_echo "$as_me: semble libraries flags: ${SEMBLE_LIBS}" >&6;}
 
 
 #######################

@@ -128,7 +128,8 @@ namespace kinfac
     template <typename T>
     struct KinFacABC
     {
-        virtual typename LinSysRetType<T>::type operator()(const KinKey &key) = 0;
+      virtual typename LinSysRetType<T>::type operator()(const KinKey &key) = 0;
+      virtual unsigned short nFactors(void) = 0;
     };
 
 
@@ -171,6 +172,7 @@ namespace kinfac
       kinIni ini;
 
         typename LinSysRetType<T>::type operator()(const KinKey &key);
+      unsigned short nFactors(void) {return 1;}
     };
 
 
@@ -266,7 +268,7 @@ namespace kinfac
 
       kinIni ini;
 
-        typename LinSysRetType<T>::type operator()(const KinKey &key);
+      typename LinSysRetType<T>::type operator()(const KinKey &key);
     };
 
 

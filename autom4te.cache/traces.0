@@ -783,16 +783,16 @@ m4trace:configure.ac:11: -1- _AM_SUBST_NOTMAKE([am__fastdepCXX_TRUE])
 m4trace:configure.ac:11: -1- _AM_SUBST_NOTMAKE([am__fastdepCXX_FALSE])
 m4trace:configure.ac:11: -1- _AM_IF_OPTION([silent-rules], [AC_REQUIRE([AM_SILENT_RULES])])
 m4trace:configure.ac:11: -2- _AM_MANGLE_OPTION([silent-rules])
-m4trace:configure.ac:19: -2- _m4_warn([obsolete], [The macro `AC_HELP_STRING' is obsolete.
+m4trace:configure.ac:21: -2- _m4_warn([obsolete], [The macro `AC_HELP_STRING' is obsolete.
 You should run autoupdate.], [../../lib/autoconf/general.m4:209: AC_HELP_STRING is expanded from...
-configure.ac:19: the top level])
-m4trace:configure.ac:28: -1- m4_pattern_allow([^ADAT_CONFIG$])
+configure.ac:21: the top level])
 m4trace:configure.ac:30: -1- m4_pattern_allow([^ADAT_CONFIG$])
-m4trace:configure.ac:38: -1- m4_pattern_allow([^CXX$])
-m4trace:configure.ac:40: -1- m4_pattern_allow([^ADAT_CXXFLAGS$])
-m4trace:configure.ac:42: -1- m4_pattern_allow([^ADAT_LDFLAGS$])
-m4trace:configure.ac:44: -1- m4_pattern_allow([^ADAT_LIBS$])
-m4trace:configure.ac:48: -1- m4_include([m4/pac_adat_link_cxx_func.m4])
+m4trace:configure.ac:32: -1- m4_pattern_allow([^ADAT_CONFIG$])
+m4trace:configure.ac:40: -1- m4_pattern_allow([^CXX$])
+m4trace:configure.ac:42: -1- m4_pattern_allow([^ADAT_CXXFLAGS$])
+m4trace:configure.ac:44: -1- m4_pattern_allow([^ADAT_LDFLAGS$])
+m4trace:configure.ac:46: -1- m4_pattern_allow([^ADAT_LIBS$])
+m4trace:configure.ac:50: -1- m4_include([m4/pac_adat_link_cxx_func.m4])
 m4trace:m4/pac_adat_link_cxx_func.m4:24: -1- AC_DEFUN([PAC_ADAT_LINK_CXX_FUNC], [
 dnl - set local parallel compiler environments
 dnl - so input variables can be CXXFLAGS, LDFLAGS or LIBS
@@ -835,49 +835,58 @@ dnl - set the parallel compiler environment
     fi
   
 ])
-m4trace:configure.ac:52: -1- _m4_warn([obsolete], [The macro `AC_LANG_SAVE' is obsolete.
+m4trace:configure.ac:54: -1- _m4_warn([obsolete], [The macro `AC_LANG_SAVE' is obsolete.
 You should run autoupdate.], [../../lib/autoconf/lang.m4:126: AC_LANG_SAVE is expanded from...
 m4/pac_adat_link_cxx_func.m4:24: PAC_ADAT_LINK_CXX_FUNC is expanded from...
-configure.ac:52: the top level])
-m4trace:configure.ac:52: -1- _m4_warn([obsolete], [The macro `AC_LANG_CPLUSPLUS' is obsolete.
+configure.ac:54: the top level])
+m4trace:configure.ac:54: -1- _m4_warn([obsolete], [The macro `AC_LANG_CPLUSPLUS' is obsolete.
 You should run autoupdate.], [../../lib/autoconf/c.m4:252: AC_LANG_CPLUSPLUS is expanded from...
 m4/pac_adat_link_cxx_func.m4:24: PAC_ADAT_LINK_CXX_FUNC is expanded from...
-configure.ac:52: the top level])
-m4trace:configure.ac:52: -1- _m4_warn([obsolete], [The macro `AC_TRY_LINK' is obsolete.
+configure.ac:54: the top level])
+m4trace:configure.ac:54: -1- _m4_warn([obsolete], [The macro `AC_TRY_LINK' is obsolete.
 You should run autoupdate.], [../../lib/autoconf/general.m4:2688: AC_TRY_LINK is expanded from...
 m4/pac_adat_link_cxx_func.m4:24: PAC_ADAT_LINK_CXX_FUNC is expanded from...
-configure.ac:52: the top level])
-m4trace:configure.ac:52: -1- _m4_warn([obsolete], [The macro `AC_LANG_RESTORE' is obsolete.
+configure.ac:54: the top level])
+m4trace:configure.ac:54: -1- _m4_warn([obsolete], [The macro `AC_LANG_RESTORE' is obsolete.
 You should run autoupdate.], [../../lib/autoconf/lang.m4:135: AC_LANG_RESTORE is expanded from...
 m4/pac_adat_link_cxx_func.m4:24: PAC_ADAT_LINK_CXX_FUNC is expanded from...
-configure.ac:52: the top level])
-m4trace:configure.ac:73: -2- _m4_warn([obsolete], [The macro `AC_HELP_STRING' is obsolete.
+configure.ac:54: the top level])
+m4trace:configure.ac:75: -2- _m4_warn([obsolete], [The macro `AC_HELP_STRING' is obsolete.
 You should run autoupdate.], [../../lib/autoconf/general.m4:209: AC_HELP_STRING is expanded from...
-configure.ac:73: the top level])
-m4trace:configure.ac:83: -1- m4_pattern_allow([^ITPP_CONFIG$])
-m4trace:configure.ac:88: -1- m4_pattern_allow([^ITPP_CXXFLAGS$])
-m4trace:configure.ac:90: -1- m4_pattern_allow([^ITPP_LIBS$])
-m4trace:configure.ac:94: -1- m4_pattern_allow([^ITPP_CXXFLAGS$])
-m4trace:configure.ac:95: -1- m4_pattern_allow([^ITPP_LIBS$])
-m4trace:configure.ac:101: -2- _m4_warn([obsolete], [The macro `AC_HELP_STRING' is obsolete.
+configure.ac:75: the top level])
+m4trace:configure.ac:85: -1- m4_pattern_allow([^ITPP_CONFIG$])
+m4trace:configure.ac:90: -1- m4_pattern_allow([^ITPP_CXXFLAGS$])
+m4trace:configure.ac:92: -1- m4_pattern_allow([^ITPP_LIBS$])
+m4trace:configure.ac:96: -1- m4_pattern_allow([^ITPP_CXXFLAGS$])
+m4trace:configure.ac:97: -1- m4_pattern_allow([^ITPP_LIBS$])
+m4trace:configure.ac:103: -2- _m4_warn([obsolete], [The macro `AC_HELP_STRING' is obsolete.
 You should run autoupdate.], [../../lib/autoconf/general.m4:209: AC_HELP_STRING is expanded from...
-configure.ac:101: the top level])
-m4trace:configure.ac:109: -1- m4_pattern_allow([^USE_MPI$])
-m4trace:configure.ac:112: -1- AM_CONDITIONAL([ADAT_MPI_COMMS], [test "x${ac_mpi_enabled}x" = "x1x" ])
-m4trace:configure.ac:112: -1- m4_pattern_allow([^ADAT_MPI_COMMS_TRUE$])
-m4trace:configure.ac:112: -1- m4_pattern_allow([^ADAT_MPI_COMMS_FALSE$])
-m4trace:configure.ac:112: -1- _AM_SUBST_NOTMAKE([ADAT_MPI_COMMS_TRUE])
-m4trace:configure.ac:112: -1- _AM_SUBST_NOTMAKE([ADAT_MPI_COMMS_FALSE])
-m4trace:configure.ac:113: -1- AM_CONDITIONAL([ADAT_SINGLE_COMMS], [test "x${ac_mpi_enabled}x" = "x0x" ])
-m4trace:configure.ac:113: -1- m4_pattern_allow([^ADAT_SINGLE_COMMS_TRUE$])
-m4trace:configure.ac:113: -1- m4_pattern_allow([^ADAT_SINGLE_COMMS_FALSE$])
-m4trace:configure.ac:113: -1- _AM_SUBST_NOTMAKE([ADAT_SINGLE_COMMS_TRUE])
-m4trace:configure.ac:113: -1- _AM_SUBST_NOTMAKE([ADAT_SINGLE_COMMS_FALSE])
-m4trace:configure.ac:136: -1- m4_pattern_allow([^LIB@&t@OBJS$])
-m4trace:configure.ac:136: -1- m4_pattern_allow([^LTLIBOBJS$])
-m4trace:configure.ac:136: -1- AM_CONDITIONAL([am__EXEEXT], [test -n "$EXEEXT"])
-m4trace:configure.ac:136: -1- m4_pattern_allow([^am__EXEEXT_TRUE$])
-m4trace:configure.ac:136: -1- m4_pattern_allow([^am__EXEEXT_FALSE$])
-m4trace:configure.ac:136: -1- _AM_SUBST_NOTMAKE([am__EXEEXT_TRUE])
-m4trace:configure.ac:136: -1- _AM_SUBST_NOTMAKE([am__EXEEXT_FALSE])
-m4trace:configure.ac:136: -1- _AM_OUTPUT_DEPENDENCY_COMMANDS
+configure.ac:103: the top level])
+m4trace:configure.ac:111: -1- m4_pattern_allow([^USE_MPI$])
+m4trace:configure.ac:114: -1- AM_CONDITIONAL([ADAT_MPI_COMMS], [test "x${ac_mpi_enabled}x" = "x1x" ])
+m4trace:configure.ac:114: -1- m4_pattern_allow([^ADAT_MPI_COMMS_TRUE$])
+m4trace:configure.ac:114: -1- m4_pattern_allow([^ADAT_MPI_COMMS_FALSE$])
+m4trace:configure.ac:114: -1- _AM_SUBST_NOTMAKE([ADAT_MPI_COMMS_TRUE])
+m4trace:configure.ac:114: -1- _AM_SUBST_NOTMAKE([ADAT_MPI_COMMS_FALSE])
+m4trace:configure.ac:115: -1- AM_CONDITIONAL([ADAT_SINGLE_COMMS], [test "x${ac_mpi_enabled}x" = "x0x" ])
+m4trace:configure.ac:115: -1- m4_pattern_allow([^ADAT_SINGLE_COMMS_TRUE$])
+m4trace:configure.ac:115: -1- m4_pattern_allow([^ADAT_SINGLE_COMMS_FALSE$])
+m4trace:configure.ac:115: -1- _AM_SUBST_NOTMAKE([ADAT_SINGLE_COMMS_TRUE])
+m4trace:configure.ac:115: -1- _AM_SUBST_NOTMAKE([ADAT_SINGLE_COMMS_FALSE])
+m4trace:configure.ac:119: -2- _m4_warn([obsolete], [The macro `AC_HELP_STRING' is obsolete.
+You should run autoupdate.], [../../lib/autoconf/general.m4:209: AC_HELP_STRING is expanded from...
+configure.ac:119: the top level])
+m4trace:configure.ac:127: -1- m4_pattern_allow([^SEMBLE_CONFIG$])
+m4trace:configure.ac:129: -1- m4_pattern_allow([^SEMBLE_CONFIG$])
+m4trace:configure.ac:139: -1- m4_pattern_allow([^CXX$])
+m4trace:configure.ac:141: -1- m4_pattern_allow([^SEMBLE_CXXFLAGS$])
+m4trace:configure.ac:143: -1- m4_pattern_allow([^SEMBLE_LDFLAGS$])
+m4trace:configure.ac:145: -1- m4_pattern_allow([^SEMBLE_LIBS$])
+m4trace:configure.ac:168: -1- m4_pattern_allow([^LIB@&t@OBJS$])
+m4trace:configure.ac:168: -1- m4_pattern_allow([^LTLIBOBJS$])
+m4trace:configure.ac:168: -1- AM_CONDITIONAL([am__EXEEXT], [test -n "$EXEEXT"])
+m4trace:configure.ac:168: -1- m4_pattern_allow([^am__EXEEXT_TRUE$])
+m4trace:configure.ac:168: -1- m4_pattern_allow([^am__EXEEXT_FALSE$])
+m4trace:configure.ac:168: -1- _AM_SUBST_NOTMAKE([am__EXEEXT_TRUE])
+m4trace:configure.ac:168: -1- _AM_SUBST_NOTMAKE([am__EXEEXT_FALSE])
+m4trace:configure.ac:168: -1- _AM_OUTPUT_DEPENDENCY_COMMANDS

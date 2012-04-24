@@ -20,7 +20,8 @@ nobase_include_HEADDERS = 	tensor/tensorbase.h 	\
 #utils
 nobase_include_HEADDERS += 	utils/stringify.h			\
 				utils/pow2assert.h			\
-				utils/rodrigues_rotation_matrix.h
+				utils/rodrigues_rotation_matrix.h	\
+				utils/lorentz.h
 
 #polarisation
 nobase_include_HEADDERS +=	polarisation/polarisation_factory_keys.h	\
@@ -34,10 +35,6 @@ nobase_include_HEADDERS += 	kinematic_factors/kinfac_fwd.h		\
 				kinematic_factors/kinematic_factors.h	\
 				kinematic_factors/kinfacbase.h
 
-#NB THIS IS A BAD WAY, ASK ROBERT
-#semble
-nobase_include_HEADDERS += 	semble/semble_vector.h
-
 #
 # Library
 #
@@ -50,7 +47,8 @@ libradmat_a_SOURCES = 		tensor/test_utils.cc			\
 
 #utils
 libradmat_a_SOURCES +=		utils/pow2assert.cc 			\
-				utils/rodrigues_rotation_matrix.cc	
+				utils/rodrigues_rotation_matrix.cc	\
+				utils/lorentz.cc
 
 #polarisation
 libradmat_a_SOURCES +=		polarisation/polarisation_factory_keys.cc	\

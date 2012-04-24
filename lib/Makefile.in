@@ -98,7 +98,7 @@ libradmat_a_AR = $(AR) $(ARFLAGS)
 libradmat_a_LIBADD =
 am_libradmat_a_OBJECTS = test_utils.$(OBJEXT) tensor_algebra.$(OBJEXT) \
 	pow2assert.$(OBJEXT) rodrigues_rotation_matrix.$(OBJEXT) \
-	polarisation_factory_keys.$(OBJEXT) \
+	lorentz.$(OBJEXT) polarisation_factory_keys.$(OBJEXT) \
 	polarisation_factory_inventory.$(OBJEXT) \
 	polarisation_factory.$(OBJEXT) kinfac_key.$(OBJEXT)
 libradmat_a_OBJECTS = $(am_libradmat_a_OBJECTS)
@@ -169,6 +169,10 @@ PACKAGE_URL = @PACKAGE_URL@
 PACKAGE_VERSION = @PACKAGE_VERSION@
 PATH_SEPARATOR = @PATH_SEPARATOR@
 RANLIB = @RANLIB@
+SEMBLE_CONFIG = @SEMBLE_CONFIG@
+SEMBLE_CXXFLAGS = @SEMBLE_CXXFLAGS@
+SEMBLE_LDFLAGS = @SEMBLE_LDFLAGS@
+SEMBLE_LIBS = @SEMBLE_LIBS@
 SET_MAKE = @SET_MAKE@
 SHELL = @SHELL@
 STRIP = @STRIP@
@@ -227,21 +231,18 @@ AM_CXXFLAGS = -I@top_srcdir@/lib		\
 #polarisation
 
 #kinematic_factors
-
-#NB THIS IS A BAD WAY, ASK ROBERT
-#semble
 nobase_include_HEADDERS = tensor/tensorbase.h tensor/tensor_fwd.h \
 	tensor/narray.h tensor/tensor.h tensor/tensor_algebra.h \
 	tensor/test_NArray.h tensor/test_Tensor.h tensor/test_utils.h \
 	tensor/tensor_aux.h utils/stringify.h utils/pow2assert.h \
-	utils/rodrigues_rotation_matrix.h \
+	utils/rodrigues_rotation_matrix.h utils/lorentz.h \
 	polarisation/polarisation_factory_keys.h \
 	polarisation/polarisation_factory_inventory.h \
 	polarisation/polarisation_factory.h \
 	polarisation/polarisationbase.h kinematic_factors/kinfac_fwd.h \
 	kinematic_factors/kinfac_key.h \
 	kinematic_factors/kinematic_factors.h \
-	kinematic_factors/kinfacbase.h semble/semble_vector.h
+	kinematic_factors/kinfacbase.h
 
 #
 # Library
@@ -257,7 +258,7 @@ lib_LIBRARIES = libradmat.a
 #kinematic_factors
 libradmat_a_SOURCES = tensor/test_utils.cc tensor/tensor_algebra.cc \
 	utils/pow2assert.cc utils/rodrigues_rotation_matrix.cc \
-	polarisation/polarisation_factory_keys.cc \
+	utils/lorentz.cc polarisation/polarisation_factory_keys.cc \
 	polarisation/polarisation_factory_inventory.cc \
 	polarisation/polarisation_factory.cc \
 	kinematic_factors/kinfac_key.cc
@@ -338,6 +339,7 @@ distclean-compile:
 	-rm -f *.tab.c
 
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/kinfac_key.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/lorentz.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/polarisation_factory.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/polarisation_factory_inventory.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/polarisation_factory_keys.Po@am__quote@
@@ -415,6 +417,20 @@ rodrigues_rotation_matrix.obj: utils/rodrigues_rotation_matrix.cc
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='utils/rodrigues_rotation_matrix.cc' object='rodrigues_rotation_matrix.obj' libtool=no @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCXX_FALSE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o rodrigues_rotation_matrix.obj `if test -f 'utils/rodrigues_rotation_matrix.cc'; then $(CYGPATH_W) 'utils/rodrigues_rotation_matrix.cc'; else $(CYGPATH_W) '$(srcdir)/utils/rodrigues_rotation_matrix.cc'; fi`
+
+lorentz.o: utils/lorentz.cc
+@am__fastdepCXX_TRUE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT lorentz.o -MD -MP -MF $(DEPDIR)/lorentz.Tpo -c -o lorentz.o `test -f 'utils/lorentz.cc' || echo '$(srcdir)/'`utils/lorentz.cc
+@am__fastdepCXX_TRUE@	$(am__mv) $(DEPDIR)/lorentz.Tpo $(DEPDIR)/lorentz.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='utils/lorentz.cc' object='lorentz.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o lorentz.o `test -f 'utils/lorentz.cc' || echo '$(srcdir)/'`utils/lorentz.cc
+
+lorentz.obj: utils/lorentz.cc
+@am__fastdepCXX_TRUE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT lorentz.obj -MD -MP -MF $(DEPDIR)/lorentz.Tpo -c -o lorentz.obj `if test -f 'utils/lorentz.cc'; then $(CYGPATH_W) 'utils/lorentz.cc'; else $(CYGPATH_W) '$(srcdir)/utils/lorentz.cc'; fi`
+@am__fastdepCXX_TRUE@	$(am__mv) $(DEPDIR)/lorentz.Tpo $(DEPDIR)/lorentz.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='utils/lorentz.cc' object='lorentz.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o lorentz.obj `if test -f 'utils/lorentz.cc'; then $(CYGPATH_W) 'utils/lorentz.cc'; else $(CYGPATH_W) '$(srcdir)/utils/lorentz.cc'; fi`
 
 polarisation_factory_keys.o: polarisation/polarisation_factory_keys.cc
 @am__fastdepCXX_TRUE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT polarisation_factory_keys.o -MD -MP -MF $(DEPDIR)/polarisation_factory_keys.Tpo -c -o polarisation_factory_keys.o `test -f 'polarisation/polarisation_factory_keys.cc' || echo '$(srcdir)/'`polarisation/polarisation_factory_keys.cc

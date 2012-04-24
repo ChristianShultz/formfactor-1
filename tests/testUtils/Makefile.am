@@ -19,9 +19,11 @@ LDADD = @ADAT_LIBS@ @ITPP_LIBS@ @LIBS@ -lradmat
 ##   be built by 'make check' and is not installed.
 #noinst_PROGRAMS = spectrum
 
-check_PROGRAMS = test_RODRIGUES
+check_PROGRAMS = test_RODRIGUES test_LORENTZ
 
-test_RODRIGUES_SOURCES = test_rodrigues.cc
+test_RODRIGUES_SOURCES = test_rodrigues.cc 
+
+test_LORENTZ_SOURCES = test_lorentz.cc
 
 #
 # The following rule will always try to rebuild libadat.a when you 
