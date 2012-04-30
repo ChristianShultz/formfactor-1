@@ -48,7 +48,7 @@ POST_INSTALL = :
 NORMAL_UNINSTALL = :
 PRE_UNINSTALL = :
 POST_UNINSTALL = :
-check_PROGRAMS = test_RODRIGUES$(EXEEXT) test_LORENTZ$(EXEEXT)
+check_PROGRAMS = test_RODRIGUES$(EXEEXT) test_BREIT$(EXEEXT)
 subdir = tests/testUtils
 DIST_COMMON = $(srcdir)/Makefile.am $(srcdir)/Makefile.in
 ACLOCAL_M4 = $(top_srcdir)/aclocal.m4
@@ -59,10 +59,10 @@ am__configure_deps = $(am__aclocal_m4_deps) $(CONFIGURE_DEPENDENCIES) \
 mkinstalldirs = $(install_sh) -d
 CONFIG_CLEAN_FILES =
 CONFIG_CLEAN_VPATH_FILES =
-am_test_LORENTZ_OBJECTS = test_lorentz.$(OBJEXT)
-test_LORENTZ_OBJECTS = $(am_test_LORENTZ_OBJECTS)
-test_LORENTZ_LDADD = $(LDADD)
-test_LORENTZ_DEPENDENCIES =
+am_test_BREIT_OBJECTS = test_breit.$(OBJEXT)
+test_BREIT_OBJECTS = $(am_test_BREIT_OBJECTS)
+test_BREIT_LDADD = $(LDADD)
+test_BREIT_DEPENDENCIES =
 am_test_RODRIGUES_OBJECTS = test_rodrigues.$(OBJEXT)
 test_RODRIGUES_OBJECTS = $(am_test_RODRIGUES_OBJECTS)
 test_RODRIGUES_LDADD = $(LDADD)
@@ -76,8 +76,8 @@ CXXCOMPILE = $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) \
 CXXLD = $(CXX)
 CXXLINK = $(CXXLD) $(AM_CXXFLAGS) $(CXXFLAGS) $(AM_LDFLAGS) $(LDFLAGS) \
 	-o $@
-SOURCES = $(test_LORENTZ_SOURCES) $(test_RODRIGUES_SOURCES)
-DIST_SOURCES = $(test_LORENTZ_SOURCES) $(test_RODRIGUES_SOURCES)
+SOURCES = $(test_BREIT_SOURCES) $(test_RODRIGUES_SOURCES)
+DIST_SOURCES = $(test_BREIT_SOURCES) $(test_RODRIGUES_SOURCES)
 am__can_run_installinfo = \
   case $$AM_UPDATE_INFO_DIR in \
     n|no|NO) false;; \
@@ -197,7 +197,7 @@ AM_LDFLAGS = -L@top_builddir@/lib \
 
 LDADD = @ADAT_LIBS@ @ITPP_LIBS@ @LIBS@ -lradmat
 test_RODRIGUES_SOURCES = test_rodrigues.cc 
-test_LORENTZ_SOURCES = test_lorentz.cc
+test_BREIT_SOURCES = test_breit.cc
 
 #
 # The following rule will always try to rebuild libadat.a when you 
@@ -242,9 +242,9 @@ $(am__aclocal_m4_deps):
 
 clean-checkPROGRAMS:
 	-test -z "$(check_PROGRAMS)" || rm -f $(check_PROGRAMS)
-test_LORENTZ$(EXEEXT): $(test_LORENTZ_OBJECTS) $(test_LORENTZ_DEPENDENCIES) $(EXTRA_test_LORENTZ_DEPENDENCIES) 
-	@rm -f test_LORENTZ$(EXEEXT)
-	$(CXXLINK) $(test_LORENTZ_OBJECTS) $(test_LORENTZ_LDADD) $(LIBS)
+test_BREIT$(EXEEXT): $(test_BREIT_OBJECTS) $(test_BREIT_DEPENDENCIES) $(EXTRA_test_BREIT_DEPENDENCIES) 
+	@rm -f test_BREIT$(EXEEXT)
+	$(CXXLINK) $(test_BREIT_OBJECTS) $(test_BREIT_LDADD) $(LIBS)
 test_RODRIGUES$(EXEEXT): $(test_RODRIGUES_OBJECTS) $(test_RODRIGUES_DEPENDENCIES) $(EXTRA_test_RODRIGUES_DEPENDENCIES) 
 	@rm -f test_RODRIGUES$(EXEEXT)
 	$(CXXLINK) $(test_RODRIGUES_OBJECTS) $(test_RODRIGUES_LDADD) $(LIBS)
@@ -255,7 +255,7 @@ mostlyclean-compile:
 distclean-compile:
 	-rm -f *.tab.c
 
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/test_lorentz.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/test_breit.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/test_rodrigues.Po@am__quote@
 
 .cc.o:

@@ -3,16 +3,15 @@
 // Tuesday, April  3 2012
 //
 
-#include "tensor/tensorbase.h"
-#include "polarisation/polarisationbase.h"
-#include "utils/rodrigues_rotation_matrix.h"
-#include "utils/pow2assert.h"
+#include "radmat/tensor/tensorbase.h"
+#include "radmat/polarisation/polarisationbase.h"
+#include "radmat/utils/breit_frame.h"
+#include "radmat/utils/pow2assert.h"
 #include "hadron/clebsch.h"
-#include "tensor/test_utils.h"
+#include "radmat/tensor/test_utils.h"
 
-using namespace tensor;
-using namespace polarisation;
-
+using namespace radmat;
+using namespace radmat::breit;
 
 int 
 main(void)
@@ -62,7 +61,7 @@ main(void)
 
       // get the one from the factory
       pFacKey P2_z(p_z,2,HELICITY);
-      Tensor<std::complex<double> , 2> p2z = castAndDeref<std::complex<double>,2 >( factory.get(P2_z) );
+      Tensor<std::complex<double> , 2> p2z = downcastAndDeref<Tensor<std::complex<double>,2 >, TensorImplBase>( factory.get(P2_z) );
       Tensor<std::complex<double> , 2> fake;
       std::vector<idx_t> dimfake(2,4);
       fake.create(&dimfake[0]);

@@ -4,12 +4,12 @@
 //
 
 
-#include "tensor/test_Tensor.h"
+#include "radmat/tensor/test_Tensor.h"
 
 #include <iostream>
 #include <complex>
 
-using namespace tensor;
+using namespace radmat;
 
 
 int 

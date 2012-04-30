@@ -3,11 +3,11 @@
 // Friday, March 30 2012
 //
 
-#include "tensor/tensorbase.h"
-#include "utils/pow2assert.h"
+#include "radmat/tensor/tensorbase.h"
+#include "radmat/utils/pow2assert.h"
 #include <iostream>
 
-using namespace tensor;
+using namespace radmat;
 
 int factorial(int n)
 {

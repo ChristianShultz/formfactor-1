@@ -161,7 +161,7 @@ AC_CONFIG_FILES(tests/testTensor/Makefile)
 AC_CONFIG_FILES(tests/testADATClebsch/Makefile)
 AC_CONFIG_FILES(tests/testUtils/Makefile)
 AC_CONFIG_FILES(tests/testPolarisation/Makefile)
-AC_CONFIG_FILES(tests/testKinfac/Makefile)
+
 #
 # Finish
 #

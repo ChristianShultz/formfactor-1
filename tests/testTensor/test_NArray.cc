@@ -5,11 +5,11 @@
 
 
 #include <complex>
-#include "tensor/test_NArray.h"
+#include "radmat/tensor/test_NArray.h"
 
 
 
-using namespace tensor;
+using namespace radmat;
 
 int 
 main(void)

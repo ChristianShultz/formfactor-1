@@ -4,7 +4,7 @@
 //
 
 #include "hadron/clebsch.h"
-#include "utils/pow2assert.h"
+#include "radmat/utils/pow2assert.h"
 #include <iostream>
 
 using namespace Hadron;
@@ -12,6 +12,6 @@ using namespace Hadron;
 int 
 main(void)
 {
-  POW2_ASSERT(clebsch(1,1,1,1,2,2) == 1.);
+  POW2_ASSERT( clebsch(1,1,1,1,2,2) == 1.);
   std::cout << "Adat clebsch successfully linked and tested" << std::endl;
 }

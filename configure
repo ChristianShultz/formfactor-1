@@ -4120,7 +4120,6 @@ ac_config_files="$ac_config_files tests/testUtils/Makefile"
 
 ac_config_files="$ac_config_files tests/testPolarisation/Makefile"
 
-ac_config_files="$ac_config_files tests/testKinfac/Makefile"
 
 #
 # Finish
@@ -4891,7 +4890,6 @@ do
     "tests/testADATClebsch/Makefile") CONFIG_FILES="$CONFIG_FILES tests/testADATClebsch/Makefile" ;;
     "tests/testUtils/Makefile") CONFIG_FILES="$CONFIG_FILES tests/testUtils/Makefile" ;;
     "tests/testPolarisation/Makefile") CONFIG_FILES="$CONFIG_FILES tests/testPolarisation/Makefile" ;;
-    "tests/testKinfac/Makefile") CONFIG_FILES="$CONFIG_FILES tests/testKinfac/Makefile" ;;
 
   *) as_fn_error $? "invalid argument: \`$ac_config_target'" "$LINENO" 5;;
   esac

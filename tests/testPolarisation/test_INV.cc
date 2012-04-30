@@ -3,11 +3,12 @@
 // Monday, April  2 2012
 //
 
-#include "polarisation/polarisationbase.h"
-#include "tensor/tensorbase.h";
+#include "radmat/polarisation/polarisationbase.h"
+#include "radmat/tensor/tensorbase.h"
+#include "radmat/utils/breit_frame.h"
 
-using namespace tensor;
-using namespace polarisation;
+using namespace radmat;
+using namespace radmat::breit;
 
 int
 main(void)
@@ -49,9 +50,9 @@ main(void)
   eps_z = c_z();
   eps = c();
 
-  polarisation::pFacInv::pFacInvRegister(k,eps);
+  pFacInv::pFacInvRegister(k,eps);
   
-  polarisation::pFacInv::dumpInventory();
+  pFacInv::dumpInventory();
 
   std::cout << "results of test_INV in pFacInvDump.log " << std::endl;
 

@@ -6,34 +6,32 @@ AM_CXXFLAGS = 	-I@top_srcdir@/lib		\
 		@CXXFLAGS@ @ADAT_CXXFLAGS@ @ITPP_CXXFLAGS@
 
 #tensor
-nobase_include_HEADDERS = 	tensor/tensorbase.h 	\
-				tensor/tensor_fwd.h	\
-				tensor/narray.h		\
-				tensor/tensor.h		\
-				tensor/tensor_algebra.h	\
-				tensor/test_NArray.h	\
-				tensor/test_Tensor.h	\
-				tensor/test_utils.h	\
-				tensor/tensor_aux.h
+nobase_include_HEADERS = 	radmat/tensor/tensorbase.h 	\
+				radmat/tensor/tensor_fwd.h	\
+				radmat/tensor/narray.h		\
+				radmat/tensor/tensor.h		\
+				radmat/tensor/tensor_algebra.h	\
+				radmat/tensor/test_NArray.h	\
+				radmat/tensor/test_Tensor.h	\
+				radmat/tensor/test_utils.h	
 
 
 #utils
-nobase_include_HEADDERS += 	utils/stringify.h			\
-				utils/pow2assert.h			\
-				utils/rodrigues_rotation_matrix.h	\
-				utils/lorentz.h
+nobase_include_HEADERS += 	radmat/utils/stringify.h			\
+				radmat/utils/pow2assert.h			\
+				radmat/utils/breit_frame.h			\
+				radmat/utils/wigner.h 				\
+				radmat/utils/euler_angles.h			\
+				radmat/utils/perThreadStorage.h			\
+				radmat/utils/aux.h
 
 #polarisation
-nobase_include_HEADDERS +=	polarisation/polarisation_factory_keys.h	\
-				polarisation/polarisation_factory_inventory.h	\
-				polarisation/polarisation_factory.h		\
-				polarisation/polarisationbase.h
+nobase_include_HEADERS +=	radmat/polarisation/polarisation_factory_keys.h	\
+				radmat/polarisation/polarisation_factory_inventory.h	\
+				radmat/polarisation/polarisation_factory.h		\
+				radmat/polarisation/polarisationbase.h
 
-#kinematic_factors
-nobase_include_HEADDERS += 	kinematic_factors/kinfac_fwd.h		\
-				kinematic_factors/kinfac_key.h		\
-				kinematic_factors/kinematic_factors.h	\
-				kinematic_factors/kinfacbase.h
+
 
 #
 # Library
@@ -42,18 +40,17 @@ nobase_include_HEADDERS += 	kinematic_factors/kinfac_fwd.h		\
 lib_LIBRARIES = libradmat.a
 
 #tensor
-libradmat_a_SOURCES = 		tensor/test_utils.cc			\
-				tensor/tensor_algebra.cc
+libradmat_a_SOURCES = 		radmat/tensor/test_utils.cc			\
+				radmat/tensor/tensor_algebra.cc
 
 #utils
-libradmat_a_SOURCES +=		utils/pow2assert.cc 			\
-				utils/rodrigues_rotation_matrix.cc	\
-				utils/lorentz.cc
+libradmat_a_SOURCES +=		radmat/utils/pow2assert.cc 			\
+				radmat/utils/breit_frame.cc			\
+				radmat/utils/wigner.cc				\
+				radmat/utils/euler_angles.cc
 
 #polarisation
-libradmat_a_SOURCES +=		polarisation/polarisation_factory_keys.cc	\
-				polarisation/polarisation_factory_inventory.cc	\
-				polarisation/polarisation_factory.cc
+libradmat_a_SOURCES +=		radmat/polarisation/polarisation_factory_keys.cc	\
+				radmat/polarisation/polarisation_factory_inventory.cc	\
+				radmat/polarisation/polarisation_factory.cc
 
-#kinematic_factors
-libradmat_a_SOURCES += 		kinematic_factors/kinfac_key.cc

@@ -6,5 +6,4 @@
 SUBDIRS = 	testTensor 	\
 		testADATClebsch	\
 	 	testUtils 	\
-		testPolarisation\
-		testKinFac
+		testPolarisation

@@ -3,9 +3,9 @@
 // Friday, March 30 2012
 //
 
-#include "tensor/tensorbase.h"
+#include "radmat/tensor/tensorbase.h"
 
-using namespace tensor;
+using namespace radmat;
 
 int
 main(void)

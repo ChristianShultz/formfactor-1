@@ -4,7 +4,7 @@
 AM_CXXFLAGS = -I@top_srcdir@/lib \
                @CXXFLAGS@ @ADAT_CXXFLAGS@ @ITPP_CXXFLAGS@ 
 
-AM_LDFLAGS  = -L@top_builddir@/lib \
+AM_LDFLAGS  = -L@top_builddir@/lib/ \
                @LDFLAGS@ @ADAT_LDFLAGS@
 
 LDADD = @ADAT_LIBS@ @ITPP_LIBS@ @LIBS@ -lradmat

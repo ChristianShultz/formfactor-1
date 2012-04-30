@@ -5,9 +5,10 @@
 
 #include <iostream>
 #include "itpp/itbase.h"
-#include "utils/rodrigues_rotation_matrix.h"
-#include "utils/pow2assert.h"
+#include "radmat/utils/breit_frame.h"
+#include "radmat/utils/pow2assert.h"
 
+using namespace radmat::breit;
 
 int 
 main(void)
@@ -27,8 +28,9 @@ main(void)
     POW2_ASSERT(fabs(rot(i) - (R*orig)(i)) < 1e-15);
 
 
-  // test a rotation by pi
+  // test a reflection
   rot = -orig;
+  std::cout << "You should see a warning about an improper rotation " << std::endl;
   R = rodRotMat(orig,rot);
   
   std::cout << "Rodrigues Rotation Matrix test successful" << std::endl;

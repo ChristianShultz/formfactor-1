@@ -3,17 +3,16 @@
 // Monday, April  2 2012
 //
 
-#include "polarisation/polarisationbase.h"
-#include "tensor/tensorbase.h"
-#include "tensor/test_utils.h"
-#include "utils/pow2assert.h"
-#include "utils/rodrigues_rotation_matrix.h"
+#include "radmat/polarisation/polarisationbase.h"
+#include "radmat/tensor/tensorbase.h"
+#include "radmat/tensor/test_utils.h"
+#include "radmat/utils/pow2assert.h"
+#include "radmat/utils/breit_frame.h"
 #include "itpp/itbase.h"
 #include <iostream>
 
 
-using namespace tensor;
-using namespace polarisation;
+using namespace radmat;
 
 int 
 C1(void)
@@ -53,7 +52,7 @@ C1(void)
 			pmu[3]*pmu[3]
 			);
 
-	  itpp::Mat<double> R = rodRotMat(p_z,pmu);
+	  itpp::Mat<double> R = breit::rodRotMat(p_z,pmu);
 
 	  for(idx_t i = 0; i < 3; ++i)
 	    {
@@ -139,7 +138,7 @@ factory(void)
 			pmu[3]*pmu[3]
 			);
 
-	  itpp::Mat<double> R = rodRotMat(p_z,pmu);
+	  itpp::Mat<double> R = breit::rodRotMat(p_z,pmu);
 
 	  for(idx_t i = 0; i < 3; ++i)
 	    {
@@ -149,8 +148,8 @@ factory(void)
 
       
 	  Tensor<std::complex<double> ,1 > e,e_z, er;
-	  e = castAndDeref<std::complex<double> ,1 >( factory.get(k) );
-	  e_z = castAndDeref<std::complex<double> ,1 >( factory.get(k_z) );
+	  e = downcastAndDeref<Tensor<std::complex<double> ,1 >, TensorImplBase>( factory.get(k) );
+	  e_z = downcastAndDeref<Tensor<std::complex<double> ,1 >, TensorImplBase>( factory.get(k_z) );
 	  er = e_z;
 
 	  for(idx_t i = 0; i < 3; ++i)

@@ -213,8 +213,7 @@ top_srcdir = @top_srcdir@
 SUBDIRS = testTensor 	\
 		testADATClebsch	\
 	 	testUtils 	\
-		testPolarisation\
-		testKinFac
+		testPolarisation
 
 all: all-recursive
 
