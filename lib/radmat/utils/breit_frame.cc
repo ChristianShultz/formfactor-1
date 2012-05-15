@@ -5,7 +5,7 @@
 
 #include "breit_frame.h"
 #include "itpp/itbase.h"
-#include "radmat/tensor/tensor.h"
+#include "tensor.h"
 
 using namespace std;
 using namespace itpp;
@@ -347,11 +347,9 @@ namespace breit
 
     itpp::Mat<double> rodRotMat(const Tensor<double, 1> &r, bool pz)
     {
-        Tensor<double, 1> z;
-        z.create(std::vector<idx_t>(1, 4));
-        z[0] = z[1] = z[2] = 0.;
-        z[3] = pz ? 1. : -1.;
-        return rodRotMat(z, r);
+      Tensor<double, 1> z(TensorShape<1>()[4],0.);
+      z[3] = pz ? 1. : -1.;
+      return rodRotMat(z, r);
     }
 
 } // close breit namespace

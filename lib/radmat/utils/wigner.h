@@ -5,7 +5,7 @@
 #include <complex>
 #include "semble/semble_meta.h"
 #include "euler_angles.h"
-#include "radmat/tensor/tensor.h"
+#include "tensor.h"
 #include "itpp/itbase.h"
 
 namespace radmat

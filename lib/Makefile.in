@@ -98,11 +98,8 @@ AR = ar
 ARFLAGS = cru
 libradmat_a_AR = $(AR) $(ARFLAGS)
 libradmat_a_LIBADD =
-am_libradmat_a_OBJECTS = test_utils.$(OBJEXT) tensor_algebra.$(OBJEXT) \
-	pow2assert.$(OBJEXT) breit_frame.$(OBJEXT) wigner.$(OBJEXT) \
-	euler_angles.$(OBJEXT) polarisation_factory_keys.$(OBJEXT) \
-	polarisation_factory_inventory.$(OBJEXT) \
-	polarisation_factory.$(OBJEXT)
+am_libradmat_a_OBJECTS = breit_frame.$(OBJEXT) euler_angles.$(OBJEXT) \
+	pow2assert.$(OBJEXT) wigner.$(OBJEXT) tensor.$(OBJEXT)
 libradmat_a_OBJECTS = $(am_libradmat_a_OBJECTS)
 DEFAULT_INCLUDES = -I.@am__isrc@
 depcomp = $(SHELL) $(top_srcdir)/config/depcomp
@@ -227,41 +224,26 @@ AM_CXXFLAGS = -I@top_srcdir@/lib		\
 		@CXXFLAGS@ @ADAT_CXXFLAGS@ @ITPP_CXXFLAGS@
 
 
-#tensor
-
 #utils
 
-#polarisation
-nobase_include_HEADERS = radmat/tensor/tensorbase.h \
-	radmat/tensor/tensor_fwd.h radmat/tensor/narray.h \
-	radmat/tensor/tensor.h radmat/tensor/tensor_algebra.h \
-	radmat/tensor/test_NArray.h radmat/tensor/test_Tensor.h \
-	radmat/tensor/test_utils.h radmat/utils/stringify.h \
-	radmat/utils/pow2assert.h radmat/utils/breit_frame.h \
-	radmat/utils/wigner.h radmat/utils/euler_angles.h \
-	radmat/utils/perThreadStorage.h radmat/utils/aux.h \
-	radmat/polarisation/polarisation_factory_keys.h \
-	radmat/polarisation/polarisation_factory_inventory.h \
-	radmat/polarisation/polarisation_factory.h \
-	radmat/polarisation/polarisationbase.h
+#lorentz_ff
+nobase_include_HEADERS = radmat/utils/aux.h radmat/utils/breit_frame.h \
+	radmat/utils/euler_angles.h radmat/utils/lorentz.h \
+	radmat/utils/perThreadStorage.h \
+	radmat/utils/polarisation_tensors.h radmat/utils/pow2assert.h \
+	radmat/utils/stringify.h radmat/utils/tensor.h \
+	radmat/utils/wigner.h radmat/lorentz_ff/ff_base.h \
+	radmat/lorentz_ff/ff_llsq_row.h radmat/lorentz_ff/ff_loader.h \
+	radmat/lorentz_ff/formfac/fake.h \
+	radmat/lorentz_ff/formfac/ff_0p0p.h
 
 #
 # Library
 #
 lib_LIBRARIES = libradmat.a
 
-#tensor
-
 #utils
-
-#polarisation
-libradmat_a_SOURCES = radmat/tensor/test_utils.cc \
-	radmat/tensor/tensor_algebra.cc radmat/utils/pow2assert.cc \
-	radmat/utils/breit_frame.cc radmat/utils/wigner.cc \
-	radmat/utils/euler_angles.cc \
-	radmat/polarisation/polarisation_factory_keys.cc \
-	radmat/polarisation/polarisation_factory_inventory.cc \
-	radmat/polarisation/polarisation_factory.cc
+libradmat_a_SOURCES = radmat/utils/breit_frame.cc radmat/utils/euler_angles.cc radmat/utils/pow2assert.cc radmat/utils/wigner.cc radmat/utils/tensor.cc
 all: all-am
 
 .SUFFIXES:
@@ -340,12 +322,8 @@ distclean-compile:
 
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/breit_frame.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/euler_angles.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/polarisation_factory.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/polarisation_factory_inventory.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/polarisation_factory_keys.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/pow2assert.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/tensor_algebra.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/test_utils.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/tensor.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/wigner.Po@am__quote@
 
 .cc.o:
@@ -362,48 +340,6 @@ distclean-compile:
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCXX_FALSE@	$(CXXCOMPILE) -c -o $@ `$(CYGPATH_W) '$<'`
 
-test_utils.o: radmat/tensor/test_utils.cc
-@am__fastdepCXX_TRUE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT test_utils.o -MD -MP -MF $(DEPDIR)/test_utils.Tpo -c -o test_utils.o `test -f 'radmat/tensor/test_utils.cc' || echo '$(srcdir)/'`radmat/tensor/test_utils.cc
-@am__fastdepCXX_TRUE@	$(am__mv) $(DEPDIR)/test_utils.Tpo $(DEPDIR)/test_utils.Po
-@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='radmat/tensor/test_utils.cc' object='test_utils.o' libtool=no @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCXX_FALSE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o test_utils.o `test -f 'radmat/tensor/test_utils.cc' || echo '$(srcdir)/'`radmat/tensor/test_utils.cc
-
-test_utils.obj: radmat/tensor/test_utils.cc
-@am__fastdepCXX_TRUE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT test_utils.obj -MD -MP -MF $(DEPDIR)/test_utils.Tpo -c -o test_utils.obj `if test -f 'radmat/tensor/test_utils.cc'; then $(CYGPATH_W) 'radmat/tensor/test_utils.cc'; else $(CYGPATH_W) '$(srcdir)/radmat/tensor/test_utils.cc'; fi`
-@am__fastdepCXX_TRUE@	$(am__mv) $(DEPDIR)/test_utils.Tpo $(DEPDIR)/test_utils.Po
-@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='radmat/tensor/test_utils.cc' object='test_utils.obj' libtool=no @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCXX_FALSE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o test_utils.obj `if test -f 'radmat/tensor/test_utils.cc'; then $(CYGPATH_W) 'radmat/tensor/test_utils.cc'; else $(CYGPATH_W) '$(srcdir)/radmat/tensor/test_utils.cc'; fi`
-
-tensor_algebra.o: radmat/tensor/tensor_algebra.cc
-@am__fastdepCXX_TRUE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT tensor_algebra.o -MD -MP -MF $(DEPDIR)/tensor_algebra.Tpo -c -o tensor_algebra.o `test -f 'radmat/tensor/tensor_algebra.cc' || echo '$(srcdir)/'`radmat/tensor/tensor_algebra.cc
-@am__fastdepCXX_TRUE@	$(am__mv) $(DEPDIR)/tensor_algebra.Tpo $(DEPDIR)/tensor_algebra.Po
-@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='radmat/tensor/tensor_algebra.cc' object='tensor_algebra.o' libtool=no @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCXX_FALSE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o tensor_algebra.o `test -f 'radmat/tensor/tensor_algebra.cc' || echo '$(srcdir)/'`radmat/tensor/tensor_algebra.cc
-
-tensor_algebra.obj: radmat/tensor/tensor_algebra.cc
-@am__fastdepCXX_TRUE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT tensor_algebra.obj -MD -MP -MF $(DEPDIR)/tensor_algebra.Tpo -c -o tensor_algebra.obj `if test -f 'radmat/tensor/tensor_algebra.cc'; then $(CYGPATH_W) 'radmat/tensor/tensor_algebra.cc'; else $(CYGPATH_W) '$(srcdir)/radmat/tensor/tensor_algebra.cc'; fi`
-@am__fastdepCXX_TRUE@	$(am__mv) $(DEPDIR)/tensor_algebra.Tpo $(DEPDIR)/tensor_algebra.Po
-@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='radmat/tensor/tensor_algebra.cc' object='tensor_algebra.obj' libtool=no @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCXX_FALSE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o tensor_algebra.obj `if test -f 'radmat/tensor/tensor_algebra.cc'; then $(CYGPATH_W) 'radmat/tensor/tensor_algebra.cc'; else $(CYGPATH_W) '$(srcdir)/radmat/tensor/tensor_algebra.cc'; fi`
-
-pow2assert.o: radmat/utils/pow2assert.cc
-@am__fastdepCXX_TRUE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT pow2assert.o -MD -MP -MF $(DEPDIR)/pow2assert.Tpo -c -o pow2assert.o `test -f 'radmat/utils/pow2assert.cc' || echo '$(srcdir)/'`radmat/utils/pow2assert.cc
-@am__fastdepCXX_TRUE@	$(am__mv) $(DEPDIR)/pow2assert.Tpo $(DEPDIR)/pow2assert.Po
-@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='radmat/utils/pow2assert.cc' object='pow2assert.o' libtool=no @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCXX_FALSE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o pow2assert.o `test -f 'radmat/utils/pow2assert.cc' || echo '$(srcdir)/'`radmat/utils/pow2assert.cc
-
-pow2assert.obj: radmat/utils/pow2assert.cc
-@am__fastdepCXX_TRUE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT pow2assert.obj -MD -MP -MF $(DEPDIR)/pow2assert.Tpo -c -o pow2assert.obj `if test -f 'radmat/utils/pow2assert.cc'; then $(CYGPATH_W) 'radmat/utils/pow2assert.cc'; else $(CYGPATH_W) '$(srcdir)/radmat/utils/pow2assert.cc'; fi`
-@am__fastdepCXX_TRUE@	$(am__mv) $(DEPDIR)/pow2assert.Tpo $(DEPDIR)/pow2assert.Po
-@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='radmat/utils/pow2assert.cc' object='pow2assert.obj' libtool=no @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCXX_FALSE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o pow2assert.obj `if test -f 'radmat/utils/pow2assert.cc'; then $(CYGPATH_W) 'radmat/utils/pow2assert.cc'; else $(CYGPATH_W) '$(srcdir)/radmat/utils/pow2assert.cc'; fi`
-
 breit_frame.o: radmat/utils/breit_frame.cc
 @am__fastdepCXX_TRUE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT breit_frame.o -MD -MP -MF $(DEPDIR)/breit_frame.Tpo -c -o breit_frame.o `test -f 'radmat/utils/breit_frame.cc' || echo '$(srcdir)/'`radmat/utils/breit_frame.cc
 @am__fastdepCXX_TRUE@	$(am__mv) $(DEPDIR)/breit_frame.Tpo $(DEPDIR)/breit_frame.Po
@@ -417,20 +353,6 @@ breit_frame.obj: radmat/utils/breit_frame.cc
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='radmat/utils/breit_frame.cc' object='breit_frame.obj' libtool=no @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCXX_FALSE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o breit_frame.obj `if test -f 'radmat/utils/breit_frame.cc'; then $(CYGPATH_W) 'radmat/utils/breit_frame.cc'; else $(CYGPATH_W) '$(srcdir)/radmat/utils/breit_frame.cc'; fi`
-
-wigner.o: radmat/utils/wigner.cc
-@am__fastdepCXX_TRUE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT wigner.o -MD -MP -MF $(DEPDIR)/wigner.Tpo -c -o wigner.o `test -f 'radmat/utils/wigner.cc' || echo '$(srcdir)/'`radmat/utils/wigner.cc
-@am__fastdepCXX_TRUE@	$(am__mv) $(DEPDIR)/wigner.Tpo $(DEPDIR)/wigner.Po
-@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='radmat/utils/wigner.cc' object='wigner.o' libtool=no @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCXX_FALSE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o wigner.o `test -f 'radmat/utils/wigner.cc' || echo '$(srcdir)/'`radmat/utils/wigner.cc
-
-wigner.obj: radmat/utils/wigner.cc
-@am__fastdepCXX_TRUE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT wigner.obj -MD -MP -MF $(DEPDIR)/wigner.Tpo -c -o wigner.obj `if test -f 'radmat/utils/wigner.cc'; then $(CYGPATH_W) 'radmat/utils/wigner.cc'; else $(CYGPATH_W) '$(srcdir)/radmat/utils/wigner.cc'; fi`
-@am__fastdepCXX_TRUE@	$(am__mv) $(DEPDIR)/wigner.Tpo $(DEPDIR)/wigner.Po
-@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='radmat/utils/wigner.cc' object='wigner.obj' libtool=no @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCXX_FALSE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o wigner.obj `if test -f 'radmat/utils/wigner.cc'; then $(CYGPATH_W) 'radmat/utils/wigner.cc'; else $(CYGPATH_W) '$(srcdir)/radmat/utils/wigner.cc'; fi`
 
 euler_angles.o: radmat/utils/euler_angles.cc
 @am__fastdepCXX_TRUE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT euler_angles.o -MD -MP -MF $(DEPDIR)/euler_angles.Tpo -c -o euler_angles.o `test -f 'radmat/utils/euler_angles.cc' || echo '$(srcdir)/'`radmat/utils/euler_angles.cc
@@ -446,47 +368,47 @@ euler_angles.obj: radmat/utils/euler_angles.cc
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCXX_FALSE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o euler_angles.obj `if test -f 'radmat/utils/euler_angles.cc'; then $(CYGPATH_W) 'radmat/utils/euler_angles.cc'; else $(CYGPATH_W) '$(srcdir)/radmat/utils/euler_angles.cc'; fi`
 
-polarisation_factory_keys.o: radmat/polarisation/polarisation_factory_keys.cc
-@am__fastdepCXX_TRUE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT polarisation_factory_keys.o -MD -MP -MF $(DEPDIR)/polarisation_factory_keys.Tpo -c -o polarisation_factory_keys.o `test -f 'radmat/polarisation/polarisation_factory_keys.cc' || echo '$(srcdir)/'`radmat/polarisation/polarisation_factory_keys.cc
-@am__fastdepCXX_TRUE@	$(am__mv) $(DEPDIR)/polarisation_factory_keys.Tpo $(DEPDIR)/polarisation_factory_keys.Po
-@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='radmat/polarisation/polarisation_factory_keys.cc' object='polarisation_factory_keys.o' libtool=no @AMDEPBACKSLASH@
+pow2assert.o: radmat/utils/pow2assert.cc
+@am__fastdepCXX_TRUE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT pow2assert.o -MD -MP -MF $(DEPDIR)/pow2assert.Tpo -c -o pow2assert.o `test -f 'radmat/utils/pow2assert.cc' || echo '$(srcdir)/'`radmat/utils/pow2assert.cc
+@am__fastdepCXX_TRUE@	$(am__mv) $(DEPDIR)/pow2assert.Tpo $(DEPDIR)/pow2assert.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='radmat/utils/pow2assert.cc' object='pow2assert.o' libtool=no @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCXX_FALSE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o polarisation_factory_keys.o `test -f 'radmat/polarisation/polarisation_factory_keys.cc' || echo '$(srcdir)/'`radmat/polarisation/polarisation_factory_keys.cc
+@am__fastdepCXX_FALSE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o pow2assert.o `test -f 'radmat/utils/pow2assert.cc' || echo '$(srcdir)/'`radmat/utils/pow2assert.cc
 
-polarisation_factory_keys.obj: radmat/polarisation/polarisation_factory_keys.cc
-@am__fastdepCXX_TRUE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT polarisation_factory_keys.obj -MD -MP -MF $(DEPDIR)/polarisation_factory_keys.Tpo -c -o polarisation_factory_keys.obj `if test -f 'radmat/polarisation/polarisation_factory_keys.cc'; then $(CYGPATH_W) 'radmat/polarisation/polarisation_factory_keys.cc'; else $(CYGPATH_W) '$(srcdir)/radmat/polarisation/polarisation_factory_keys.cc'; fi`
-@am__fastdepCXX_TRUE@	$(am__mv) $(DEPDIR)/polarisation_factory_keys.Tpo $(DEPDIR)/polarisation_factory_keys.Po
-@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='radmat/polarisation/polarisation_factory_keys.cc' object='polarisation_factory_keys.obj' libtool=no @AMDEPBACKSLASH@
+pow2assert.obj: radmat/utils/pow2assert.cc
+@am__fastdepCXX_TRUE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT pow2assert.obj -MD -MP -MF $(DEPDIR)/pow2assert.Tpo -c -o pow2assert.obj `if test -f 'radmat/utils/pow2assert.cc'; then $(CYGPATH_W) 'radmat/utils/pow2assert.cc'; else $(CYGPATH_W) '$(srcdir)/radmat/utils/pow2assert.cc'; fi`
+@am__fastdepCXX_TRUE@	$(am__mv) $(DEPDIR)/pow2assert.Tpo $(DEPDIR)/pow2assert.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='radmat/utils/pow2assert.cc' object='pow2assert.obj' libtool=no @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCXX_FALSE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o polarisation_factory_keys.obj `if test -f 'radmat/polarisation/polarisation_factory_keys.cc'; then $(CYGPATH_W) 'radmat/polarisation/polarisation_factory_keys.cc'; else $(CYGPATH_W) '$(srcdir)/radmat/polarisation/polarisation_factory_keys.cc'; fi`
+@am__fastdepCXX_FALSE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o pow2assert.obj `if test -f 'radmat/utils/pow2assert.cc'; then $(CYGPATH_W) 'radmat/utils/pow2assert.cc'; else $(CYGPATH_W) '$(srcdir)/radmat/utils/pow2assert.cc'; fi`
 
-polarisation_factory_inventory.o: radmat/polarisation/polarisation_factory_inventory.cc
-@am__fastdepCXX_TRUE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT polarisation_factory_inventory.o -MD -MP -MF $(DEPDIR)/polarisation_factory_inventory.Tpo -c -o polarisation_factory_inventory.o `test -f 'radmat/polarisation/polarisation_factory_inventory.cc' || echo '$(srcdir)/'`radmat/polarisation/polarisation_factory_inventory.cc
-@am__fastdepCXX_TRUE@	$(am__mv) $(DEPDIR)/polarisation_factory_inventory.Tpo $(DEPDIR)/polarisation_factory_inventory.Po
-@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='radmat/polarisation/polarisation_factory_inventory.cc' object='polarisation_factory_inventory.o' libtool=no @AMDEPBACKSLASH@
+wigner.o: radmat/utils/wigner.cc
+@am__fastdepCXX_TRUE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT wigner.o -MD -MP -MF $(DEPDIR)/wigner.Tpo -c -o wigner.o `test -f 'radmat/utils/wigner.cc' || echo '$(srcdir)/'`radmat/utils/wigner.cc
+@am__fastdepCXX_TRUE@	$(am__mv) $(DEPDIR)/wigner.Tpo $(DEPDIR)/wigner.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='radmat/utils/wigner.cc' object='wigner.o' libtool=no @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCXX_FALSE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o polarisation_factory_inventory.o `test -f 'radmat/polarisation/polarisation_factory_inventory.cc' || echo '$(srcdir)/'`radmat/polarisation/polarisation_factory_inventory.cc
+@am__fastdepCXX_FALSE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o wigner.o `test -f 'radmat/utils/wigner.cc' || echo '$(srcdir)/'`radmat/utils/wigner.cc
 
-polarisation_factory_inventory.obj: radmat/polarisation/polarisation_factory_inventory.cc
-@am__fastdepCXX_TRUE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT polarisation_factory_inventory.obj -MD -MP -MF $(DEPDIR)/polarisation_factory_inventory.Tpo -c -o polarisation_factory_inventory.obj `if test -f 'radmat/polarisation/polarisation_factory_inventory.cc'; then $(CYGPATH_W) 'radmat/polarisation/polarisation_factory_inventory.cc'; else $(CYGPATH_W) '$(srcdir)/radmat/polarisation/polarisation_factory_inventory.cc'; fi`
-@am__fastdepCXX_TRUE@	$(am__mv) $(DEPDIR)/polarisation_factory_inventory.Tpo $(DEPDIR)/polarisation_factory_inventory.Po
-@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='radmat/polarisation/polarisation_factory_inventory.cc' object='polarisation_factory_inventory.obj' libtool=no @AMDEPBACKSLASH@
+wigner.obj: radmat/utils/wigner.cc
+@am__fastdepCXX_TRUE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT wigner.obj -MD -MP -MF $(DEPDIR)/wigner.Tpo -c -o wigner.obj `if test -f 'radmat/utils/wigner.cc'; then $(CYGPATH_W) 'radmat/utils/wigner.cc'; else $(CYGPATH_W) '$(srcdir)/radmat/utils/wigner.cc'; fi`
+@am__fastdepCXX_TRUE@	$(am__mv) $(DEPDIR)/wigner.Tpo $(DEPDIR)/wigner.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='radmat/utils/wigner.cc' object='wigner.obj' libtool=no @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCXX_FALSE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o polarisation_factory_inventory.obj `if test -f 'radmat/polarisation/polarisation_factory_inventory.cc'; then $(CYGPATH_W) 'radmat/polarisation/polarisation_factory_inventory.cc'; else $(CYGPATH_W) '$(srcdir)/radmat/polarisation/polarisation_factory_inventory.cc'; fi`
+@am__fastdepCXX_FALSE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o wigner.obj `if test -f 'radmat/utils/wigner.cc'; then $(CYGPATH_W) 'radmat/utils/wigner.cc'; else $(CYGPATH_W) '$(srcdir)/radmat/utils/wigner.cc'; fi`
 
-polarisation_factory.o: radmat/polarisation/polarisation_factory.cc
-@am__fastdepCXX_TRUE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT polarisation_factory.o -MD -MP -MF $(DEPDIR)/polarisation_factory.Tpo -c -o polarisation_factory.o `test -f 'radmat/polarisation/polarisation_factory.cc' || echo '$(srcdir)/'`radmat/polarisation/polarisation_factory.cc
-@am__fastdepCXX_TRUE@	$(am__mv) $(DEPDIR)/polarisation_factory.Tpo $(DEPDIR)/polarisation_factory.Po
-@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='radmat/polarisation/polarisation_factory.cc' object='polarisation_factory.o' libtool=no @AMDEPBACKSLASH@
+tensor.o: radmat/utils/tensor.cc
+@am__fastdepCXX_TRUE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT tensor.o -MD -MP -MF $(DEPDIR)/tensor.Tpo -c -o tensor.o `test -f 'radmat/utils/tensor.cc' || echo '$(srcdir)/'`radmat/utils/tensor.cc
+@am__fastdepCXX_TRUE@	$(am__mv) $(DEPDIR)/tensor.Tpo $(DEPDIR)/tensor.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='radmat/utils/tensor.cc' object='tensor.o' libtool=no @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCXX_FALSE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o polarisation_factory.o `test -f 'radmat/polarisation/polarisation_factory.cc' || echo '$(srcdir)/'`radmat/polarisation/polarisation_factory.cc
+@am__fastdepCXX_FALSE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o tensor.o `test -f 'radmat/utils/tensor.cc' || echo '$(srcdir)/'`radmat/utils/tensor.cc
 
-polarisation_factory.obj: radmat/polarisation/polarisation_factory.cc
-@am__fastdepCXX_TRUE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT polarisation_factory.obj -MD -MP -MF $(DEPDIR)/polarisation_factory.Tpo -c -o polarisation_factory.obj `if test -f 'radmat/polarisation/polarisation_factory.cc'; then $(CYGPATH_W) 'radmat/polarisation/polarisation_factory.cc'; else $(CYGPATH_W) '$(srcdir)/radmat/polarisation/polarisation_factory.cc'; fi`
-@am__fastdepCXX_TRUE@	$(am__mv) $(DEPDIR)/polarisation_factory.Tpo $(DEPDIR)/polarisation_factory.Po
-@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='radmat/polarisation/polarisation_factory.cc' object='polarisation_factory.obj' libtool=no @AMDEPBACKSLASH@
+tensor.obj: radmat/utils/tensor.cc
+@am__fastdepCXX_TRUE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT tensor.obj -MD -MP -MF $(DEPDIR)/tensor.Tpo -c -o tensor.obj `if test -f 'radmat/utils/tensor.cc'; then $(CYGPATH_W) 'radmat/utils/tensor.cc'; else $(CYGPATH_W) '$(srcdir)/radmat/utils/tensor.cc'; fi`
+@am__fastdepCXX_TRUE@	$(am__mv) $(DEPDIR)/tensor.Tpo $(DEPDIR)/tensor.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='radmat/utils/tensor.cc' object='tensor.obj' libtool=no @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCXX_FALSE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o polarisation_factory.obj `if test -f 'radmat/polarisation/polarisation_factory.cc'; then $(CYGPATH_W) 'radmat/polarisation/polarisation_factory.cc'; else $(CYGPATH_W) '$(srcdir)/radmat/polarisation/polarisation_factory.cc'; fi`
+@am__fastdepCXX_FALSE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o tensor.obj `if test -f 'radmat/utils/tensor.cc'; then $(CYGPATH_W) 'radmat/utils/tensor.cc'; else $(CYGPATH_W) '$(srcdir)/radmat/utils/tensor.cc'; fi`
 install-nobase_includeHEADERS: $(nobase_include_HEADERS)
 	@$(NORMAL_INSTALL)
 	@list='$(nobase_include_HEADERS)'; test -n "$(includedir)" || list=; \

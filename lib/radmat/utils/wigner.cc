@@ -8,7 +8,7 @@
 #include "hadron/clebsch.h"
 #include "semble/semble_meta.h"
 #include "euler_angles.h"
-#include "radmat/tensor/tensor.h"
+#include "tensor.h"
 #include <math.h>
 #include <complex>
 #include "pow2assert.h"

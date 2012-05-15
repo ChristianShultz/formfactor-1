@@ -2,7 +2,7 @@
 #define BREIT_FRAME_H_H_GUARD
 
 #include "itpp/itbase.h"
-#include "radmat/tensor/tensor.h"
+#include "tensor.h"
 
 namespace radmat
 {

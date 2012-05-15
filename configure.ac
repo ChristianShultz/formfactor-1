@@ -157,10 +157,6 @@ AC_CONFIG_FILES(Makefile)
 AC_CONFIG_FILES(lib/Makefile)
 AC_CONFIG_FILES(main/Makefile)
 AC_CONFIG_FILES(tests/Makefile)
-AC_CONFIG_FILES(tests/testTensor/Makefile)
-AC_CONFIG_FILES(tests/testADATClebsch/Makefile)
-AC_CONFIG_FILES(tests/testUtils/Makefile)
-AC_CONFIG_FILES(tests/testPolarisation/Makefile)
 
 #
 # Finish
