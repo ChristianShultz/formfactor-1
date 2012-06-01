@@ -108,6 +108,7 @@ namespace radmat
   {
     virtual std::string ff(void) const {return std::string("unknown");}
     virtual Tensor<T,1> operator()(const PInv_t &moms) const = 0;
+    virtual ~ffBlockBase_t(void)=0;
   };
 
 
@@ -136,7 +137,8 @@ namespace radmat
     {  }
 
   
-    // virtual ~ffBase_t -- using handles, don't need to do anything here
+    // needs to be present and virtual b/c we are using pointers to derived
+    virtual ~ffBase_t(void) {}
 
 
     // generate some tex code corresponding to the 

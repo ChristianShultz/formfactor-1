@@ -364,6 +364,7 @@ namespace radmat
   struct TensorBase
   {
     virtual TensorBase *clone(void) const = 0;
+    virtual ~TensorBase(void) = 0;  
   };
 
 
