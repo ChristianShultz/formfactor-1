@@ -108,7 +108,7 @@ namespace radmat
   {
     virtual std::string ff(void) const {return std::string("unknown");}
     virtual Tensor<T,1> operator()(const PInv_t &moms) const = 0;
-    virtual ~ffBlockBase_t(void)=0;
+    virtual ~ffBlockBase_t(void) {}
   };
 
 
