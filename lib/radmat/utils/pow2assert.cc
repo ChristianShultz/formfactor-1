@@ -25,7 +25,7 @@
 * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
-#include "Pow2Assert.h"
+#include "pow2assert.h"
 
 #include <cstdio>
 #include <cstdarg>
