@@ -1,0 +1,131 @@
+#ifndef POLARISATION_TENSORS_H_H_GUARD
+#define POLARISATION_TENSORS_H_H_GUARD
+
+#include "tensor.h"
+#include "aux.h"
+#include "adat/handle.h"
+#include "ensem/ensem.h"
+#include "hadron/irrep_util.h"
+#include "hadron/clebsch.h"
+#include "xml_array.h"
+#include <utility>
+#include <map>
+
+namespace radmat
+{
+  
+  typedef std::pair<idx_t,short> pKey_t; // J, helicity
+  
+
+  template<idx_t J>
+  struct genPolTens
+  {
+    typedef std::map<pKey_t,TensorBase*> map_t;
+    typedef XMLArray::Array<int> Aint;
+    typedef ADAT::Handle<map_t> map_handle;
+    typedef ADAT::Handle<Tensor<double,2> > tensor_handle;  
+    typedef ENSEM::Real Real;
+
+    genPolTens(void) ;  // hidden
+    
+    genPolTens(const Aint &_p)
+    : h_map(new map_t()) , h_R(new Tensor<double,2>(genRotationMatrix(_p) ) ), p(_p)
+    {   }
+
+    Tensor<std::complex<double>,J> operator()(const Real E, const short helicity)
+    {
+      refresh_map();
+      set_base(E);
+      return get(helicity);
+    }
+
+  private:
+    void refresh_map(void)
+    {
+      map_t::iterator it;
+      for(it = h_map->begin(); it != h_map->end(); ++it)
+	{
+	  delete it->second;
+	  it->second = NULL;
+	}
+      h_map->clear();
+    }
+
+    void set_base(const Real E);
+
+    Tensor<std::complex<double>, J > get(const short helicity , int ct = 0);
+
+    void make(const short helicity);
+    
+    genPolTens(map_handle & _m, tensor_handle *_R, const Aint &_p)
+      : h_map(_m) , h_R(_R) , p(_p)
+    {  }
+    
+    friend struct genPolTens<J+1>;  
+
+    map_handle h_map;
+    tensor_handle h_R;
+    Aint p;
+  };
+
+  template<idx_t J>
+  void genPolTens<J>::set_base(const Real _E)
+  {
+    Tensor<std::complex<double>, 1> eps0(TensorShape<1>()[4],0.),epsp(TensorShape<1>()[4],0.),epsm(TensorShape<1>()[4],0.);
+    double E = ENSEM::toDouble(_E);
+    double m_p = sqrt(p[0]*p[0] + p[1]*p[1] + p[2]*p[2]);
+    double m_m = sqrt(E*E - m_p*m_p);
+
+    eps0[0] = m_p/m_m;
+    eps0[3] = E/m_m;
+
+    epsp[1] = - 1./sqrt(2.);
+    epsp[2] = std::complex<double>(0.,-1.);
+
+    epsm[1] = 1./sqrt(2.);
+    epsm[2] = std::complex<double>(0.,-1.);
+
+    h_map->insert(map_t::value_type(pKey_t(1,0),(*h_R * eps0).clone()));
+    h_map->insert(map_t::value_type(pKey_t(1,1),(*h_R * epsp).clone()));
+    h_map->insert(map_t::value_type(pKey_t(1,-1),(*h_R * epsm).clone()));
+  }
+
+  template<idx_t J>
+  Tensor<std::complex<double> , J> genPolTens<J>::get(const short helicity, int ct)
+  {
+    ++ct;
+    POW2_ASSERT(ct < 100);
+
+    map_t::const_iterator it = h_map->find(pKey_t(J,helicity));
+    if(it != h_map->end())
+      return downcastAndDeref<Tensor<std::complex<double>, J >, TensorBase >(it->second);
+    
+    make(helicity);
+
+    return get(helicity); 
+  }
+
+  template<idx_t J>
+  void genPolTens<J>::make(const short helicity)
+  {
+    genPolTens<J-1> Jm(h_map,h_R,p);
+    genPolTens<1> J1(h_map,h_R,p);
+    double factor;
+
+    Tensor<std::complex<double> , J> ptensor(std::vector<idx_t>(J,4),0.);
+
+    for(short big_h = -J; big_h < J+1; ++big_h)
+      for(short small_h = -1; small_h < 2; ++small_h)
+	{
+	  factor = Hadron::clebsch(2*(J-1),2*big_h,2,2*small_h,2*J,2*helicity);
+	  
+	  if(factor != 0.)
+	    ptensor += (factor * (Jm.get(big_h) ^ J1.get(small_h)));
+	}
+
+    h_map->insert(map_t::value_type(pKey_t(J,helicity),ptensor.clone()));
+  }
+
+} // radmat
+
+#endif

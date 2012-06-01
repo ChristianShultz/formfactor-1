@@ -1,0 +1,56 @@
+#ifndef FF_BASE_H_H_GUARD
+#define FF_BASE_H_H_GUARD
+
+#include "xml_array.h"
+#include "radmat/utils/tensor.h"
+#include "radmat/utils/pow2assert.h"
+#include "ensem/ensem.h"
+#include "adat/handle.h"
+#include <utility>
+
+
+namespace radmat
+{
+  
+  struct InvariantPack_t
+  {
+    InvariantPack_t(const double _E, const XMLArray::Array<int> &_mom, const idx_t _J, const short _lambda)
+      : E(_E) , mom(_mom) , J(_J), lambda(_lambda)
+    { 
+      POW2_ASSERT( abs(lambda) <= J);
+    }
+
+    void operator()(const double _E) // update the energy for looping
+    {
+      E = _E;
+    }
+
+    Tensor<double,1> pmu(void)
+    {
+      Tensor<double,1> p(TensorShape<1>()[4],0.);
+      p[0] = E;
+      p[1] = mom[0];
+      p[2] = mom[1]; 
+      p[3] = mom[2];
+      return p;
+    }
+    
+    double E;
+    XMLArray::Array<int> mom;
+    idx_t J;
+    short lambda;
+  };
+  
+  
+  typedef Tensor<std::complex<double>, 1 > FFBlock_rt;
+
+  struct FFBlockBase_t
+  {
+    typedef ADAT::Handle<InvariantPack_t> pack_handle;
+    virtual FFBlock_rt operator()(const pack_handle &final, const pack_handle &initial) const = 0;
+  };
+
+}// namespace
+
+
+#endif
