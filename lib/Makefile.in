@@ -99,7 +99,8 @@ ARFLAGS = cru
 libradmat_a_AR = $(AR) $(ARFLAGS)
 libradmat_a_LIBADD =
 am_libradmat_a_OBJECTS = breit_frame.$(OBJEXT) euler_angles.$(OBJEXT) \
-	pow2assert.$(OBJEXT) wigner.$(OBJEXT) tensor.$(OBJEXT)
+	pow2assert.$(OBJEXT) wigner.$(OBJEXT) tensor.$(OBJEXT) \
+	common_cfg.$(OBJEXT) lorentzff_PiPi.$(OBJEXT)
 libradmat_a_OBJECTS = $(am_libradmat_a_OBJECTS)
 DEFAULT_INCLUDES = -I.@am__isrc@
 depcomp = $(SHELL) $(top_srcdir)/config/depcomp
@@ -227,15 +228,16 @@ AM_CXXFLAGS = -I@top_srcdir@/lib		\
 #utils
 
 #lorentz_ff
+#nobase_include_HEADERS += radmat/lorentz_ff/ff_base.h radmat/lorentz_ff/ff_llsq_row.h radmat/lorentz_ff/ff_loader.h radmat/lorentz_ff/formfac/fake.h radmat/lorentz_ff/formfac/ff_0p0p.h
+
+#ff
 nobase_include_HEADERS = radmat/utils/aux.h radmat/utils/breit_frame.h \
 	radmat/utils/euler_angles.h radmat/utils/lorentz.h \
 	radmat/utils/perThreadStorage.h \
 	radmat/utils/polarisation_tensors.h radmat/utils/pow2assert.h \
 	radmat/utils/stringify.h radmat/utils/tensor.h \
-	radmat/utils/wigner.h radmat/lorentz_ff/ff_base.h \
-	radmat/lorentz_ff/ff_llsq_row.h radmat/lorentz_ff/ff_loader.h \
-	radmat/lorentz_ff/formfac/fake.h \
-	radmat/lorentz_ff/formfac/ff_0p0p.h
+	radmat/utils/wigner.h radmat/ff/common_cfg.h \
+	radmat/ff/lorentzff_PiPi.h
 
 #
 # Library
@@ -243,7 +245,12 @@ nobase_include_HEADERS = radmat/utils/aux.h radmat/utils/breit_frame.h \
 lib_LIBRARIES = libradmat.a
 
 #utils
-libradmat_a_SOURCES = radmat/utils/breit_frame.cc radmat/utils/euler_angles.cc radmat/utils/pow2assert.cc radmat/utils/wigner.cc radmat/utils/tensor.cc
+
+#ff
+libradmat_a_SOURCES = radmat/utils/breit_frame.cc \
+	radmat/utils/euler_angles.cc radmat/utils/pow2assert.cc \
+	radmat/utils/wigner.cc radmat/utils/tensor.cc \
+	radmat/ff/common_cfg.cc radmat/ff/lorentzff_PiPi.cc
 all: all-am
 
 .SUFFIXES:
@@ -321,7 +328,9 @@ distclean-compile:
 	-rm -f *.tab.c
 
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/breit_frame.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/common_cfg.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/euler_angles.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/lorentzff_PiPi.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/pow2assert.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/tensor.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/wigner.Po@am__quote@
@@ -409,6 +418,34 @@ tensor.obj: radmat/utils/tensor.cc
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='radmat/utils/tensor.cc' object='tensor.obj' libtool=no @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCXX_FALSE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o tensor.obj `if test -f 'radmat/utils/tensor.cc'; then $(CYGPATH_W) 'radmat/utils/tensor.cc'; else $(CYGPATH_W) '$(srcdir)/radmat/utils/tensor.cc'; fi`
+
+common_cfg.o: radmat/ff/common_cfg.cc
+@am__fastdepCXX_TRUE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT common_cfg.o -MD -MP -MF $(DEPDIR)/common_cfg.Tpo -c -o common_cfg.o `test -f 'radmat/ff/common_cfg.cc' || echo '$(srcdir)/'`radmat/ff/common_cfg.cc
+@am__fastdepCXX_TRUE@	$(am__mv) $(DEPDIR)/common_cfg.Tpo $(DEPDIR)/common_cfg.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='radmat/ff/common_cfg.cc' object='common_cfg.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o common_cfg.o `test -f 'radmat/ff/common_cfg.cc' || echo '$(srcdir)/'`radmat/ff/common_cfg.cc
+
+common_cfg.obj: radmat/ff/common_cfg.cc
+@am__fastdepCXX_TRUE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT common_cfg.obj -MD -MP -MF $(DEPDIR)/common_cfg.Tpo -c -o common_cfg.obj `if test -f 'radmat/ff/common_cfg.cc'; then $(CYGPATH_W) 'radmat/ff/common_cfg.cc'; else $(CYGPATH_W) '$(srcdir)/radmat/ff/common_cfg.cc'; fi`
+@am__fastdepCXX_TRUE@	$(am__mv) $(DEPDIR)/common_cfg.Tpo $(DEPDIR)/common_cfg.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='radmat/ff/common_cfg.cc' object='common_cfg.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o common_cfg.obj `if test -f 'radmat/ff/common_cfg.cc'; then $(CYGPATH_W) 'radmat/ff/common_cfg.cc'; else $(CYGPATH_W) '$(srcdir)/radmat/ff/common_cfg.cc'; fi`
+
+lorentzff_PiPi.o: radmat/ff/lorentzff_PiPi.cc
+@am__fastdepCXX_TRUE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT lorentzff_PiPi.o -MD -MP -MF $(DEPDIR)/lorentzff_PiPi.Tpo -c -o lorentzff_PiPi.o `test -f 'radmat/ff/lorentzff_PiPi.cc' || echo '$(srcdir)/'`radmat/ff/lorentzff_PiPi.cc
+@am__fastdepCXX_TRUE@	$(am__mv) $(DEPDIR)/lorentzff_PiPi.Tpo $(DEPDIR)/lorentzff_PiPi.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='radmat/ff/lorentzff_PiPi.cc' object='lorentzff_PiPi.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o lorentzff_PiPi.o `test -f 'radmat/ff/lorentzff_PiPi.cc' || echo '$(srcdir)/'`radmat/ff/lorentzff_PiPi.cc
+
+lorentzff_PiPi.obj: radmat/ff/lorentzff_PiPi.cc
+@am__fastdepCXX_TRUE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT lorentzff_PiPi.obj -MD -MP -MF $(DEPDIR)/lorentzff_PiPi.Tpo -c -o lorentzff_PiPi.obj `if test -f 'radmat/ff/lorentzff_PiPi.cc'; then $(CYGPATH_W) 'radmat/ff/lorentzff_PiPi.cc'; else $(CYGPATH_W) '$(srcdir)/radmat/ff/lorentzff_PiPi.cc'; fi`
+@am__fastdepCXX_TRUE@	$(am__mv) $(DEPDIR)/lorentzff_PiPi.Tpo $(DEPDIR)/lorentzff_PiPi.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='radmat/ff/lorentzff_PiPi.cc' object='lorentzff_PiPi.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o lorentzff_PiPi.obj `if test -f 'radmat/ff/lorentzff_PiPi.cc'; then $(CYGPATH_W) 'radmat/ff/lorentzff_PiPi.cc'; else $(CYGPATH_W) '$(srcdir)/radmat/ff/lorentzff_PiPi.cc'; fi`
 install-nobase_includeHEADERS: $(nobase_include_HEADERS)
 	@$(NORMAL_INSTALL)
 	@list='$(nobase_include_HEADERS)'; test -n "$(includedir)" || list=; \

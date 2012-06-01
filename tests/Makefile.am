@@ -12,7 +12,7 @@ LDADD = @ADAT_LIBS@ @ITPP_LIBS@ @LIBS@ -lradmat
 
 check_PROGRAMS = test
 
-test_SOURCES = src/test_polarisation_tensor.cc src/test_ff_fake.cc src/test.cc
+test_SOURCES = src/test_polarisation_tensor.cc src/test_ff_pipi.cc src/test.cc
 
 # no idea how/why this works, cut paste job
 #

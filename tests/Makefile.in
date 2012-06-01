@@ -60,7 +60,7 @@ mkinstalldirs = $(install_sh) -d
 CONFIG_CLEAN_FILES =
 CONFIG_CLEAN_VPATH_FILES =
 am_test_OBJECTS = test_polarisation_tensor.$(OBJEXT) \
-	test_ff_fake.$(OBJEXT) test.$(OBJEXT)
+	test_ff_pipi.$(OBJEXT) test.$(OBJEXT)
 test_OBJECTS = $(am_test_OBJECTS)
 test_LDADD = $(LDADD)
 test_DEPENDENCIES =
@@ -193,7 +193,7 @@ AM_LDFLAGS = -L@top_builddir@/lib/ \
                @LDFLAGS@ @ADAT_LDFLAGS@
 
 LDADD = @ADAT_LIBS@ @ITPP_LIBS@ @LIBS@ -lradmat
-test_SOURCES = src/test_polarisation_tensor.cc src/test_ff_fake.cc src/test.cc
+test_SOURCES = src/test_polarisation_tensor.cc src/test_ff_pipi.cc src/test.cc
 
 # no idea how/why this works, cut paste job
 #
@@ -249,7 +249,7 @@ distclean-compile:
 	-rm -f *.tab.c
 
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/test.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/test_ff_fake.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/test_ff_pipi.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/test_polarisation_tensor.Po@am__quote@
 
 .cc.o:
@@ -280,19 +280,19 @@ test_polarisation_tensor.obj: src/test_polarisation_tensor.cc
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCXX_FALSE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o test_polarisation_tensor.obj `if test -f 'src/test_polarisation_tensor.cc'; then $(CYGPATH_W) 'src/test_polarisation_tensor.cc'; else $(CYGPATH_W) '$(srcdir)/src/test_polarisation_tensor.cc'; fi`
 
-test_ff_fake.o: src/test_ff_fake.cc
-@am__fastdepCXX_TRUE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT test_ff_fake.o -MD -MP -MF $(DEPDIR)/test_ff_fake.Tpo -c -o test_ff_fake.o `test -f 'src/test_ff_fake.cc' || echo '$(srcdir)/'`src/test_ff_fake.cc
-@am__fastdepCXX_TRUE@	$(am__mv) $(DEPDIR)/test_ff_fake.Tpo $(DEPDIR)/test_ff_fake.Po
-@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='src/test_ff_fake.cc' object='test_ff_fake.o' libtool=no @AMDEPBACKSLASH@
+test_ff_pipi.o: src/test_ff_pipi.cc
+@am__fastdepCXX_TRUE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT test_ff_pipi.o -MD -MP -MF $(DEPDIR)/test_ff_pipi.Tpo -c -o test_ff_pipi.o `test -f 'src/test_ff_pipi.cc' || echo '$(srcdir)/'`src/test_ff_pipi.cc
+@am__fastdepCXX_TRUE@	$(am__mv) $(DEPDIR)/test_ff_pipi.Tpo $(DEPDIR)/test_ff_pipi.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='src/test_ff_pipi.cc' object='test_ff_pipi.o' libtool=no @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCXX_FALSE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o test_ff_fake.o `test -f 'src/test_ff_fake.cc' || echo '$(srcdir)/'`src/test_ff_fake.cc
+@am__fastdepCXX_FALSE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o test_ff_pipi.o `test -f 'src/test_ff_pipi.cc' || echo '$(srcdir)/'`src/test_ff_pipi.cc
 
-test_ff_fake.obj: src/test_ff_fake.cc
-@am__fastdepCXX_TRUE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT test_ff_fake.obj -MD -MP -MF $(DEPDIR)/test_ff_fake.Tpo -c -o test_ff_fake.obj `if test -f 'src/test_ff_fake.cc'; then $(CYGPATH_W) 'src/test_ff_fake.cc'; else $(CYGPATH_W) '$(srcdir)/src/test_ff_fake.cc'; fi`
-@am__fastdepCXX_TRUE@	$(am__mv) $(DEPDIR)/test_ff_fake.Tpo $(DEPDIR)/test_ff_fake.Po
-@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='src/test_ff_fake.cc' object='test_ff_fake.obj' libtool=no @AMDEPBACKSLASH@
+test_ff_pipi.obj: src/test_ff_pipi.cc
+@am__fastdepCXX_TRUE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT test_ff_pipi.obj -MD -MP -MF $(DEPDIR)/test_ff_pipi.Tpo -c -o test_ff_pipi.obj `if test -f 'src/test_ff_pipi.cc'; then $(CYGPATH_W) 'src/test_ff_pipi.cc'; else $(CYGPATH_W) '$(srcdir)/src/test_ff_pipi.cc'; fi`
+@am__fastdepCXX_TRUE@	$(am__mv) $(DEPDIR)/test_ff_pipi.Tpo $(DEPDIR)/test_ff_pipi.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='src/test_ff_pipi.cc' object='test_ff_pipi.obj' libtool=no @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCXX_FALSE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o test_ff_fake.obj `if test -f 'src/test_ff_fake.cc'; then $(CYGPATH_W) 'src/test_ff_fake.cc'; else $(CYGPATH_W) '$(srcdir)/src/test_ff_fake.cc'; fi`
+@am__fastdepCXX_FALSE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o test_ff_pipi.obj `if test -f 'src/test_ff_pipi.cc'; then $(CYGPATH_W) 'src/test_ff_pipi.cc'; else $(CYGPATH_W) '$(srcdir)/src/test_ff_pipi.cc'; fi`
 
 test.o: src/test.cc
 @am__fastdepCXX_TRUE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT test.o -MD -MP -MF $(DEPDIR)/test.Tpo -c -o test.o `test -f 'src/test.cc' || echo '$(srcdir)/'`src/test.cc
