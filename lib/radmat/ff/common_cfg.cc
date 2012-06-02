@@ -8,14 +8,14 @@
 namespace radmat
 {
 
-  Tensor<double,1> pPlus(const PInv_t &moms)
+  Tensor<double,1> pPlus(const Tensor<double,1> &p_f, const Tensor<double,1> &p_i)
   {
-    return moms.first + moms.second;
+    return p_f + p_i;
   }
 
-  Tensor<double,1> pMinus(const PInv_t &moms)
+  Tensor<double,1> pMinus(const Tensor<double,1> &p_f, const Tensor<double,1> &p_i)
   {
-    return moms.first - moms.second;
+    return p_f - p_i;
   }
 
 } // close radmat

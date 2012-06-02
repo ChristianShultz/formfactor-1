@@ -47,10 +47,10 @@ namespace radmat
 	      baz[i] = tmp + tmp2;
 	    }
 
-	  PInv_t inv(foo,bar);
+	  
 	  itpp::Mat<std::complex<double> > bazMat = toItpp(baz);
       
-	  bool isEqual = bazMat == foobar(inv);
+	  bool isEqual = bazMat == foobar(foo,bar);
 
 	  if(!!!isEqual) 
 	    std::cout << "you messed this up " << std::endl;

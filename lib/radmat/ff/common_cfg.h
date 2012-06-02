@@ -60,8 +60,8 @@ namespace radmat
   typedef std::pair<Tensor<double,1>, Tensor<double,1> > PInv_t;
  
   
-  Tensor<double,1> pPlus(const PInv_t &moms);   // p_f + p_i
-  Tensor<double,1> pMinus(const PInv_t &moms);  // p_f - p_i
+  Tensor<double,1> pPlus(const Tensor<double,1> &p_f, const Tensor<double,1> &p_i);   // p_f + p_i
+  Tensor<double,1> pMinus(const Tensor<double,1> &p_f, const Tensor<double,1> &p_i);  // p_f - p_i
 
 
   /////////////////////////////////////////////////////////////////////////////////////////////////
@@ -73,6 +73,17 @@ namespace radmat
   {
     idx_t dim = v.getDim(0);
     itpp::Vec<T> foo(dim);
+    for(idx_t i = 0; i < dim; i++)
+      foo[i] = v[i];
+
+    return foo;
+  }
+
+  template<typename T>
+  Tensor<T,1> toTensor(const itpp::Vec<T> &v)
+  {
+    idx_t dim = v.size();
+    Tensor<T,1> foo(TensorShape<1>()[dim],0.);
     for(idx_t i = 0; i < dim; i++)
       foo[i] = v[i];
 
@@ -107,7 +118,7 @@ namespace radmat
   struct ffBlockBase_t
   {
     virtual std::string ff(void) const {return std::string("unknown");}
-    virtual Tensor<T,1> operator()(const PInv_t &moms) const = 0;
+    virtual Tensor<T,1> operator()(const Tensor<double,1> &p_f, const Tensor<double,1> &p_i) const = 0;
     virtual ~ffBlockBase_t(void) {}
   };
 
@@ -126,6 +137,7 @@ namespace radmat
   struct ffBase_t
   {
     // save some typing
+    typedef  ffBlockBase_t<T> BBType;
     typedef typename ADAT::Handle< ffBlockBase_t< T > > BBHandle_t;
     typedef std::list< BBHandle_t > ff_list;
 
@@ -136,10 +148,24 @@ namespace radmat
     : m_list(list) 
     {  }
 
+    ffBase_t& operator=(const ffBase_t &o)
+    {
+      if(this != &o)
+	{
+	  m_list = o.m_list;
+	}
+      return *this;
+    }
+
+    ffBase_t(const ffBase_t &o)
+    : m_list(o.m_list)
+    {  }
   
     // needs to be present and virtual b/c we are using pointers to derived
     virtual ~ffBase_t(void) {}
 
+    // useful higher up
+    virtual int nFacs(void) {return m_list.size();}
 
     // generate some tex code corresponding to the 
     //  string of stuff we think this is making
@@ -152,23 +178,21 @@ namespace radmat
       return ss.str();
     }
 
-    // generate the linear system base on the available set of kinematic factors
-    // eventually wanna pass this through some type of isZero() filter?  
+    // generate the linear system based on the available set of kinematic factors
+    // eventually wanna pass this through some type of isZero() filter?  -- do it at the ensemble level 
     // -- sometimes things will obviously be zero eg eps(z)_0,3 == 0
-    virtual itpp::Mat<T> operator()(const PInv_t &moms) const
+    virtual itpp::Mat<T> operator()(const Tensor<double,1> &p_f, const Tensor<double,1> &p_i) const
     {
       itpp::Mat<T> ret;
       typename ff_list::const_iterator it;
       for (it = m_list.begin(); it != m_list.end(); it++)
-	ret.append_col(toItpp<T>((**it)(moms)));
+	ret.append_col(toItpp<T>((**it)(p_f,p_i)));
 
       return ret;
     }
 
   protected:  // hide ctor
     ffBase_t(void);
-    ffBase_t& operator=(const ffBase_t &);
-    ffBase_t(const ffBase_t &);
     
     // data store
     ff_list m_list;

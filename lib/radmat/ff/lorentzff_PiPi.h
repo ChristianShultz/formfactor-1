@@ -28,7 +28,8 @@ namespace radmat
     struct F1 : public ffBlockBase_t<std::complex<double> >
     {
       std::string ff(void) const;
-      Tensor<std::complex<double> , 1> operator()(const PInv_t &moms) const;
+      Tensor<std::complex<double> , 1> operator()(const Tensor<double,1> &p_f, 
+						  const Tensor<double,1> &p_i) const;
     };
 
 
@@ -49,14 +50,23 @@ namespace radmat
     struct PiPi : public ffBase_t<std::complex<double> >
     {
       PiPi(void)
-      : ffBase_t<std::complex<double> >(genList())  // scoped to look in nested::PiPi:: first
+      : ffBase_t<std::complex<double> >(radmat::PiPi::genList())  
       {  } 
 
-      // hide ctor
-    private:
-      PiPi& operator=(const PiPi &o);
-      PiPi(const PiPi &o);
+      PiPi& operator=(const PiPi &o)
+      {
 
+	if(this != &o)
+	  ffBase_t<std::complex<double> >::operator=(o);
+	return *this;
+      }
+
+      // no slicing
+      PiPi(const PiPi &o)
+      : ffBase_t<std::complex<double> >(o)
+      {  }
+      
+    private:
       // I'm not sure if these could inherit so we will hide them as well
       PiPi(const ffBase_t<std::complex<double> >::ff_list &);
       PiPi(const ffBase_t<std::complex<double> >::ff_list);
