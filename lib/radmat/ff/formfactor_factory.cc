@@ -8,6 +8,7 @@
 #include "common_ensemble.h"
 #include <string>
 #include <complex>
+#include <exception>
 #include "adat/singleton.h"
 #include "adat/objfactory.h"
 #include "adat/handle.h"
@@ -57,6 +58,7 @@ namespace radmat
 	  POW2_ASSERT(false);
 	}
 
+      POW2_ASSERT(foo);
       return ADAT::Handle<ffBase_t<std::complex<double> > >(foo);
     }
 
