@@ -12,7 +12,10 @@ nobase_include_HEADERS = radmat/utils/aux.h radmat/utils/breit_frame.h radmat/ut
 #nobase_include_HEADERS += radmat/lorentz_ff/ff_base.h radmat/lorentz_ff/ff_llsq_row.h radmat/lorentz_ff/ff_loader.h radmat/lorentz_ff/formfac/fake.h radmat/lorentz_ff/formfac/ff_0p0p.h
 
 #ff
-nobase_include_HEADERS += radmat/ff/LLSQSolvers.h radmat/ff/LLSQ_base.h radmat/ff/LLSQ_solver.h radmat/ff/common_cfg.h radmat/ff/common_ensemble.h radmat/ff/formfactor_factory.h radmat/ff/lorentzff_PiPi.h
+nobase_include_HEADERS += radmat/ff/LLSQSolvers.h radmat/ff/LLSQ_base.h radmat/ff/LLSQ_solver.h radmat/ff/common_cfg.h radmat/ff/common_ensemble.h radmat/ff/formfactor_factory.h radmat/ff/lorentzff_PiPi.h 
+
+#fake_data
+nobase_include_HEADERS += radmat/fake_data/covarrying_vectors.h radmat/fake_data/minimal_fake_data.h
 
 #
 # Library

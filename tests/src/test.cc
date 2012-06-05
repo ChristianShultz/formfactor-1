@@ -43,6 +43,16 @@ main(void)
   // test the PiPi form factor
   dump_test(ct_err,ct_test,PiPi::test_ff());
 
+  // test the factories
+  dump_test(ct_err,ct_test,test_solver_factory());
+  dump_test(ct_err,ct_test,test_mat_elem_factory());
+
+  // test the LLSQ framework
+  dump_test(ct_err,ct_test,test_LLSQ_solver());
+  
+
+  // fake data
+  dump_test(ct_err,ct_test,test_minimal_fake_data(std::string("PiPi")));
 
 
   // conclude testing

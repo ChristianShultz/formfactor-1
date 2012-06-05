@@ -75,6 +75,8 @@ namespace radmat
       return KF;
     }
 
+    int nFacs(void) {return m_KFacGen->nFacs();}
+
     // hide ctor    
   private:
     ffKinematicFactors_t(void);

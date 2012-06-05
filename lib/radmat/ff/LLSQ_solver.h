@@ -41,8 +41,8 @@ namespace radmat
       // some fancy type of inputs that are solution method dependet but this should be simple/safe to implement
 
       // strange that "solving" the problem is actually done in three lines
-      LLSQInputType_h inputs(new LLSQInputType_t<T>(momenta,matElems,inikeys.matElemID,inikeys.Q2PrecisionCheck));
-      LLSQBaseSolver_h solver = LLSQSolverFactoryEnv::callFactory(inikeys.solnID);
+      LLSQInputType_h inputs(new LLSQInputType_t<T>(momenta,matElems,iniKeys.matElemID,iniKeys.Q2PrecisionCheck));
+      LLSQBaseSolver_h solver = LLSQSolverFactoryEnv::callFactory(iniKeys.solnID);
 
       return (*solver)(inputs);
     }				     
