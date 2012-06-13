@@ -101,7 +101,8 @@ libradmat_a_LIBADD =
 am_libradmat_a_OBJECTS = breit_frame.$(OBJEXT) euler_angles.$(OBJEXT) \
 	pow2assert.$(OBJEXT) wigner.$(OBJEXT) tensor.$(OBJEXT) \
 	LLSQSolvers.$(OBJEXT) common_cfg.$(OBJEXT) \
-	formfactor_factory.$(OBJEXT) lorentzff_PiPi.$(OBJEXT)
+	formfactor_factory.$(OBJEXT) lorentzff_PiPi.$(OBJEXT) \
+	covarrying_vectors.$(OBJEXT)
 libradmat_a_OBJECTS = $(am_libradmat_a_OBJECTS)
 DEFAULT_INCLUDES = -I.@am__isrc@
 depcomp = $(SHELL) $(top_srcdir)/config/depcomp
@@ -228,9 +229,6 @@ AM_CXXFLAGS = -I@top_srcdir@/lib		\
 
 #utils
 
-#lorentz_ff
-#nobase_include_HEADERS += radmat/lorentz_ff/ff_base.h radmat/lorentz_ff/ff_llsq_row.h radmat/lorentz_ff/ff_loader.h radmat/lorentz_ff/formfac/fake.h radmat/lorentz_ff/formfac/ff_0p0p.h
-
 #ff
 
 #fake_data
@@ -243,8 +241,7 @@ nobase_include_HEADERS = radmat/utils/aux.h radmat/utils/breit_frame.h \
 	radmat/ff/LLSQ_base.h radmat/ff/LLSQ_solver.h \
 	radmat/ff/common_cfg.h radmat/ff/common_ensemble.h \
 	radmat/ff/formfactor_factory.h radmat/ff/lorentzff_PiPi.h \
-	radmat/fake_data/covarrying_vectors.h \
-	radmat/fake_data/minimal_fake_data.h
+	radmat/fake_data/covarrying_vectors.h
 
 #
 # Library
@@ -254,11 +251,14 @@ lib_LIBRARIES = libradmat.a
 #utils
 
 #ff
+
+#fake_data 
 libradmat_a_SOURCES = radmat/utils/breit_frame.cc \
 	radmat/utils/euler_angles.cc radmat/utils/pow2assert.cc \
 	radmat/utils/wigner.cc radmat/utils/tensor.cc \
 	radmat/ff/LLSQSolvers.cc radmat/ff/common_cfg.cc \
-	radmat/ff/formfactor_factory.cc radmat/ff/lorentzff_PiPi.cc
+	radmat/ff/formfactor_factory.cc radmat/ff/lorentzff_PiPi.cc \
+	radmat/fake_data/covarrying_vectors.cc
 all: all-am
 
 .SUFFIXES:
@@ -338,6 +338,7 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/LLSQSolvers.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/breit_frame.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/common_cfg.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/covarrying_vectors.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/euler_angles.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/formfactor_factory.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/lorentzff_PiPi.Po@am__quote@
@@ -484,6 +485,20 @@ lorentzff_PiPi.obj: radmat/ff/lorentzff_PiPi.cc
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='radmat/ff/lorentzff_PiPi.cc' object='lorentzff_PiPi.obj' libtool=no @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCXX_FALSE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o lorentzff_PiPi.obj `if test -f 'radmat/ff/lorentzff_PiPi.cc'; then $(CYGPATH_W) 'radmat/ff/lorentzff_PiPi.cc'; else $(CYGPATH_W) '$(srcdir)/radmat/ff/lorentzff_PiPi.cc'; fi`
+
+covarrying_vectors.o: radmat/fake_data/covarrying_vectors.cc
+@am__fastdepCXX_TRUE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT covarrying_vectors.o -MD -MP -MF $(DEPDIR)/covarrying_vectors.Tpo -c -o covarrying_vectors.o `test -f 'radmat/fake_data/covarrying_vectors.cc' || echo '$(srcdir)/'`radmat/fake_data/covarrying_vectors.cc
+@am__fastdepCXX_TRUE@	$(am__mv) $(DEPDIR)/covarrying_vectors.Tpo $(DEPDIR)/covarrying_vectors.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='radmat/fake_data/covarrying_vectors.cc' object='covarrying_vectors.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o covarrying_vectors.o `test -f 'radmat/fake_data/covarrying_vectors.cc' || echo '$(srcdir)/'`radmat/fake_data/covarrying_vectors.cc
+
+covarrying_vectors.obj: radmat/fake_data/covarrying_vectors.cc
+@am__fastdepCXX_TRUE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT covarrying_vectors.obj -MD -MP -MF $(DEPDIR)/covarrying_vectors.Tpo -c -o covarrying_vectors.obj `if test -f 'radmat/fake_data/covarrying_vectors.cc'; then $(CYGPATH_W) 'radmat/fake_data/covarrying_vectors.cc'; else $(CYGPATH_W) '$(srcdir)/radmat/fake_data/covarrying_vectors.cc'; fi`
+@am__fastdepCXX_TRUE@	$(am__mv) $(DEPDIR)/covarrying_vectors.Tpo $(DEPDIR)/covarrying_vectors.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='radmat/fake_data/covarrying_vectors.cc' object='covarrying_vectors.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o covarrying_vectors.obj `if test -f 'radmat/fake_data/covarrying_vectors.cc'; then $(CYGPATH_W) 'radmat/fake_data/covarrying_vectors.cc'; else $(CYGPATH_W) '$(srcdir)/radmat/fake_data/covarrying_vectors.cc'; fi`
 install-nobase_includeHEADERS: $(nobase_include_HEADERS)
 	@$(NORMAL_INSTALL)
 	@list='$(nobase_include_HEADERS)'; test -n "$(includedir)" || list=; \

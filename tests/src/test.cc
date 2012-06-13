@@ -52,8 +52,11 @@ main(void)
   
 
   // fake data
+  test_covarrying_vectors cov;
+  dump_test(ct_err,ct_test,cov.test<double>());
+  dump_test(ct_err,ct_test,cov.test<std::complex<double> >());
   dump_test(ct_err,ct_test,test_minimal_fake_data(std::string("PiPi")));
-
+  
 
   // conclude testing
   cout << "\n" << ct_err << "/" << ct_test << " failed" << endl; 

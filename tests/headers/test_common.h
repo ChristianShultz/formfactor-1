@@ -3,6 +3,7 @@
 
 #include "tester.h"
 #include <string>
+#include <complex>
 
 namespace radmat
 {
@@ -23,6 +24,15 @@ namespace radmat
   tester test_mat_elem_factory(void);
 
   // fake data
+  struct test_covarrying_vectors
+  {
+    template<typename T>
+    tester test(void) const;
+  };
+
+  template<> tester test_covarrying_vectors::test<double>(void) const;
+  template<> tester test_covarrying_vectors::test<std::complex<double> >(void) const;
+
   tester test_minimal_fake_data(const std::string &matElemID);
 
 }

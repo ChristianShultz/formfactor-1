@@ -62,7 +62,7 @@ CONFIG_CLEAN_VPATH_FILES =
 am_test_OBJECTS = test_polarisation_tensor.$(OBJEXT) \
 	test_ff_pipi.$(OBJEXT) test_LLSQ_solver.$(OBJEXT) \
 	test_factories.$(OBJEXT) test_minimal_fake_data.$(OBJEXT) \
-	test.$(OBJEXT)
+	test_covarrying_vector.$(OBJEXT) test.$(OBJEXT)
 test_OBJECTS = $(am_test_OBJECTS)
 test_LDADD = $(LDADD)
 test_DEPENDENCIES =
@@ -195,7 +195,7 @@ AM_LDFLAGS = -L@top_builddir@/lib/ \
                @LDFLAGS@ @ADAT_LDFLAGS@
 
 LDADD = -lradmat @ADAT_LIBS@ @ITPP_LIBS@ @LIBS@ 
-test_SOURCES = src/test_polarisation_tensor.cc src/test_ff_pipi.cc src/test_LLSQ_solver.cc src/test_factories.cc src/test_minimal_fake_data.cc src/test.cc 
+test_SOURCES = src/test_polarisation_tensor.cc src/test_ff_pipi.cc src/test_LLSQ_solver.cc src/test_factories.cc src/test_minimal_fake_data.cc src/test_covarrying_vector.cc src/test.cc 
 
 # no idea how/why this works, cut paste job
 #
@@ -252,6 +252,7 @@ distclean-compile:
 
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/test.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/test_LLSQ_solver.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/test_covarrying_vector.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/test_factories.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/test_ff_pipi.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/test_minimal_fake_data.Po@am__quote@
@@ -340,6 +341,20 @@ test_minimal_fake_data.obj: src/test_minimal_fake_data.cc
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='src/test_minimal_fake_data.cc' object='test_minimal_fake_data.obj' libtool=no @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCXX_FALSE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o test_minimal_fake_data.obj `if test -f 'src/test_minimal_fake_data.cc'; then $(CYGPATH_W) 'src/test_minimal_fake_data.cc'; else $(CYGPATH_W) '$(srcdir)/src/test_minimal_fake_data.cc'; fi`
+
+test_covarrying_vector.o: src/test_covarrying_vector.cc
+@am__fastdepCXX_TRUE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT test_covarrying_vector.o -MD -MP -MF $(DEPDIR)/test_covarrying_vector.Tpo -c -o test_covarrying_vector.o `test -f 'src/test_covarrying_vector.cc' || echo '$(srcdir)/'`src/test_covarrying_vector.cc
+@am__fastdepCXX_TRUE@	$(am__mv) $(DEPDIR)/test_covarrying_vector.Tpo $(DEPDIR)/test_covarrying_vector.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='src/test_covarrying_vector.cc' object='test_covarrying_vector.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o test_covarrying_vector.o `test -f 'src/test_covarrying_vector.cc' || echo '$(srcdir)/'`src/test_covarrying_vector.cc
+
+test_covarrying_vector.obj: src/test_covarrying_vector.cc
+@am__fastdepCXX_TRUE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT test_covarrying_vector.obj -MD -MP -MF $(DEPDIR)/test_covarrying_vector.Tpo -c -o test_covarrying_vector.obj `if test -f 'src/test_covarrying_vector.cc'; then $(CYGPATH_W) 'src/test_covarrying_vector.cc'; else $(CYGPATH_W) '$(srcdir)/src/test_covarrying_vector.cc'; fi`
+@am__fastdepCXX_TRUE@	$(am__mv) $(DEPDIR)/test_covarrying_vector.Tpo $(DEPDIR)/test_covarrying_vector.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='src/test_covarrying_vector.cc' object='test_covarrying_vector.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o test_covarrying_vector.obj `if test -f 'src/test_covarrying_vector.cc'; then $(CYGPATH_W) 'src/test_covarrying_vector.cc'; else $(CYGPATH_W) '$(srcdir)/src/test_covarrying_vector.cc'; fi`
 
 test.o: src/test.cc
 @am__fastdepCXX_TRUE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT test.o -MD -MP -MF $(DEPDIR)/test.Tpo -c -o test.o `test -f 'src/test.cc' || echo '$(srcdir)/'`src/test.cc
