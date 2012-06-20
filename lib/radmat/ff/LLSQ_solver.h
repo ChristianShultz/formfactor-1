@@ -1,7 +1,6 @@
 #ifndef LLSQ_SOLVER_H_H_GUARD
 #define LLSQ_SOLVER_H_H_GUARD
 
-
 #include "LLSQ_base.h"
 #include "LLSQSolvers.h"
 #include "adat/handle.h"

@@ -1,7 +1,6 @@
 #ifndef COMMON_H_H_GUARD
 #define COMMON_H_H_GUARD
 
-
 #include "radmat/utils/pow2assert.h"
 #include "radmat/utils/tensor.h"
 #include "adat/handle.h"

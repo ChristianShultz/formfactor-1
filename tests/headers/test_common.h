@@ -19,7 +19,8 @@ namespace radmat
   }
 
   // llsq 
-  tester test_LLSQ_solver(void);
+  tester test_LLSQ_solver_SVDMakeSquare(void);
+
   tester test_solver_factory(void);
   tester test_mat_elem_factory(void);
 
@@ -34,6 +35,8 @@ namespace radmat
   template<> tester test_covarrying_vectors::test<std::complex<double> >(void) const;
 
   tester test_minimal_fake_data(const std::string &matElemID);
+
+  
 
 }
 #endif

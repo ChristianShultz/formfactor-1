@@ -23,7 +23,7 @@ namespace radmat
     tester m_test(__func__);
 
     LLSQBaseSolver_t<cd> *ptr;
-    // call the factory and get a handle
+    // call the factory and get a handle -- the call Factory method takes care of registration the first time its called
     ADAT::Handle<LLSQBaseSolver_t<cd> > test_handle = LLSQSolverFactoryEnv::callFactory(std::string("LU"));
 
     // get the address of the dereferenced pointer inside the handle then check to make sure it isn't null

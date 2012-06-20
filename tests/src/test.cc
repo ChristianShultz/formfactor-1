@@ -48,7 +48,7 @@ main(void)
   dump_test(ct_err,ct_test,test_mat_elem_factory());
 
   // test the LLSQ framework
-  dump_test(ct_err,ct_test,test_LLSQ_solver());
+  dump_test(ct_err,ct_test,test_LLSQ_solver_SVDMakeSquare());
   
 
   // fake data
@@ -59,8 +59,13 @@ main(void)
   
 
   // conclude testing
-  cout << "\n" << ct_err << "/" << ct_test << " failed" << endl; 
+  cout << "\n**********************************\n"
+       << ct_test - ct_err << " of " << ct_test << " tests passed.\n" << endl;
   cout << "finished testing" << endl;
   
+
+  if(ct_err != 0) 
+    cout << "Warning: " << ct_err << " tests failed." << endl;
+
   return 0;
 }

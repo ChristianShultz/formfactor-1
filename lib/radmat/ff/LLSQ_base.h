@@ -1,7 +1,6 @@
 #ifndef LLSQ_BASE_H_H_GUARD
 #define LLSQ_BASE_H_H_GUARD
 
-
 #include "common_ensemble.h"
 #include "semble/semble_vector.h"
 #include "adat/handle.h"
@@ -56,6 +55,11 @@ namespace radmat
       m_KFacs = generator(m_Momenta);
     }
 
+    // for testing
+    LLSQInputType_t(const LatticeMatrixElements &FakeMatElems, const KinematicFactorMatrix &FakeMatrix)
+      : m_MatElems(FakeMatElems) , m_KFacs(FakeMatrix)
+    {  }
+
     virtual ~LLSQInputType_t(void) {}
 
   private:
@@ -82,6 +86,7 @@ namespace radmat
     // hide ctor
   private:
     LLSQInputType_t(void);
+
 
   public:
     SemblePInvList_t m_Momenta;   
