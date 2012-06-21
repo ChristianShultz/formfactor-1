@@ -15,8 +15,8 @@
 
 
 #define SIZE 2                       // the problem gets more difficult for larger rank..
-#define NCFG 30000
-#define PRECISION_CHECK_MEAN 1e-2    // allow for 1% error in each in 30k draws
+#define NCFG 50000
+#define PRECISION_CHECK_MEAN 1e-2    // allow for 1% error in each in 50k draws
 #define PRECISION_CHECK_COR 1e-2     // ~ this method gives a realistic data set but
 #define NCHECK 10                    // it converges to the target painfully slowly 
 
@@ -220,7 +220,7 @@ namespace radmat
 		      << itpp::round_to_zero(corr - wCor.cor<cd::dc>(cv), PRECISION_CHECK_COR)
 		      << std::endl;
 	    std::cout << "\n correlation in: \n" << corr << std::endl;
-	    std::cout << "\n correlation in: \n" << corr << std::endl;
+	    std::cout << "\n correlation out: \n" << wCor.cor<cd::dc>(cv) << std::endl;
 	  }
 
 	/*

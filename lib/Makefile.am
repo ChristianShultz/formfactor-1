@@ -6,13 +6,13 @@ AM_CXXFLAGS = 	-I@top_srcdir@/lib		\
 		@CXXFLAGS@ @SEMBLE_CXXFLAGS@ @ADAT_CXXFLAGS@ @ITPP_CXXFLAGS@
 
 #utils
-nobase_include_HEADERS = radmat/utils/aux.h radmat/utils/breit_frame.h radmat/utils/euler_angles.h radmat/utils/lorentz.h radmat/utils/perThreadStorage.h radmat/utils/polarisation_tensors.h radmat/utils/pow2assert.h radmat/utils/stringify.h radmat/utils/tensor.h radmat/utils/wigner.h
+nobase_include_HEADERS = radmat/utils/aux.h radmat/utils/breit_frame.h radmat/utils/euler_angles.h radmat/utils/lorentz.h radmat/utils/perThreadStorage.h radmat/utils/polarisation_tensors.h radmat/utils/pow2assert.h radmat/utils/stringify.h radmat/utils/tensor.h radmat/utils/wigner.h radmat/utils/splash.h radmat/utils/harmonic.h
 
 #ff
 nobase_include_HEADERS += radmat/ff/LLSQSolvers.h radmat/ff/LLSQ_base.h radmat/ff/LLSQ_solver.h radmat/ff/common_cfg.h radmat/ff/common_ensemble.h radmat/ff/formfactor_factory.h radmat/ff/lorentzff_PiPi.h 
 
 #fake_data
-nobase_include_HEADERS += radmat/fake_data/covarrying_vectors.h 
+nobase_include_HEADERS += radmat/fake_data/covarrying_vectors.h radmat/fake_data/fake_data_ini.h radmat/fake_data/minimal_fake_data.h
 
 #
 # Library
@@ -21,10 +21,10 @@ nobase_include_HEADERS += radmat/fake_data/covarrying_vectors.h
 lib_LIBRARIES = libradmat.a
 
 #utils
-libradmat_a_SOURCES = radmat/utils/breit_frame.cc radmat/utils/euler_angles.cc radmat/utils/pow2assert.cc radmat/utils/wigner.cc radmat/utils/tensor.cc
+libradmat_a_SOURCES = radmat/utils/breit_frame.cc radmat/utils/euler_angles.cc radmat/utils/pow2assert.cc radmat/utils/wigner.cc radmat/utils/tensor.cc radmat/utils/splash.cc radmat/utils/harmonic.cc
 
 #ff
 libradmat_a_SOURCES += radmat/ff/LLSQSolvers.cc radmat/ff/common_cfg.cc radmat/ff/formfactor_factory.cc radmat/ff/lorentzff_PiPi.cc
 
 #fake_data 
-libradmat_a_SOURCES += radmat/fake_data/covarrying_vectors.cc
+libradmat_a_SOURCES += radmat/fake_data/covarrying_vectors.cc radmat/fake_data/fake_data_ini.cc

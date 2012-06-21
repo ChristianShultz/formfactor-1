@@ -100,9 +100,10 @@ libradmat_a_AR = $(AR) $(ARFLAGS)
 libradmat_a_LIBADD =
 am_libradmat_a_OBJECTS = breit_frame.$(OBJEXT) euler_angles.$(OBJEXT) \
 	pow2assert.$(OBJEXT) wigner.$(OBJEXT) tensor.$(OBJEXT) \
-	LLSQSolvers.$(OBJEXT) common_cfg.$(OBJEXT) \
-	formfactor_factory.$(OBJEXT) lorentzff_PiPi.$(OBJEXT) \
-	covarrying_vectors.$(OBJEXT)
+	splash.$(OBJEXT) harmonic.$(OBJEXT) LLSQSolvers.$(OBJEXT) \
+	common_cfg.$(OBJEXT) formfactor_factory.$(OBJEXT) \
+	lorentzff_PiPi.$(OBJEXT) covarrying_vectors.$(OBJEXT) \
+	fake_data_ini.$(OBJEXT)
 libradmat_a_OBJECTS = $(am_libradmat_a_OBJECTS)
 DEFAULT_INCLUDES = -I.@am__isrc@
 depcomp = $(SHELL) $(top_srcdir)/config/depcomp
@@ -237,11 +238,14 @@ nobase_include_HEADERS = radmat/utils/aux.h radmat/utils/breit_frame.h \
 	radmat/utils/perThreadStorage.h \
 	radmat/utils/polarisation_tensors.h radmat/utils/pow2assert.h \
 	radmat/utils/stringify.h radmat/utils/tensor.h \
-	radmat/utils/wigner.h radmat/ff/LLSQSolvers.h \
+	radmat/utils/wigner.h radmat/utils/splash.h \
+	radmat/utils/harmonic.h radmat/ff/LLSQSolvers.h \
 	radmat/ff/LLSQ_base.h radmat/ff/LLSQ_solver.h \
 	radmat/ff/common_cfg.h radmat/ff/common_ensemble.h \
 	radmat/ff/formfactor_factory.h radmat/ff/lorentzff_PiPi.h \
-	radmat/fake_data/covarrying_vectors.h
+	radmat/fake_data/covarrying_vectors.h \
+	radmat/fake_data/fake_data_ini.h \
+	radmat/fake_data/minimal_fake_data.h
 
 #
 # Library
@@ -256,9 +260,11 @@ lib_LIBRARIES = libradmat.a
 libradmat_a_SOURCES = radmat/utils/breit_frame.cc \
 	radmat/utils/euler_angles.cc radmat/utils/pow2assert.cc \
 	radmat/utils/wigner.cc radmat/utils/tensor.cc \
+	radmat/utils/splash.cc radmat/utils/harmonic.cc \
 	radmat/ff/LLSQSolvers.cc radmat/ff/common_cfg.cc \
 	radmat/ff/formfactor_factory.cc radmat/ff/lorentzff_PiPi.cc \
-	radmat/fake_data/covarrying_vectors.cc
+	radmat/fake_data/covarrying_vectors.cc \
+	radmat/fake_data/fake_data_ini.cc
 all: all-am
 
 .SUFFIXES:
@@ -340,9 +346,12 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/common_cfg.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/covarrying_vectors.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/euler_angles.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/fake_data_ini.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/formfactor_factory.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/harmonic.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/lorentzff_PiPi.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/pow2assert.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/splash.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/tensor.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/wigner.Po@am__quote@
 
@@ -430,6 +439,34 @@ tensor.obj: radmat/utils/tensor.cc
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCXX_FALSE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o tensor.obj `if test -f 'radmat/utils/tensor.cc'; then $(CYGPATH_W) 'radmat/utils/tensor.cc'; else $(CYGPATH_W) '$(srcdir)/radmat/utils/tensor.cc'; fi`
 
+splash.o: radmat/utils/splash.cc
+@am__fastdepCXX_TRUE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT splash.o -MD -MP -MF $(DEPDIR)/splash.Tpo -c -o splash.o `test -f 'radmat/utils/splash.cc' || echo '$(srcdir)/'`radmat/utils/splash.cc
+@am__fastdepCXX_TRUE@	$(am__mv) $(DEPDIR)/splash.Tpo $(DEPDIR)/splash.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='radmat/utils/splash.cc' object='splash.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o splash.o `test -f 'radmat/utils/splash.cc' || echo '$(srcdir)/'`radmat/utils/splash.cc
+
+splash.obj: radmat/utils/splash.cc
+@am__fastdepCXX_TRUE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT splash.obj -MD -MP -MF $(DEPDIR)/splash.Tpo -c -o splash.obj `if test -f 'radmat/utils/splash.cc'; then $(CYGPATH_W) 'radmat/utils/splash.cc'; else $(CYGPATH_W) '$(srcdir)/radmat/utils/splash.cc'; fi`
+@am__fastdepCXX_TRUE@	$(am__mv) $(DEPDIR)/splash.Tpo $(DEPDIR)/splash.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='radmat/utils/splash.cc' object='splash.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o splash.obj `if test -f 'radmat/utils/splash.cc'; then $(CYGPATH_W) 'radmat/utils/splash.cc'; else $(CYGPATH_W) '$(srcdir)/radmat/utils/splash.cc'; fi`
+
+harmonic.o: radmat/utils/harmonic.cc
+@am__fastdepCXX_TRUE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT harmonic.o -MD -MP -MF $(DEPDIR)/harmonic.Tpo -c -o harmonic.o `test -f 'radmat/utils/harmonic.cc' || echo '$(srcdir)/'`radmat/utils/harmonic.cc
+@am__fastdepCXX_TRUE@	$(am__mv) $(DEPDIR)/harmonic.Tpo $(DEPDIR)/harmonic.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='radmat/utils/harmonic.cc' object='harmonic.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o harmonic.o `test -f 'radmat/utils/harmonic.cc' || echo '$(srcdir)/'`radmat/utils/harmonic.cc
+
+harmonic.obj: radmat/utils/harmonic.cc
+@am__fastdepCXX_TRUE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT harmonic.obj -MD -MP -MF $(DEPDIR)/harmonic.Tpo -c -o harmonic.obj `if test -f 'radmat/utils/harmonic.cc'; then $(CYGPATH_W) 'radmat/utils/harmonic.cc'; else $(CYGPATH_W) '$(srcdir)/radmat/utils/harmonic.cc'; fi`
+@am__fastdepCXX_TRUE@	$(am__mv) $(DEPDIR)/harmonic.Tpo $(DEPDIR)/harmonic.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='radmat/utils/harmonic.cc' object='harmonic.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o harmonic.obj `if test -f 'radmat/utils/harmonic.cc'; then $(CYGPATH_W) 'radmat/utils/harmonic.cc'; else $(CYGPATH_W) '$(srcdir)/radmat/utils/harmonic.cc'; fi`
+
 LLSQSolvers.o: radmat/ff/LLSQSolvers.cc
 @am__fastdepCXX_TRUE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT LLSQSolvers.o -MD -MP -MF $(DEPDIR)/LLSQSolvers.Tpo -c -o LLSQSolvers.o `test -f 'radmat/ff/LLSQSolvers.cc' || echo '$(srcdir)/'`radmat/ff/LLSQSolvers.cc
 @am__fastdepCXX_TRUE@	$(am__mv) $(DEPDIR)/LLSQSolvers.Tpo $(DEPDIR)/LLSQSolvers.Po
@@ -499,6 +536,20 @@ covarrying_vectors.obj: radmat/fake_data/covarrying_vectors.cc
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='radmat/fake_data/covarrying_vectors.cc' object='covarrying_vectors.obj' libtool=no @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCXX_FALSE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o covarrying_vectors.obj `if test -f 'radmat/fake_data/covarrying_vectors.cc'; then $(CYGPATH_W) 'radmat/fake_data/covarrying_vectors.cc'; else $(CYGPATH_W) '$(srcdir)/radmat/fake_data/covarrying_vectors.cc'; fi`
+
+fake_data_ini.o: radmat/fake_data/fake_data_ini.cc
+@am__fastdepCXX_TRUE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT fake_data_ini.o -MD -MP -MF $(DEPDIR)/fake_data_ini.Tpo -c -o fake_data_ini.o `test -f 'radmat/fake_data/fake_data_ini.cc' || echo '$(srcdir)/'`radmat/fake_data/fake_data_ini.cc
+@am__fastdepCXX_TRUE@	$(am__mv) $(DEPDIR)/fake_data_ini.Tpo $(DEPDIR)/fake_data_ini.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='radmat/fake_data/fake_data_ini.cc' object='fake_data_ini.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o fake_data_ini.o `test -f 'radmat/fake_data/fake_data_ini.cc' || echo '$(srcdir)/'`radmat/fake_data/fake_data_ini.cc
+
+fake_data_ini.obj: radmat/fake_data/fake_data_ini.cc
+@am__fastdepCXX_TRUE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT fake_data_ini.obj -MD -MP -MF $(DEPDIR)/fake_data_ini.Tpo -c -o fake_data_ini.obj `if test -f 'radmat/fake_data/fake_data_ini.cc'; then $(CYGPATH_W) 'radmat/fake_data/fake_data_ini.cc'; else $(CYGPATH_W) '$(srcdir)/radmat/fake_data/fake_data_ini.cc'; fi`
+@am__fastdepCXX_TRUE@	$(am__mv) $(DEPDIR)/fake_data_ini.Tpo $(DEPDIR)/fake_data_ini.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='radmat/fake_data/fake_data_ini.cc' object='fake_data_ini.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o fake_data_ini.obj `if test -f 'radmat/fake_data/fake_data_ini.cc'; then $(CYGPATH_W) 'radmat/fake_data/fake_data_ini.cc'; else $(CYGPATH_W) '$(srcdir)/radmat/fake_data/fake_data_ini.cc'; fi`
 install-nobase_includeHEADERS: $(nobase_include_HEADERS)
 	@$(NORMAL_INSTALL)
 	@list='$(nobase_include_HEADERS)'; test -n "$(includedir)" || list=; \

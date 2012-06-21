@@ -48,7 +48,7 @@ POST_INSTALL = :
 NORMAL_UNINSTALL = :
 PRE_UNINSTALL = :
 POST_UNINSTALL = :
-check_PROGRAMS = test$(EXEEXT)
+check_PROGRAMS = test$(EXEEXT) test_fake_ini$(EXEEXT)
 subdir = tests
 DIST_COMMON = $(srcdir)/Makefile.am $(srcdir)/Makefile.in
 ACLOCAL_M4 = $(top_srcdir)/aclocal.m4
@@ -66,6 +66,10 @@ am_test_OBJECTS = test_polarisation_tensor.$(OBJEXT) \
 test_OBJECTS = $(am_test_OBJECTS)
 test_LDADD = $(LDADD)
 test_DEPENDENCIES =
+am_test_fake_ini_OBJECTS = test_fake_ini.$(OBJEXT)
+test_fake_ini_OBJECTS = $(am_test_fake_ini_OBJECTS)
+test_fake_ini_LDADD = $(LDADD)
+test_fake_ini_DEPENDENCIES =
 DEFAULT_INCLUDES = -I.@am__isrc@
 depcomp = $(SHELL) $(top_srcdir)/config/depcomp
 am__depfiles_maybe = depfiles
@@ -75,8 +79,8 @@ CXXCOMPILE = $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) \
 CXXLD = $(CXX)
 CXXLINK = $(CXXLD) $(AM_CXXFLAGS) $(CXXFLAGS) $(AM_LDFLAGS) $(LDFLAGS) \
 	-o $@
-SOURCES = $(test_SOURCES)
-DIST_SOURCES = $(test_SOURCES)
+SOURCES = $(test_SOURCES) $(test_fake_ini_SOURCES)
+DIST_SOURCES = $(test_SOURCES) $(test_fake_ini_SOURCES)
 am__can_run_installinfo = \
   case $$AM_UPDATE_INFO_DIR in \
     n|no|NO) false;; \
@@ -196,8 +200,9 @@ AM_LDFLAGS = -L@top_builddir@/lib/ \
 
 LDADD = -lradmat @SEMBLE_LIBS@ @ADAT_LIBS@ @ITPP_LIBS@ @LIBS@ 
 test_SOURCES = src/test_polarisation_tensor.cc src/test_ff_pipi.cc src/test_LLSQ_solver.cc src/test_factories.cc src/test_minimal_fake_data.cc src/test_covarrying_vector.cc src/test.cc 
+test_fake_ini_SOURCES = src/test_fake_ini.cc
 
-# no idea how/why this works, cut paste job
+# no idea how/why (if?) this works, cut paste job
 #
 # The folow rule will always try to rebuild libadat.a when you 
 # try to compile a main prog
@@ -243,6 +248,9 @@ clean-checkPROGRAMS:
 test$(EXEEXT): $(test_OBJECTS) $(test_DEPENDENCIES) $(EXTRA_test_DEPENDENCIES) 
 	@rm -f test$(EXEEXT)
 	$(CXXLINK) $(test_OBJECTS) $(test_LDADD) $(LIBS)
+test_fake_ini$(EXEEXT): $(test_fake_ini_OBJECTS) $(test_fake_ini_DEPENDENCIES) $(EXTRA_test_fake_ini_DEPENDENCIES) 
+	@rm -f test_fake_ini$(EXEEXT)
+	$(CXXLINK) $(test_fake_ini_OBJECTS) $(test_fake_ini_LDADD) $(LIBS)
 
 mostlyclean-compile:
 	-rm -f *.$(OBJEXT)
@@ -254,6 +262,7 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/test_LLSQ_solver.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/test_covarrying_vector.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/test_factories.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/test_fake_ini.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/test_ff_pipi.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/test_minimal_fake_data.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/test_polarisation_tensor.Po@am__quote@
@@ -369,6 +378,20 @@ test.obj: src/test.cc
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='src/test.cc' object='test.obj' libtool=no @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCXX_FALSE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o test.obj `if test -f 'src/test.cc'; then $(CYGPATH_W) 'src/test.cc'; else $(CYGPATH_W) '$(srcdir)/src/test.cc'; fi`
+
+test_fake_ini.o: src/test_fake_ini.cc
+@am__fastdepCXX_TRUE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT test_fake_ini.o -MD -MP -MF $(DEPDIR)/test_fake_ini.Tpo -c -o test_fake_ini.o `test -f 'src/test_fake_ini.cc' || echo '$(srcdir)/'`src/test_fake_ini.cc
+@am__fastdepCXX_TRUE@	$(am__mv) $(DEPDIR)/test_fake_ini.Tpo $(DEPDIR)/test_fake_ini.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='src/test_fake_ini.cc' object='test_fake_ini.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o test_fake_ini.o `test -f 'src/test_fake_ini.cc' || echo '$(srcdir)/'`src/test_fake_ini.cc
+
+test_fake_ini.obj: src/test_fake_ini.cc
+@am__fastdepCXX_TRUE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT test_fake_ini.obj -MD -MP -MF $(DEPDIR)/test_fake_ini.Tpo -c -o test_fake_ini.obj `if test -f 'src/test_fake_ini.cc'; then $(CYGPATH_W) 'src/test_fake_ini.cc'; else $(CYGPATH_W) '$(srcdir)/src/test_fake_ini.cc'; fi`
+@am__fastdepCXX_TRUE@	$(am__mv) $(DEPDIR)/test_fake_ini.Tpo $(DEPDIR)/test_fake_ini.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='src/test_fake_ini.cc' object='test_fake_ini.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o test_fake_ini.obj `if test -f 'src/test_fake_ini.cc'; then $(CYGPATH_W) 'src/test_fake_ini.cc'; else $(CYGPATH_W) '$(srcdir)/src/test_fake_ini.cc'; fi`
 
 ID: $(HEADERS) $(SOURCES) $(LISP) $(TAGS_FILES)
 	list='$(SOURCES) $(HEADERS) $(LISP) $(TAGS_FILES)'; \

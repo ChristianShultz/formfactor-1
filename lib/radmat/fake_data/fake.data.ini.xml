@@ -1,0 +1,59 @@
+<?xml version="1.0"?>
+<FakeDataIni>
+
+  <version>0</version>
+
+  <stateProps>
+    <nStates>10</nStates>
+    <spectrumGenerator>ladder</spectrumGenerator>
+    <overlapGenerator>unitary</overlapGenerator>
+    <ladderSpacing>0.1</ladderSpacing>
+  </stateProps>
+
+
+  <suppressionProps>
+    <suppress>true</suppress>
+    <targetZ_at_order1>true</targetZ_at_order1>
+    <suppressionOrder>0.01</suppressionOrder>
+  </suppressionProps>
+
+  <matElemProps>
+    <upper>PiPi</upper>
+    <lower>PiPi</lower>
+    <diag>PiPi</diag>
+    <left_target>0</left_target>
+    <right_target>0</right_target>
+  </matElemProps>
+
+  <timeProps>
+    <tsource>0</tsource>
+    <tsink>25</tsink>
+  </timeProps>
+
+  <dataProps>
+    <momenta>
+      <elem>
+	<momSource>0 0 1</momSource>
+	<momSink>0 0 1</momSink>
+      </elem>
+      <elem>
+	<momSource>0 1 0</momSource>
+	<momSink>0 1 0</momSink>
+      </elem>
+      <elem>
+	<momSource>1 0 0</momSource>
+	<momSink>1 0 0</momSink>
+      </elem>
+      <elem>
+	<momSource>0 0 1</momSource>
+	<momSink>0 1 0</momSink>
+      </elem>
+      <elem>
+	<momSource>0 0 1</momSource>
+	<momSink>1 0 0</momSink>
+      </elem>
+    </momenta>
+  </dataProps>
+
+
+</FakeDataIni>

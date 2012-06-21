@@ -10,11 +10,13 @@ AM_LDFLAGS  = -L@top_builddir@/lib/ \
 LDADD = -lradmat @SEMBLE_LIBS@ @ADAT_LIBS@ @ITPP_LIBS@ @LIBS@ 
 
 
-check_PROGRAMS = test
+check_PROGRAMS = test test_fake_ini
 
 test_SOURCES = src/test_polarisation_tensor.cc src/test_ff_pipi.cc src/test_LLSQ_solver.cc src/test_factories.cc src/test_minimal_fake_data.cc src/test_covarrying_vector.cc src/test.cc 
 
-# no idea how/why this works, cut paste job
+test_fake_ini_SOURCES = src/test_fake_ini.cc
+
+# no idea how/why (if?) this works, cut paste job
 #
 # The folow rule will always try to rebuild libadat.a when you 
 # try to compile a main prog
