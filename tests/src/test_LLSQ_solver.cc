@@ -6,9 +6,9 @@
 #include "../headers/test_common.h"
 #include "../headers/tester.h"
 #include "radmat/utils/pow2assert.h"
-#include "radmat/ff/LLSQSolvers.h"
-#include "radmat/ff/LLSQ_base.h"
-#include "radmat/ff/LLSQ_solver.h"
+#include "radmat/ff/llsq_solvers.h"
+#include "radmat/ff/llsq_gen_system.h"
+#include "radmat/ff/llsq_solver.h"
 #include "adat/handle.h"
 #include <string>
 #include <complex>
@@ -42,7 +42,7 @@ namespace radmat
     A = iA;		  
     b = iA*ix;
 
-    LLSQInputType_t<dc> *inputPtr = new LLSQInputType_t<dc>(b,A);
+    LLSQInputType_t<dc> *inputPtr = new LLSQInputType_t<dc>(A,b);
     POW2_ASSERT(inputPtr);
     ADAT::Handle<LLSQInputType_t<dc> > inputHandle(inputPtr);
    

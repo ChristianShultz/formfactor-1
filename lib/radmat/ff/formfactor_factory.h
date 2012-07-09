@@ -1,8 +1,7 @@
 #ifndef FORMFACTOR_FACTORY_H_H_GUARD
 #define FORMFACTOR_FACTORY_H_H_GUARD
 
-#include "common_cfg.h"
-#include "common_ensemble.h"
+#include "ff_gen_llsq_row.h"
 #include <string>
 #include <complex>
 #include "adat/singleton.h"

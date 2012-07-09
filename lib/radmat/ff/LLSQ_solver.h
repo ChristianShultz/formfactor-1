@@ -1,25 +1,16 @@
 #ifndef LLSQ_SOLVER_H_H_GUARD
 #define LLSQ_SOLVER_H_H_GUARD
 
-#include "LLSQ_base.h"
-#include "LLSQSolvers.h"
+#include "llsq_solvers.h"
+#include "llsq_gen_system.h"
 #include "adat/handle.h"
 #include <string>
+#include <complex>
 
 namespace radmat
 {
 
-  // i hate xml ini files but we obviously need one here..
-  struct LLSQIni_t
-  {
-    std::string solnID;
-    std::string matElemID;
-    double Q2PrecisionCheck; // set to -1 to avoid a check
-  };
 
-
-  // this basically sets up some matrix element/soltution type dependent linear system and then 
-  // returns the solution
   template<typename T>
   struct LLSQSolver_t
   {
@@ -27,27 +18,16 @@ namespace radmat
     typedef typename LLSQBaseSolver_t<T>::LLSQRetTypeBase_h LLSQRetTypeBase_h;
     typedef typename LLSQBaseSolver_t<T>::LLSQInputType_h LLSQInputType_h;
     typedef typename ADAT::Handle<LLSQBaseSolver_t<T> > LLSQBaseSolver_h; 
-    
-    // do nothing
-    LLSQSolver_t(void) {};
-    // another functor 
-    LLSQRetTypeBase_h operator()(const typename LLSQInputType_t<T>::SemblePInvList_t & momenta,
-				 const typename LLSQInputType_t<T>::LatticeMatrixElements &matElems,
-				 const LLSQIni_t &iniKeys)
+
+    LLSQSolver_t(void) {}
+
+    LLSQRetTypeBase_h operator()(const std::vector<LLSQDataPoint> &data, std::string &solverID)
     {
-      // if we want to mess around with what goes in we can throw a key into the LLSQIni_t and do it here
-      // obviously we are going to need to dynamically cast out of the base handle if we want to send in 
-      // some fancy type of inputs that are solution method dependet but this should be simple/safe to implement
+      LLSQBaseSolver_h solver = LLSQSolverFactoryEnv::callFactory(solverID);
+      return (*solver)(generateLLSQSystem<T>(data));
+    }
 
-      // strange that "solving" the problem is actually done in three lines
-      LLSQInputType_h inputs(new LLSQInputType_t<T>(momenta,matElems,iniKeys.matElemID,iniKeys.Q2PrecisionCheck));
-      LLSQBaseSolver_h solver = LLSQSolverFactoryEnv::callFactory(iniKeys.solnID);
-
-      return (*solver)(inputs);
-    }				     
   };
-
-
 
 }
 

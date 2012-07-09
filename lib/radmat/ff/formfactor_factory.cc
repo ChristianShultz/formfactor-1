@@ -4,8 +4,6 @@
 //
 
 #include"formfactor_factory.h"
-#include "common_cfg.h"
-#include "common_ensemble.h"
 #include <string>
 #include <complex>
 #include <exception>

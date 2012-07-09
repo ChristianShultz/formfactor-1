@@ -1,7 +1,7 @@
 #ifndef LORENTZFF_PIPI_H_H_GUARD
 #define LORENTZFF_PIPI_H_H_GUARD
 
-#include "common_cfg.h"
+#include "ff_gen_llsq_row.h"
 #include <complex>
 
 namespace radmat

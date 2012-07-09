@@ -2,7 +2,7 @@
 #define LLSQSOLVERS_H_H_GUARD
 
 
-#include "LLSQ_base.h"
+#include "llsq_gen_system.h"
 #include <string>
 #include <complex>
 #include "adat/singleton.h"

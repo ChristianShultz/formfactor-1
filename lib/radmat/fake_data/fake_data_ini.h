@@ -2,13 +2,13 @@
 #define FAKE_DATA_INI_H_H_GUARD
 
 #include "io/adat_xmlio.h"
-#include "radmat/ff/LLSQ_solver.h"
+//#include "radmat/ff/ll_solver.h"
 #include <string>
 #include <iostream>
 #include <sstream>
 
 using namespace ADATXML;
-using namespace ADATIO;
+//using namespace ADATIO;
 
 namespace radmat
 {

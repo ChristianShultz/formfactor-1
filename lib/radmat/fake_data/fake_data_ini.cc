@@ -5,14 +5,14 @@
 
 #include"fake_data_ini.h"
 #include "io/adat_xmlio.h"
-#include "radmat/ff/LLSQ_solver.h"
+//#include "radmat/ff/ll_solver.h"
 #include "radmat/utils/splash.h"
 #include <string>
 #include <iostream>
 #include <sstream>
 
 using namespace ADATXML;
-using namespace ADATIO;
+//using namespace ADATIO;
 using namespace std;
 
 namespace radmat

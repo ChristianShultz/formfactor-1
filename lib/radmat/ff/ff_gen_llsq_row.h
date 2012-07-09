@@ -1,20 +1,18 @@
-#ifndef COMMON_H_H_GUARD
-#define COMMON_H_H_GUARD
+#ifndef FF_GEN_LLSQ_ROW_H_H_GUARD
+#define FF_GEN_LLSQ_ROW_H_H_GUARD
+
 
 #include "radmat/utils/pow2assert.h"
 #include "radmat/utils/tensor.h"
 #include "adat/handle.h"
 #include "itpp/itbase.h"
+#include "io/adat_xmlio.h"
+#include "semble/semble_vector.h"
+#include "semble/semble_matrix.h"
 #include <utility>
 #include <sstream>
 #include <string>
 #include <list>
-
-
-/**
-   @file common.h common definitions to lorentz decomposition ffs and multipole ffs
-   @brief contains some common definitions 
-*/
 
 
 /*
@@ -50,6 +48,9 @@
   \end{document}
 
 */
+
+using namespace ADATXML;
+//using namespace ADATIO;
 
 namespace radmat
 {
@@ -201,17 +202,82 @@ namespace radmat
   /////////////////////////////////////////////////////////////////////////////////////////////////
   /////////////////////////////////////////////////////////////////////////////////////////////////
   
+  // save some typing
+  typedef std::pair<SEMBLE::SembleVector<double> , 
+		    SEMBLE::SembleVector<double> > SemblePInv_t;
 
-  /*
-    There needs to be something here that takes an ensemble of pairs of energies
-    and two lattice momentum directions and spits back out an ensemble of 
-    kinematic factors. 
-  */
 
-  /*
-    ROTATIONS ? -- could we set up some driver to rip things out of adat and try to get the phases 
-    right by starting with a meson op and adding some extra bit of phase?
-  */
+  SemblePInv_t makeMomInvariants(const EnsemReal &E_f, 
+				 const EnsemReal &E_i,
+				 const Array<int> &p_f,
+				 const Array<int> &p_i);
+
+  /**
+     @brief generate the kinematic factor matrix for one measurement,
+     
+     @details ie: a 4 x n form factors matrix where the row index is the lorentz index.
+          These then need to get stitched together higher up 
+     
+   */
+  template<typename T>
+  struct ffKinematicFactors_t
+  {
+    // save some typing
+    typedef typename ADAT::Handle<ffBase_t<T> > ffBase_h;
+    typedef typename SEMBLE::SembleMatrix<T> KinematicFactorMatrix;
+
+    // the only available constructor
+    ffKinematicFactors_t(ffBase_h &KFacGen)
+    : m_KFacGen(KFacGen) 
+    {  }
+
+    ~ffKinematicFactors_t(void) {} // handle cleans itself up
+
+    // basically generate the 4 X (n multipole) matrix of kinematic factors, 
+    // the row index is the lorentz index of the lattice matrix element
+    KinematicFactorMatrix genFactors(const SemblePInv_t &moms)
+    {
+      SEMBLE::SembleVector<double> p_f(moms.first), p_i(moms.second);
+      int nfacs = m_KFacGen->nFacs();
+      int nbins = p_f.getB();
+
+      POW2_ASSERT_DEBUG( (nbins == p_i.getB()) && (nfacs > 0) );
+
+      KinematicFactorMatrix KF(nbins,4,nfacs);
+      KF.zeros();
+
+      // scale down
+      p_f.rescaleSembleDown();
+      p_i.rescaleSembleDown();
+
+      for(int bin = 0; bin < nbins; bin++)
+	KF[bin] = (*m_KFacGen)(toTensor<double>(p_f[bin]),toTensor<double>(p_i[bin]));
+
+      ////////////////////////////////////////////////////////////////////////////////
+      ////////////////////////////////////////////////////////////////////////////////
+      /*
+	TO DO -- put the isZero()? type check in here before the return statement
+      */
+      ////////////////////////////////////////////////////////////////////////////////
+      ////////////////////////////////////////////////////////////////////////////////
+
+      // scale up
+      KF.rescaleSembleUp();
+    
+      return KF;
+    }
+
+    int nFacs(void) {return m_KFacGen->nFacs();}
+
+    // hide ctor    
+  private:
+    ffKinematicFactors_t(void);
+    ffKinematicFactors_t(const ffKinematicFactors_t &o);
+    ffKinematicFactors_t& operator=(const ffKinematicFactors_t<T> &o);
+
+  private:
+    ffBase_h m_KFacGen;
+  };
 
 }
 

@@ -3,7 +3,7 @@
 
 
 #include "adat/handle.h"
-#include "radmat/ff/common_cfg.h"
+#include "radmat/ff/ff_gen_llsq_row.h"
 #include "semble/semble_matrix.h"
 #include <string>
 #include "itpp/itbase.h"

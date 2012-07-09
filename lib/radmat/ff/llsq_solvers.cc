@@ -3,7 +3,7 @@
 // Saturday, June  2 2012
 //
 
-#include"LLSQSolvers.h"
+#include"llsq_solvers.h"
 #include <string>
 #include <complex>
 #include <exception>

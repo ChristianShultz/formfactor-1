@@ -8,7 +8,7 @@
 #include "../headers/test_common.h"
 #include "itpp/itbase.h"
 #include "radmat/ff/lorentzff_PiPi.h"
-#include "radmat/ff/common_cfg.h"
+#include "radmat/ff/ff_gen_llsq_row.h"
 #include "radmat/utils/tensor.h"
 #include "radmat/utils/pow2assert.h"
 #include <complex>
