@@ -79,26 +79,57 @@ namespace radmat
   void read(XMLReader &xml, const std::string &path, StateProps_t &prop)
   {
     XMLReader ptop(xml,path);
-    
-    if(ptop.count("nStates") > 0)
-      read(ptop,"nStates",prop.nStates);
-    else
-      prop.nStates = 4;
 
-    if(ptop.count("spectrumGenerator") > 0)
-      read(ptop,"spectrumGenerator",prop.spectrumGenerator);
+    if(ptop.count("sourceMasses") > 0)
+      read(ptop,"sourceMasses",prop.sourceMasses);
     else
-      prop.spectrumGenerator = std::string("ladder");
+      {
+	SPLASH("No source masses present");
+	exit(1);
+      }
+
+    if(ptop.count("sourceVarO") > 0)
+      read(ptop,"sourceVarO",prop.sourceVarO);
+    else
+      prop.sourceVarO = 0.1;
+
+    if(ptop.count("sourceUpdateCovariance") > 0)
+      read(ptop,"sourceUpdateCovariance",prop.sourceUpdateCovariance);
+    else
+      prop.sourceUpdateCovariance = true;
+
+    if(ptop.count("sourceUpdateVariance") > 0)
+      read(ptop,"sourceUpdateVariance",prop.sourceUpdateVariance);
+    else
+      prop.sourceUpdateVariance = true;
+
+    if(ptop.count("sinkMasses") > 0) 
+      read(ptop,"sinkMasses",prop.sinkMasses);
+    else
+      {
+	SPLASH("No sink masses present");
+	exit(1);
+      }
+
+    if(ptop.count("sinkVarO") > 0)
+      read(ptop,"sinkVarO",prop.sinkVarO);
+    else
+      prop.sinkVarO = 0.1;
+
+    if(ptop.count("sinkUpdateCovariance") > 0)
+      read(ptop,"sinkUpdateCovariance",prop.sinkUpdateCovariance);
+    else
+      prop.sinkUpdateCovariance = true;
+
+    if(ptop.count("sinkUpdateVariance") > 0)
+      read(ptop,"sinkUpdateVariance",prop.sinkUpdateVariance);
+    else
+      prop.sinkUpdateVariance = true;
 
     if(ptop.count("overlapGenerator") > 0)
       read(ptop,"overlapGenerator",prop.overlapGenerator);
     else
       prop.overlapGenerator = std::string("unitary");
-
-    if(ptop.count("ladderSpacing") > 0)
-      read(ptop,"ladderSpacing", prop.ladderSpacing);
-    else
-      prop.ladderSpacing = 0.1;
   } 
   
 
@@ -160,6 +191,26 @@ namespace radmat
       read(ptop,"right_target",prop.right_target);
     else
       prop.right_target = 0;
+
+    if(ptop.count("sameOp") > 0)
+      read(ptop,"sameOp",prop.sameOp);
+    else
+      prop.sameOp = true;
+
+    if(ptop.count("updateCovariance") > 0)
+      read(ptop,"updateCovariance",prop.updateCovariance);
+    else
+      prop.updateCovariance = true;
+
+    if(ptop.count("updateVariance") > 0)
+      read(ptop,"updateVariance",prop.updateVariance);
+    else
+      prop.updateVariance = true;
+    
+    if(ptop.count("varianceOrder") > 0)
+      read(ptop,"varianceOrder", prop.varianceOrder);
+    else
+      prop.varianceOrder = 0.1;
   }
 
   void read(XMLReader &xml, const std::string &path, TimeProps_t &prop)
@@ -202,6 +253,11 @@ namespace radmat
   {
     XMLReader ptop(xml,path);
 
+    if(ptop.count("ncfg") > 0)
+      read(ptop,"ncfg",prop.ncfg);
+    else
+      prop.ncfg = 500;
+
     if(ptop.count("momenta") > 0)
       read(ptop,"momenta",prop.momenta);
     else
@@ -232,10 +288,25 @@ namespace radmat
   std::string write_params(const StateProps_t &ini)
   {
     std::stringstream ss;
-    ss << "nStates: " << ini.nStates << n;
-    ss << "spectrumGenerator: " << ini.spectrumGenerator << n;
+
+    ss << "source spectrum:";    
+    for(int i = 0; i < ini.sourceMasses.size(); i++)
+      ss << " " << ini.sourceMasses[i];
+    ss << n;
+
+    ss << "sourceVarO: " << ini.sourceVarO << n;
+    ss << "sourceUpdateCovariance: " << ini.sourceUpdateCovariance << n;
+    ss << "sourceUpdateVariance: " << ini.sourceUpdateVariance << n;
+        
+    ss << "sink spectrum:";    
+    for(int i =0 ; i < ini.sinkMasses.size(); i++)
+      ss << " " << ini.sinkMasses[i];
+    ss << n;
+
+    ss << "sinkVarO: " << ini.sinkVarO << n;
+    ss << "sinkUpdateCovariance: " << ini.sinkUpdateCovariance << n;
+    ss << "sinkUpdateCovariance: " << ini.sinkUpdateCovariance << n;
     ss << "overlapGenerator: " << ini.overlapGenerator << n;
-    ss << "ladderSpacing: " << ini.ladderSpacing << n;
 
     return ss.str();
   }
@@ -258,6 +329,10 @@ namespace radmat
     ss << "diag: " << ini.diag << n;
     ss << "left_target: " << ini.left_target << n;
     ss << "right_target: " << ini.right_target << n;
+    ss << "sameOp: " << ini.sameOp << n;
+    ss << "updateCovariance: " << ini.updateCovariance << n;
+    ss << "updateVariance: " << ini.updateVariance << n;
+    ss << "varianceOrder: " << ini.varianceOrder << n;
 
     return ss.str();
   }
@@ -283,6 +358,9 @@ namespace radmat
   std::string write_params(const DataProps_t &ini)
   {
     std::stringstream ss;
+    
+    ss << "ncfg: " << ini.ncfg << n;
+
     for(int i = 0; i < ini.momenta.size(); i++)
       ss << "elem: \n" << write_params(ini.momenta[i]) << n;
 

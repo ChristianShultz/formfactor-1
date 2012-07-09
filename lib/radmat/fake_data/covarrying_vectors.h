@@ -74,7 +74,7 @@ namespace radmat
 
     if(correlation_matrix != itpp::hermitian_transpose(correlation_matrix) )
       {
-	std::cout << __func__ << std::endl;
+	std::cout <<__PRETTY_FUNCTION__ << std::endl;
 	std::cout << "Warning, non symmetric (hermitian) correlation matricies" 
 		  << " are evil, symmetrizing (hermiterizing)." << std::endl;
 	CovarianceMatrix = 0.5 * (correlation_matrix + itpp::hermitian_transpose(correlation_matrix) );

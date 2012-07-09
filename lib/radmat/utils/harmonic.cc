@@ -68,7 +68,7 @@ namespace radmat
 
   double Harmonic(const int n, const double x)
   {
-    return HermiteP(n,x)*HarmonicNormalization(n)*exp(-x*x/2);
+    return HermiteP(n,x)*HarmonicNormalization(n)*exp(-x*x/2.);
   }
 
 }

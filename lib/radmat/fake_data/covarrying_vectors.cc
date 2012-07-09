@@ -152,7 +152,9 @@ namespace radmat
     for(int i = 0; i < rank; i++)
       foo.set_row(i,foo.get_row(i)/std::sqrt(itpp::dot(foo.get_row(i),foo.get_row(i))));
 
-    return foo * itpp::transpose(foo);
+    foo = foo*itpp::hermitian_transpose(foo);
+    
+    return 0.5*(foo + itpp::hermitian_transpose(foo));
   };
 
 

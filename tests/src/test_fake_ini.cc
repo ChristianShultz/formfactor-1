@@ -35,6 +35,15 @@ main(int argc, char *argv[])
       XMLReader xml(xmlinifile);
       read(xml,"/FakeDataIni",fakeinikeys);
     }
+  catch(std::exception &e)
+    {
+      std::cout << "std exception: " << e.what();
+    }
+  catch(std::string &e)
+    {
+      std::cout << __func__ << ": ERROR: can't read xmlinifile (" << xmlinifile << "): " << e << std::endl;
+      exit(1);
+    }
   catch(...)
     {
       SPLASH("An error occured while loading the fake data inifile");

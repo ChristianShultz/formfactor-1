@@ -35,7 +35,8 @@ namespace radmat
   template<> tester test_covarrying_vectors::test<std::complex<double> >(void) const;
 
   tester test_minimal_fake_data(const std::string &matElemID);
-
+  tester test_make_fake_overlaps(void);
+  tester test_make_fake_spectrum(void);
   
 
 }

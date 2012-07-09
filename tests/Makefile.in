@@ -62,7 +62,9 @@ CONFIG_CLEAN_VPATH_FILES =
 am_test_OBJECTS = test_polarisation_tensor.$(OBJEXT) \
 	test_ff_pipi.$(OBJEXT) test_LLSQ_solver.$(OBJEXT) \
 	test_factories.$(OBJEXT) test_minimal_fake_data.$(OBJEXT) \
-	test_covarrying_vector.$(OBJEXT) test.$(OBJEXT)
+	test_covarrying_vector.$(OBJEXT) \
+	test_make_fake_overlaps.$(OBJEXT) \
+	test_make_fake_spectrum.$(OBJEXT) test.$(OBJEXT)
 test_OBJECTS = $(am_test_OBJECTS)
 test_LDADD = $(LDADD)
 test_DEPENDENCIES =
@@ -199,7 +201,7 @@ AM_LDFLAGS = -L@top_builddir@/lib/ \
                @LDFLAGS@ @ADAT_LDFLAGS@ @SEMBLE_LDFLAGS@
 
 LDADD = -lradmat @SEMBLE_LIBS@ @ADAT_LIBS@ @ITPP_LIBS@ @LIBS@ 
-test_SOURCES = src/test_polarisation_tensor.cc src/test_ff_pipi.cc src/test_LLSQ_solver.cc src/test_factories.cc src/test_minimal_fake_data.cc src/test_covarrying_vector.cc src/test.cc 
+test_SOURCES = src/test_polarisation_tensor.cc src/test_ff_pipi.cc src/test_LLSQ_solver.cc src/test_factories.cc src/test_minimal_fake_data.cc src/test_covarrying_vector.cc src/test_make_fake_overlaps.cc src/test_make_fake_spectrum.cc src/test.cc 
 test_fake_ini_SOURCES = src/test_fake_ini.cc
 
 # no idea how/why (if?) this works, cut paste job
@@ -264,6 +266,8 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/test_factories.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/test_fake_ini.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/test_ff_pipi.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/test_make_fake_overlaps.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/test_make_fake_spectrum.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/test_minimal_fake_data.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/test_polarisation_tensor.Po@am__quote@
 
@@ -364,6 +368,34 @@ test_covarrying_vector.obj: src/test_covarrying_vector.cc
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='src/test_covarrying_vector.cc' object='test_covarrying_vector.obj' libtool=no @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCXX_FALSE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o test_covarrying_vector.obj `if test -f 'src/test_covarrying_vector.cc'; then $(CYGPATH_W) 'src/test_covarrying_vector.cc'; else $(CYGPATH_W) '$(srcdir)/src/test_covarrying_vector.cc'; fi`
+
+test_make_fake_overlaps.o: src/test_make_fake_overlaps.cc
+@am__fastdepCXX_TRUE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT test_make_fake_overlaps.o -MD -MP -MF $(DEPDIR)/test_make_fake_overlaps.Tpo -c -o test_make_fake_overlaps.o `test -f 'src/test_make_fake_overlaps.cc' || echo '$(srcdir)/'`src/test_make_fake_overlaps.cc
+@am__fastdepCXX_TRUE@	$(am__mv) $(DEPDIR)/test_make_fake_overlaps.Tpo $(DEPDIR)/test_make_fake_overlaps.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='src/test_make_fake_overlaps.cc' object='test_make_fake_overlaps.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o test_make_fake_overlaps.o `test -f 'src/test_make_fake_overlaps.cc' || echo '$(srcdir)/'`src/test_make_fake_overlaps.cc
+
+test_make_fake_overlaps.obj: src/test_make_fake_overlaps.cc
+@am__fastdepCXX_TRUE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT test_make_fake_overlaps.obj -MD -MP -MF $(DEPDIR)/test_make_fake_overlaps.Tpo -c -o test_make_fake_overlaps.obj `if test -f 'src/test_make_fake_overlaps.cc'; then $(CYGPATH_W) 'src/test_make_fake_overlaps.cc'; else $(CYGPATH_W) '$(srcdir)/src/test_make_fake_overlaps.cc'; fi`
+@am__fastdepCXX_TRUE@	$(am__mv) $(DEPDIR)/test_make_fake_overlaps.Tpo $(DEPDIR)/test_make_fake_overlaps.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='src/test_make_fake_overlaps.cc' object='test_make_fake_overlaps.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o test_make_fake_overlaps.obj `if test -f 'src/test_make_fake_overlaps.cc'; then $(CYGPATH_W) 'src/test_make_fake_overlaps.cc'; else $(CYGPATH_W) '$(srcdir)/src/test_make_fake_overlaps.cc'; fi`
+
+test_make_fake_spectrum.o: src/test_make_fake_spectrum.cc
+@am__fastdepCXX_TRUE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT test_make_fake_spectrum.o -MD -MP -MF $(DEPDIR)/test_make_fake_spectrum.Tpo -c -o test_make_fake_spectrum.o `test -f 'src/test_make_fake_spectrum.cc' || echo '$(srcdir)/'`src/test_make_fake_spectrum.cc
+@am__fastdepCXX_TRUE@	$(am__mv) $(DEPDIR)/test_make_fake_spectrum.Tpo $(DEPDIR)/test_make_fake_spectrum.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='src/test_make_fake_spectrum.cc' object='test_make_fake_spectrum.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o test_make_fake_spectrum.o `test -f 'src/test_make_fake_spectrum.cc' || echo '$(srcdir)/'`src/test_make_fake_spectrum.cc
+
+test_make_fake_spectrum.obj: src/test_make_fake_spectrum.cc
+@am__fastdepCXX_TRUE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT test_make_fake_spectrum.obj -MD -MP -MF $(DEPDIR)/test_make_fake_spectrum.Tpo -c -o test_make_fake_spectrum.obj `if test -f 'src/test_make_fake_spectrum.cc'; then $(CYGPATH_W) 'src/test_make_fake_spectrum.cc'; else $(CYGPATH_W) '$(srcdir)/src/test_make_fake_spectrum.cc'; fi`
+@am__fastdepCXX_TRUE@	$(am__mv) $(DEPDIR)/test_make_fake_spectrum.Tpo $(DEPDIR)/test_make_fake_spectrum.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='src/test_make_fake_spectrum.cc' object='test_make_fake_spectrum.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o test_make_fake_spectrum.obj `if test -f 'src/test_make_fake_spectrum.cc'; then $(CYGPATH_W) 'src/test_make_fake_spectrum.cc'; else $(CYGPATH_W) '$(srcdir)/src/test_make_fake_spectrum.cc'; fi`
 
 test.o: src/test.cc
 @am__fastdepCXX_TRUE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT test.o -MD -MP -MF $(DEPDIR)/test.Tpo -c -o test.o `test -f 'src/test.cc' || echo '$(srcdir)/'`src/test.cc

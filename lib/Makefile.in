@@ -103,7 +103,8 @@ am_libradmat_a_OBJECTS = breit_frame.$(OBJEXT) euler_angles.$(OBJEXT) \
 	splash.$(OBJEXT) harmonic.$(OBJEXT) LLSQSolvers.$(OBJEXT) \
 	common_cfg.$(OBJEXT) formfactor_factory.$(OBJEXT) \
 	lorentzff_PiPi.$(OBJEXT) covarrying_vectors.$(OBJEXT) \
-	fake_data_ini.$(OBJEXT)
+	fake_data_ini.$(OBJEXT) fake_overlaps.$(OBJEXT) \
+	fake_spectrum.$(OBJEXT)
 libradmat_a_OBJECTS = $(am_libradmat_a_OBJECTS)
 DEFAULT_INCLUDES = -I.@am__isrc@
 depcomp = $(SHELL) $(top_srcdir)/config/depcomp
@@ -244,7 +245,9 @@ nobase_include_HEADERS = radmat/utils/aux.h radmat/utils/breit_frame.h \
 	radmat/ff/common_cfg.h radmat/ff/common_ensemble.h \
 	radmat/ff/formfactor_factory.h radmat/ff/lorentzff_PiPi.h \
 	radmat/fake_data/covarrying_vectors.h \
-	radmat/fake_data/fake_data_ini.h \
+	radmat/fake_data/fake_data.h radmat/fake_data/fake_data_ini.h \
+	radmat/fake_data/fake_overlaps.h \
+	radmat/fake_data/fake_spectrum.h \
 	radmat/fake_data/minimal_fake_data.h
 
 #
@@ -264,7 +267,9 @@ libradmat_a_SOURCES = radmat/utils/breit_frame.cc \
 	radmat/ff/LLSQSolvers.cc radmat/ff/common_cfg.cc \
 	radmat/ff/formfactor_factory.cc radmat/ff/lorentzff_PiPi.cc \
 	radmat/fake_data/covarrying_vectors.cc \
-	radmat/fake_data/fake_data_ini.cc
+	radmat/fake_data/fake_data_ini.cc \
+	radmat/fake_data/fake_overlaps.cc \
+	radmat/fake_data/fake_spectrum.cc
 all: all-am
 
 .SUFFIXES:
@@ -347,6 +352,8 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/covarrying_vectors.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/euler_angles.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/fake_data_ini.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/fake_overlaps.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/fake_spectrum.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/formfactor_factory.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/harmonic.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/lorentzff_PiPi.Po@am__quote@
@@ -550,6 +557,34 @@ fake_data_ini.obj: radmat/fake_data/fake_data_ini.cc
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='radmat/fake_data/fake_data_ini.cc' object='fake_data_ini.obj' libtool=no @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCXX_FALSE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o fake_data_ini.obj `if test -f 'radmat/fake_data/fake_data_ini.cc'; then $(CYGPATH_W) 'radmat/fake_data/fake_data_ini.cc'; else $(CYGPATH_W) '$(srcdir)/radmat/fake_data/fake_data_ini.cc'; fi`
+
+fake_overlaps.o: radmat/fake_data/fake_overlaps.cc
+@am__fastdepCXX_TRUE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT fake_overlaps.o -MD -MP -MF $(DEPDIR)/fake_overlaps.Tpo -c -o fake_overlaps.o `test -f 'radmat/fake_data/fake_overlaps.cc' || echo '$(srcdir)/'`radmat/fake_data/fake_overlaps.cc
+@am__fastdepCXX_TRUE@	$(am__mv) $(DEPDIR)/fake_overlaps.Tpo $(DEPDIR)/fake_overlaps.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='radmat/fake_data/fake_overlaps.cc' object='fake_overlaps.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o fake_overlaps.o `test -f 'radmat/fake_data/fake_overlaps.cc' || echo '$(srcdir)/'`radmat/fake_data/fake_overlaps.cc
+
+fake_overlaps.obj: radmat/fake_data/fake_overlaps.cc
+@am__fastdepCXX_TRUE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT fake_overlaps.obj -MD -MP -MF $(DEPDIR)/fake_overlaps.Tpo -c -o fake_overlaps.obj `if test -f 'radmat/fake_data/fake_overlaps.cc'; then $(CYGPATH_W) 'radmat/fake_data/fake_overlaps.cc'; else $(CYGPATH_W) '$(srcdir)/radmat/fake_data/fake_overlaps.cc'; fi`
+@am__fastdepCXX_TRUE@	$(am__mv) $(DEPDIR)/fake_overlaps.Tpo $(DEPDIR)/fake_overlaps.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='radmat/fake_data/fake_overlaps.cc' object='fake_overlaps.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o fake_overlaps.obj `if test -f 'radmat/fake_data/fake_overlaps.cc'; then $(CYGPATH_W) 'radmat/fake_data/fake_overlaps.cc'; else $(CYGPATH_W) '$(srcdir)/radmat/fake_data/fake_overlaps.cc'; fi`
+
+fake_spectrum.o: radmat/fake_data/fake_spectrum.cc
+@am__fastdepCXX_TRUE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT fake_spectrum.o -MD -MP -MF $(DEPDIR)/fake_spectrum.Tpo -c -o fake_spectrum.o `test -f 'radmat/fake_data/fake_spectrum.cc' || echo '$(srcdir)/'`radmat/fake_data/fake_spectrum.cc
+@am__fastdepCXX_TRUE@	$(am__mv) $(DEPDIR)/fake_spectrum.Tpo $(DEPDIR)/fake_spectrum.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='radmat/fake_data/fake_spectrum.cc' object='fake_spectrum.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o fake_spectrum.o `test -f 'radmat/fake_data/fake_spectrum.cc' || echo '$(srcdir)/'`radmat/fake_data/fake_spectrum.cc
+
+fake_spectrum.obj: radmat/fake_data/fake_spectrum.cc
+@am__fastdepCXX_TRUE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT fake_spectrum.obj -MD -MP -MF $(DEPDIR)/fake_spectrum.Tpo -c -o fake_spectrum.obj `if test -f 'radmat/fake_data/fake_spectrum.cc'; then $(CYGPATH_W) 'radmat/fake_data/fake_spectrum.cc'; else $(CYGPATH_W) '$(srcdir)/radmat/fake_data/fake_spectrum.cc'; fi`
+@am__fastdepCXX_TRUE@	$(am__mv) $(DEPDIR)/fake_spectrum.Tpo $(DEPDIR)/fake_spectrum.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='radmat/fake_data/fake_spectrum.cc' object='fake_spectrum.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o fake_spectrum.obj `if test -f 'radmat/fake_data/fake_spectrum.cc'; then $(CYGPATH_W) 'radmat/fake_data/fake_spectrum.cc'; else $(CYGPATH_W) '$(srcdir)/radmat/fake_data/fake_spectrum.cc'; fi`
 install-nobase_includeHEADERS: $(nobase_include_HEADERS)
 	@$(NORMAL_INSTALL)
 	@list='$(nobase_include_HEADERS)'; test -n "$(includedir)" || list=; \

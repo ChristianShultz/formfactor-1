@@ -50,10 +50,15 @@ namespace radmat
   //impl
   struct StateProps_t 
   {
-    int nStates;
-    std::string spectrumGenerator;
+    Array<double> sourceMasses;
+    double sourceVarO;
+    bool sourceUpdateCovariance;
+    bool sourceUpdateVariance;
+    Array<double> sinkMasses;
+    double sinkVarO;
+    bool sinkUpdateCovariance;
+    bool sinkUpdateVariance;
     std::string overlapGenerator;
-    double ladderSpacing;
   };
   
   struct SuppressionProps_t
@@ -70,6 +75,10 @@ namespace radmat
     std::string diag;
     int left_target;
     int right_target;
+    bool sameOp;         // is it a diag corr 
+    bool updateCovariance; // do we want all the Z to have the same timeslice covariance (probably not)
+    bool updateVariance;   // do we want all the Z to have the same variance (propbably not)
+    double varianceOrder;  // gets multiplied by a vector of normal rands [0,1]
   };
 
   struct TimeProps_t 
@@ -86,6 +95,7 @@ namespace radmat
 
   struct DataProps_t
   {
+    int ncfg;
     Array<pProp_t> momenta;
   };
 

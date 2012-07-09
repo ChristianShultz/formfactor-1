@@ -56,7 +56,8 @@ main(void)
   dump_test(ct_err,ct_test,cov.test<double>());
   dump_test(ct_err,ct_test,cov.test<std::complex<double> >());
   dump_test(ct_err,ct_test,test_minimal_fake_data(std::string("PiPi")));
-  
+  dump_test(ct_err,ct_test,test_make_fake_overlaps());
+  dump_test(ct_err,ct_test,test_make_fake_spectrum());
 
   // conclude testing
   cout << "\n**********************************\n"
