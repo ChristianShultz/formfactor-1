@@ -210,7 +210,8 @@ namespace radmat
   SemblePInv_t makeMomInvariants(const EnsemReal &E_f, 
 				 const EnsemReal &E_i,
 				 const Array<int> &p_f,
-				 const Array<int> &p_i);
+				 const Array<int> &p_i,
+         const double mom_factor);  // 1/xi * 2pi /L_s -- the "unit" size
 
   /**
      @brief generate the kinematic factor matrix for one measurement,
@@ -227,7 +228,7 @@ namespace radmat
     typedef typename SEMBLE::SembleMatrix<T> KinematicFactorMatrix;
 
     // the only available constructor
-    ffKinematicFactors_t(ffBase_h &KFacGen)
+    ffKinematicFactors_t(const ffBase_h &KFacGen)
     : m_KFacGen(KFacGen) 
     {  }
 

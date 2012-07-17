@@ -20,7 +20,7 @@ void dump_test(unsigned short &ct_err, unsigned short &ct_test,const tester &t)
 }
 
 
-int 
+  int 
 main(void)
 {
   // test the tester
@@ -36,12 +36,13 @@ main(void)
   // test the tensors
   dump_test(ct_err,ct_test,test_tensor(double(10)));
   dump_test(ct_err,ct_test,test_tensor(std::complex<double>(10,10)));
-  
+
   // test out polarisation tensors 
   dump_test(ct_err,ct_test,test_polarisation_tensor());
 
   // test the PiPi form factor
   dump_test(ct_err,ct_test,PiPi::test_ff());
+  dump_test(ct_err,ct_test,PiPi::test_ffKinematicFactor());
 
   // test the factories
   dump_test(ct_err,ct_test,test_solver_factory());
@@ -49,7 +50,7 @@ main(void)
 
   // test the LLSQ framework
   dump_test(ct_err,ct_test,test_LLSQ_solver_SVDMakeSquare());
-  
+
 
   // fake data
   test_covarrying_vectors cov;
@@ -58,12 +59,14 @@ main(void)
   dump_test(ct_err,ct_test,test_minimal_fake_data(std::string("PiPi")));
   dump_test(ct_err,ct_test,test_make_fake_overlaps());
   dump_test(ct_err,ct_test,test_make_fake_spectrum());
+  dump_test(ct_err,ct_test,test_fake_3pt_aux());
+  dump_test(ct_err,ct_test,test_fake_3pt());
 
   // conclude testing
   cout << "\n**********************************\n"
-       << ct_test - ct_err << " of " << ct_test << " tests passed.\n" << endl;
+    << ct_test - ct_err << " of " << ct_test << " tests passed.\n" << endl;
   cout << "finished testing" << endl;
-  
+
 
   if(ct_err != 0) 
     cout << "Warning: " << ct_err << " tests failed." << endl;

@@ -146,6 +146,40 @@ AC_SUBST(SEMBLE_LIBS,     "`${SEMBLE_CONFIG} --libs`")
 AC_MSG_NOTICE([semble libraries flags: ${SEMBLE_LIBS}])
 
 
+dnl --with-jackFitter=DIR
+AC_ARG_WITH(jackFitter,
+  AC_HELP_STRING(
+    [--with-jackFitter=DIR],
+    [Building on top of jackFitter where jackFitter is installed in DIR]
+  ),
+  [JACKFITTER_HOME="$with_jackFitter"]
+)
+
+if test "X${JACKFITTER_HOME}X" = "XX"; then
+  AC_PATH_PROG(JACKFITTER_CONFIG, [jackFitter-config], [])
+else
+  AC_PATH_PROG(JACKFITTER_CONFIG, [jackFitter-config], [], [${JACKFITTER_HOME}/bin:${PATH}])
+fi
+
+if test  "X${JACKFITTER_CONFIG}X" = "XX" ; then
+  AC_MSG_ERROR([jackFitter configuration program jackFitter-config not found.
+  		Cannot compile/linke without jackFitter. 
+		Use --with-jackFitter=<dir> to select a working version.])
+fi  
+
+
+AC_MSG_NOTICE([Found semble configuration program ${JACKFITTER_CONFIG}])
+AC_SUBST(CXX, "`${JACKFITTER_CONFIG} --cxx`")
+AC_MSG_NOTICE([jackFitter compiler: ${CXX}])
+AC_SUBST(JACKFITTER_CXXFLAGS, "`${JACKFITTER_CONFIG} --cxxflags`")
+AC_MSG_NOTICE([jackFitter compile flags: ${JACKFITTER_CXXFLAGS}])
+AC_SUBST(JACKFITTER_LDFLAGS,  "`${JACKFITTER_CONFIG} --ldflags`")
+AC_MSG_NOTICE([jackFitter linking flags: ${JACKFITTER_LDFLAGS}])
+AC_SUBST(JACKFITTER_LIBS,     "`${JACKFITTER_CONFIG} --libs`")
+AC_MSG_NOTICE([jackFitter libraries flags: ${JACKFITTER_LIBS}])
+
+
+
 #######################
 # Produce output
 #######################

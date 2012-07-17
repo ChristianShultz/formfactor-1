@@ -30,6 +30,32 @@ namespace radmat
     return b_op(convert_stl_type<T,U>(t),convert_stl_type<U,T>(u));
   }
 
+  // this is a useful functor for fake data that gets stuck here since it doesn't really have a home
+  template<typename T, typename U, typename V, T(*ptr)(const U, const V) >
+  struct bind1st_2ParFunction_cc
+  {
+
+    bind1st_2ParFunction_cc(void)
+    : bound(false)
+    {  }
+
+    void bind1st(const U &par1)
+    {
+      m_par = par1;
+      bound = true;
+    }
+
+    T operator()(const V &par2) const
+    {
+      POW2_ASSERT(bound);
+      return (*ptr)(m_par,par2);
+    }
+
+  private:
+    U m_par;
+    bool bound;
+  };
+
 }
 
 #endif

@@ -23,7 +23,7 @@ namespace radmat
     return p_f - p_i;
   }
 
- SemblePInv_t makeMomInvariants(const EnsemReal &E_f, const EnsemReal &E_i, const Array<int> &p_f, const Array<int> &p_i)
+ SemblePInv_t makeMomInvariants(const EnsemReal &E_f, const EnsemReal &E_i, const Array<int> &p_f, const Array<int> &p_i, const double factor)
  {
    SembleVector<double> final(E_f.size(),4);
    SembleVector<double> initial(E_i.size(),4);
@@ -39,8 +39,8 @@ namespace radmat
    for(int bin = 0; bin < ncfg; bin ++)
      for(int lorentz = 0; lorentz < 3; lorentz ++)
        {
-	 final.setElement(bin,lorentz+1,double(p_f[lorentz]));
-	 initial.setElement(bin,lorentz+1,double(p_i[lorentz]));
+	 final.setElement(bin,lorentz+1,factor*double(p_f[lorentz]));
+	 initial.setElement(bin,lorentz+1,factor*double(p_i[lorentz]));
        }
 
    return SemblePInv_t(final,initial);

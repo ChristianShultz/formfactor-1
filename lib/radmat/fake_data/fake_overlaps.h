@@ -16,8 +16,8 @@ namespace radmat
     : m_ini(ini) 
     {  }
 
-    template<typename T>
-    typename std::vector<SEMBLE::SembleMatrix<T> > generate(const int) const;
+    template<typename T>  // vector index is time, matrix index is state,op
+    typename std::vector<SEMBLE::SembleMatrix<T> > generate(const int, const std::string &source_or_sink) const; 
 
   private:
     FakeDataIni_t m_ini;
@@ -26,11 +26,21 @@ namespace radmat
 
   template<> 
   std::vector<SEMBLE::SembleMatrix<std::complex<double> > > 
-  FakeOverlaps::generate<std::complex<double> >(const int dim) const;
+  FakeOverlaps::generate<std::complex<double> >(const int dim, const std::string &source_or_sink) const;
 
   template<> 
   std::vector<SEMBLE::SembleMatrix<double> > 
-  FakeOverlaps::generate<double>(const int dim) const;
+  FakeOverlaps::generate<double>(const int dim, const std::string &source_or_sink) const;
+
+  template<typename T>
+  std::vector<SEMBLE::SembleVector<T> > pullRow(const std::vector<SEMBLE::SembleMatrix<T> > &stuff, const int row)
+  {
+    std::vector<SEMBLE::SembleVector<T> > foo;
+    typename std::vector<SEMBLE::SembleMatrix<T> >::const_iterator it;
+    for(it = stuff.begin(); it != stuff.end(); it++)
+      foo.push_back(it->getRow(row));
+    return foo;
+  }
 
 }
 

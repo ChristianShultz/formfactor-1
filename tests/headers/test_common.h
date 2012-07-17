@@ -2,6 +2,7 @@
 #define TEST_COMMON_H_H_GUARD
 
 #include "tester.h"
+#include "radmat/fake_data/fake_data_ini.h"
 #include <string>
 #include <complex>
 
@@ -16,6 +17,7 @@ namespace radmat
   {
     tester test_ff_debug(void);
     tester test_ff(void);
+  tester test_ffKinematicFactor(void);
   }
 
   // llsq 
@@ -24,11 +26,13 @@ namespace radmat
   tester test_solver_factory(void);
   tester test_mat_elem_factory(void);
 
+  FakeDataIni_t makeFakeIni(void);
+
   // fake data
   struct test_covarrying_vectors
   {
     template<typename T>
-    tester test(void) const;
+      tester test(void) const;
   };
 
   template<> tester test_covarrying_vectors::test<double>(void) const;
@@ -37,7 +41,7 @@ namespace radmat
   tester test_minimal_fake_data(const std::string &matElemID);
   tester test_make_fake_overlaps(void);
   tester test_make_fake_spectrum(void);
-  
-
+  tester test_fake_3pt_aux(void); 
+  tester test_fake_3pt(void);
 }
 #endif

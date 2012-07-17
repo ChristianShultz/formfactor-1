@@ -39,24 +39,26 @@ namespace
   {
     pack_t pack;
     pack.ncfg = ini.dataProps.ncfg;
-    pack.Lt = abs(ini.timeProps.tsink - ini.timeProps.tsource);
+    pack.Lt = abs(ini.timeProps.tsink - ini.timeProps.tsource + 1);
 
     if(s == std::string("sink"))
-      {
-	pack.uCov = ini.stateProps.sinkUpdateCovariance;
-	pack.uVar = ini.stateProps.sinkUpdateVariance;
-	pack.varO = ini.stateProps.sinkVarO;
-	pack.spectrum = ini.stateProps.sinkMasses;
-	return pack;
-      }
+    {
+      pack.uCov = ini.stateProps.mProps.sinkUpdateCovariance;
+      pack.uVar = ini.stateProps.mProps.sinkUpdateVariance;
+      pack.varO = ini.stateProps.mProps.sinkVarO;
+      pack.spectrum = ini.stateProps.mProps.sinkMasses;
+
+      return pack;
+    }
     else if(s == std::string("source"))
-      {
-	pack.uCov = ini.stateProps.sourceUpdateCovariance;
-	pack.uVar = ini.stateProps.sourceUpdateVariance;
-	pack.varO = ini.stateProps.sourceVarO;
-	pack.spectrum = ini.stateProps.sourceMasses;
-	return pack;
-      }
+    {
+      pack.uCov = ini.stateProps.mProps.sourceUpdateCovariance;
+      pack.uVar = ini.stateProps.mProps.sourceUpdateVariance;
+      pack.varO = ini.stateProps.mProps.sourceVarO;
+      pack.spectrum = ini.stateProps.mProps.sourceMasses;
+
+      return pack;
+    }
     else
       SPLASH("failed to specify source or sink");
     exit(1);
@@ -68,38 +70,44 @@ namespace
 
 namespace radmat
 {
-  
+
   std::vector<SEMBLE::SembleVector<double> > FakeSpectrum::generate(const std::string &s) const
   {
     pack_t pack = pull(m_ini,s);
     int dim = pack.spectrum.size();
     SEMBLE::SembleVector<double> zero(pack.ncfg,dim);
+    zero.zeros();
     std::vector<SEMBLE::SembleVector<double> > Lambdat(pack.Lt,zero);
     itpp::Vec<double> mean(pack.Lt);
-    itpp::Vec<double> var = pack.varO*itpp::randn(pack.Lt);
+    itpp::Vec<double> var = itpp::abs(pack.varO*itpp::randn(pack.Lt));
     corMat genCor;
     itpp::Mat<double> cor = genCor.genMat<double>(pack.Lt);    
     std::vector<itpp::Vec<double> > work;
 
     for(int elem = 0; elem < dim; elem++)
-      {
-	mean = pack.spectrum[elem];
+    {
+      mean = pack.spectrum[elem];
 
-	if(pack.uCov)
-	  cor = genCor.genMat<double>(pack.Lt);
-	if(pack.uVar)
-	  var = pack.varO * itpp::randn(pack.Lt);
+      if(pack.uCov)
+        cor = genCor.genMat<double>(pack.Lt);
+      if(pack.uVar)
+        var = itpp::abs(pack.varO * itpp::randn(pack.Lt));
 
-	work = genCovarryingDist(mean,var,cor,pack.ncfg);
+      work = genCovarryingDist(mean,var,cor,pack.ncfg);
 
-	for(int t = 0; t < pack.Lt; t++)
-	  for(int bin = 0; bin < pack.ncfg; bin++)
-	    Lambdat[t].setElement(bin,elem,work[bin][t]);
-      }
+      for(int t = 0; t < pack.Lt; t++)
+        for(int bin = 0; bin < pack.ncfg; bin++)
+          Lambdat[t].setElement(bin,elem,work[bin][t]);
+    }
+
+    //  std::cout << __func__ << std::endl;
+    //  std::vector<SEMBLE::SembleVector<double> >::const_iterator it;
+    //  for(it = Lambdat.begin(); it != Lambdat.end(); it++)
+    //      std::cout << it->mean() << std::endl;
 
     return Lambdat;
   }
-  
+
 
 
 

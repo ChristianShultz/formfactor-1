@@ -23,8 +23,9 @@ namespace radmat
     std::pair<bool,ENSEM::EnsemComplex> three;
     Array<int> p_f;                              // the momenta used
     Array<int> p_i;
-    EnsemReal E_f;                              // these are in flight energies 
-    EnsemReal E_i;                              //  ie: sqrt(m*m + p*p)
+    ENSEM::EnsemReal E_f;                              // these are in flight energies 
+    ENSEM::EnsemReal E_i;                              //  ie: sqrt(m*m + p*p)
+    double mom_fac;                           // 1/xi * 2pi/L_s -- the "unit" size
   };
 
   /////////////////////////////////////////////////////////////////////////////////
@@ -88,7 +89,7 @@ namespace radmat
 
     do {
       ffKinematicFactors_t<T> genK(FormFactorDecompositionFactoryEnv::callFactory(it->matElemID));
-      KWork = genK.genFactors(makeMomInvariants(it->E_f,it->E_i,it->p_f,it->p_i));
+      KWork = genK.genFactors(makeMomInvariants(it->E_f,it->E_i,it->p_f,it->p_i,it->mom_fac));
 
       if(it->zero.first)
 	{
@@ -169,7 +170,7 @@ namespace radmat
 	  break;
 
 	ffKinematicFactors_t<T> genK(FormFactorDecompositionFactoryEnv::callFactory(it->matElemID));
-	KWork = genK.genFactors(makeMomInvariants(it->E_f,it->E_i,it->p_f,it->p_i));
+	KWork = genK.genFactors(makeMomInvariants(it->E_f,it->E_i,it->p_f,it->p_i,it->mom_fac));
 
 	if(it->zero.first)
 	  {

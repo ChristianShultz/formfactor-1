@@ -9,6 +9,7 @@
 #include "itpp/itbase.h"
 #include "radmat/ff/lorentzff_PiPi.h"
 #include "radmat/ff/ff_gen_llsq_row.h"
+#include "radmat/ff/formfactor_factory.h"
 #include "radmat/utils/tensor.h"
 #include "radmat/utils/pow2assert.h"
 #include <complex>
@@ -58,9 +59,26 @@ namespace radmat
 	  TESTER_TEST(m_test,isEqual,"PiPi ff is broken");
 	}
 
+      PiPi barbaz;
+      TESTER_TEST(m_test,barbaz.nFacs() == 1,"nfacs() is broken");
+
       return m_test;
     }
 
+// test ffKinematicFactors_t
+
+  tester test_ffKinematicFactor(void)
+{
+  tester m_test(__func__);
+  
+  ffKinematicFactors_t<std::complex<double> >
+   foo(FormFactorDecompositionFactoryEnv::callFactory(std::string("PiPi")));
+
+  TESTER_TEST(m_test,foo.nFacs() == 1, "nFacs() broken");
+
+
+  return m_test;
+}
 
 
   } // close PiPi

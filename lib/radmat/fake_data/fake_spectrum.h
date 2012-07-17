@@ -17,6 +17,7 @@ namespace radmat
     : m_ini(ini)
     {  }
 
+    // vector index is time, semble index is state elem
     std::vector<SEMBLE::SembleVector<double> > generate(const std::string &source_or_sink) const;
 
   private:

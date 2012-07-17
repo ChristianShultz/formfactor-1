@@ -48,7 +48,8 @@ POST_INSTALL = :
 NORMAL_UNINSTALL = :
 PRE_UNINSTALL = :
 POST_UNINSTALL = :
-check_PROGRAMS = test$(EXEEXT) test_fake_ini$(EXEEXT)
+check_PROGRAMS = test$(EXEEXT) test_fake_ini$(EXEEXT) \
+	test_cov_vecs$(EXEEXT) fake_3pt_play$(EXEEXT)
 subdir = tests
 DIST_COMMON = $(srcdir)/Makefile.am $(srcdir)/Makefile.in
 ACLOCAL_M4 = $(top_srcdir)/aclocal.m4
@@ -59,15 +60,25 @@ am__configure_deps = $(am__aclocal_m4_deps) $(CONFIGURE_DEPENDENCIES) \
 mkinstalldirs = $(install_sh) -d
 CONFIG_CLEAN_FILES =
 CONFIG_CLEAN_VPATH_FILES =
+am_fake_3pt_play_OBJECTS = fake_3pt_play.$(OBJEXT)
+fake_3pt_play_OBJECTS = $(am_fake_3pt_play_OBJECTS)
+fake_3pt_play_LDADD = $(LDADD)
+fake_3pt_play_DEPENDENCIES =
 am_test_OBJECTS = test_polarisation_tensor.$(OBJEXT) \
 	test_ff_pipi.$(OBJEXT) test_LLSQ_solver.$(OBJEXT) \
 	test_factories.$(OBJEXT) test_minimal_fake_data.$(OBJEXT) \
 	test_covarrying_vector.$(OBJEXT) \
 	test_make_fake_overlaps.$(OBJEXT) \
-	test_make_fake_spectrum.$(OBJEXT) test.$(OBJEXT)
+	test_make_fake_spectrum.$(OBJEXT) test_fake_3pt_aux.$(OBJEXT) \
+	test_fake_3pt.$(OBJEXT) test_make_fake_data_ini.$(OBJEXT) \
+	test.$(OBJEXT)
 test_OBJECTS = $(am_test_OBJECTS)
 test_LDADD = $(LDADD)
 test_DEPENDENCIES =
+am_test_cov_vecs_OBJECTS = test_cov_vecs.$(OBJEXT)
+test_cov_vecs_OBJECTS = $(am_test_cov_vecs_OBJECTS)
+test_cov_vecs_LDADD = $(LDADD)
+test_cov_vecs_DEPENDENCIES =
 am_test_fake_ini_OBJECTS = test_fake_ini.$(OBJEXT)
 test_fake_ini_OBJECTS = $(am_test_fake_ini_OBJECTS)
 test_fake_ini_LDADD = $(LDADD)
@@ -81,8 +92,10 @@ CXXCOMPILE = $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) \
 CXXLD = $(CXX)
 CXXLINK = $(CXXLD) $(AM_CXXFLAGS) $(CXXFLAGS) $(AM_LDFLAGS) $(LDFLAGS) \
 	-o $@
-SOURCES = $(test_SOURCES) $(test_fake_ini_SOURCES)
-DIST_SOURCES = $(test_SOURCES) $(test_fake_ini_SOURCES)
+SOURCES = $(fake_3pt_play_SOURCES) $(test_SOURCES) \
+	$(test_cov_vecs_SOURCES) $(test_fake_ini_SOURCES)
+DIST_SOURCES = $(fake_3pt_play_SOURCES) $(test_SOURCES) \
+	$(test_cov_vecs_SOURCES) $(test_fake_ini_SOURCES)
 am__can_run_installinfo = \
   case $$AM_UPDATE_INFO_DIR in \
     n|no|NO) false;; \
@@ -123,6 +136,10 @@ INSTALL_STRIP_PROGRAM = @INSTALL_STRIP_PROGRAM@
 ITPP_CONFIG = @ITPP_CONFIG@
 ITPP_CXXFLAGS = @ITPP_CXXFLAGS@
 ITPP_LIBS = @ITPP_LIBS@
+JACKFITTER_CONFIG = @JACKFITTER_CONFIG@
+JACKFITTER_CXXFLAGS = @JACKFITTER_CXXFLAGS@
+JACKFITTER_LDFLAGS = @JACKFITTER_LDFLAGS@
+JACKFITTER_LIBS = @JACKFITTER_LIBS@
 LDFLAGS = @LDFLAGS@
 LIBOBJS = @LIBOBJS@
 LIBS = @LIBS@
@@ -201,8 +218,10 @@ AM_LDFLAGS = -L@top_builddir@/lib/ \
                @LDFLAGS@ @ADAT_LDFLAGS@ @SEMBLE_LDFLAGS@
 
 LDADD = -lradmat @SEMBLE_LIBS@ @ADAT_LIBS@ @ITPP_LIBS@ @LIBS@ 
-test_SOURCES = src/test_polarisation_tensor.cc src/test_ff_pipi.cc src/test_LLSQ_solver.cc src/test_factories.cc src/test_minimal_fake_data.cc src/test_covarrying_vector.cc src/test_make_fake_overlaps.cc src/test_make_fake_spectrum.cc src/test.cc 
+test_SOURCES = src/test_polarisation_tensor.cc src/test_ff_pipi.cc src/test_LLSQ_solver.cc src/test_factories.cc src/test_minimal_fake_data.cc src/test_covarrying_vector.cc src/test_make_fake_overlaps.cc src/test_make_fake_spectrum.cc src/test_fake_3pt_aux.cc src/test_fake_3pt.cc src/test_make_fake_data_ini.cc src/test.cc 
 test_fake_ini_SOURCES = src/test_fake_ini.cc
+test_cov_vecs_SOURCES = src/test_cov_vecs.cc
+fake_3pt_play_SOURCES = src/fake_3pt_play.cc
 
 # no idea how/why (if?) this works, cut paste job
 #
@@ -247,9 +266,15 @@ $(am__aclocal_m4_deps):
 
 clean-checkPROGRAMS:
 	-test -z "$(check_PROGRAMS)" || rm -f $(check_PROGRAMS)
+fake_3pt_play$(EXEEXT): $(fake_3pt_play_OBJECTS) $(fake_3pt_play_DEPENDENCIES) $(EXTRA_fake_3pt_play_DEPENDENCIES) 
+	@rm -f fake_3pt_play$(EXEEXT)
+	$(CXXLINK) $(fake_3pt_play_OBJECTS) $(fake_3pt_play_LDADD) $(LIBS)
 test$(EXEEXT): $(test_OBJECTS) $(test_DEPENDENCIES) $(EXTRA_test_DEPENDENCIES) 
 	@rm -f test$(EXEEXT)
 	$(CXXLINK) $(test_OBJECTS) $(test_LDADD) $(LIBS)
+test_cov_vecs$(EXEEXT): $(test_cov_vecs_OBJECTS) $(test_cov_vecs_DEPENDENCIES) $(EXTRA_test_cov_vecs_DEPENDENCIES) 
+	@rm -f test_cov_vecs$(EXEEXT)
+	$(CXXLINK) $(test_cov_vecs_OBJECTS) $(test_cov_vecs_LDADD) $(LIBS)
 test_fake_ini$(EXEEXT): $(test_fake_ini_OBJECTS) $(test_fake_ini_DEPENDENCIES) $(EXTRA_test_fake_ini_DEPENDENCIES) 
 	@rm -f test_fake_ini$(EXEEXT)
 	$(CXXLINK) $(test_fake_ini_OBJECTS) $(test_fake_ini_LDADD) $(LIBS)
@@ -260,12 +285,17 @@ mostlyclean-compile:
 distclean-compile:
 	-rm -f *.tab.c
 
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/fake_3pt_play.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/test.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/test_LLSQ_solver.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/test_cov_vecs.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/test_covarrying_vector.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/test_factories.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/test_fake_3pt.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/test_fake_3pt_aux.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/test_fake_ini.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/test_ff_pipi.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/test_make_fake_data_ini.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/test_make_fake_overlaps.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/test_make_fake_spectrum.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/test_minimal_fake_data.Po@am__quote@
@@ -284,6 +314,20 @@ distclean-compile:
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='$<' object='$@' libtool=no @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCXX_FALSE@	$(CXXCOMPILE) -c -o $@ `$(CYGPATH_W) '$<'`
+
+fake_3pt_play.o: src/fake_3pt_play.cc
+@am__fastdepCXX_TRUE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT fake_3pt_play.o -MD -MP -MF $(DEPDIR)/fake_3pt_play.Tpo -c -o fake_3pt_play.o `test -f 'src/fake_3pt_play.cc' || echo '$(srcdir)/'`src/fake_3pt_play.cc
+@am__fastdepCXX_TRUE@	$(am__mv) $(DEPDIR)/fake_3pt_play.Tpo $(DEPDIR)/fake_3pt_play.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='src/fake_3pt_play.cc' object='fake_3pt_play.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o fake_3pt_play.o `test -f 'src/fake_3pt_play.cc' || echo '$(srcdir)/'`src/fake_3pt_play.cc
+
+fake_3pt_play.obj: src/fake_3pt_play.cc
+@am__fastdepCXX_TRUE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT fake_3pt_play.obj -MD -MP -MF $(DEPDIR)/fake_3pt_play.Tpo -c -o fake_3pt_play.obj `if test -f 'src/fake_3pt_play.cc'; then $(CYGPATH_W) 'src/fake_3pt_play.cc'; else $(CYGPATH_W) '$(srcdir)/src/fake_3pt_play.cc'; fi`
+@am__fastdepCXX_TRUE@	$(am__mv) $(DEPDIR)/fake_3pt_play.Tpo $(DEPDIR)/fake_3pt_play.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='src/fake_3pt_play.cc' object='fake_3pt_play.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o fake_3pt_play.obj `if test -f 'src/fake_3pt_play.cc'; then $(CYGPATH_W) 'src/fake_3pt_play.cc'; else $(CYGPATH_W) '$(srcdir)/src/fake_3pt_play.cc'; fi`
 
 test_polarisation_tensor.o: src/test_polarisation_tensor.cc
 @am__fastdepCXX_TRUE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT test_polarisation_tensor.o -MD -MP -MF $(DEPDIR)/test_polarisation_tensor.Tpo -c -o test_polarisation_tensor.o `test -f 'src/test_polarisation_tensor.cc' || echo '$(srcdir)/'`src/test_polarisation_tensor.cc
@@ -397,6 +441,48 @@ test_make_fake_spectrum.obj: src/test_make_fake_spectrum.cc
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCXX_FALSE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o test_make_fake_spectrum.obj `if test -f 'src/test_make_fake_spectrum.cc'; then $(CYGPATH_W) 'src/test_make_fake_spectrum.cc'; else $(CYGPATH_W) '$(srcdir)/src/test_make_fake_spectrum.cc'; fi`
 
+test_fake_3pt_aux.o: src/test_fake_3pt_aux.cc
+@am__fastdepCXX_TRUE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT test_fake_3pt_aux.o -MD -MP -MF $(DEPDIR)/test_fake_3pt_aux.Tpo -c -o test_fake_3pt_aux.o `test -f 'src/test_fake_3pt_aux.cc' || echo '$(srcdir)/'`src/test_fake_3pt_aux.cc
+@am__fastdepCXX_TRUE@	$(am__mv) $(DEPDIR)/test_fake_3pt_aux.Tpo $(DEPDIR)/test_fake_3pt_aux.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='src/test_fake_3pt_aux.cc' object='test_fake_3pt_aux.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o test_fake_3pt_aux.o `test -f 'src/test_fake_3pt_aux.cc' || echo '$(srcdir)/'`src/test_fake_3pt_aux.cc
+
+test_fake_3pt_aux.obj: src/test_fake_3pt_aux.cc
+@am__fastdepCXX_TRUE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT test_fake_3pt_aux.obj -MD -MP -MF $(DEPDIR)/test_fake_3pt_aux.Tpo -c -o test_fake_3pt_aux.obj `if test -f 'src/test_fake_3pt_aux.cc'; then $(CYGPATH_W) 'src/test_fake_3pt_aux.cc'; else $(CYGPATH_W) '$(srcdir)/src/test_fake_3pt_aux.cc'; fi`
+@am__fastdepCXX_TRUE@	$(am__mv) $(DEPDIR)/test_fake_3pt_aux.Tpo $(DEPDIR)/test_fake_3pt_aux.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='src/test_fake_3pt_aux.cc' object='test_fake_3pt_aux.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o test_fake_3pt_aux.obj `if test -f 'src/test_fake_3pt_aux.cc'; then $(CYGPATH_W) 'src/test_fake_3pt_aux.cc'; else $(CYGPATH_W) '$(srcdir)/src/test_fake_3pt_aux.cc'; fi`
+
+test_fake_3pt.o: src/test_fake_3pt.cc
+@am__fastdepCXX_TRUE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT test_fake_3pt.o -MD -MP -MF $(DEPDIR)/test_fake_3pt.Tpo -c -o test_fake_3pt.o `test -f 'src/test_fake_3pt.cc' || echo '$(srcdir)/'`src/test_fake_3pt.cc
+@am__fastdepCXX_TRUE@	$(am__mv) $(DEPDIR)/test_fake_3pt.Tpo $(DEPDIR)/test_fake_3pt.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='src/test_fake_3pt.cc' object='test_fake_3pt.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o test_fake_3pt.o `test -f 'src/test_fake_3pt.cc' || echo '$(srcdir)/'`src/test_fake_3pt.cc
+
+test_fake_3pt.obj: src/test_fake_3pt.cc
+@am__fastdepCXX_TRUE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT test_fake_3pt.obj -MD -MP -MF $(DEPDIR)/test_fake_3pt.Tpo -c -o test_fake_3pt.obj `if test -f 'src/test_fake_3pt.cc'; then $(CYGPATH_W) 'src/test_fake_3pt.cc'; else $(CYGPATH_W) '$(srcdir)/src/test_fake_3pt.cc'; fi`
+@am__fastdepCXX_TRUE@	$(am__mv) $(DEPDIR)/test_fake_3pt.Tpo $(DEPDIR)/test_fake_3pt.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='src/test_fake_3pt.cc' object='test_fake_3pt.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o test_fake_3pt.obj `if test -f 'src/test_fake_3pt.cc'; then $(CYGPATH_W) 'src/test_fake_3pt.cc'; else $(CYGPATH_W) '$(srcdir)/src/test_fake_3pt.cc'; fi`
+
+test_make_fake_data_ini.o: src/test_make_fake_data_ini.cc
+@am__fastdepCXX_TRUE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT test_make_fake_data_ini.o -MD -MP -MF $(DEPDIR)/test_make_fake_data_ini.Tpo -c -o test_make_fake_data_ini.o `test -f 'src/test_make_fake_data_ini.cc' || echo '$(srcdir)/'`src/test_make_fake_data_ini.cc
+@am__fastdepCXX_TRUE@	$(am__mv) $(DEPDIR)/test_make_fake_data_ini.Tpo $(DEPDIR)/test_make_fake_data_ini.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='src/test_make_fake_data_ini.cc' object='test_make_fake_data_ini.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o test_make_fake_data_ini.o `test -f 'src/test_make_fake_data_ini.cc' || echo '$(srcdir)/'`src/test_make_fake_data_ini.cc
+
+test_make_fake_data_ini.obj: src/test_make_fake_data_ini.cc
+@am__fastdepCXX_TRUE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT test_make_fake_data_ini.obj -MD -MP -MF $(DEPDIR)/test_make_fake_data_ini.Tpo -c -o test_make_fake_data_ini.obj `if test -f 'src/test_make_fake_data_ini.cc'; then $(CYGPATH_W) 'src/test_make_fake_data_ini.cc'; else $(CYGPATH_W) '$(srcdir)/src/test_make_fake_data_ini.cc'; fi`
+@am__fastdepCXX_TRUE@	$(am__mv) $(DEPDIR)/test_make_fake_data_ini.Tpo $(DEPDIR)/test_make_fake_data_ini.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='src/test_make_fake_data_ini.cc' object='test_make_fake_data_ini.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o test_make_fake_data_ini.obj `if test -f 'src/test_make_fake_data_ini.cc'; then $(CYGPATH_W) 'src/test_make_fake_data_ini.cc'; else $(CYGPATH_W) '$(srcdir)/src/test_make_fake_data_ini.cc'; fi`
+
 test.o: src/test.cc
 @am__fastdepCXX_TRUE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT test.o -MD -MP -MF $(DEPDIR)/test.Tpo -c -o test.o `test -f 'src/test.cc' || echo '$(srcdir)/'`src/test.cc
 @am__fastdepCXX_TRUE@	$(am__mv) $(DEPDIR)/test.Tpo $(DEPDIR)/test.Po
@@ -410,6 +496,20 @@ test.obj: src/test.cc
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='src/test.cc' object='test.obj' libtool=no @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCXX_FALSE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o test.obj `if test -f 'src/test.cc'; then $(CYGPATH_W) 'src/test.cc'; else $(CYGPATH_W) '$(srcdir)/src/test.cc'; fi`
+
+test_cov_vecs.o: src/test_cov_vecs.cc
+@am__fastdepCXX_TRUE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT test_cov_vecs.o -MD -MP -MF $(DEPDIR)/test_cov_vecs.Tpo -c -o test_cov_vecs.o `test -f 'src/test_cov_vecs.cc' || echo '$(srcdir)/'`src/test_cov_vecs.cc
+@am__fastdepCXX_TRUE@	$(am__mv) $(DEPDIR)/test_cov_vecs.Tpo $(DEPDIR)/test_cov_vecs.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='src/test_cov_vecs.cc' object='test_cov_vecs.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o test_cov_vecs.o `test -f 'src/test_cov_vecs.cc' || echo '$(srcdir)/'`src/test_cov_vecs.cc
+
+test_cov_vecs.obj: src/test_cov_vecs.cc
+@am__fastdepCXX_TRUE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT test_cov_vecs.obj -MD -MP -MF $(DEPDIR)/test_cov_vecs.Tpo -c -o test_cov_vecs.obj `if test -f 'src/test_cov_vecs.cc'; then $(CYGPATH_W) 'src/test_cov_vecs.cc'; else $(CYGPATH_W) '$(srcdir)/src/test_cov_vecs.cc'; fi`
+@am__fastdepCXX_TRUE@	$(am__mv) $(DEPDIR)/test_cov_vecs.Tpo $(DEPDIR)/test_cov_vecs.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='src/test_cov_vecs.cc' object='test_cov_vecs.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o test_cov_vecs.obj `if test -f 'src/test_cov_vecs.cc'; then $(CYGPATH_W) 'src/test_cov_vecs.cc'; else $(CYGPATH_W) '$(srcdir)/src/test_cov_vecs.cc'; fi`
 
 test_fake_ini.o: src/test_fake_ini.cc
 @am__fastdepCXX_TRUE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT test_fake_ini.o -MD -MP -MF $(DEPDIR)/test_fake_ini.Tpo -c -o test_fake_ini.o `test -f 'src/test_fake_ini.cc' || echo '$(srcdir)/'`src/test_fake_ini.cc

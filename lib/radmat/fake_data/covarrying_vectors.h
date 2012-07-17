@@ -13,6 +13,7 @@ namespace radmat
     typedef std::complex<double> dc;
   };
 
+  // return a vector/matrix of random numbers
   struct wrapRandN
   {
   public:
@@ -31,6 +32,8 @@ namespace radmat
   //
   //
 
+
+  // calculate the covariance of the distribution 
   struct wrapCov
   {
   public: 
@@ -44,6 +47,7 @@ namespace radmat
   //
   //
 
+  // calculate the correlation matrix of the distribution
   struct wrapCor
   {
   public:
@@ -57,6 +61,7 @@ namespace radmat
   //
   //
 
+  // generate a covarrying distribution
   template<typename T>
   std::vector<itpp::Vec<T> > genCovarryingDist(const itpp::Vec<T> &mean,
 					       const itpp::Vec<double> &variance,       // (y - ybar)* x (y - ybar) -- real!
@@ -132,6 +137,7 @@ namespace radmat
   //
   //
 
+  // generate a valid correlation Matrix in R^n or C^n
   struct corMat
   {
   public:

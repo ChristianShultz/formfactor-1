@@ -158,6 +158,10 @@ INSTALL_STRIP_PROGRAM = @INSTALL_STRIP_PROGRAM@
 ITPP_CONFIG = @ITPP_CONFIG@
 ITPP_CXXFLAGS = @ITPP_CXXFLAGS@
 ITPP_LIBS = @ITPP_LIBS@
+JACKFITTER_CONFIG = @JACKFITTER_CONFIG@
+JACKFITTER_CXXFLAGS = @JACKFITTER_CXXFLAGS@
+JACKFITTER_LDFLAGS = @JACKFITTER_LDFLAGS@
+JACKFITTER_LIBS = @JACKFITTER_LIBS@
 LDFLAGS = @LDFLAGS@
 LIBOBJS = @LIBOBJS@
 LIBS = @LIBS@
@@ -245,7 +249,9 @@ nobase_include_HEADERS = radmat/utils/aux.h radmat/utils/breit_frame.h \
 	radmat/ff/llsq_solver.h radmat/ff/llsq_solvers.h \
 	radmat/ff/lorentzff_PiPi.h \
 	radmat/fake_data/covarrying_vectors.h \
-	radmat/fake_data/fake_data.h radmat/fake_data/fake_data_ini.h \
+	radmat/fake_data/fake_3pt_function.h \
+	radmat/fake_data/fake_3pt_function_aux.h \
+	radmat/fake_data/fake_data_ini.h \
 	radmat/fake_data/fake_overlaps.h \
 	radmat/fake_data/fake_spectrum.h \
 	radmat/fake_data/minimal_fake_data.h

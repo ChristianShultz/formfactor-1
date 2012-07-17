@@ -1,18 +1,19 @@
 #
 # Boiler Plate stuff: Autoconf Substitutions etc
 #
-AM_CXXFLAGS = -I@top_srcdir@/lib \
-               @CXXFLAGS@ @ADAT_CXXFLAGS@ @ITPP_CXXFLAGS@ 
+AM_CXXFLAGS = 	-I@top_srcdir@/lib		\
+		@CXXFLAGS@ @SEMBLE_CXXFLAGS@ @JACKFITTER_CXXFLAGS@ @ADAT_CXXFLAGS@ @ITPP_CXXFLAGS@
 
 AM_LDFLAGS  = -L@top_builddir@/lib/ \
-               @LDFLAGS@ @ADAT_LDFLAGS@
+               @LDFLAGS@ @SEMBLE_LDFLAGS@ @JACKFITTER_LDFLAGS@ @ADAT_LDFLAGS@
 
-LDADD = @ADAT_LIBS@ @ITPP_LIBS@ @LIBS@ -lradmat
+LDADD = -lradmat @SEMBLE_LIBS@ @JACKFITTER_LIBS@ @ADAT_LIBS@ @ITPP_LIBS@ @LIBS@ 
 
-bin_PROGRAMS = hello
+noinst_PROGRAMS = hello plot_fake_3pt
 
 hello_SOURCES = hello.cc
 
+plot_fake_3pt_SOURCES = plot_fake_3pt.cc
 
 # no idea how/why this works, cut paste job
 #
