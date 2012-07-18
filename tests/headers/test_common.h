@@ -43,5 +43,6 @@ namespace radmat
   tester test_make_fake_spectrum(void);
   tester test_fake_3pt_aux(void); 
   tester test_fake_3pt(void);
+  tester test_gen_fake_dataset(void);
 }
 #endif

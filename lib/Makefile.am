@@ -12,7 +12,7 @@ nobase_include_HEADERS = radmat/utils/aux.h radmat/utils/breit_frame.h radmat/ut
 nobase_include_HEADERS += radmat/ff/ff_gen_llsq_row.h radmat/ff/formfactor_factory.h radmat/ff/llsq_gen_system.h radmat/ff/llsq_solver.h radmat/ff/llsq_solvers.h radmat/ff/lorentzff_PiPi.h radmat/ff/lorentzff_PiPiStar.h
 
 #fake_data
-nobase_include_HEADERS += radmat/fake_data/covarrying_vectors.h radmat/fake_data/fake_3pt_function.h radmat/fake_data/fake_3pt_function_aux.h radmat/fake_data/fake_data_ini.h radmat/fake_data/fake_overlaps.h radmat/fake_data/fake_spectrum.h radmat/fake_data/minimal_fake_data.h
+nobase_include_HEADERS += radmat/fake_data/covarrying_vectors.h radmat/fake_data/fake_3pt_function.h radmat/fake_data/fake_3pt_function_aux.h radmat/fake_data/fake_data_ini.h radmat/fake_data/fake_overlaps.h radmat/fake_data/fake_spectrum.h radmat/fake_data/gen_fake_dataset.h radmat/fake_data/minimal_fake_data.h
 
 
 

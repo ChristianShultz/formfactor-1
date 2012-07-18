@@ -254,6 +254,7 @@ nobase_include_HEADERS = radmat/utils/aux.h radmat/utils/breit_frame.h \
 	radmat/fake_data/fake_data_ini.h \
 	radmat/fake_data/fake_overlaps.h \
 	radmat/fake_data/fake_spectrum.h \
+	radmat/fake_data/gen_fake_dataset.h \
 	radmat/fake_data/minimal_fake_data.h
 
 #

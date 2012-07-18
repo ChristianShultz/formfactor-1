@@ -18,6 +18,9 @@ namespace radmat
     std::string elemIDBase;
     ENSEM::EnsemReal E_source;
     ENSEM::EnsemReal E_sink;
+    ENSEM::EnsemComplex Z_source;
+    ENSEM::EnsemComplex Z_sink;
+    ENSEM::EnsemReal Q2;
     pProp_t mom;
   };
 
@@ -34,10 +37,6 @@ namespace radmat
           const pProp_t &mom)
         : m_inputs(inputs)
       { 
-        m_key.lorentz = lorentz;
-        m_key.hel_source = hel_source;
-        m_key.hel_sink = hel_sink;
-        m_key.mom = mom;
 
         int source = inputs->original->ini.matElemProps.right_target;
         int sink = inputs->original->ini.matElemProps.left_target;
@@ -53,11 +52,31 @@ namespace radmat
         else  
           m_key.elemIDBase = inputs->working->ini.matElemProps.off;
 
-
+        // fill in the key
+        m_key.lorentz = lorentz;
+        m_key.hel_source = hel_source;
+        m_key.hel_sink = hel_sink;
+        m_key.mom = mom;
         m_key.E_source = getE(inputs->working->specsource,inputs->working->ini.matElemProps.right_target);
         m_key.E_sink = getE(inputs->working->specsink,inputs->working->ini.matElemProps.left_target);
+        m_key.Z_source = getZ(inputs->working->zsource[inputs->working->ini.timeProps.tsource],
+            inputs->working->ini.matElemProps.right_target);
+        m_key.Z_sink = getZ(inputs->working->zsink[inputs->working->ini.timeProps.tsink],
+            inputs->working->ini.matElemProps.left_target);
+
+        SemblePInv_t mom_inv =   makeMomInvariants( m_key.E_sink,
+            m_key.E_source,
+            mom.momSink,
+            mom.momSource,
+            inputs->working->mom_factor);
+
+        SEMBLE::SembleVector<double> q = (mom_inv.first - mom_inv.second);
+        ENSEM::EnsemReal Q2 = (-q(0)*q(0) + q(1)*q(1) + q(2)*q(2) + q(3)*q(3));
+
+        m_key.Q2 = Q2;
 
 
+        // fake up the three pt function
         m_threePtFcn.resize(m_key.E_source.size());
         m_threePtFcn.resizeObs(inputs->working->specsink.size());
         m_threePtFcn = SEMBLE::toScalar(T(0.));
@@ -67,12 +86,20 @@ namespace radmat
 
       }
 
+
+      Fake3ptCorr(const Fake3ptCorr<T> &o)
+        :m_key(o.m_key) , m_threePtFcn(o.m_threePtFcn) , m_inputs(o.m_inputs)
+      {
+
+      }
+
+
       public:
-      Fake3ptKey& getKey(void) const {return m_key;}
+      const Fake3ptKey& getKey(void) const {return m_key;}
       Fake3ptKey& getKey(void) {return m_key;}
-      typename SEMBLE::PromoteEnsemVec<T>::Type& get3pt(void) const {return m_threePtFcn;}
+      const typename SEMBLE::PromoteEnsemVec<T>::Type& get3pt(void) const {return m_threePtFcn;}
       typename SEMBLE::PromoteEnsemVec<T>::Type& get3pt(void) {return m_threePtFcn;}
-      typename ADAT::Handle<FakeDataInputs<T> >& getInputs(void) const {return m_inputs;}
+      const typename ADAT::Handle<FakeDataInputs<T> >& getInputs(void) const {return m_inputs;}
       typename ADAT::Handle<FakeDataInputs<T> >& getInputs(void) {return m_inputs;}
 
 
@@ -91,9 +118,14 @@ namespace radmat
         return ret;      
       }
 
+      ENSEM::EnsemComplex getZ(const SEMBLE::SembleVector<std::complex<double> > &zz, const int state)
+      {
+        return zz(state);
+      } 
+
+
       private:
       Fake3ptCorr(void);
-      Fake3ptCorr(const Fake3ptCorr<T> &o);
 
       Fake3ptKey m_key;
       typename SEMBLE::PromoteEnsemVec<T>::Type m_threePtFcn;

@@ -61,6 +61,7 @@ main(void)
   dump_test(ct_err,ct_test,test_make_fake_spectrum());
   dump_test(ct_err,ct_test,test_fake_3pt_aux());
   dump_test(ct_err,ct_test,test_fake_3pt());
+  dump_test(ct_err,ct_test,test_gen_fake_dataset());
 
   // conclude testing
   cout << "\n**********************************\n"
