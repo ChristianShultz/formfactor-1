@@ -39,12 +39,19 @@ namespace radmat
         m_key.hel_sink = hel_sink;
         m_key.mom = mom;
 
-        if(inputs->working->ini.matElemProps.left_target > inputs->working->ini.matElemProps.right_target)  
-          m_key.elemIDBase = inputs->working->ini.matElemProps.upper;
-        else if(inputs->working->ini.matElemProps.left_target < inputs->working->ini.matElemProps.right_target)
-          m_key.elemIDBase = inputs->working->ini.matElemProps.lower;
-        else
+        int source = inputs->original->ini.matElemProps.right_target;
+        int sink = inputs->original->ini.matElemProps.left_target;
+
+        double Esink,Esource,meanvar;
+        Esink = SEMBLE::toScalar(ENSEM::mean(inputs->original->specsink[0](sink)));
+        Esource = SEMBLE::toScalar(ENSEM::mean(inputs->original->specsource[0](source)));
+        meanvar = inputs->original->ini.stateProps.mProps.sourceVarO + inputs->original->ini.stateProps.mProps.sinkVarO;
+
+        // try to figure out if we are looking at a diagonal guy or not -- duct tape and dreams
+        if( fabs(Esink - Esource)/std::max(Esink,Esource) <= meanvar)
           m_key.elemIDBase = inputs->working->ini.matElemProps.diag;
+        else  
+          m_key.elemIDBase = inputs->working->ini.matElemProps.off;
 
 
         m_key.E_source = getE(inputs->working->specsource,inputs->working->ini.matElemProps.right_target);

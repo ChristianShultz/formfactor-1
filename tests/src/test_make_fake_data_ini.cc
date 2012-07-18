@@ -6,7 +6,7 @@
 
  * Creation Date : 13-07-2012
 
- * Last Modified : Tue Jul 17 13:31:04 2012
+ * Last Modified : Tue Jul 17 16:19:31 2012
 
  * Created By : shultz
 
@@ -50,10 +50,9 @@ namespace radmat
 
 
     // matElemProps
-    ini.matElemProps.upper = std::string("PiPi");
-    ini.matElemProps.lower = ini.matElemProps.upper;
-    ini.matElemProps.diag = ini.matElemProps.lower;
-    ini.matElemProps.left_target = 0;
+    ini.matElemProps.diag = std::string("PiPi");
+    ini.matElemProps.off = ini.matElemProps.diag;
+      ini.matElemProps.left_target = 0;
     ini.matElemProps.right_target = ini.matElemProps.left_target;
 
     // timeProps

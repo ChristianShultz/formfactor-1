@@ -13,6 +13,7 @@
 
 // ffs
 #include "lorentzff_PiPi.h"
+#include "lorentzff_PiPiStar.h"
 
 namespace FacEnv = radmat::FormFactorDecompositionFactoryEnv;
 typedef radmat::TheFormFactorDecompositionFactory Factory;
@@ -29,13 +30,13 @@ namespace radmat
 
       // helper function
       template<class T, class U> 
-      T* upCast(void)
-      {
-	T *t = new U();
-	POW2_ASSERT(t);
-	return t;
-      }
-      
+        T* upCast(void)
+        {
+          T *t = new U();
+          POW2_ASSERT(t);
+          return t;
+        }
+
       bool registered = false;
     }
 
@@ -48,13 +49,13 @@ namespace radmat
       ffBase_t<std::complex<double> > *foo;
 
       try
-	{
-	  foo = TheFormFactorDecompositionFactory::Instance().createObject(matElemID);
-	}
+      {
+        foo = TheFormFactorDecompositionFactory::Instance().createObject(matElemID);
+      }
       catch(...)
-	{
-	  POW2_ASSERT(false);
-	}
+      {
+        POW2_ASSERT(false);
+      }
 
       POW2_ASSERT(foo);
       return ADAT::Handle<ffBase_t<std::complex<double> > >(foo);
@@ -66,13 +67,14 @@ namespace radmat
       bool success = true;
 
       if(!!!registered)
-	{
-	  success &= Factory::Instance().registerObject(std::string("PiPi"),FacEnv::upCast<ffBase_t<std::complex<double> > ,radmat::PiPi::PiPi>);
-	  success &= Factory::Instance().registerObject(std::string("PiPi_0_0"),FacEnv::upCast<ffBase_t<std::complex<double> > ,radmat::PiPi::PiPi>);
+      {
+        success &= Factory::Instance().registerObject(std::string("PiPi"),FacEnv::upCast<ffBase_t<std::complex<double> > ,radmat::PiPi::PiPi>);
+        success &= Factory::Instance().registerObject(std::string("PiPi_0_0"),FacEnv::upCast<ffBase_t<std::complex<double> > ,radmat::PiPi::PiPi>);
+        success &= Factory::Instance().registerObject(std::string("PiPiStar_0_0"),FacEnv::upCast<ffBase_t<std::complex<double> > ,radmat::PiPiStar::PiPiStar>);
 
 
-	  registered = true;
-	}
+        registered = true;
+      }
 
       return success;
     }

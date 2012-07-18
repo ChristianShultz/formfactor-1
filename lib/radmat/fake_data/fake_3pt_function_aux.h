@@ -17,9 +17,11 @@
 #include <string>
 #include <sstream>
 #include <iostream>
+#include <algorithm>
 
 namespace radmat
 {
+
 
   // FWD
   ///////
@@ -70,6 +72,8 @@ namespace radmat
   /////////////////////////////////////////////////////////////////////////////
 
 
+//#define DEBUG_FAKE_MAT_ELEM_CJS
+
   struct FakeMatrixElement
   {
     typedef bind1st_2ParFunction_cc<double,int,double,&HarmonicPlusOne> ffFunction;
@@ -96,6 +100,7 @@ namespace radmat
       for(unsigned int k = 0; k < ffgen.size(); k++)
         matelem += K_k(k) * SEMBLE::toScalar(ffgen[k](Q2));
 
+#ifdef DEBUG_FAKE_MAT_ELEM_CJS
        // -- DEBUG
          std::cout << __func__ << std::endl;
          std::cout << "matelem " << SEMBLE::toScalar(ENSEM::mean(matelem)) << std::endl;
@@ -105,11 +110,13 @@ namespace radmat
          std::cout << "K_k(0) " << SEMBLE::toScalar(ENSEM::mean(K_k(0))) << std::endl;
          std::cout << "ffgen[0](Q2) " << ffgen[0](Q2) << std::endl;
          std::cout << "Q2 " << Q2 << std::endl;
+#endif
        
       return matelem * exp;
     }
   };
 
+#undef DEBUG_FAKE_MAT_ELEM_CJS
 
   /////////////////////////////////////////////////////////////////////////////
   /////////////////////////////////////////////////////////////////////////////
@@ -259,7 +266,7 @@ namespace radmat
       itpp::Mat<std::vector<FakeMatrixElement::ffFunction> > ffmv(szSource,szSink);
 
       typename ADAT::Handle<ffBase_t<T> > foobar =
-        FormFactorDecompositionFactoryEnv::callFactory(ini.matElemProps.upper);
+        FormFactorDecompositionFactoryEnv::callFactory(ini.matElemProps.diag);
       int nff = foobar->nFacs();
 
       for(int n = 0; n < szSource; n++)
@@ -429,12 +436,17 @@ namespace radmat
         for(int sink = 0; sink < nsink; sink++)
         {
           std::stringstream ss;
-          if(source < sink)
-            ss << handle->ini.matElemProps.lower;
-          else if(source == sink)
+
+          double Esink,Esource,meanvar;
+          Esink = SEMBLE::toScalar(ENSEM::mean(inputs->original->specsink[0](sink)));
+          Esource = SEMBLE::toScalar(ENSEM::mean(inputs->original->specsource[0](source)));
+          meanvar = handle->ini.stateProps.mProps.sourceVarO + handle->ini.stateProps.mProps.sinkVarO;
+
+          // try to figure out if we are looking at a diagonal guy or not -- duct tape and dreams
+          if( fabs(Esink - Esource)/std::max(Esink,Esource) <= meanvar)
             ss << handle->ini.matElemProps.diag;
           else 
-            ss << handle->ini.matElemProps.upper;
+            ss << handle->ini.matElemProps.off;
 
           ss << "_" << hel_source << "_" << hel_sink;
 

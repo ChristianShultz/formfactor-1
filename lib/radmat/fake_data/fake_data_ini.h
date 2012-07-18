@@ -103,9 +103,8 @@ namespace radmat
 
   struct MatElemProps_t
   {
-    std::string upper;   // think of the things that go into fake data as a sum over a matrix
-    std::string lower;   // Sum_n,m   factor(time) * <n| j | m> -- the decomps are time dependent
-    std::string diag;
+    std::string off;    // think of the things that go into fake data as a sum over a matrix
+    std::string diag;   // Sum_n,m   factor(time) * <n| j | m> -- the decomps are time dependent
     int left_target;
     int right_target;
   };

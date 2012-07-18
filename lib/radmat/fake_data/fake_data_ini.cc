@@ -244,16 +244,8 @@ namespace radmat
   {
     XMLReader ptop(xml,path);
 
-    if(ptop.count("upper") > 0 )
-      read(ptop,"upper",prop.upper);
-    else
-    {
-      SPLASH("need to provide decompositions");
-      exit(1);
-    }
-
-    if(ptop.count("lower") > 0)
-      read(ptop,"lower",prop.lower);
+    if(ptop.count("off") > 0 )
+      read(ptop,"off",prop.off);
     else
     {
       SPLASH("need to provide decompositions");
@@ -464,8 +456,7 @@ namespace radmat
   std::string write_params(const MatElemProps_t &ini)
   {
     std::stringstream ss;
-    ss << "upper: " << ini.upper << n;
-    ss << "lower: " << ini.lower << n;
+    ss << "off: " << ini.off << n;
     ss << "diag: " << ini.diag << n;
     ss << "left_target: " << ini.left_target << n;
     ss << "right_target: " << ini.right_target << n;
