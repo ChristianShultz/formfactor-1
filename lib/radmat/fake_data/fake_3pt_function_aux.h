@@ -76,7 +76,7 @@ namespace radmat
 
   struct FakeMatrixElement
   {
-    typedef bind1st_2ParFunction_cc<double,int,double,&HarmonicPlusOne> ffFunction;
+    typedef bind1st_2ParFunction_cc<double,int,double,&One> ffFunction;
 
     ENSEM::EnsemComplex operator()(const std::string &elemID, 
         const int t,

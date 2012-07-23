@@ -45,6 +45,17 @@ namespace radmat
       p_f(o.p_f) , p_i(o.p_i) , E_f(o.E_f) , E_i(o.E_i) , mom_fac(o.mom_fac)
     {  }
 
+    ENSEM::EnsemReal Q2(void) const
+    {
+      double pp(0); 
+      pp = mom_fac*mom_fac*((p_f[0] - p_i[0])*(p_f[0] - p_i[0])
+          + (p_f[1] - p_i[1])*(p_f[1] - p_i[1])
+          + (p_f[2] - p_i[2])*(p_f[2] - p_i[2]));
+
+
+      return ( - (E_f-E_i)*(E_f-E_i) + SEMBLE::toScalar(pp));
+    }
+
 
     std::string matElemID;                      // int the h_f h_i language
     std::pair<bool,ENSEM::EnsemComplex> zero;   // lorentz index of measurements
@@ -56,6 +67,7 @@ namespace radmat
     ENSEM::EnsemReal E_f;                              // these are in flight energies 
     ENSEM::EnsemReal E_i;                              //  ie: sqrt(m*m + p*p)
     double mom_fac;                           // 1/xi * 2pi/L_s -- the "unit" size  
+
   };
 
   /////////////////////////////////////////////////////////////////////////////////
@@ -111,7 +123,7 @@ namespace radmat
   ///////////////////////////////////////////////////////////////////////////////////////////
 
   template<typename T>
-     ADAT::Handle<LLSQInputType_t<T> > generateLLSQSystem(const std::vector<LLSQDataPoint> &data)
+    ADAT::Handle<LLSQInputType_t<T> > generateLLSQSystem(const std::vector<LLSQDataPoint> &data)
     {
 
       typename LLSQInputType_t<T>::KinematicFactors K,KWork;

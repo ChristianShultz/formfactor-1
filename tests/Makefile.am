@@ -1,13 +1,14 @@
 #
 # Boiler Plate stuff: Autoconf Substitutions etc
 #
-AM_CXXFLAGS = -I@top_srcdir@/lib \
-               @CXXFLAGS@ @ADAT_CXXFLAGS@ @ITPP_CXXFLAGS@ @SEMBLE_CXXFLAGS@
+AM_CXXFLAGS =   -I@top_srcdir@/lib              \
+                @CXXFLAGS@ @SEMBLE_CXXFLAGS@ @JACKFITTER_CXXFLAGS@ @ADAT_CXXFLAGS@ @ITPP_CXXFLAGS@
 
 AM_LDFLAGS  = -L@top_builddir@/lib/ \
-               @LDFLAGS@ @ADAT_LDFLAGS@ @SEMBLE_LDFLAGS@
+               @LDFLAGS@ @SEMBLE_LDFLAGS@ @JACKFITTER_LDFLAGS@ @ADAT_LDFLAGS@
 
-LDADD = -lradmat @SEMBLE_LIBS@ @ADAT_LIBS@ @ITPP_LIBS@ @LIBS@ 
+LDADD = -lradmat @SEMBLE_LIBS@ @JACKFITTER_LIBS@ @ADAT_LIBS@ @ITPP_LIBS@ @LIBS@ 
+
 
 
 check_PROGRAMS = test test_fake_ini test_cov_vecs fake_3pt_play

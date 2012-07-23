@@ -32,6 +32,9 @@ namespace radmat
         for(it = in->begin(); it != in->end(); it++)
           tmp.insert(it->first, m_solver(it->second, m_solverID));
 
+
+        tmp.setQ2(in->Q2());
+
         return transformLLSQRetPack(tmp);
       }
 

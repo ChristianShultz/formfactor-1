@@ -19,6 +19,7 @@ namespace radmat
   double HermiteP(const int n, const double x);
   double Harmonic(const int n, const double x);
   double HarmonicPlusOne(const int n, const double x);
+  double One(const int , const double); // returns one
       
 }
 #endif

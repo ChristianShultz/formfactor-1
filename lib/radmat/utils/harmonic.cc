@@ -76,4 +76,9 @@ namespace radmat
     return Harmonic(n,x) + 1;
   }
 
+  double One(const int, const double)
+  {
+  return double(1);
+  }
+
 }

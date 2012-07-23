@@ -51,19 +51,41 @@ namespace radmat
       typedef typename map_t::value_type value_type;
 
 
+      LLSQRet_t_Q2Pack(void) {}
+
+
+      LLSQRet_t_Q2Pack(const LLSQRet_t_Q2Pack &o)
+        : m_map(o.m_map) , m_Q2(o.m_Q2)
+      {}
+
+      ~LLSQRet_t_Q2Pack(void) {}
+
       // stl wrappers
       iterator begin(void) {return m_map.begin();}
       const_iterator begin(void) const {return m_map.begin();}
       iterator end(void) {return m_map.end();}
       const_iterator end(void) const {return m_map.end();}
+      ENSEM::EnsemReal Q2(void) const {return m_Q2;}
+      void setQ2(const ENSEM::EnsemReal &Q2) {m_Q2 = Q2;}
 
+
+      unsigned int size(void) const {return m_map.size();}
 
       void insert(const int t, const LLSQRetTypeBase_h &v)
       {
+
+        if(m_map.find(t) != m_map.end())
+        {
+          SPLASH("map key already present, exiting");
+          exit(1);
+        }
+
         m_map.insert(value_type(t,v->m_FF));
       }
 
       map_t m_map;
+      ENSEM::EnsemReal m_Q2;
+
 
     };
 
@@ -71,6 +93,16 @@ namespace radmat
   template<typename T>
     struct LLSQRet_ff_Q2Pack
     {
+
+      LLSQRet_ff_Q2Pack(void) {}
+
+      LLSQRet_ff_Q2Pack(const LLSQRet_ff_Q2Pack &o)
+        : m_map(o.m_map) , m_Q2(o.m_Q2)
+      {}
+
+      ~LLSQRet_ff_Q2Pack(void) {}
+
+
       typedef typename std::map<int, typename SEMBLE::PromoteEnsemVec<T>::Type > map_t;
 
       // map index to ensem FF(t)
@@ -84,26 +116,41 @@ namespace radmat
       const_iterator begin(void) const {return m_map.begin();}
       iterator end(void) {return m_map.end();}
       const_iterator end(void) const {return m_map.end();}
+      ENSEM::EnsemReal Q2(void) const {return m_Q2;}
+      void setQ2(const ENSEM::EnsemReal &Q2) {m_Q2 = Q2;}
 
-      void insert(const int ff_num, typename SEMBLE::PromoteEnsemVec<T>::Type &ensem)
+
+      unsigned int size(void) const {return m_map.size();}
+
+      void insert(const int ff_num, const typename SEMBLE::PromoteEnsemVec<T>::Type &ensem)
       {
+
+        // no double insertions, this is a one off class
+        if(m_map.find(ff_num) != m_map.end())
+        {
+          SPLASH("map key already present, exiting");
+          exit(1);
+        }
+
         m_map.insert(value_type(ff_num,ensem));
       }
 
       map_t m_map;
+      ENSEM::EnsemReal m_Q2;
+
     };
 
 
   template<typename T>
-  struct Q2Pack
-{
-  LLSQDataPointQ2Pack latticeData;   
-  LLSQRet_ff_Q2Pack<T> formFactors;
-};
+    struct Q2Pack
+    {
+      LLSQDataPointQ2Pack latticeData;   
+      LLSQRet_ff_Q2Pack<T> formFactors;
+    };
 
 
 
-// transform from the LLSQ storage scheme to a schem indexed by ff#
+  // transform from the LLSQ storage scheme to a schem indexed by ff#
 
 
   template<typename T>
@@ -120,9 +167,9 @@ namespace radmat
       zero.resizeObs(Lt);
       zero = SEMBLE::toScalar(T(0));
 
-      // init the map to zero
-      for(int i = 0; i < nff; i++)
-        out.insert(i,zero);
+      //      // init the map to zero
+      //      for(int i = 0; i < nff; i++)
+      //        out.insert(i,zero);
 
       typename LLSQRet_t_Q2Pack<T>::const_iterator it;
 
@@ -136,6 +183,19 @@ namespace radmat
 
         out.insert(i,tmp);
       }
+
+      std::cout << __func__ <<  "  " << out.size() << std::endl;
+
+      typename SEMBLE::PromoteEnsemVec<T>::Type tmp;
+      tmp = out.begin()->second;
+      std::cout << __func__ << std::endl;
+      for(int t = 0; t < Lt; t++)
+        std::cout << "t = " << t << " " 
+          << SEMBLE::toScalar(ENSEM::mean(ENSEM::peekObs(tmp,t))) << std::endl;
+
+
+
+      out.setQ2(in.Q2());
 
       return out;
     }

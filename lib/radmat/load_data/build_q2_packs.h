@@ -230,6 +230,8 @@ namespace radmat
     {
       POW2_ASSERT(haveCorr);
 
+      std::cout << __func__ << " Normalizing.." << std::endl;
+
       if(!!!normalizedZ)
       {
 
@@ -259,6 +261,8 @@ namespace radmat
     void BuildQ2Packs<T>::normalizeExp(void)
     {
       POW2_ASSERT(haveCorr);
+
+      std::cout << __func__ << " removing principal time dependence" << std::endl;
 
       if(!!!normalizedExp)
       {
@@ -294,7 +298,7 @@ namespace radmat
         ENSEM::EnsemReal factor;
         factor =  ENSEM::exp(E_sink * SEMBLE::toScalar(double(t_sink - t)))
           * ENSEM::exp(E_source * SEMBLE::toScalar(double(t - t_source) ) );
-        pokeObs(foo,peekObs(foo,t)*factor,t);
+        pokeObs(m_cor.at(i).C3pt,peekObs(foo,t)*factor,t);
       }
     }
 
@@ -381,6 +385,8 @@ namespace radmat
         std::vector<int> m_threepoints = sortQ2[packnum].second;
         ADAT::Handle<LLSQDataPointQ2Pack> m_handle = q2_pack[packnum];
         POW2_ASSERT(&*m_handle); // check allocation
+
+        m_handle->setQ2(m_cor[m_threepoints[0]].Q2);
 
         std::vector<int>::const_iterator three_point_iterator; 
         std::vector<SortThreePoint> lorentz_packs;
@@ -548,6 +554,7 @@ namespace radmat
           m_handle->insert(tmp);
 
         } // loop over time
+
 
       }  // end parallel
 
