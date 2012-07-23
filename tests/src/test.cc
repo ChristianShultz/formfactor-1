@@ -33,6 +33,7 @@ main(void)
   cout << "\n\n" << "beginning tests.." << endl;
   unsigned short ct_err(0), ct_test(0);
 
+  
   // test the tensors
   dump_test(ct_err,ct_test,test_tensor(double(10)));
   dump_test(ct_err,ct_test,test_tensor(std::complex<double>(10,10)));
@@ -61,7 +62,8 @@ main(void)
   dump_test(ct_err,ct_test,test_make_fake_spectrum());
   dump_test(ct_err,ct_test,test_fake_3pt_aux());
   dump_test(ct_err,ct_test,test_fake_3pt());
-  dump_test(ct_err,ct_test,test_gen_fake_dataset());
+  // dump_test(ct_err,ct_test,test_gen_fake_dataset()); -- redundant, load fake data makes a fake set
+  dump_test(ct_err,ct_test,test_load_fake_data());
 
   // conclude testing
   cout << "\n**********************************\n"

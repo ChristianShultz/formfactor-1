@@ -207,78 +207,78 @@ namespace radmat
 		    SEMBLE::SembleVector<double> > SemblePInv_t;
 
 
-  SemblePInv_t makeMomInvariants(const EnsemReal &E_f, 
-				 const EnsemReal &E_i,
-				 const Array<int> &p_f,
-				 const Array<int> &p_i,
-         const double mom_factor);  // 1/xi * 2pi /L_s -- the "unit" size
+SemblePInv_t makeMomInvariants(const EnsemReal &E_f, 
+			       const EnsemReal &E_i,
+			       const Array<int> &p_f,
+			       const Array<int> &p_i,
+			       const double mom_factor);  // 1/xi * 2pi /L_s -- the "unit" size
 
-  /**
-     @brief generate the kinematic factor matrix for one measurement,
+/**
+   @brief generate the kinematic factor matrix for one measurement,
      
-     @details ie: a 4 x n form factors matrix where the row index is the lorentz index.
-          These then need to get stitched together higher up 
+   @details ie: a 4 x n form factors matrix where the row index is the lorentz index.
+   These then need to get stitched together higher up 
      
-   */
-  template<typename T>
-  struct ffKinematicFactors_t
+*/
+template<typename T>
+struct ffKinematicFactors_t
+{
+  // save some typing
+  typedef typename ADAT::Handle<ffBase_t<T> > ffBase_h;
+  typedef typename SEMBLE::SembleMatrix<T> KinematicFactorMatrix;
+
+  // the only available constructor
+  ffKinematicFactors_t(const ffBase_h &KFacGen)
+  : m_KFacGen(KFacGen) 
+  {  }
+
+  ~ffKinematicFactors_t(void) {} // handle cleans itself up
+
+  // basically generate the 4 X (n multipole) matrix of kinematic factors, 
+  // the row index is the lorentz index of the lattice matrix element
+  KinematicFactorMatrix genFactors(const SemblePInv_t &moms)
   {
-    // save some typing
-    typedef typename ADAT::Handle<ffBase_t<T> > ffBase_h;
-    typedef typename SEMBLE::SembleMatrix<T> KinematicFactorMatrix;
+    SEMBLE::SembleVector<double> p_f(moms.first), p_i(moms.second);
+    int nfacs = m_KFacGen->nFacs();
+    int nbins = p_f.getB();
 
-    // the only available constructor
-    ffKinematicFactors_t(const ffBase_h &KFacGen)
-    : m_KFacGen(KFacGen) 
-    {  }
+    POW2_ASSERT_DEBUG( (nbins == p_i.getB()) && (nfacs > 0) );
 
-    ~ffKinematicFactors_t(void) {} // handle cleans itself up
+    KinematicFactorMatrix KF(nbins,4,nfacs);
+    KF.zeros();
 
-    // basically generate the 4 X (n multipole) matrix of kinematic factors, 
-    // the row index is the lorentz index of the lattice matrix element
-    KinematicFactorMatrix genFactors(const SemblePInv_t &moms)
-    {
-      SEMBLE::SembleVector<double> p_f(moms.first), p_i(moms.second);
-      int nfacs = m_KFacGen->nFacs();
-      int nbins = p_f.getB();
+    // scale down
+    p_f.rescaleSembleDown();
+    p_i.rescaleSembleDown();
 
-      POW2_ASSERT_DEBUG( (nbins == p_i.getB()) && (nfacs > 0) );
+    for(int bin = 0; bin < nbins; bin++)
+      KF[bin] = (*m_KFacGen)(toTensor<double>(p_f[bin]),toTensor<double>(p_i[bin]));
 
-      KinematicFactorMatrix KF(nbins,4,nfacs);
-      KF.zeros();
+    ////////////////////////////////////////////////////////////////////////////////
+    ////////////////////////////////////////////////////////////////////////////////
+    /*
+      TO DO -- put the isZero()? type check in here before the return statement
+    */
+    ////////////////////////////////////////////////////////////////////////////////
+    ////////////////////////////////////////////////////////////////////////////////
 
-      // scale down
-      p_f.rescaleSembleDown();
-      p_i.rescaleSembleDown();
-
-      for(int bin = 0; bin < nbins; bin++)
-	KF[bin] = (*m_KFacGen)(toTensor<double>(p_f[bin]),toTensor<double>(p_i[bin]));
-
-      ////////////////////////////////////////////////////////////////////////////////
-      ////////////////////////////////////////////////////////////////////////////////
-      /*
-	TO DO -- put the isZero()? type check in here before the return statement
-      */
-      ////////////////////////////////////////////////////////////////////////////////
-      ////////////////////////////////////////////////////////////////////////////////
-
-      // scale up
-      KF.rescaleSembleUp();
+    // scale up
+    KF.rescaleSembleUp();
     
-      return KF;
-    }
+    return KF;
+  }
 
-    int nFacs(void) {return m_KFacGen->nFacs();}
+  int nFacs(void) {return m_KFacGen->nFacs();}
 
-    // hide ctor    
-  private:
-    ffKinematicFactors_t(void);
-    ffKinematicFactors_t(const ffKinematicFactors_t &o);
-    ffKinematicFactors_t& operator=(const ffKinematicFactors_t<T> &o);
+  // hide ctor    
+private:
+  ffKinematicFactors_t(void);
+  ffKinematicFactors_t(const ffKinematicFactors_t &o);
+  ffKinematicFactors_t& operator=(const ffKinematicFactors_t<T> &o);
 
-  private:
-    ffBase_h m_KFacGen;
-  };
+private:
+  ffBase_h m_KFacGen;
+};
 
 }
 

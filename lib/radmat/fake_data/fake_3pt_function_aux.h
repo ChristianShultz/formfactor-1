@@ -135,8 +135,8 @@ namespace radmat
         const ENSEM::EnsemComplex &Z_m,
         const int t_m)
     {
-      return  ((exp(-E_n * SEMBLE::toScalar(double(t_n))) 
-            * exp(E_m * SEMBLE::toScalar(double(t_m)))
+      return  ((ENSEM::exp(-E_n * SEMBLE::toScalar(double(t_n))) 
+            * ENSEM::exp(E_m * SEMBLE::toScalar(double(t_m)))
             * ENSEM::conj(Z_n)
             * Z_m) 
           / ( E_n * E_m * SEMBLE::toScalar(double(4))));

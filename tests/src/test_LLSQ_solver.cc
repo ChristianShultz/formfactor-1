@@ -6,9 +6,9 @@
 #include "../headers/test_common.h"
 #include "../headers/tester.h"
 #include "radmat/utils/pow2assert.h"
-#include "radmat/ff/llsq_solvers.h"
-#include "radmat/ff/llsq_gen_system.h"
-#include "radmat/ff/llsq_solver.h"
+#include "radmat/llsq/llsq_solvers.h"
+#include "radmat/llsq/llsq_gen_system.h"
+#include "radmat/llsq/llsq_solver.h"
 #include "adat/handle.h"
 #include <string>
 #include <complex>

@@ -101,10 +101,10 @@ libradmat_a_LIBADD =
 am_libradmat_a_OBJECTS = breit_frame.$(OBJEXT) euler_angles.$(OBJEXT) \
 	pow2assert.$(OBJEXT) wigner.$(OBJEXT) tensor.$(OBJEXT) \
 	splash.$(OBJEXT) harmonic.$(OBJEXT) ff_gen_llsq_row.$(OBJEXT) \
-	formfactor_factory.$(OBJEXT) llsq_solvers.$(OBJEXT) \
-	lorentzff_PiPi.$(OBJEXT) lorentzff_PiPiStar.$(OBJEXT) \
-	covarrying_vectors.$(OBJEXT) fake_data_ini.$(OBJEXT) \
-	fake_overlaps.$(OBJEXT) fake_spectrum.$(OBJEXT)
+	formfactor_factory.$(OBJEXT) lorentzff_PiPi.$(OBJEXT) \
+	lorentzff_PiPiStar.$(OBJEXT) covarrying_vectors.$(OBJEXT) \
+	fake_data_ini.$(OBJEXT) fake_overlaps.$(OBJEXT) \
+	fake_spectrum.$(OBJEXT) llsq_solvers.$(OBJEXT)
 libradmat_a_OBJECTS = $(am_libradmat_a_OBJECTS)
 DEFAULT_INCLUDES = -I.@am__isrc@
 depcomp = $(SHELL) $(top_srcdir)/config/depcomp
@@ -238,6 +238,10 @@ AM_CXXFLAGS = -I@top_srcdir@/lib		\
 #ff
 
 #fake_data
+
+#llsq
+
+#load_data
 nobase_include_HEADERS = radmat/utils/aux.h radmat/utils/breit_frame.h \
 	radmat/utils/euler_angles.h radmat/utils/lorentz.h \
 	radmat/utils/perThreadStorage.h \
@@ -245,9 +249,8 @@ nobase_include_HEADERS = radmat/utils/aux.h radmat/utils/breit_frame.h \
 	radmat/utils/stringify.h radmat/utils/tensor.h \
 	radmat/utils/wigner.h radmat/utils/splash.h \
 	radmat/utils/harmonic.h radmat/ff/ff_gen_llsq_row.h \
-	radmat/ff/formfactor_factory.h radmat/ff/llsq_gen_system.h \
-	radmat/ff/llsq_solver.h radmat/ff/llsq_solvers.h \
-	radmat/ff/lorentzff_PiPi.h radmat/ff/lorentzff_PiPiStar.h \
+	radmat/ff/formfactor_factory.h radmat/ff/lorentzff_PiPi.h \
+	radmat/ff/lorentzff_PiPiStar.h \
 	radmat/fake_data/covarrying_vectors.h \
 	radmat/fake_data/fake_3pt_function.h \
 	radmat/fake_data/fake_3pt_function_aux.h \
@@ -255,7 +258,12 @@ nobase_include_HEADERS = radmat/utils/aux.h radmat/utils/breit_frame.h \
 	radmat/fake_data/fake_overlaps.h \
 	radmat/fake_data/fake_spectrum.h \
 	radmat/fake_data/gen_fake_dataset.h \
-	radmat/fake_data/minimal_fake_data.h
+	radmat/fake_data/minimal_fake_data.h radmat/llsq/llsq_driver.h \
+	radmat/llsq/llsq_gen_system.h radmat/llsq/llsq_q2_pack.h \
+	radmat/llsq/llsq_solver.h radmat/llsq/llsq_solvers.h \
+	radmat/load_data/build_q2_packs.h \
+	radmat/load_data/load_fake_data.h \
+	radmat/load_data/three_point.h
 
 #
 # Library
@@ -267,17 +275,18 @@ lib_LIBRARIES = libradmat.a
 #ff
 
 #fake_data 
+
+#llsq
 libradmat_a_SOURCES = radmat/utils/breit_frame.cc \
 	radmat/utils/euler_angles.cc radmat/utils/pow2assert.cc \
 	radmat/utils/wigner.cc radmat/utils/tensor.cc \
 	radmat/utils/splash.cc radmat/utils/harmonic.cc \
 	radmat/ff/ff_gen_llsq_row.cc radmat/ff/formfactor_factory.cc \
-	radmat/ff/llsq_solvers.cc radmat/ff/lorentzff_PiPi.cc \
-	radmat/ff/lorentzff_PiPiStar.cc \
+	radmat/ff/lorentzff_PiPi.cc radmat/ff/lorentzff_PiPiStar.cc \
 	radmat/fake_data/covarrying_vectors.cc \
 	radmat/fake_data/fake_data_ini.cc \
 	radmat/fake_data/fake_overlaps.cc \
-	radmat/fake_data/fake_spectrum.cc
+	radmat/fake_data/fake_spectrum.cc radmat/llsq/llsq_solvers.cc
 all: all-am
 
 .SUFFIXES:
@@ -511,20 +520,6 @@ formfactor_factory.obj: radmat/ff/formfactor_factory.cc
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCXX_FALSE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o formfactor_factory.obj `if test -f 'radmat/ff/formfactor_factory.cc'; then $(CYGPATH_W) 'radmat/ff/formfactor_factory.cc'; else $(CYGPATH_W) '$(srcdir)/radmat/ff/formfactor_factory.cc'; fi`
 
-llsq_solvers.o: radmat/ff/llsq_solvers.cc
-@am__fastdepCXX_TRUE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT llsq_solvers.o -MD -MP -MF $(DEPDIR)/llsq_solvers.Tpo -c -o llsq_solvers.o `test -f 'radmat/ff/llsq_solvers.cc' || echo '$(srcdir)/'`radmat/ff/llsq_solvers.cc
-@am__fastdepCXX_TRUE@	$(am__mv) $(DEPDIR)/llsq_solvers.Tpo $(DEPDIR)/llsq_solvers.Po
-@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='radmat/ff/llsq_solvers.cc' object='llsq_solvers.o' libtool=no @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCXX_FALSE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o llsq_solvers.o `test -f 'radmat/ff/llsq_solvers.cc' || echo '$(srcdir)/'`radmat/ff/llsq_solvers.cc
-
-llsq_solvers.obj: radmat/ff/llsq_solvers.cc
-@am__fastdepCXX_TRUE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT llsq_solvers.obj -MD -MP -MF $(DEPDIR)/llsq_solvers.Tpo -c -o llsq_solvers.obj `if test -f 'radmat/ff/llsq_solvers.cc'; then $(CYGPATH_W) 'radmat/ff/llsq_solvers.cc'; else $(CYGPATH_W) '$(srcdir)/radmat/ff/llsq_solvers.cc'; fi`
-@am__fastdepCXX_TRUE@	$(am__mv) $(DEPDIR)/llsq_solvers.Tpo $(DEPDIR)/llsq_solvers.Po
-@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='radmat/ff/llsq_solvers.cc' object='llsq_solvers.obj' libtool=no @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCXX_FALSE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o llsq_solvers.obj `if test -f 'radmat/ff/llsq_solvers.cc'; then $(CYGPATH_W) 'radmat/ff/llsq_solvers.cc'; else $(CYGPATH_W) '$(srcdir)/radmat/ff/llsq_solvers.cc'; fi`
-
 lorentzff_PiPi.o: radmat/ff/lorentzff_PiPi.cc
 @am__fastdepCXX_TRUE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT lorentzff_PiPi.o -MD -MP -MF $(DEPDIR)/lorentzff_PiPi.Tpo -c -o lorentzff_PiPi.o `test -f 'radmat/ff/lorentzff_PiPi.cc' || echo '$(srcdir)/'`radmat/ff/lorentzff_PiPi.cc
 @am__fastdepCXX_TRUE@	$(am__mv) $(DEPDIR)/lorentzff_PiPi.Tpo $(DEPDIR)/lorentzff_PiPi.Po
@@ -608,6 +603,20 @@ fake_spectrum.obj: radmat/fake_data/fake_spectrum.cc
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='radmat/fake_data/fake_spectrum.cc' object='fake_spectrum.obj' libtool=no @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCXX_FALSE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o fake_spectrum.obj `if test -f 'radmat/fake_data/fake_spectrum.cc'; then $(CYGPATH_W) 'radmat/fake_data/fake_spectrum.cc'; else $(CYGPATH_W) '$(srcdir)/radmat/fake_data/fake_spectrum.cc'; fi`
+
+llsq_solvers.o: radmat/llsq/llsq_solvers.cc
+@am__fastdepCXX_TRUE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT llsq_solvers.o -MD -MP -MF $(DEPDIR)/llsq_solvers.Tpo -c -o llsq_solvers.o `test -f 'radmat/llsq/llsq_solvers.cc' || echo '$(srcdir)/'`radmat/llsq/llsq_solvers.cc
+@am__fastdepCXX_TRUE@	$(am__mv) $(DEPDIR)/llsq_solvers.Tpo $(DEPDIR)/llsq_solvers.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='radmat/llsq/llsq_solvers.cc' object='llsq_solvers.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o llsq_solvers.o `test -f 'radmat/llsq/llsq_solvers.cc' || echo '$(srcdir)/'`radmat/llsq/llsq_solvers.cc
+
+llsq_solvers.obj: radmat/llsq/llsq_solvers.cc
+@am__fastdepCXX_TRUE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT llsq_solvers.obj -MD -MP -MF $(DEPDIR)/llsq_solvers.Tpo -c -o llsq_solvers.obj `if test -f 'radmat/llsq/llsq_solvers.cc'; then $(CYGPATH_W) 'radmat/llsq/llsq_solvers.cc'; else $(CYGPATH_W) '$(srcdir)/radmat/llsq/llsq_solvers.cc'; fi`
+@am__fastdepCXX_TRUE@	$(am__mv) $(DEPDIR)/llsq_solvers.Tpo $(DEPDIR)/llsq_solvers.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='radmat/llsq/llsq_solvers.cc' object='llsq_solvers.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o llsq_solvers.obj `if test -f 'radmat/llsq/llsq_solvers.cc'; then $(CYGPATH_W) 'radmat/llsq/llsq_solvers.cc'; else $(CYGPATH_W) '$(srcdir)/radmat/llsq/llsq_solvers.cc'; fi`
 install-nobase_includeHEADERS: $(nobase_include_HEADERS)
 	@$(NORMAL_INSTALL)
 	@list='$(nobase_include_HEADERS)'; test -n "$(includedir)" || list=; \
@@ -838,6 +847,8 @@ uninstall-am: uninstall-libLIBRARIES uninstall-nobase_includeHEADERS
 	uninstall-am uninstall-libLIBRARIES \
 	uninstall-nobase_includeHEADERS
 
+
+#load_data
 
 # Tell versions [3.59,3.63) of GNU make to not export all variables.
 # Otherwise a system limit (for SysV at least) may be exceeded.

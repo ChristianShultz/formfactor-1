@@ -15,6 +15,9 @@ namespace radmat
     int lorentz;
     int hel_source;
     int hel_sink;
+    int t_source;
+    int t_sink;
+
     std::string elemIDBase;
     ENSEM::EnsemReal E_source;
     ENSEM::EnsemReal E_sink;
@@ -22,6 +25,8 @@ namespace radmat
     ENSEM::EnsemComplex Z_sink;
     ENSEM::EnsemReal Q2;
     pProp_t mom;
+
+    double mom_factor;
   };
 
 
@@ -74,7 +79,9 @@ namespace radmat
         ENSEM::EnsemReal Q2 = (-q(0)*q(0) + q(1)*q(1) + q(2)*q(2) + q(3)*q(3));
 
         m_key.Q2 = Q2;
-
+        m_key.t_source = inputs->working->ini.timeProps.tsource;
+        m_key.t_sink = inputs->working->ini.timeProps.tsink;
+        m_key.mom_factor = inputs->working->mom_factor;
 
         // fake up the three pt function
         m_threePtFcn.resize(m_key.E_source.size());

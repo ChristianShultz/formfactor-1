@@ -44,5 +44,6 @@ namespace radmat
   tester test_fake_3pt_aux(void); 
   tester test_fake_3pt(void);
   tester test_gen_fake_dataset(void);
+  tester test_load_fake_data(void);
 }
 #endif

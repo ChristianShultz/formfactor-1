@@ -6,7 +6,7 @@
 #include "../headers/test_common.h"
 #include "../headers/tester.h"
 #include "radmat/utils/pow2assert.h"
-#include "radmat/ff/LLSQ_solver.h"
+#include "radmat/llsq/llsq_solvers.h"
 #include "adat/handle.h"
 #include <string>
 
