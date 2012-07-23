@@ -32,7 +32,7 @@ namespace radmat
     Tensor<T,4> test_shape2(foo);
 
     T factor2 = T(10);
-    Tensor<T,4> test_init(TensorShape<4>()[4][4][4][4], factor2);
+    Tensor<T,4> test_init((TensorShape<4>())[4][4][4][4], factor2);
     int init = std::count_if(test_init.begin(),test_init.end(),
 			     std::bind1st(std::equal_to<T>(),factor2));
     TESTER_TEST(m_test,init == 4*4*4*4,"init const failed");
@@ -54,11 +54,11 @@ namespace radmat
     Tensor<T,4> test_empty;
     TESTER_TEST(m_test,test_empty.empty(),"empty failed");
     
-    resizeable = test_empty.resize(TensorShape<4>()[4][4][4][4],0);
+    resizeable = test_empty.resize((TensorShape<4>())[4][4][4][4],0);
     TESTER_TEST(m_test,!test_empty.empty(),"empty failed");
 
     T factor = T(2.71828183);
-    Tensor<T,4> test_algebra_pluseq(TensorShape<4>()[4][4][4][4],0);
+    Tensor<T,4> test_algebra_pluseq((TensorShape<4>())[4][4][4][4],0);
     test_algebra_pluseq += factor;
     bool test_op_pluseq = test_algebra_pluseq.end() == std::find_if(test_algebra_pluseq.begin(), 
 								    test_algebra_pluseq.end(),
@@ -72,7 +72,7 @@ namespace radmat
 								      std::bind1st(std::not_equal_to<T>(),0));
     TESTER_TEST(m_test,test_op_minuseq,"-= factor failed");
 
-    Tensor<T,4> test_algebra_teq(TensorShape<4>()[4][4][4][4],1);
+    Tensor<T,4> test_algebra_teq((TensorShape<4>())[4][4][4][4],1);
     test_algebra_teq *= factor;
     bool test_op_teq = test_algebra_teq.end() == std::find_if(test_algebra_teq.begin(), test_algebra_teq.end(),
 							      std::bind1st(std::not_equal_to<T>(),factor));
@@ -83,7 +83,7 @@ namespace radmat
 							      std::bind1st(std::not_equal_to<T>(),1));
     TESTER_TEST(m_test,test_op_deq,"/= factor failed");
 
-    Tensor<T,4> test_algebra_plus_eq_t(TensorShape<4>()[4][4][4][4],0);
+    Tensor<T,4> test_algebra_plus_eq_t((TensorShape<4>())[4][4][4][4],0);
     test_algebra_plus_eq_t += test_algebra_teq;
     bool test_op_peq_t = std::equal(test_algebra_plus_eq_t.begin(), test_algebra_plus_eq_t.end(), test_algebra_teq.begin());
     TESTER_TEST(m_test,test_op_peq_t,"+= tensor failed");
@@ -104,7 +104,7 @@ namespace radmat
     TESTER_TEST(m_test,test_op_m,"operator minus failed");
    
     idx_t bound4 = 4;
-    Tensor<T,4> test_access_copy(TensorShape<4>()[bound4][bound4][bound4][bound4],0.);
+    Tensor<T,4> test_access_copy((TensorShape<4>())[bound4][bound4][bound4][bound4],0.);
     
     for(idx_t i = 0; i < bound4; ++i)
       for(idx_t j = 0; j < bound4; ++j)
@@ -126,9 +126,9 @@ namespace radmat
 
     TESTER_TEST(m_test,test_access_copy_success,"access copy success failed");
  
-    Tensor<T,4> contractA(TensorShape<4>()[4][4][4][4], 0.);
-    Tensor<T,2> contract_mI4(TensorShape<2>()[4][4],0.);
-    Tensor<T,4> contractB(TensorShape<4>()[4][4][4][4],0.);
+    Tensor<T,4> contractA((TensorShape<4>())[4][4][4][4], 0.);
+    Tensor<T,2> contract_mI4((TensorShape<2>())[4][4],0.);
+    Tensor<T,4> contractB((TensorShape<4>())[4][4][4][4],0.);
 
     contract_mI4.setRaised(std::vector<bool>(2,false));
     contractB.lower_index(3);
@@ -162,8 +162,8 @@ namespace radmat
     
     bool AcB(true), AcI(true), BcI(true);
 
-    Tensor<T,6> _AcB(TensorShape<6>()[4][4][4][4][4][4],0.);
-    Tensor<T,4> _AcI(TensorShape<4>()[4][4][4][4],0.), _BcI(TensorShape<4>()[4][4][4][4],0.);
+    Tensor<T,6> _AcB((TensorShape<6>())[4][4][4][4][4][4],0.);
+    Tensor<T,4> _AcI((TensorShape<4>())[4][4][4][4],0.), _BcI((TensorShape<4>())[4][4][4][4],0.);
 
     // sigh -- this is why we need contract to work, these large sum loops are a pain to write
     for(idx_t i = 0; i < 4; ++i)
@@ -204,9 +204,9 @@ namespace radmat
 
     TESTER_TEST(m_test,contractA.empty(),"clear failed");
 
-    contractA.resize(TensorShape<4>()[4][4][4][4],0.);
+    contractA.resize((TensorShape<4>())[4][4][4][4],0.);
     contractB = contractA;
-    _AcB.resize(TensorShape<6>()[4][4][4][4][4][4],0.);
+    _AcB.resize((TensorShape<6>())[4][4][4][4][4][4],0.);
 
     srand( time(NULL) );
     
@@ -223,7 +223,7 @@ namespace radmat
     contractB.lower_index(0);
     _AcB = contract(contractA,contractB,3,0);
 
-    Tensor<T,6> __AcB(TensorShape<6>()[4][4][4][4][4][4],0.);
+    Tensor<T,6> __AcB((TensorShape<6>())[4][4][4][4][4][4],0.);
     
     for(idx_t i = 0; i < 4; ++i)
       for(idx_t j = 0; j < 4; ++j)

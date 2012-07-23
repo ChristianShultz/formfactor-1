@@ -1800,10 +1800,12 @@ namespace radmat
     bool chckDim(const Tensor<T, N> &a, const Tensor<T, N> &b)
     {
       if(a.empty())
-        if(b.empty())
+      {
+        if(b.empty()) 
           return true;
-        else
+        else          
           return false;
+      }
       return std::equal(a.Dimensions,a.Dimensions+N,b.Dimensions);
     }
 
@@ -2282,7 +2284,7 @@ namespace radmat
     }
 
 
-// the next set all cause crashes since the operations don't make sense to me
+  // the next set all cause crashes since the operations don't make sense to me
   template<typename T, typename U, typename V, idx_t N>
     Tensor < typename Promote<T, typename Promote<U, V>::Type_t >::Type_t , N>
     contract(const Tensor<T, N> &A,
@@ -2371,7 +2373,7 @@ namespace radmat
   /////////////////////////////////////////////////////////////////////////////////////
 
 
- // tensor products
+  // tensor products
 
 
 
@@ -2698,7 +2700,7 @@ namespace radmat
       {
       return contract(a, b, 0, 0);
       }
-   */
+      */
 
   //! overload wedge to tensor product
   template<typename T, typename U, idx_t N, idx_t M>

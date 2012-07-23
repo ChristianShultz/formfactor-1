@@ -22,7 +22,7 @@ double genE(const Aint mom, double m)
 
 radmat::Tensor<std::complex<double>, 1 > genEps(const double E, const short h, const Aint mom)
 {
-  radmat::Tensor<std::complex<double> , 1> eps(radmat::TensorShape<1>()[4],0.);
+  radmat::Tensor<std::complex<double> , 1> eps((radmat::TensorShape<1>())[4],0.);
   radmat::Tensor<double,2> R = radmat::genRotationMatrix(mom);
   if(h == 1)
     {
@@ -125,7 +125,7 @@ namespace radmat
 	  }
       }
 
-    Tensor<std::complex<double> , 2> coupled(TensorShape<2>()[4][4],0.);
+    Tensor<std::complex<double> , 2> coupled((TensorShape<2>())[4][4],0.);
     std::complex<double> zero(0.,0.);
 
     // check J = 2 explicitly
@@ -153,7 +153,7 @@ namespace radmat
       }
 
     // check J = 3 explicitly
-    Tensor<std::complex<double> , 3> coupled3(TensorShape<3>()[4][4][4],0.);
+    Tensor<std::complex<double> , 3> coupled3((TensorShape<3>())[4][4][4],0.);
     for(it = moms.begin(); it != moms.end(); ++it)
       {
 	mom[0] = it->x;

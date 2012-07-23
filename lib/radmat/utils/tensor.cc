@@ -11,7 +11,7 @@ namespace radmat
 
   Tensor<double,2> g_dd(void)
   {
-    Tensor<double,2> gmunu(TensorShape<2>()[4][4],0.);
+    Tensor<double,2> gmunu((TensorShape<2>())[4][4],0.);
     gmunu[0][0] = 1;
     gmunu[1][1] = gmunu[2][2] = gmunu[3][3] = -1;
     gmunu.lower_index(0);
@@ -21,7 +21,7 @@ namespace radmat
 
   Tensor<double,2> g_uu(void)
   {
-    Tensor<double,2> gmunu(TensorShape<2>()[4][4],0.);
+    Tensor<double,2> gmunu((TensorShape<2>())[4][4],0.);
     gmunu[0][0] = 1;
     gmunu[1][1] = gmunu[2][2] = gmunu[3][3] = -1;
     return gmunu;
@@ -31,7 +31,7 @@ namespace radmat
   {
     Hadron::CubicCanonicalRotation_t eulerangles = Hadron::cubicCanonicalRotation(mom);
 
-    Tensor<double,2> A(TensorShape<2>()[4][4],0.),B(TensorShape<2>()[4][4],0.),C(TensorShape<2>()[4][4],0.);
+    Tensor<double,2> A((TensorShape<2>())[4][4],0.),B((TensorShape<2>())[4][4],0.),C((TensorShape<2>())[4][4],0.);
 
     for(idx_t i = 0; i < 4; ++i)
       A[i][i] = B[i][i] = C[i][i] = 1.;

@@ -347,7 +347,7 @@ namespace breit
 
     itpp::Mat<double> rodRotMat(const Tensor<double, 1> &r, bool pz)
     {
-      Tensor<double, 1> z(TensorShape<1>()[4],0.);
+      Tensor<double, 1> z((TensorShape<1>())[4],0.);
       z[3] = pz ? 1. : -1.;
       return rodRotMat(z, r);
     }

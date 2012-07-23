@@ -36,8 +36,8 @@ namespace radmat
       for(int i = 0; i < 200; i++)
 	{
 	  PiPi foobar;
-	  Tensor<double,1> foo(TensorShape<1>()[4],0.) , bar(TensorShape<1>()[4],0.) ;
-	  Tensor<std::complex<double> , 1> baz(TensorShape<1>()[4],0.);
+	  Tensor<double,1> foo((TensorShape<1>())[4],0.) , bar((TensorShape<1>())[4],0.) ;
+	  Tensor<std::complex<double> , 1> baz((TensorShape<1>())[4],0.);
       
 	  for (idx_t i = 0; i < 4; i++)
 	    {

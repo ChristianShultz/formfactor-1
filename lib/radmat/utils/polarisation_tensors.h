@@ -92,7 +92,7 @@ namespace radmat
     //! make a J = 1 polarisation tensor
     Tensor<std::complex<double>,1> make(const double E, const short hel)
     {
-      Tensor<std::complex<double> ,1 > eps(TensorShape<1>()[4],0.);
+      Tensor<std::complex<double> ,1 > eps((TensorShape<1>())[4],0.);
       bool in_bounds(false);
       if(hel == 1)
 	{

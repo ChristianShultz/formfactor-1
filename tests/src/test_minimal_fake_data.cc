@@ -24,7 +24,7 @@ namespace radmat
     // need to get this right to be able to do the next part anyways
     genMinimalFakeData_c matElem( std::string("PiPi") );      
     itpp::Mat<std::complex<double> > pplus(4,1);
-    Tensor<double,1> p_f(TensorShape<1>()[4],0.) , p_i(TensorShape<1>()[4],0.);
+    Tensor<double,1> p_f((TensorShape<1>())[4],0.) , p_i((TensorShape<1>())[4],0.);
 
     for(int i = 0; i < 4; i++)
       {

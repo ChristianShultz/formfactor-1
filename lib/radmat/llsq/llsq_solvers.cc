@@ -59,6 +59,7 @@ namespace radmat
     {
       POW2_ASSERT(FacEnv::registerAll());
       LLSQBaseSolver_t<std::complex<double> > *foo;
+      foo = NULL;
       try
 	{
 	  foo = Factory::Instance().createObject(solnID);

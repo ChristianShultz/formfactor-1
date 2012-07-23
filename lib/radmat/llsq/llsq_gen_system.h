@@ -20,6 +20,32 @@ namespace radmat
 
   struct LLSQDataPoint
   {
+  // need to provide the ensems with default starting values so that they can be used
+  // in the stl containers b/c the ensem copy constructor doesnt allow one to 
+  // copy around empty ensembles
+  
+    LLSQDataPoint(void)
+    {
+      ENSEM::EnsemComplex Ezero;
+      Ezero.resize(1); 
+      Ezero = SEMBLE::toScalar(std::complex<double>(0.,0.));
+      
+      zero.first = false;
+      zero.second = Ezero;
+      one = zero;
+      two = one;
+      three = two;
+
+      E_f = ENSEM::real(Ezero);
+      E_i = E_f; 
+    }
+
+    LLSQDataPoint(const LLSQDataPoint &o)
+      : matElemID(o.matElemID) , zero(o.zero) , one(o.one) , two(o.two) , three(o.three),
+      p_f(o.p_f) , p_i(o.p_i) , E_f(o.E_f) , E_i(o.E_i) , mom_fac(o.mom_fac)
+    {  }
+
+
     std::string matElemID;                      // int the h_f h_i language
     std::pair<bool,ENSEM::EnsemComplex> zero;   // lorentz index of measurements
     std::pair<bool,ENSEM::EnsemComplex> one;    // bool is if we want to use it

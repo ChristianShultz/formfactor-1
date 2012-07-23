@@ -45,7 +45,7 @@ namespace  // a few useful functions that don't need to exist elsewhere
 
     exp_skew.zeros();
 
-    for(int block = 0; block < exp_skew.rows(); block+=2)
+    for(int block = 0; block < bound; block+=2)
     {
       itpp::Mat<double> dum(2,2);
       double sigma = S(block,block+1);
@@ -141,7 +141,7 @@ namespace  // a few useful functions that don't need to exist elsewhere
         const double varO = ini.stateProps.zProps.varianceOrder;
         const int Lt = abs(ini.timeProps.tsink - ini.timeProps.tsource + 1);
 
-        int nstates;
+        int nstates(-1);
         Array<double> z_r,z_i;
         Array<std::complex<double> > zArr;
 

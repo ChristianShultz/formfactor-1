@@ -47,7 +47,7 @@ namespace radmat
     {
       POW2_ASSERT(FacEnv::registerAll());
       ffBase_t<std::complex<double> > *foo;
-
+      foo = NULL;
       try
       {
         foo = TheFormFactorDecompositionFactory::Instance().createObject(matElemID);
