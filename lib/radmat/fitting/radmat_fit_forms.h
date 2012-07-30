@@ -8,36 +8,51 @@
 namespace radmat
 {
 
-// upon further consideration I have decided that this function 
-// is absolute lunacy and I'm going home
-  struct ConstPlusConstTimesTwoExp : public FitFunction
+
+  struct Constant: public FitFunction
   {
+    Constant(void) 
+      : FitFunction(1)
+    {
+      setParName(0,"FF");
+    }
 
-    public:
-      ConstPlusConstTimesTwoExp(const double tf, const double ti)
-        : FitFunction(4) , m_tf(tf) , m_ti(ti) 
-      {
-        setParName(0,"FF");
-        setParName(1,"const2");
-        setParName(2,"deltamf");
-        setParName(3,"deltami");
-      }
+    inline double operator()(const std::vector<double> &par, double t) const
+    {
+      return par[0];
+    }
 
-      inline double operator()(const std::vector<double> &pars, double t)
-      {
-        return pars[0] + pars[1]*exp(pars[2]*(m_tf - t))*exp(pars[3]*(t-m_ti));
-      }
+    std::string getFitType(void) const {return std::string("Constant");}
 
-
-      std::string getFitType(void) const {return std::string("hackey 3point fit");}
-
-    private : 
-      ConstPlusConstTimesTwoExp(void) ; // hide ctor since we need to hack jackknife to get it to work
-
-      double m_tf;
-      double m_ti;
   };
 
-}
+
+  struct ConstantTimesTwoExp : public FitFunction
+  {
+    ConstantTimesTwoExp (const double tf, const double ti)
+      : FitFunction(3) , m_tf(tf) , m_ti(ti) 
+    {
+      setParName(0,"FF");
+      setParName(1,"deltam_f");
+      setParName(2,"deltam_i");
+    }
+
+    inline double operator()(const std::vector<double> &par, double t) const
+    {
+      return par[0]*exp(par[1]*(m_tf -t))*exp(par[2]*(t-m_ti));
+    }
+
+    std::string getFitType(void) const {return std::string("ConstTimesTwoExp");}
+
+    private:
+    double m_tf;
+    double m_ti;
+  };
+
+
+
+
+
+} // namespace radmat
 
 #endif

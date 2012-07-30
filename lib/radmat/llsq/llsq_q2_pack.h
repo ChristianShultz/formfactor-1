@@ -184,17 +184,6 @@ namespace radmat
         out.insert(i,tmp);
       }
 
-      std::cout << __func__ <<  "  " << out.size() << std::endl;
-
-      typename SEMBLE::PromoteEnsemVec<T>::Type tmp;
-      tmp = out.begin()->second;
-      std::cout << __func__ << std::endl;
-      for(int t = 0; t < Lt; t++)
-        std::cout << "t = " << t << " " 
-          << SEMBLE::toScalar(ENSEM::mean(ENSEM::peekObs(tmp,t))) << std::endl;
-
-
-
       out.setQ2(in.Q2());
 
       return out;

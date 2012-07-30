@@ -238,11 +238,25 @@ namespace radmat
         int i;
         int sz = m_cor.size();
 
+        /*
+           std::cout << "pre norm Z" << std::endl;
+           std::cout << SEMBLE::toScalar(ENSEM::mean(ENSEM::peekObs(m_cor.begin()->C3pt,0))) << std::endl;
+           std::cout << "Z_source" << std::endl;
+           std::cout << SEMBLE::toScalar(ENSEM::mean(m_cor.begin()->Z_source)) << std::endl;
+           std::cout << "Z_sink" << std::endl;
+           std::cout << SEMBLE::toScalar(ENSEM::mean(m_cor.begin()->Z_sink)) << std::endl;
+         */
+
 #ifdef USE_OMP_LOAD_DATA_BUILDQ2PACKS
 #pragma omp parallel for shared(i,sz)
 #endif
         for(i = 0; i < sz; i++)        
           normZ(i);
+
+        /*
+           std::cout << "post norm Z" << std::endl;
+           std::cout << SEMBLE::toScalar(ENSEM::mean(ENSEM::peekObs(m_cor.begin()->C3pt,0))) << std::endl;
+         */
 
       }
       normalizedZ = true;
@@ -270,11 +284,21 @@ namespace radmat
         int i;
         int sz = m_cor.size();
 
+        /*
+           std::cout << "pre norm E" << std::endl;
+           std::cout << SEMBLE::toScalar(ENSEM::mean(ENSEM::peekObs(m_cor.begin()->C3pt,0))) << std::endl;
+         */
+
 #ifdef USE_OMP_LOAD_DATA_BUILDQ2PACKS
 #pragma omp parallel for shared(i,sz)
 #endif
         for(i = 0; i < sz; i++)
           normE(i);
+
+        /*
+           std::cout << "post norm E" << std::endl;
+           std::cout << SEMBLE::toScalar(ENSEM::mean(ENSEM::peekObs(m_cor.begin()->C3pt,0))) << std::endl;
+         */
 
       }
 
@@ -288,11 +312,11 @@ namespace radmat
       typename SEMBLE::PromoteEnsemVec<T>::Type foo = m_cor.at(i).C3pt;
       ENSEM::EnsemReal E_source = m_cor.at(i).E_source;
       ENSEM::EnsemReal E_sink = m_cor.at(i).E_sink;
-      const int Lt = foo.numElem();
       const int t_source = m_cor.at(i).t_source;
       const int t_sink = m_cor.at(i).t_sink;
+      const int Lt = abs(t_source - t_sink);
 
-      for(int t = 0; t < Lt; t++)
+      for(int t = 0; t <= Lt; t++)
       {
 
         ENSEM::EnsemReal factor;

@@ -104,7 +104,8 @@ am_libradmat_a_OBJECTS = breit_frame.$(OBJEXT) euler_angles.$(OBJEXT) \
 	formfactor_factory.$(OBJEXT) lorentzff_PiPi.$(OBJEXT) \
 	lorentzff_PiPiStar.$(OBJEXT) covarrying_vectors.$(OBJEXT) \
 	fake_data_ini.$(OBJEXT) fake_overlaps.$(OBJEXT) \
-	fake_spectrum.$(OBJEXT) llsq_solvers.$(OBJEXT)
+	fake_spectrum.$(OBJEXT) llsq_solvers.$(OBJEXT) \
+	fit_three_point_ff.$(OBJEXT)
 libradmat_a_OBJECTS = $(am_libradmat_a_OBJECTS)
 DEFAULT_INCLUDES = -I.@am__isrc@
 depcomp = $(SHELL) $(top_srcdir)/config/depcomp
@@ -242,6 +243,8 @@ AM_CXXFLAGS = -I@top_srcdir@/lib		\
 #llsq
 
 #load_data
+
+#fitting
 nobase_include_HEADERS = radmat/utils/aux.h radmat/utils/breit_frame.h \
 	radmat/utils/euler_angles.h radmat/utils/lorentz.h \
 	radmat/utils/perThreadStorage.h \
@@ -263,7 +266,9 @@ nobase_include_HEADERS = radmat/utils/aux.h radmat/utils/breit_frame.h \
 	radmat/llsq/llsq_solver.h radmat/llsq/llsq_solvers.h \
 	radmat/load_data/build_q2_packs.h \
 	radmat/load_data/load_fake_data.h \
-	radmat/load_data/three_point.h
+	radmat/load_data/three_point.h \
+	radmat/fitting/fit_three_point_ff.h \
+	radmat/fitting/radmat_fit_forms.h
 
 #
 # Library
@@ -277,6 +282,10 @@ lib_LIBRARIES = libradmat.a
 #fake_data 
 
 #llsq
+
+#load_data
+
+#fitting
 libradmat_a_SOURCES = radmat/utils/breit_frame.cc \
 	radmat/utils/euler_angles.cc radmat/utils/pow2assert.cc \
 	radmat/utils/wigner.cc radmat/utils/tensor.cc \
@@ -286,7 +295,8 @@ libradmat_a_SOURCES = radmat/utils/breit_frame.cc \
 	radmat/fake_data/covarrying_vectors.cc \
 	radmat/fake_data/fake_data_ini.cc \
 	radmat/fake_data/fake_overlaps.cc \
-	radmat/fake_data/fake_spectrum.cc radmat/llsq/llsq_solvers.cc
+	radmat/fake_data/fake_spectrum.cc radmat/llsq/llsq_solvers.cc \
+	radmat/fitting/fit_three_point_ff.cc
 all: all-am
 
 .SUFFIXES:
@@ -370,6 +380,7 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/fake_overlaps.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/fake_spectrum.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/ff_gen_llsq_row.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/fit_three_point_ff.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/formfactor_factory.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/harmonic.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/llsq_solvers.Po@am__quote@
@@ -617,6 +628,20 @@ llsq_solvers.obj: radmat/llsq/llsq_solvers.cc
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='radmat/llsq/llsq_solvers.cc' object='llsq_solvers.obj' libtool=no @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCXX_FALSE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o llsq_solvers.obj `if test -f 'radmat/llsq/llsq_solvers.cc'; then $(CYGPATH_W) 'radmat/llsq/llsq_solvers.cc'; else $(CYGPATH_W) '$(srcdir)/radmat/llsq/llsq_solvers.cc'; fi`
+
+fit_three_point_ff.o: radmat/fitting/fit_three_point_ff.cc
+@am__fastdepCXX_TRUE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT fit_three_point_ff.o -MD -MP -MF $(DEPDIR)/fit_three_point_ff.Tpo -c -o fit_three_point_ff.o `test -f 'radmat/fitting/fit_three_point_ff.cc' || echo '$(srcdir)/'`radmat/fitting/fit_three_point_ff.cc
+@am__fastdepCXX_TRUE@	$(am__mv) $(DEPDIR)/fit_three_point_ff.Tpo $(DEPDIR)/fit_three_point_ff.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='radmat/fitting/fit_three_point_ff.cc' object='fit_three_point_ff.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o fit_three_point_ff.o `test -f 'radmat/fitting/fit_three_point_ff.cc' || echo '$(srcdir)/'`radmat/fitting/fit_three_point_ff.cc
+
+fit_three_point_ff.obj: radmat/fitting/fit_three_point_ff.cc
+@am__fastdepCXX_TRUE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT fit_three_point_ff.obj -MD -MP -MF $(DEPDIR)/fit_three_point_ff.Tpo -c -o fit_three_point_ff.obj `if test -f 'radmat/fitting/fit_three_point_ff.cc'; then $(CYGPATH_W) 'radmat/fitting/fit_three_point_ff.cc'; else $(CYGPATH_W) '$(srcdir)/radmat/fitting/fit_three_point_ff.cc'; fi`
+@am__fastdepCXX_TRUE@	$(am__mv) $(DEPDIR)/fit_three_point_ff.Tpo $(DEPDIR)/fit_three_point_ff.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='radmat/fitting/fit_three_point_ff.cc' object='fit_three_point_ff.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o fit_three_point_ff.obj `if test -f 'radmat/fitting/fit_three_point_ff.cc'; then $(CYGPATH_W) 'radmat/fitting/fit_three_point_ff.cc'; else $(CYGPATH_W) '$(srcdir)/radmat/fitting/fit_three_point_ff.cc'; fi`
 install-nobase_includeHEADERS: $(nobase_include_HEADERS)
 	@$(NORMAL_INSTALL)
 	@list='$(nobase_include_HEADERS)'; test -n "$(includedir)" || list=; \
@@ -847,8 +872,6 @@ uninstall-am: uninstall-libLIBRARIES uninstall-nobase_includeHEADERS
 	uninstall-am uninstall-libLIBRARIES \
 	uninstall-nobase_includeHEADERS
 
-
-#load_data
 
 # Tell versions [3.59,3.63) of GNU make to not export all variables.
 # Otherwise a system limit (for SysV at least) may be exceeded.

@@ -116,6 +116,7 @@ namespace radmat
       {
         ENSEM::EnsemReal ret; 
         ret.resize(spec[0].getB());
+        ret = SEMBLE::toScalar(double(0));
         std::vector<SEMBLE::SembleVector<double> >::const_iterator it;
         for(it = spec.begin(); it != spec.end(); it++)
           ret += (*it)(target);

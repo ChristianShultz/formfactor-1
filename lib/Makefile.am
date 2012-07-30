@@ -20,6 +20,9 @@ nobase_include_HEADERS += radmat/llsq/llsq_driver.h radmat/llsq/llsq_gen_system.
 #load_data
 nobase_include_HEADERS += radmat/load_data/build_q2_packs.h radmat/load_data/load_fake_data.h radmat/load_data/three_point.h
 
+#fitting
+nobase_include_HEADERS += radmat/fitting/fit_three_point_ff.h radmat/fitting/radmat_fit_forms.h
+
 #
 # Library
 #
@@ -39,3 +42,6 @@ libradmat_a_SOURCES += radmat/fake_data/covarrying_vectors.cc radmat/fake_data/f
 libradmat_a_SOURCES += radmat/llsq/llsq_solvers.cc
 
 #load_data
+
+#fitting
+libradmat_a_SOURCES += radmat/fitting/fit_three_point_ff.cc

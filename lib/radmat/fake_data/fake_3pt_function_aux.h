@@ -72,7 +72,7 @@ namespace radmat
   /////////////////////////////////////////////////////////////////////////////
 
 
-//#define DEBUG_FAKE_MAT_ELEM_CJS
+// #define DEBUG_FAKE_MAT_ELEM_CJS
 
   struct FakeMatrixElement
   {
@@ -243,15 +243,17 @@ namespace radmat
 
       handle->specsource = FakeSpec.generate(std::string("source"));
 
-      // DEBUG
-      //      std::cout << __func__ << std::endl;
-      //      std::vector<SEMBLE::SembleVector<double> >::const_iterator it;
-      //
-      //      std::cout << "size: " << handle->specsource.size() << std::endl;
-      //      for(it = handle->specsource.begin(); it != handle->specsource.end(); it++)
-      //        std::cout << "B: " << it->getB() << "\n N: " << it->getN() << "\n mean: " << it->mean() << std::endl;
-      //
-      //        __builtin_trap();
+   /*   // DEBUG
+            std::cout << __func__ << std::endl;
+            std::vector<SEMBLE::SembleVector<double> >::const_iterator it;
+      
+            std::cout << "size: " << handle->specsource.size() << std::endl;
+            for(it = handle->specsource.begin(); it != handle->specsource.end(); it++)
+              std::cout << "B: " << it->getB() << "\n N: " << it->getN() << "\n mean: " << it->mean() << std::endl;
+      
+              __builtin_trap();
+
+*/
 
       if(!!!ini.stateProps.sameOp)
         handle->specsink = FakeSpec.generate(std::string("sink"));

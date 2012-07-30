@@ -124,6 +124,11 @@ main(void)
     dump_test(ct_err,ct_test,test_load_fake_data());
       }
 
+#pragma omp section
+      {
+    dump_test(ct_err,ct_test,test_fit_constant());
+      }
+
     } // omp sections
   } // parallel 
 

@@ -51,6 +51,13 @@ namespace radmat
       C3.Z_source = c.getKey().Z_source/c.getKey().E_source/SEMBLE::toScalar(double(2));
       C3.Z_sink = c.getKey().Z_sink/c.getKey().E_sink/SEMBLE::toScalar(double(2));
 
+      /*
+         std::cout << __func__ << std::endl;
+         std::cout << SEMBLE::toScalar(ENSEM::mean(c.getKey().E_source)) << std::endl;
+         std::cout << SEMBLE::toScalar(ENSEM::mean(c.getKey().E_sink)) << std::endl;
+         std::cout << SEMBLE::toScalar(ENSEM::mean(c.getKey().Z_source)) << std::endl;
+       */
+
       C3.Q2 = c.getKey().Q2;
       C3.C3pt = c.get3pt();
       C3.mom_factor = c.getKey().mom_factor;

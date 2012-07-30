@@ -245,6 +245,7 @@ namespace radmat
         }
 
       // check bin0 -- something strange is happening and the real part is blowing up?
+      // hadn't initialized the ensem to zero in one of the sub classes and apparently it doesnt know to do that
 
       std::cout << "bar[0]: " << SEMBLE::toScalar(bar.elem(0)) << std::endl; // didnt do it here, must be in the FakeCorr section
       pokeObs(tpt,bar,t_ins);
