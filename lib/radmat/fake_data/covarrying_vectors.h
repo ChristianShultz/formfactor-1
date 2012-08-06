@@ -4,6 +4,7 @@
 #include "itpp/itbase.h"
 #include <vector>
 #include <complex>
+#include "radmat/utils/pow2assert.h"
 
 namespace radmat
 {
@@ -61,78 +62,79 @@ namespace radmat
   //
   //
 
+
   // generate a covarrying distribution
   template<typename T>
-  std::vector<itpp::Vec<T> > genCovarryingDist(const itpp::Vec<T> &mean,
-					       const itpp::Vec<double> &variance,       // (y - ybar)* x (y - ybar) -- real!
-					       const itpp::Mat<T> &correlation_matrix,  // unit normalized guy
-					       const int ncfg) 
-  {
-    int sz = mean.size();
-    
-    if( (variance.size() != sz) 
-	|| (correlation_matrix.rows() != sz) 
-	|| (correlation_matrix.rows() != correlation_matrix.cols()) )
-      __builtin_trap();
-    
-    itpp::Mat<T> CovarianceMatrix;
+    std::vector<itpp::Vec<T> > genCovarryingDist(const itpp::Vec<T> &mean,
+        const itpp::Vec<double> &variance,       // (y - ybar)* x (y - ybar) -- real!
+        const itpp::Mat<T> &correlation_matrix,  // unit normalized guy
+        const int ncfg) 
+    {
+      int sz = mean.size();
 
-    if(correlation_matrix != itpp::hermitian_transpose(correlation_matrix) )
+      if( (variance.size() != sz) 
+          || (correlation_matrix.rows() != sz) 
+          || (correlation_matrix.rows() != correlation_matrix.cols()) )
+        __builtin_trap();
+
+      itpp::Mat<T> CovarianceMatrix;
+
+      if(correlation_matrix != itpp::hermitian_transpose(correlation_matrix) )
       {
-	std::cout <<__PRETTY_FUNCTION__ << std::endl;
-	std::cout << "Warning, non symmetric (hermitian) correlation matricies" 
-		  << " are evil, symmetrizing (hermiterizing)." << std::endl;
-	CovarianceMatrix = 0.5 * (correlation_matrix + itpp::hermitian_transpose(correlation_matrix) );
-     }
-    else
-      CovarianceMatrix = correlation_matrix;
-    
-    itpp::Vec<double> d(variance);
-    for(int i =0; i < sz; i++)
-      d(i) = std::sqrt(d(i));
+        std::cout <<__PRETTY_FUNCTION__ << std::endl;
+        std::cout << "Warning, non symmetric (hermitian) correlation matricies" 
+          << " are evil, symmetrizing (hermiterizing)." << std::endl;
+        CovarianceMatrix = 0.5 * (correlation_matrix + itpp::hermitian_transpose(correlation_matrix) );
+      }
+      else
+        CovarianceMatrix = correlation_matrix;
 
-    itpp::Mat<double> D = itpp::diag(d);
+      itpp::Vec<T> d(variance.size());
+      for(int i =0; i < sz; i++)
+        d(i) = std::sqrt(variance(i));
 
-    CovarianceMatrix = D * CovarianceMatrix * D;
+      itpp::Mat<T> D = itpp::diag(d);
 
-    /*
-    const itpp::Mat<T> Chalf = itpp::chol(CovarianceMatrix).H();
-    std::vector<itpp::Vec<T> > cv(ncfg,mean);
-    typename std::vector<itpp::Vec<T> >::iterator it;
-    wrapRandN wrapper;
-    */
+      CovarianceMatrix = itpp::hermitian_transpose(D) * CovarianceMatrix * D;
 
-    /* wrapRandN wrapper;
-    typename std::vector<itpp::Vec<T> >::iterator it;
-    std::vector<itpp::Vec<T> > cv(ncfg,mean);
-    itpp::Mat<T> UU,VV;
-    itpp::Vec<double> ss;
-    itpp::svd(CovarianceMatrix,UU,ss,VV);
-    
-    for(int i = 0 ; i < sz; i++)
-      ss(i) = std::sqrt(ss(i));
+      /*
+         const itpp::Mat<T> Chalf = itpp::chol(CovarianceMatrix).H();
+         std::vector<itpp::Vec<T> > cv(ncfg,mean);
+         typename std::vector<itpp::Vec<T> >::iterator it;
+         wrapRandN wrapper;
+       */
 
-    const itpp::Mat<T> Chalf = UU*itpp::diag(ss);
-    */
+      /* wrapRandN wrapper;
+         typename std::vector<itpp::Vec<T> >::iterator it;
+         std::vector<itpp::Vec<T> > cv(ncfg,mean);
+         itpp::Mat<T> UU,VV;
+         itpp::Vec<double> ss;
+         itpp::svd(CovarianceMatrix,UU,ss,VV);
 
-    // this "converged" the fastest
-    wrapRandN wrapper;
-    typename std::vector<itpp::Vec<T> >::iterator it;
-    std::vector<itpp::Vec<T> > cv(ncfg,mean);
-    itpp::Mat<T> V;
-    itpp::Vec<double> lambda;
-    itpp::eig_sym(CovarianceMatrix,lambda,V);
-    
-    for(int i = 0; i < sz; i++)
-      lambda(i) = std::sqrt(lambda(i));
+         for(int i = 0 ; i < sz; i++)
+         ss(i) = std::sqrt(ss(i));
 
-    const itpp::Mat<T> Chalf = V*itpp::diag(lambda);
+         const itpp::Mat<T> Chalf = UU*itpp::diag(ss);
+       */
 
-    for(it = cv.begin(); it != cv.end(); it++)
-      *it += Chalf * wrapper.wrap<T>(sz);
+      // this "converged" the fastest
+      wrapRandN wrapper;
+      typename std::vector<itpp::Vec<T> >::iterator it;
+      std::vector<itpp::Vec<T> > cv(ncfg,mean);
+      itpp::Mat<T> V;
+      itpp::Vec<double> lambda;
+      itpp::eig_sym(CovarianceMatrix,lambda,V);
 
-    return cv;
-  }
+      for(int i = 0; i < sz; i++)
+        lambda(i) = std::sqrt(lambda(i));
+
+      const itpp::Mat<T> Chalf = V*itpp::diag(lambda);
+
+      for(it = cv.begin(); it != cv.end(); ++it)
+        *it += Chalf * wrapper.wrap<T>(sz);
+
+      return cv;
+    }
 
   //
   //
@@ -140,9 +142,9 @@ namespace radmat
   // generate a valid correlation Matrix in R^n or C^n
   struct corMat
   {
-  public:
-    template<typename T>
-    itpp::Mat<T> genMat(const int rank) const;
+    public:
+      template<typename T>
+        itpp::Mat<T> genMat(const int rank) const;
   };
 
 

@@ -23,6 +23,9 @@
 // #define DEBUG_NASTY_NESTED_STRUCT_WITH_POINTERS_THAT_I_HATE
 // actually its not that bad
 
+#define DEBUGGIN_BUILD_PACKS
+
+
 // parallel region in here for normalizing the correlators and such,
 // the vectors already have their storage allocated, we will be 
 // writing one thread per elem so its safe
@@ -238,14 +241,17 @@ namespace radmat
         int i;
         int sz = m_cor.size();
 
-        /*
-           std::cout << "pre norm Z" << std::endl;
-           std::cout << SEMBLE::toScalar(ENSEM::mean(ENSEM::peekObs(m_cor.begin()->C3pt,0))) << std::endl;
-           std::cout << "Z_source" << std::endl;
-           std::cout << SEMBLE::toScalar(ENSEM::mean(m_cor.begin()->Z_source)) << std::endl;
-           std::cout << "Z_sink" << std::endl;
-           std::cout << SEMBLE::toScalar(ENSEM::mean(m_cor.begin()->Z_sink)) << std::endl;
-         */
+#ifdef DEBUGGIN_BUILD_PACKS
+        std::cout << "pre norm Z" << std::endl;
+      std::cout << SEMBLE::toScalar(ENSEM::mean(ENSEM::peekObs(m_cor.begin()->C3pt,0))) << " +/- " 
+<< std::cout << SEMBLE::toScalar(ENSEM::variance(ENSEM::peekObs(m_cor.begin()->C3pt,0))) << std::endl;
+        std::cout << "Z_source" << std::endl;
+        std::cout << SEMBLE::toScalar(ENSEM::mean(m_cor.begin()->Z_source)) << " +/- " 
+<< SEMBLE::toScalar(ENSEM::variance(m_cor.begin()->Z_source)) << std::endl;
+        std::cout << "Z_sink" << std::endl;
+        std::cout << SEMBLE::toScalar(ENSEM::mean(m_cor.begin()->Z_sink)) << " +/- " 
+<<  SEMBLE::toScalar(ENSEM::variance(m_cor.begin()->Z_sink)) << std::endl;
+#endif
 
 #ifdef USE_OMP_LOAD_DATA_BUILDQ2PACKS
 #pragma omp parallel for shared(i,sz)
@@ -284,10 +290,17 @@ namespace radmat
         int i;
         int sz = m_cor.size();
 
-        /*
-           std::cout << "pre norm E" << std::endl;
-           std::cout << SEMBLE::toScalar(ENSEM::mean(ENSEM::peekObs(m_cor.begin()->C3pt,0))) << std::endl;
-         */
+#ifdef DEBUGGIN_BUILD_PACKS
+
+        std::cout << "pre norm E" << std::endl;
+        std::cout << SEMBLE::toScalar(ENSEM::mean(ENSEM::peekObs(m_cor.begin()->C3pt,0))) << std::endl;
+        std::cout << "E_source " << SEMBLE::toScalar(ENSEM::mean(m_cor.begin()->E_source)) << " +/- " 
+          << SEMBLE::toScalar(ENSEM::variance(m_cor.begin()->E_source))  << std::endl;
+        std::cout << "E_sink " <<  SEMBLE::toScalar(ENSEM::mean(m_cor.begin()->E_sink)) << " +/- " 
+          << SEMBLE::toScalar(ENSEM::variance(m_cor.begin()->E_sink))  << std::endl;
+
+
+#endif
 
 #ifdef USE_OMP_LOAD_DATA_BUILDQ2PACKS
 #pragma omp parallel for shared(i,sz)
@@ -295,10 +308,11 @@ namespace radmat
         for(i = 0; i < sz; i++)
           normE(i);
 
-        /*
-           std::cout << "post norm E" << std::endl;
-           std::cout << SEMBLE::toScalar(ENSEM::mean(ENSEM::peekObs(m_cor.begin()->C3pt,0))) << std::endl;
-         */
+#ifdef DEBUGGIN_BUILD_PACKS
+
+        std::cout << "post norm E" << std::endl;
+        std::cout << SEMBLE::toScalar(ENSEM::mean(ENSEM::peekObs(m_cor.begin()->C3pt,0))) << std::endl;
+#endif
 
       }
 
@@ -593,6 +607,7 @@ namespace radmat
 
 #undef USE_OMP_LOAD_DATA_BUILDQ2PACKS
 #undef DEBUG_NASTY_NESTED_STRUCT_WITH_POINTERS_THAT_I_HATE
+#undef DEBUGGIN_BUILD_PACKS
 
 
 #endif

@@ -6,7 +6,7 @@
 
  * Creation Date : 16-07-2012
 
- * Last Modified : Mon Jul 23 16:04:05 2012
+ * Last Modified : Thu Aug  2 09:50:49 2012
 
  * Created By : shultz
 
@@ -177,7 +177,7 @@ main(int argc, char *argv[])
   {
     LLSQRet_ff_Q2Pack<std::complex<double> > foobar;
     LLSQDriver_t<std::complex<double> > llsq_driver(std::string("SVDMakeSquare"));
-    foobar = llsq_driver(*q2_pack_iterator);
+    foobar = *llsq_driver(*q2_pack_iterator);
 
     LLSQRet_ff_Q2Pack<std::complex<double> >::const_iterator it;
 

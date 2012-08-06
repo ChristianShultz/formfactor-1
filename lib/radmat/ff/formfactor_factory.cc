@@ -15,6 +15,8 @@
 #include "lorentzff_PiPi.h"
 #include "lorentzff_PiPiStar.h"
 
+#include <omp.h>
+
 namespace FacEnv = radmat::FormFactorDecompositionFactoryEnv;
 typedef radmat::TheFormFactorDecompositionFactory Factory;
 
@@ -37,7 +39,7 @@ namespace radmat
           return t;
         }
 
-      bool registered = false;
+      volatile bool registered = false;
     }
 
     // never played with this toy before so we are just going to 
@@ -64,19 +66,23 @@ namespace radmat
     // register the factory "inventory"
     bool registerAll(void)
     {
+
       bool success = true;
-
-      if(!!!registered)
+#pragma omp critical
       {
-        success &= Factory::Instance().registerObject(std::string("PiPi"),FacEnv::upCast<ffBase_t<std::complex<double> > ,radmat::PiPi::PiPi>);
-        success &= Factory::Instance().registerObject(std::string("PiPi_0_0"),FacEnv::upCast<ffBase_t<std::complex<double> > ,radmat::PiPi::PiPi>);
-        success &= Factory::Instance().registerObject(std::string("PiPiStar_0_0"),FacEnv::upCast<ffBase_t<std::complex<double> > ,radmat::PiPiStar::PiPiStar>);
+
+        if(!!!registered)
+        {
+          success &= Factory::Instance().registerObject(std::string("PiPi"),FacEnv::upCast<ffBase_t<std::complex<double> > ,radmat::PiPi::PiPi>);
+          success &= Factory::Instance().registerObject(std::string("PiPi_0_0"),FacEnv::upCast<ffBase_t<std::complex<double> > ,radmat::PiPi::PiPi>);
+          success &= Factory::Instance().registerObject(std::string("PiPiStar_0_0"),FacEnv::upCast<ffBase_t<std::complex<double> > ,radmat::PiPiStar::PiPiStar>);
 
 
-        registered = true;
+          registered = true;
+        }
       }
-
       return success;
+
     }
 
 

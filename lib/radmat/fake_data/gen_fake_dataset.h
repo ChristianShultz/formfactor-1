@@ -21,6 +21,8 @@ namespace radmat
       typedef Fake3ptCorr<T> Corr;
       typedef typename ADAT::Handle<FakeDataInputs_p<T> > PrimInput_h;
       typedef typename ADAT::Handle<FakeDataInputs<T> > Input_h;
+      typedef FakeMatrixElement::ffFunction ffFunction;
+
 
       GenFakeDataSet(void);
       GenFakeDataSet(const FakeDataIni_t &);
@@ -28,6 +30,7 @@ namespace radmat
 
       void generate(void);
       void generate(const FakeDataIni_t &);
+      std::vector<ffFunction> get_FF_inputs(void) const {return m_ff_input_functions;}
 
       typename ADAT::Handle<std::vector<Corr> > get(void);
 
@@ -36,6 +39,7 @@ namespace radmat
       bool m_have3Pt;
       FakeDataIni_t m_ini;
       typename ADAT::Handle<std::vector<Corr> > m_3Pt;
+      std::vector<ffFunction> m_ff_input_functions;
 
     };
 
@@ -85,6 +89,12 @@ namespace radmat
               m_3Pt->push_back(  Corr(work,lorentz,h_i[hi],h_f[hf],moms[p])  );
       }
 
+      const int left_target = orig->ini.matElemProps.left_target;
+      const int right_target = orig->ini.matElemProps.right_target;
+  
+
+      m_ff_input_functions = orig->ffgenerator(left_target,right_target);
+
       m_have3Pt = true;
     }
 
@@ -94,6 +104,7 @@ namespace radmat
     {
       m_ini = ini;
       m_haveIni = true;
+      generate();
     }
 
 

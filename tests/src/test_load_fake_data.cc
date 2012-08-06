@@ -41,7 +41,7 @@ namespace radmat
     LLSQRet_ff_Q2Pack<std::complex<double> > foobar;
     LLSQDriver_t<std::complex<double> > llsq_driver(std::string("SVDMakeSquare"));
 
-    foobar = llsq_driver(junk[0]);
+    foobar = *(llsq_driver(junk[0]));
 /*
   LLSQRet_ff_Q2Pack<std::complex<double> >::const_iterator it;
 

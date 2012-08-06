@@ -24,7 +24,7 @@ namespace radmat
       {  }
 
 
-      LLSQRet_ff_Q2Pack<T> operator()(const ADAT::Handle<LLSQDataPointQ2Pack> &in) const
+      ADAT::Handle<LLSQRet_ff_Q2Pack<T> > operator()(const ADAT::Handle<LLSQDataPointQ2Pack> &in) const
       {
         LLSQDataPointQ2Pack::const_iterator it;
         LLSQRet_t_Q2Pack<T> tmp;

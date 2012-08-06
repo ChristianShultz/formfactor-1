@@ -72,11 +72,11 @@ namespace radmat
   /////////////////////////////////////////////////////////////////////////////
 
 
-// #define DEBUG_FAKE_MAT_ELEM_CJS
+ //#define DEBUG_FAKE_MAT_ELEM_CJS
 
   struct FakeMatrixElement
   {
-    typedef bind1st_2ParFunction_cc<double,int,double,&One> ffFunction;
+    typedef bind1st_2ParFunction_cc<double,int,double,&HarmonicPlusOne> ffFunction;
 
     ENSEM::EnsemComplex operator()(const std::string &elemID, 
         const int t,
@@ -101,17 +101,21 @@ namespace radmat
         matelem += K_k(k) * SEMBLE::toScalar(ffgen[k](Q2));
 
 #ifdef DEBUG_FAKE_MAT_ELEM_CJS
-       // -- DEBUG
-         std::cout << __func__ << std::endl;
-         std::cout << "matelem " << SEMBLE::toScalar(ENSEM::mean(matelem)) << std::endl;
-         std::cout << "exp " << SEMBLE::toScalar(ENSEM::mean(exp)) << std::endl;
-         std::cout << "mom.first(0) " << SEMBLE::toScalar(ENSEM::mean(mom.first(0))) << std::endl;
-         std::cout << "mom.second(0) " << SEMBLE::toScalar(ENSEM::mean(mom.second(0))) << std::endl;
-         std::cout << "K_k(0) " << SEMBLE::toScalar(ENSEM::mean(K_k(0))) << std::endl;
-         std::cout << "ffgen[0](Q2) " << ffgen[0](Q2) << std::endl;
-         std::cout << "Q2 " << Q2 << std::endl;
+      // -- DEBUG
+      if(SEMBLE::toScalar(ENSEM::mean(matelem) ) != 0.)
+      {
+        std::cout << __func__ << std::endl;
+        std::cout << "matelem " << SEMBLE::toScalar(ENSEM::mean(matelem)) << std::endl;
+        std::cout << "exp " << SEMBLE::toScalar(ENSEM::mean(exp)) << std::endl;
+        std::cout << "mom.first(0) " << SEMBLE::toScalar(ENSEM::mean(mom.first(0))) << std::endl;
+        std::cout << "mom.second(0) " << SEMBLE::toScalar(ENSEM::mean(mom.second(0))) << std::endl;
+        std::cout << "K_k(0) " << SEMBLE::toScalar(ENSEM::mean(K_k(0))) << std::endl;
+        std::cout << "ffgen[0](Q2) " << ffgen[0](Q2) << std::endl;
+        std::cout << "Q2 " << Q2 << std::endl;
+        std::cout << std::endl;
+      }
 #endif
-       
+
       return matelem * exp;
     }
   };
@@ -243,17 +247,17 @@ namespace radmat
 
       handle->specsource = FakeSpec.generate(std::string("source"));
 
-   /*   // DEBUG
-            std::cout << __func__ << std::endl;
-            std::vector<SEMBLE::SembleVector<double> >::const_iterator it;
-      
-            std::cout << "size: " << handle->specsource.size() << std::endl;
-            for(it = handle->specsource.begin(); it != handle->specsource.end(); it++)
-              std::cout << "B: " << it->getB() << "\n N: " << it->getN() << "\n mean: " << it->mean() << std::endl;
-      
-              __builtin_trap();
+      /*   // DEBUG
+           std::cout << __func__ << std::endl;
+           std::vector<SEMBLE::SembleVector<double> >::const_iterator it;
 
-*/
+           std::cout << "size: " << handle->specsource.size() << std::endl;
+           for(it = handle->specsource.begin(); it != handle->specsource.end(); it++)
+           std::cout << "B: " << it->getB() << "\n N: " << it->getN() << "\n mean: " << it->mean() << std::endl;
+
+           __builtin_trap();
+
+       */
 
       if(!!!ini.stateProps.sameOp)
         handle->specsink = FakeSpec.generate(std::string("sink"));

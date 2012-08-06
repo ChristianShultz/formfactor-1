@@ -12,44 +12,51 @@
 #include "adat/handle.h"
 #include "radmat/utils/pow2assert.h"
 
+#include <omp.h>
+
 namespace FacEnv = radmat::LLSQSolverFactoryEnv;
 typedef radmat::TheLLSQSolverFactory Factory;
 
 namespace radmat
 {
-  
+
   namespace LLSQSolverFactoryEnv
   {
 
     namespace
     {
       template<class T, class U>
-      T* upCast(void)
-      {
-	T *t = new U();
-	POW2_ASSERT(t);
-	return t;
-      }
+        T* upCast(void)
+        {
+          T *t = new U();
+          POW2_ASSERT(t);
+          return t;
+        }
 
-      bool registered = false;
+      volatile bool registered = false;
     } // close anonymous 
 
 
 
     bool registerAll(void)
     {
+
       bool success = true;
-      if(!!!registered)
-	{
-	  success &= Factory::Instance().registerObject(std::string("LU"),
-							FacEnv::upCast<LLSQBaseSolver_t<std::complex<double> >, 
-								       LLSQSolverLU_t<std::complex<double> > > );
-	  success &= Factory::Instance().registerObject(std::string("SVDMakeSquare"),
-	  						FacEnv::upCast<LLSQBaseSolver_t<std::complex<double> >, 
-	  							       LLSQSolverSVDMakeSquare_t<std::complex<double> > > );
-							
-	  registered = true;
-	}
+#pragma omp critical
+      {
+
+        if(!!!registered)
+        {
+          success &= Factory::Instance().registerObject(std::string("LU"),
+              FacEnv::upCast<LLSQBaseSolver_t<std::complex<double> >, 
+              LLSQSolverLU_t<std::complex<double> > > );
+          success &= Factory::Instance().registerObject(std::string("SVDMakeSquare"),
+              FacEnv::upCast<LLSQBaseSolver_t<std::complex<double> >, 
+              LLSQSolverSVDMakeSquare_t<std::complex<double> > > );
+
+          registered = true;
+        }
+      }
       return success;
     }
 
@@ -61,19 +68,19 @@ namespace radmat
       LLSQBaseSolver_t<std::complex<double> > *foo;
       foo = NULL;
       try
-	{
-	  foo = Factory::Instance().createObject(solnID);
-	}
+      {
+        foo = Factory::Instance().createObject(solnID);
+      }
       catch(...)
-	{
-	  POW2_ASSERT(false);
-	}
+      {
+        POW2_ASSERT(false);
+      }
 
       POW2_ASSERT(foo);
       return ADAT::Handle<LLSQBaseSolver_t<std::complex<double> > >(foo);
     }
 
-    
+
   } // Env
 
 } // radmat

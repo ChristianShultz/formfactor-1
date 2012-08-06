@@ -6,6 +6,7 @@
 #include "semble/semble_vector.h"
 #include "semble/semble_meta.h"
 #include <map>
+#include "adat/handle.h"
 
 namespace radmat
 {
@@ -94,11 +95,18 @@ namespace radmat
     struct LLSQRet_ff_Q2Pack
     {
 
-      LLSQRet_ff_Q2Pack(void) {}
+      LLSQRet_ff_Q2Pack(void)
+     {
+        m_Q2.resize(1);
+        m_Q2 = SEMBLE::toScalar(double(10000000));
+      }
 
       LLSQRet_ff_Q2Pack(const LLSQRet_ff_Q2Pack &o)
         : m_map(o.m_map) , m_Q2(o.m_Q2)
-      {}
+      {
+        m_Q2.resize(1);
+        m_Q2 = SEMBLE::toScalar(double(10000000));
+      }
 
       ~LLSQRet_ff_Q2Pack(void) {}
 
@@ -154,9 +162,11 @@ namespace radmat
 
 
   template<typename T>
-    LLSQRet_ff_Q2Pack<T>  transformLLSQRetPack(const LLSQRet_t_Q2Pack<T> &in)
+   ADAT::Handle<LLSQRet_ff_Q2Pack<T> >  transformLLSQRetPack(const LLSQRet_t_Q2Pack<T> &in)
     {
-      LLSQRet_ff_Q2Pack<T> out;
+      
+    
+     ADAT::Handle<LLSQRet_ff_Q2Pack<T> > out(new LLSQRet_ff_Q2Pack<T>);      
       typename SEMBLE::PromoteEnsemVec<T>::Type zero;
 
       int ncfg = in.begin()->second.getB();
@@ -181,10 +191,10 @@ namespace radmat
         for(it = in.begin(); it != in.end(); it++)
           ENSEM::pokeObs(tmp,it->second.getEnsemElement(i),it->first);
 
-        out.insert(i,tmp);
+        out->insert(i,tmp);
       }
 
-      out.setQ2(in.Q2());
+      out->setQ2(in.Q2());
 
       return out;
     }
