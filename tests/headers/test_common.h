@@ -50,5 +50,8 @@ namespace radmat
   // fitting
   tester test_fit_constant(void);
 
+
+  // readers
+  tester test_readers(void);
 }
 #endif

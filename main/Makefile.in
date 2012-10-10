@@ -50,7 +50,7 @@ NORMAL_UNINSTALL = :
 PRE_UNINSTALL = :
 POST_UNINSTALL = :
 noinst_PROGRAMS = hello$(EXEEXT) plot_fake_3pt$(EXEEXT) \
-	fake_radmat$(EXEEXT)
+	fake_radmat$(EXEEXT) read_redstar$(EXEEXT)
 subdir = main
 DIST_COMMON = $(srcdir)/Makefile.am $(srcdir)/Makefile.in
 ACLOCAL_M4 = $(top_srcdir)/aclocal.m4
@@ -74,6 +74,10 @@ am_plot_fake_3pt_OBJECTS = plot_fake_3pt.$(OBJEXT)
 plot_fake_3pt_OBJECTS = $(am_plot_fake_3pt_OBJECTS)
 plot_fake_3pt_LDADD = $(LDADD)
 plot_fake_3pt_DEPENDENCIES =
+am_read_redstar_OBJECTS = read_redstar.$(OBJEXT)
+read_redstar_OBJECTS = $(am_read_redstar_OBJECTS)
+read_redstar_LDADD = $(LDADD)
+read_redstar_DEPENDENCIES =
 DEFAULT_INCLUDES = -I.@am__isrc@
 depcomp = $(SHELL) $(top_srcdir)/config/depcomp
 am__depfiles_maybe = depfiles
@@ -84,9 +88,9 @@ CXXLD = $(CXX)
 CXXLINK = $(CXXLD) $(AM_CXXFLAGS) $(CXXFLAGS) $(AM_LDFLAGS) $(LDFLAGS) \
 	-o $@
 SOURCES = $(fake_radmat_SOURCES) $(hello_SOURCES) \
-	$(plot_fake_3pt_SOURCES)
+	$(plot_fake_3pt_SOURCES) $(read_redstar_SOURCES)
 DIST_SOURCES = $(fake_radmat_SOURCES) $(hello_SOURCES) \
-	$(plot_fake_3pt_SOURCES)
+	$(plot_fake_3pt_SOURCES) $(read_redstar_SOURCES)
 am__can_run_installinfo = \
   case $$AM_UPDATE_INFO_DIR in \
     n|no|NO) false;; \
@@ -212,6 +216,7 @@ LDADD = -lradmat @SEMBLE_LIBS@ @JACKFITTER_LIBS@ @ADAT_LIBS@ @ITPP_LIBS@ @LIBS@
 hello_SOURCES = hello.cc
 plot_fake_3pt_SOURCES = plot_fake_3pt.cc
 fake_radmat_SOURCES = fake_radmat.cc
+read_redstar_SOURCES = read_redstar.cc
 
 # no idea how/why this works, cut paste job
 #
@@ -265,6 +270,9 @@ hello$(EXEEXT): $(hello_OBJECTS) $(hello_DEPENDENCIES) $(EXTRA_hello_DEPENDENCIE
 plot_fake_3pt$(EXEEXT): $(plot_fake_3pt_OBJECTS) $(plot_fake_3pt_DEPENDENCIES) $(EXTRA_plot_fake_3pt_DEPENDENCIES) 
 	@rm -f plot_fake_3pt$(EXEEXT)
 	$(CXXLINK) $(plot_fake_3pt_OBJECTS) $(plot_fake_3pt_LDADD) $(LIBS)
+read_redstar$(EXEEXT): $(read_redstar_OBJECTS) $(read_redstar_DEPENDENCIES) $(EXTRA_read_redstar_DEPENDENCIES) 
+	@rm -f read_redstar$(EXEEXT)
+	$(CXXLINK) $(read_redstar_OBJECTS) $(read_redstar_LDADD) $(LIBS)
 
 mostlyclean-compile:
 	-rm -f *.$(OBJEXT)
@@ -275,6 +283,7 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/fake_radmat.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/hello.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/plot_fake_3pt.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/read_redstar.Po@am__quote@
 
 .cc.o:
 @am__fastdepCXX_TRUE@	$(CXXCOMPILE) -MT $@ -MD -MP -MF $(DEPDIR)/$*.Tpo -c -o $@ $<

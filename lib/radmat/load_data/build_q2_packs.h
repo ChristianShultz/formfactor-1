@@ -23,7 +23,7 @@
 // #define DEBUG_NASTY_NESTED_STRUCT_WITH_POINTERS_THAT_I_HATE
 // actually its not that bad
 
-#define DEBUGGIN_BUILD_PACKS
+// #define DEBUGGIN_BUILD_PACKS
 
 
 // parallel region in here for normalizing the correlators and such,

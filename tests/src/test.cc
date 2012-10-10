@@ -48,6 +48,7 @@ main(void)
   {  
 #pragma omp sections
     {
+    
 #pragma omp section
       {
   // test the tensors
@@ -127,6 +128,11 @@ main(void)
 #pragma omp section
       {
     dump_test(ct_err,ct_test,test_fit_constant());
+      }
+
+#pragma omp section
+      {
+    dump_test(ct_err,ct_test,test_readers());
       }
 
     } // omp sections
