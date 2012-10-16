@@ -13,7 +13,7 @@ LDADD = -lradmat @SEMBLE_LIBS@ @JACKFITTER_LIBS@ @ADAT_LIBS@ @ITPP_LIBS@ @LIBS@
 
 check_PROGRAMS = test test_fake_ini test_cov_vecs fake_3pt_play test_load_database
 
-test_SOURCES = src/test_polarisation_tensor.cc src/test_ff_pipi.cc src/test_LLSQ_solver.cc src/test_factories.cc src/test_minimal_fake_data.cc src/test_covarrying_vector.cc src/test_make_fake_overlaps.cc src/test_make_fake_spectrum.cc src/test_fake_3pt_aux.cc src/test_fake_3pt.cc src/test_make_fake_data_ini.cc src/test_gen_fake_dataset.cc src/test_load_fake_data.cc src/test_fit_constant.cc src/test_readers.cc src/test.cc 
+test_SOURCES = src/test_polarisation_tensor.cc src/test_ff_pipi.cc src/test_LLSQ_solver.cc src/test_factories.cc src/test_minimal_fake_data.cc src/test_covarrying_vector.cc src/test_make_fake_overlaps.cc src/test_make_fake_spectrum.cc src/test_fake_3pt_aux.cc src/test_fake_3pt.cc src/test_make_fake_data_ini.cc src/test_gen_fake_dataset.cc src/test_load_fake_data.cc src/test_fit_constant.cc src/test_readers.cc src/test_invert_subduction.cc src/test.cc 
 
 test_fake_ini_SOURCES = src/test_fake_ini.cc
 

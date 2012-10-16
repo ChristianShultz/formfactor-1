@@ -105,8 +105,8 @@ am_libradmat_a_OBJECTS = breit_frame.$(OBJEXT) euler_angles.$(OBJEXT) \
 	lorentzff_PiPiStar.$(OBJEXT) covarrying_vectors.$(OBJEXT) \
 	fake_data_ini.$(OBJEXT) fake_overlaps.$(OBJEXT) \
 	fake_spectrum.$(OBJEXT) llsq_solvers.$(OBJEXT) \
-	axis_plotter.$(OBJEXT) fit_three_point_ff.$(OBJEXT) \
-	fit_tins.$(OBJEXT)
+	invert_subduction.$(OBJEXT) axis_plotter.$(OBJEXT) \
+	fit_three_point_ff.$(OBJEXT) fit_tins.$(OBJEXT)
 libradmat_a_OBJECTS = $(am_libradmat_a_OBJECTS)
 DEFAULT_INCLUDES = -I.@am__isrc@
 depcomp = $(SHELL) $(top_srcdir)/config/depcomp
@@ -269,6 +269,7 @@ nobase_include_HEADERS = radmat/utils/aux.h radmat/utils/breit_frame.h \
 	radmat/llsq/llsq_gen_system.h radmat/llsq/llsq_q2_pack.h \
 	radmat/llsq/llsq_solver.h radmat/llsq/llsq_solvers.h \
 	radmat/load_data/build_q2_packs.h \
+	radmat/load_data/invert_subduction.h \
 	radmat/load_data/load_data_junk.h \
 	radmat/load_data/load_fake_data.h \
 	radmat/load_data/radmat_database_interface.h \
@@ -291,7 +292,6 @@ lib_LIBRARIES = libradmat.a
 #llsq
 
 #load_data
-#libradmat_a_SOURCES +=  radmat/load_data/read_redstar_key_list_xml.cc
 
 #fitting
 libradmat_a_SOURCES = radmat/utils/breit_frame.cc \
@@ -304,6 +304,7 @@ libradmat_a_SOURCES = radmat/utils/breit_frame.cc \
 	radmat/fake_data/fake_data_ini.cc \
 	radmat/fake_data/fake_overlaps.cc \
 	radmat/fake_data/fake_spectrum.cc radmat/llsq/llsq_solvers.cc \
+	radmat/load_data/invert_subduction.cc \
 	radmat/fitting/axis_plotter.cc \
 	radmat/fitting/fit_three_point_ff.cc \
 	radmat/fitting/fit_tins.cc
@@ -395,6 +396,7 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/fit_tins.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/formfactor_factory.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/harmonic.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/invert_subduction.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/llsq_solvers.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/lorentzff_PiPi.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/lorentzff_PiPiStar.Po@am__quote@
@@ -640,6 +642,20 @@ llsq_solvers.obj: radmat/llsq/llsq_solvers.cc
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='radmat/llsq/llsq_solvers.cc' object='llsq_solvers.obj' libtool=no @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCXX_FALSE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o llsq_solvers.obj `if test -f 'radmat/llsq/llsq_solvers.cc'; then $(CYGPATH_W) 'radmat/llsq/llsq_solvers.cc'; else $(CYGPATH_W) '$(srcdir)/radmat/llsq/llsq_solvers.cc'; fi`
+
+invert_subduction.o: radmat/load_data/invert_subduction.cc
+@am__fastdepCXX_TRUE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT invert_subduction.o -MD -MP -MF $(DEPDIR)/invert_subduction.Tpo -c -o invert_subduction.o `test -f 'radmat/load_data/invert_subduction.cc' || echo '$(srcdir)/'`radmat/load_data/invert_subduction.cc
+@am__fastdepCXX_TRUE@	$(am__mv) $(DEPDIR)/invert_subduction.Tpo $(DEPDIR)/invert_subduction.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='radmat/load_data/invert_subduction.cc' object='invert_subduction.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o invert_subduction.o `test -f 'radmat/load_data/invert_subduction.cc' || echo '$(srcdir)/'`radmat/load_data/invert_subduction.cc
+
+invert_subduction.obj: radmat/load_data/invert_subduction.cc
+@am__fastdepCXX_TRUE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT invert_subduction.obj -MD -MP -MF $(DEPDIR)/invert_subduction.Tpo -c -o invert_subduction.obj `if test -f 'radmat/load_data/invert_subduction.cc'; then $(CYGPATH_W) 'radmat/load_data/invert_subduction.cc'; else $(CYGPATH_W) '$(srcdir)/radmat/load_data/invert_subduction.cc'; fi`
+@am__fastdepCXX_TRUE@	$(am__mv) $(DEPDIR)/invert_subduction.Tpo $(DEPDIR)/invert_subduction.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='radmat/load_data/invert_subduction.cc' object='invert_subduction.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o invert_subduction.obj `if test -f 'radmat/load_data/invert_subduction.cc'; then $(CYGPATH_W) 'radmat/load_data/invert_subduction.cc'; else $(CYGPATH_W) '$(srcdir)/radmat/load_data/invert_subduction.cc'; fi`
 
 axis_plotter.o: radmat/fitting/axis_plotter.cc
 @am__fastdepCXX_TRUE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT axis_plotter.o -MD -MP -MF $(DEPDIR)/axis_plotter.Tpo -c -o axis_plotter.o `test -f 'radmat/fitting/axis_plotter.cc' || echo '$(srcdir)/'`radmat/fitting/axis_plotter.cc

@@ -53,5 +53,6 @@ namespace radmat
 
   // readers
   tester test_readers(void);
+  tester test_invert_subduction(void);
 }
 #endif
