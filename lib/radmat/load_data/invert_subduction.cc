@@ -6,7 +6,7 @@
 
  * Creation Date : 12-10-2012
 
- * Last Modified : Tue Oct 16 09:22:41 2012
+ * Last Modified : Tue Oct 16 10:39:43 2012
 
  * Created By : shultz
 
@@ -28,7 +28,7 @@
 #include <complex>
 
 
-namespace
+namespace  // a bunch of local stuff to make my life easier
 {
   bool registered_subduction_tables = false;
 
@@ -38,6 +38,12 @@ namespace
       POW2_ASSERT(Hadron::SubduceTableEnv::registerAll());
 
     registered_subduction_tables = true;
+  }
+
+  Hadron::SubduceTable* callSubduceFactory(const std::string &id)
+  {
+    doRegistration();
+    return Hadron::TheSubduceTableFactory::Instance().createObject(id);
   }
 
   std::vector<std::string> getSubTableKeys(void)
@@ -51,7 +57,9 @@ namespace
     return std::search(text.begin(), text.end(), pattern.begin(), pattern.end()) != text.end();
   }
 
-  std::vector<std::string> tokenize(const std::string &s, const std::string &delim, const bool keep_empty_tokens=false)
+  std::vector<std::string> tokenize(const std::string &s,
+      const std::string &delim, 
+      const bool keep_empty_tokens=false)
   {
     std::vector<std::string> tokens;
 
@@ -150,8 +158,18 @@ namespace
     return expr.H + expr.J + 1;
   }
 
+  struct irrepKey
+  {
+    irrepKey(const std::string rep , const std::string sub)
+      : irrep(rep) , subduce_key(sub)
+    {}
+
+    std::string irrep;
+    std::string subduce_key;
+  };
+
   // get all of the irreps that the cont operator went into dependent on whatever group it was in
-  std::vector<std::string> getIrreps(const radmat::ContinuumBosonExprPrimitive &expr)
+  std::vector<irrepKey> getIrreps(const radmat::ContinuumBosonExprPrimitive &expr)
   {
     const std::string delimiter1("->");
     const std::string delimiter2(",1");
@@ -159,13 +177,18 @@ namespace
     std::stringstream parse_id_stream; 
 
     if(inFlight(expr.group))
+    {
       parse_id_stream << "H" << abs(expr.H);
+
+      if(abs(expr.H) == 0)
+        expr.parity ? parse_id_stream << "+" : parse_id_stream << "-";    
+    }
     else
-      parse_id_stream << "J" << expr.J; 
+      parse_id_stream << "J" << expr.J;     
 
     std::string parse_id = parse_id_stream.str();
 
-    std::vector<std::string> irreps;  
+    std::vector<irrepKey> irreps;  
     std::vector<std::string>::const_iterator it;
 
     for(it = group_keys.begin(); it != group_keys.end(); ++it)
@@ -174,7 +197,7 @@ namespace
       {
         //   std::cout << __func__ << ": matched " << *it << std::endl;
         std::vector<std::string> tokens = tokenize(*it,delimiter1);
-        irreps.push_back( tokenize(tokens[1],delimiter2)[0] );
+        irreps.push_back( irrepKey(tokenize(tokens[1],delimiter2)[0], *it) );
       }
     }
     return irreps;
@@ -188,6 +211,7 @@ namespace
   {
     return radmat::LatticeIrrepExpr_t(coefficient, radmat::LatticeExprPrimitive(group,irrep,row));
   }
+
 
 
 
@@ -254,14 +278,38 @@ namespace radmat
 
   ListLatticeIrrepExpr_t invertSubduction(const ContinuumBosonExprPrimitive & expr)
   {
-    std::vector<std::string> irreps = getIrreps(expr);
-    std::vector<std::string>::const_iterator it;
+    std::vector<irrepKey> irreps = getIrreps(expr);
+    std::vector<irrepKey>::const_iterator it;
     ListLatticeIrrepExpr_t lattice_expr;
 
-    for(it = irreps .begin(); it != irreps.end(); ++it)
+    const int Hbase1 = remapHelicity_1based(expr);
+
+    for(it = irreps.begin(); it != irreps.end(); ++it)
     {
-      lattice_expr.push_back(makeLatticeIrrepExpr(SEMBLE::toScalar(std::complex<double>(1,0)), expr.group, *it ,1));
+      Hadron::SubduceTable *subduce = callSubduceFactory(it->subduce_key); 
+      int rep_bound = subduce->dimt();
+
+      for(int irrep_row = 1; irrep_row <= rep_bound; ++irrep_row)
+      {
+
+        /*   
+             std::cout <<"group: " << expr.group << "\n" 
+             << "irrep: " << it->irrep << "\n"
+             << "rep_bound: " << rep_bound << "\n"
+             << "Hbase1: " << Hbase1 << "\n"
+             << "irrep_row: " << irrep_row << std::endl;
+         */
+
+        if(ENSEM::toBool(ENSEM::localNorm2( (*subduce)(irrep_row,Hbase1))  > ENSEM::Real(0.0)))
+          lattice_expr.push_back(
+              makeLatticeIrrepExpr(
+                (*subduce)(irrep_row,Hbase1),
+                expr.group,
+                it->irrep ,
+                irrep_row));
+      } 
     }
+
     return lattice_expr; 
   }
 
