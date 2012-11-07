@@ -6,7 +6,7 @@
 
  * Creation Date : 15-08-2012
 
- * Last Modified : Tue Sep 25 09:35:05 2012
+ * Last Modified : Tue Oct 23 11:41:00 2012
 
  * Created By : shultz
 
@@ -16,7 +16,10 @@
 #include "../headers/test_common.h"
 #include <stdio.h>
 #include <fstream>
-#include "radmat/load_data/read_redstar_key_list_xml.h"
+#include <string>
+#include <iostream>
+#include "radmat/load_data/simple_world.h"
+#include "io/adat_xmlio.h"
 
 namespace radmat
 {
@@ -27,39 +30,68 @@ namespace radmat
   {
     tester m_test(__func__);
 
-/*    std::string filename("junk.xml");
+    simpleWorld::ContinuumStateXML csxml;
 
-    make_test_file(filename);
+    csxml.J = 0;
+    csxml.parity = true;
+    csxml.mom.resize(1); 
+    csxml.mom[0].resize(3);
+    csxml.mom[0][0] = 1;
+    csxml.mom[0][1] = 0;
+    csxml.mom[0][2] = -1;
+    csxml.twoI_z = 2;
+    csxml.op_stem = "pion_pionxD0_J0__J0_";
+    csxml.creation_op = true;
+    csxml.smearedP = true;
 
+
+    simpleWorld::ContinuumLorentzMatElem CLME, CLME_in;
+    simpleWorld::ContinuumLorentzMatElem::State source,sink,ins;
     
-    redstarKeyListXMLProp_t foobar = readKeys(filename);
+    source.state = csxml;
+    source.t_slice = 0;
+    csxml.creation_op = false;
+    sink.t_slice = 24;
+    sink.state = csxml;
+    csxml.op_stem = "b_b0xD0_J0__J0_";
+    csxml.twoI_z = 0;
+    ins.state = csxml;
+    ins.t_slice = -3;
 
-    TESTER_TEST( m_test, remove(filename.c_str()) == 0, "something bad happend");
-*/
-    return m_test;
-  }
+    CLME.source = source;
+    CLME.sink = sink;
+    CLME.lorentz.resize(4);
+    CLME.lorentz[0] = ins;
+
+    ins.state.op_stem = "rho_rhoxD0_J0__J1_";
+    CLME.lorentz[1] = ins;
+    CLME.lorentz[2] = ins;
+    CLME.lorentz[3] = ins;
 
 
-/*
-  void make_test_file(const std::string &filename)
-  {
-
-    std::ofstream out(filename.c_str());
-  
-//out << " <?xml version=\"1.0\"?> \n";
- out << " <Keys> <redstarKeyList> <elem> <NPoint> <elem> <t_slice>24</t_slice> <Irrep> <CGs> </CGs> <Operators> <elem> <name>pion_pionxD0_J0__J0_A1</name> <smear></smear> <mom_type>0 0 0</mom_type> </elem> </Operators> <creation_op>false</creation_op> <smearedP>true</smearedP> <mom>0 0 0</mom> <row>1</row> <twoI_z>2</twoI_z> </Irrep> </elem> <elem> <t_slice>-3</t_slice> <Irrep> <CGs> </CGs> <Operators> <elem> <name>rho_rhoxD0_J0__J1_T1</name> <smear></smear> <mom_type>0 0 0</mom_type> </elem> </Operators> <creation_op>false</creation_op> <smearedP>true</smearedP> <mom>0 0 0</mom> <row>3</row> <twoI_z>0</twoI_z> </Irrep> </elem> <elem> <t_slice>0</t_slice> <Irrep> <CGs> </CGs> <Operators> <elem> <name>pion_pionxD0_J0__J0_A1</name> <smear></smear> <mom_type>0 0 0</mom_type> </elem> </Operators> <creation_op>true</creation_op> <smearedP>true</smearedP> <mom>0 0 0</mom> <row>1</row> <twoI_z>2</twoI_z> </Irrep> </elem> </NPoint><ensemble>fred</ensemble>";
-
- out << " </elem> <elem> <NPoint> <elem> <t_slice>24</t_slice> <Irrep> <CGs> </CGs> <Operators> <elem> <name>pion_pionxD0_J0__J0_A1</name> <smear></smear> <mom_type>0 0 0</mom_type> </elem> </Operators> <creation_op>false</creation_op> <smearedP>true</smearedP> <mom>0 0 0</mom> <row>1</row> <twoI_z>2</twoI_z> </Irrep> </elem> <elem> <t_slice>-3</t_slice> <Irrep> <CGs> </CGs> <Operators> <elem> <name>b_b0xD0_J0__J0_A1</name> <smear></smear> <mom_type>0 0 0</mom_type> </elem> </Operators> <creation_op>false</creation_op> <smearedP>true</smearedP> <mom>0 0 0</mom> <row>1</row> <twoI_z>0</twoI_z> </Irrep> </elem> <elem> <t_slice>0</t_slice> <Irrep> <CGs> </CGs> <Operators> <elem> <name>pion_pionxD0_J0__J0_A1</name> <smear></smear> <mom_type>0 0 0</mom_type> </elem> </Operators> <creation_op>true</creation_op> <smearedP>true</smearedP> <mom>0 0 0</mom> <row>1</row> <twoI_z>2</twoI_z> </Irrep> </elem> </NPoint> <ensemble>fred</ensemble> </elem>";
-
- out <<"<elem> <NPoint> <elem> <t_slice>24</t_slice> <Irrep> <CGs> </CGs> <Operators> <elem> <name>pion_pionxD0_J0__J0_A1</name> <smear></smear> <mom_type>0 0 0</mom_type> </elem> </Operators> <creation_op>false</creation_op> <smearedP>true</smearedP> <mom>0 0 0</mom> <row>1</row> <twoI_z>2</twoI_z> </Irrep> </elem> <elem> <t_slice>-3</t_slice> <Irrep> <CGs> </CGs> <Operators> <elem> <name>rho_rhoxD0_J0__J1_T1</name> <smear></smear> <mom_type>0 0 0</mom_type> </elem> </Operators> <creation_op>false</creation_op> <smearedP>true</smearedP> <mom>0 0 0</mom> <row>1</row> <twoI_z>0</twoI_z> </Irrep> </elem> <elem> <t_slice>0</t_slice> <Irrep> <CGs> </CGs> <Operators> <elem> <name>pion_pionxD0_J0__J0_A1</name> <smear></smear> <mom_type>0 0 0</mom_type> </elem> </Operators> <creation_op>true</creation_op> <smearedP>true</smearedP> <mom>0 0 0</mom> <row>1</row> <twoI_z>2</twoI_z> </Irrep> </elem> </NPoint> <ensemble>fred</ensemble> ";
-
-out << " </elem> <elem> <NPoint> <elem> <t_slice>24</t_slice> <Irrep> <CGs> </CGs> <Operators> <elem> <name>pion_pionxD0_J0__J0_A1</name> <smear></smear> <mom_type>0 0 0</mom_type> </elem> </Operators> <creation_op>false</creation_op> <smearedP>true</smearedP> <mom>0 0 0</mom> <row>1</row> <twoI_z>2</twoI_z> </Irrep> </elem> <elem> <t_slice>-3</t_slice> <Irrep> <CGs> </CGs> <Operators> <elem> <name>rho_rhoxD0_J0__J1_T1</name> <smear></smear> <mom_type>0 0 0</mom_type> </elem> </Operators> <creation_op>false</creation_op> <smearedP>true</smearedP> <mom>0 0 0</mom> <row>2</row> <twoI_z>0</twoI_z> </Irrep> </elem> <elem> <t_slice>0</t_slice> <Irrep> <CGs> </CGs> <Operators> <elem> <name>pion_pionxD0_J0__J0_A1</name> <smear></smear> <mom_type>0 0 0</mom_type> </elem> </Operators> <creation_op>true</creation_op> <smearedP>true</smearedP> <mom>0 0 0</mom> <row>1</row> <twoI_z>2</twoI_z> </Irrep> </elem> </NPoint> <ensemble>fred</ensemble> </elem> </redstarKeyList> </Keys>";
-
+    ADATXML::XMLBufferWriter xml;
+    simpleWorld::write(xml,"Key",CLME);
+    
+   // xml.print(std::cout);
+    std::string xml_name("simpleWorldXMLout.xml");
+    std::ofstream out(xml_name.c_str());
+    xml.print(out);
     out.close();
 
-  }
+    ADATXML::XMLReader xml_in(xml_name);
+    ADATXML::XMLBufferWriter xml2;
+    simpleWorld::read(xml_in,"/Key",CLME_in);
+    simpleWorld::write(xml2,"Key",CLME_in);
+    std::string xml_name2 = xml_name + std::string("_2");
+    std::ofstream out2(xml_name2.c_str());
+    xml2.print(out2);
+    out2.close();
 
-*/
+    // user should run diff on two output files if they care
+    TESTER_TEST(m_test,true,"foobar");
+
+    return m_test;
+  }
 
 
 } // namespace radmat

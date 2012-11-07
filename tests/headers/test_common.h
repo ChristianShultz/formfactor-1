@@ -17,7 +17,7 @@ namespace radmat
   {
     tester test_ff_debug(void);
     tester test_ff(void);
-  tester test_ffKinematicFactor(void);
+    tester test_ffKinematicFactor(void);
   }
 
   // llsq 
@@ -54,5 +54,6 @@ namespace radmat
   // readers
   tester test_readers(void);
   tester test_invert_subduction(void);
+  tester test_xml_to_redstar(void);
 }
 #endif

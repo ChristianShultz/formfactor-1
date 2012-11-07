@@ -199,7 +199,7 @@ namespace radmat
           eval.resize(vals.size());
           eval.resizeObs(vals[0].data().numElem());
 
-          for(int i=0; i < vals.size(); ++i)
+          for(unsigned int i=0; i < vals.size(); ++i)
           {
             SD sval = vals[i].data();
             ENSEM::pokeEnsem(eval, sval, i);

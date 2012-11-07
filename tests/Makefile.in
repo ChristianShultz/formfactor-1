@@ -66,8 +66,9 @@ fake_3pt_play_OBJECTS = $(am_fake_3pt_play_OBJECTS)
 fake_3pt_play_LDADD = $(LDADD)
 fake_3pt_play_DEPENDENCIES =
 am_test_OBJECTS = test_polarisation_tensor.$(OBJEXT) \
-	test_ff_pipi.$(OBJEXT) test_LLSQ_solver.$(OBJEXT) \
-	test_factories.$(OBJEXT) test_minimal_fake_data.$(OBJEXT) \
+	test_xml_to_redstar.$(OBJEXT) test_ff_pipi.$(OBJEXT) \
+	test_LLSQ_solver.$(OBJEXT) test_factories.$(OBJEXT) \
+	test_minimal_fake_data.$(OBJEXT) \
 	test_covarrying_vector.$(OBJEXT) \
 	test_make_fake_overlaps.$(OBJEXT) \
 	test_make_fake_spectrum.$(OBJEXT) test_fake_3pt_aux.$(OBJEXT) \
@@ -227,7 +228,7 @@ AM_LDFLAGS = -L@top_builddir@/lib/ \
                @LDFLAGS@ @SEMBLE_LDFLAGS@ @JACKFITTER_LDFLAGS@ @ADAT_LDFLAGS@
 
 LDADD = -lradmat @SEMBLE_LIBS@ @JACKFITTER_LIBS@ @ADAT_LIBS@ @ITPP_LIBS@ @LIBS@ 
-test_SOURCES = src/test_polarisation_tensor.cc src/test_ff_pipi.cc src/test_LLSQ_solver.cc src/test_factories.cc src/test_minimal_fake_data.cc src/test_covarrying_vector.cc src/test_make_fake_overlaps.cc src/test_make_fake_spectrum.cc src/test_fake_3pt_aux.cc src/test_fake_3pt.cc src/test_make_fake_data_ini.cc src/test_gen_fake_dataset.cc src/test_load_fake_data.cc src/test_fit_constant.cc src/test_readers.cc src/test_invert_subduction.cc src/test.cc 
+test_SOURCES = src/test_polarisation_tensor.cc src/test_xml_to_redstar.cc src/test_ff_pipi.cc src/test_LLSQ_solver.cc src/test_factories.cc src/test_minimal_fake_data.cc src/test_covarrying_vector.cc src/test_make_fake_overlaps.cc src/test_make_fake_spectrum.cc src/test_fake_3pt_aux.cc src/test_fake_3pt.cc src/test_make_fake_data_ini.cc src/test_gen_fake_dataset.cc src/test_load_fake_data.cc src/test_fit_constant.cc src/test_readers.cc src/test_invert_subduction.cc src/test.cc 
 test_fake_ini_SOURCES = src/test_fake_ini.cc
 test_cov_vecs_SOURCES = src/test_cov_vecs.cc
 fake_3pt_play_SOURCES = src/fake_3pt_play.cc
@@ -319,6 +320,7 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/test_minimal_fake_data.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/test_polarisation_tensor.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/test_readers.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/test_xml_to_redstar.Po@am__quote@
 
 .cc.o:
 @am__fastdepCXX_TRUE@	$(CXXCOMPILE) -MT $@ -MD -MP -MF $(DEPDIR)/$*.Tpo -c -o $@ $<
@@ -361,6 +363,20 @@ test_polarisation_tensor.obj: src/test_polarisation_tensor.cc
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='src/test_polarisation_tensor.cc' object='test_polarisation_tensor.obj' libtool=no @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCXX_FALSE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o test_polarisation_tensor.obj `if test -f 'src/test_polarisation_tensor.cc'; then $(CYGPATH_W) 'src/test_polarisation_tensor.cc'; else $(CYGPATH_W) '$(srcdir)/src/test_polarisation_tensor.cc'; fi`
+
+test_xml_to_redstar.o: src/test_xml_to_redstar.cc
+@am__fastdepCXX_TRUE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT test_xml_to_redstar.o -MD -MP -MF $(DEPDIR)/test_xml_to_redstar.Tpo -c -o test_xml_to_redstar.o `test -f 'src/test_xml_to_redstar.cc' || echo '$(srcdir)/'`src/test_xml_to_redstar.cc
+@am__fastdepCXX_TRUE@	$(am__mv) $(DEPDIR)/test_xml_to_redstar.Tpo $(DEPDIR)/test_xml_to_redstar.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='src/test_xml_to_redstar.cc' object='test_xml_to_redstar.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o test_xml_to_redstar.o `test -f 'src/test_xml_to_redstar.cc' || echo '$(srcdir)/'`src/test_xml_to_redstar.cc
+
+test_xml_to_redstar.obj: src/test_xml_to_redstar.cc
+@am__fastdepCXX_TRUE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT test_xml_to_redstar.obj -MD -MP -MF $(DEPDIR)/test_xml_to_redstar.Tpo -c -o test_xml_to_redstar.obj `if test -f 'src/test_xml_to_redstar.cc'; then $(CYGPATH_W) 'src/test_xml_to_redstar.cc'; else $(CYGPATH_W) '$(srcdir)/src/test_xml_to_redstar.cc'; fi`
+@am__fastdepCXX_TRUE@	$(am__mv) $(DEPDIR)/test_xml_to_redstar.Tpo $(DEPDIR)/test_xml_to_redstar.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='src/test_xml_to_redstar.cc' object='test_xml_to_redstar.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o test_xml_to_redstar.obj `if test -f 'src/test_xml_to_redstar.cc'; then $(CYGPATH_W) 'src/test_xml_to_redstar.cc'; else $(CYGPATH_W) '$(srcdir)/src/test_xml_to_redstar.cc'; fi`
 
 test_ff_pipi.o: src/test_ff_pipi.cc
 @am__fastdepCXX_TRUE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT test_ff_pipi.o -MD -MP -MF $(DEPDIR)/test_ff_pipi.Tpo -c -o test_ff_pipi.o `test -f 'src/test_ff_pipi.cc' || echo '$(srcdir)/'`src/test_ff_pipi.cc

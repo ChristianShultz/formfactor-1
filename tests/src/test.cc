@@ -18,9 +18,9 @@ void dump_test(unsigned short &ct_err, unsigned short &ct_test,const tester &t)
 {
 #pragma omp critical
   {
-  ct_err += t.ct_err;
-  ct_test += t.ct_test;
-  cout << t.test_unit << " " << t.ct_test - t.ct_err << " tests of " << t.ct_test << " possible passed" << endl;
+    ct_err += t.ct_err;
+    ct_test += t.ct_test;
+    cout << t.test_unit << " " << t.ct_test - t.ct_err << " tests of " << t.ct_test << " possible passed" << endl;
   }
 }
 
@@ -48,110 +48,114 @@ main(void)
   {  
 #pragma omp sections
     {
-   /* 
+      /* 
 #pragma omp section
-      {
-  // test the tensors
-  dump_test(ct_err,ct_test,test_tensor(double(10)));
-  dump_test(ct_err,ct_test,test_tensor(std::complex<double>(10,10)));
+{
+      // test the tensors
+      dump_test(ct_err,ct_test,test_tensor(double(10)));
+      dump_test(ct_err,ct_test,test_tensor(std::complex<double>(10,10)));
       }
 
 #pragma omp section
-      {
-  // test out polarisation tensors 
-  dump_test(ct_err,ct_test,test_polarisation_tensor());
+{
+      // test out polarisation tensors 
+      dump_test(ct_err,ct_test,test_polarisation_tensor());
       }
 
 #pragma omp section
-      {
-  // test the PiPi form factor
-  dump_test(ct_err,ct_test,PiPi::test_ff());
-  dump_test(ct_err,ct_test,PiPi::test_ffKinematicFactor());
+{
+      // test the PiPi form factor
+      dump_test(ct_err,ct_test,PiPi::test_ff());
+      dump_test(ct_err,ct_test,PiPi::test_ffKinematicFactor());
       }
 
 #pragma omp section
-      {
-  // test the factories
-  dump_test(ct_err,ct_test,test_solver_factory());
-  dump_test(ct_err,ct_test,test_mat_elem_factory());
+{
+      // test the factories
+      dump_test(ct_err,ct_test,test_solver_factory());
+      dump_test(ct_err,ct_test,test_mat_elem_factory());
       }
 
 #pragma omp section
-      {
-  // test the LLSQ framework
-  dump_test(ct_err,ct_test,test_LLSQ_solver_SVDMakeSquare());
+{
+      // test the LLSQ framework
+      dump_test(ct_err,ct_test,test_LLSQ_solver_SVDMakeSquare());
       }
 
-  // fake data
+    // fake data
 #pragma omp section
-      {
-  test_covarrying_vectors cov;
-  dump_test(ct_err,ct_test,cov.test<double>());
-  dump_test(ct_err,ct_test,cov.test<std::complex<double> >());
-      }
+{
+test_covarrying_vectors cov;
+dump_test(ct_err,ct_test,cov.test<double>());
+dump_test(ct_err,ct_test,cov.test<std::complex<double> >());
+}
 
 #pragma omp section
-      {
-  dump_test(ct_err,ct_test,test_minimal_fake_data(std::string("PiPi")));
-      }
+{
+dump_test(ct_err,ct_test,test_minimal_fake_data(std::string("PiPi")));
+}
 
 #pragma omp section
-      {
-  dump_test(ct_err,ct_test,test_make_fake_overlaps());
-      }
+{
+dump_test(ct_err,ct_test,test_make_fake_overlaps());
+}
 
 #pragma omp section
-      {
-  dump_test(ct_err,ct_test,test_make_fake_spectrum());
-      }
+{
+dump_test(ct_err,ct_test,test_make_fake_spectrum());
+}
 
 #pragma omp section
-      {
-  dump_test(ct_err,ct_test,test_fake_3pt_aux());
-      }
+{
+dump_test(ct_err,ct_test,test_fake_3pt_aux());
+}
 
 #pragma omp section
-      {
-  dump_test(ct_err,ct_test,test_fake_3pt());
-      }
+{
+dump_test(ct_err,ct_test,test_fake_3pt());
+}
 
 #pragma omp section
-      {
-  dump_test(ct_err,ct_test,test_gen_fake_dataset()); //-- redundant, load fake data makes a fake set
-      }
+{
+dump_test(ct_err,ct_test,test_gen_fake_dataset()); //-- redundant, load fake data makes a fake set
+}
 
 #pragma omp section
-      {
-    dump_test(ct_err,ct_test,test_load_fake_data());
-      }
+{
+  dump_test(ct_err,ct_test,test_load_fake_data());
+}
 
 #pragma omp section
-      {
-    dump_test(ct_err,ct_test,test_fit_constant());
-      }
-
-#pragma omp section
-      {
-    dump_test(ct_err,ct_test,test_readers());
-      }
+{
+  dump_test(ct_err,ct_test,test_fit_constant());
+}
 */
 #pragma omp section
-      {
-    dump_test(ct_err, ct_test, test_invert_subduction());
-      }
+{
+//  dump_test(ct_err,ct_test,test_readers());
+}
 
-    } // omp sections
-  } // parallel 
+#pragma omp section
+{
+//  dump_test(ct_err, ct_test, test_invert_subduction());
+}
+#pragma omp section
+{
+  dump_test(ct_err, ct_test, test_xml_to_redstar());
+}
+
+} // omp sections
+} // parallel 
 
 
-  // conclude testing
-  cout << "\n**********************************\n"
-    << ct_test - ct_err << " of " << ct_test << " tests passed.\n" << endl;
-  cout << "finished testing" << endl;
+// conclude testing
+cout << "\n**********************************\n"
+<< ct_test - ct_err << " of " << ct_test << " tests passed.\n" << endl;
+cout << "finished testing" << endl;
 
 
-  if(ct_err != 0) 
-    cout << "Warning: " << ct_err << " tests failed." << endl;
+if(ct_err != 0) 
+  cout << "Warning: " << ct_err << " tests failed." << endl;
 
   return 0;
-}
+  }

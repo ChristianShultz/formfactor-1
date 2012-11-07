@@ -6,7 +6,7 @@
 
  * Creation Date : 15-10-2012
 
- * Last Modified : Tue Oct 16 10:25:49 2012
+ * Last Modified : Wed Oct 17 14:05:21 2012
 
  * Created By : shultz
 
@@ -30,11 +30,14 @@ namespace radmat
 
     for(int i = 0; i < 5; ++i)
     {
-      ContinuumBosonExprPrimitive cont_expr(i,false,i,std::string("oct"));
+      for(int helicity = 0; helicity < 2*i + 1; ++helicity)
+      {
+        ContinuumBosonExprPrimitive cont_expr(i,false,helicity - i,std::string("D3")); 
 
-      ListLatticeIrrepExpr_t  inverse_subducer = invertSubduction(cont_expr);
+        ListLatticeIrrepExpr_t  inverse_subducer = invertSubduction(cont_expr);
 
-      std::cout << "J = " << i << " H = " << i << "\n" << inverse_subducer << std::endl;
+        std::cout << "J = " << i << " H = " << helicity - i << "\n" << inverse_subducer << std::endl;
+      }
     }
 
 

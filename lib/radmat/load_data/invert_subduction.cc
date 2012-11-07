@@ -6,7 +6,7 @@
 
  * Creation Date : 12-10-2012
 
- * Last Modified : Tue Oct 16 10:39:43 2012
+ * Last Modified : Tue Oct 23 12:57:15 2012
 
  * Created By : shultz
 
@@ -114,7 +114,7 @@ namespace  // a bunch of local stuff to make my life easier
 
   std::vector<std::string> getBosonKeys(const std::string &group)
   {
-    if(group == "oct")
+    if(group == "Oh")
       return getBosonKeysPattern(std::string("J"));
     if(group == "D4")
       return getBosonKeysPattern(group);
@@ -180,8 +180,12 @@ namespace  // a bunch of local stuff to make my life easier
     {
       parse_id_stream << "H" << abs(expr.H);
 
-      if(abs(expr.H) == 0)
-        expr.parity ? parse_id_stream << "+" : parse_id_stream << "-";    
+      if(abs(expr.H) == 0)   // N.B. we are using the eta_p thing. eta_p = P(-1)^J
+      {
+        int p = expr.parity ? 1 : -1; 
+        int eta_p = (expr.J % 2 == 0) ? p : -p;
+        (eta_p > 0) ? parse_id_stream << "+" : parse_id_stream << "-";   
+      }
     }
     else
       parse_id_stream << "J" << expr.J;     
@@ -212,6 +216,124 @@ namespace  // a bunch of local stuff to make my life easier
     return radmat::LatticeIrrepExpr_t(coefficient, radmat::LatticeExprPrimitive(group,irrep,row));
   }
 
+  // the patterns for this one are easy and self evident
+  radmat::ListLatticeIrrepExpr_t invertSubduction_rest(const radmat::ContinuumBosonExprPrimitive & expr)
+  {
+    std::vector<irrepKey> irreps = getIrreps(expr);
+    std::vector<irrepKey>::const_iterator it;
+    radmat::ListLatticeIrrepExpr_t lattice_expr;
+
+    const int Hbase1 = remapHelicity_1based(expr);
+
+    for(it = irreps.begin(); it != irreps.end(); ++it)
+    {
+      Hadron::SubduceTable *subduce = callSubduceFactory(it->subduce_key); 
+      int rep_bound = subduce->dimt();
+
+      for(int irrep_row = 1; irrep_row <= rep_bound; ++irrep_row)
+      {
+
+        /*
+           std::cout <<"group: " << expr.group << "\n" 
+           << "irrep: " << it->irrep << "\n"
+           << "rep_bound: " << rep_bound << "\n"
+           << "Hbase1: " << Hbase1 << "\n"
+           << "irrep_row: " << irrep_row << std::endl;
+         */
+
+        if(ENSEM::toBool(ENSEM::localNorm2( (*subduce)(irrep_row,Hbase1))  > ENSEM::Real(0.0)))
+          lattice_expr.push_back(
+              makeLatticeIrrepExpr(
+                (*subduce)(irrep_row,Hbase1),
+                expr.group,
+                it->irrep ,
+                irrep_row));
+      } 
+    }
+
+    return lattice_expr; 
+  }
+
+  // the patterns for this one suck 
+  radmat::ListLatticeIrrepExpr_t invertSubduction_flight(const radmat::ContinuumBosonExprPrimitive & expr)
+  {
+
+    int parity = (expr.parity) ? 1 : -1;
+    int eta_p = (expr.J % 2 == 0) ? parity : -parity;  
+
+    std::vector<irrepKey> irreps = getIrreps(expr);
+    std::vector<irrepKey>::const_iterator it;
+    radmat::ListLatticeIrrepExpr_t lattice_expr;
+
+  std::cout << radmat::toString( expr ) << std::endl;
+  for(it = irreps.begin(); it != irreps.end(); ++it)
+  {
+    std::cout << it->irrep << std::endl;
+  }
+
+    for(it = irreps.begin(); it != irreps.end(); ++it)
+    {
+      Hadron::SubduceTable * subduce = callSubduceFactory(it->subduce_key);
+      int rep_bound = subduce->dimt();
+
+      if(abs(expr.H) == 0)
+      {
+        // paranoia 
+        if(rep_bound != 1)
+        {
+          std::cerr << __func__ << ": Error, it looks like a Helicity zero piece is going into something"
+            << " other than an A irrep which is wrong at the point of writing this code" << std::endl;
+          exit(1);
+        }
+        if(irreps.size() != 1)
+        {
+          std::cerr << __func__ << ": Error, it looks like the Helicity zero piece is getting split across "
+            << "different irreps which doesn't make sense." << std::endl; 
+        }
+
+        lattice_expr.push_back(
+            makeLatticeIrrepExpr(
+              (*subduce)(1,1),
+              expr.group,
+              it->irrep ,
+              1));
+      }
+      else if (expr.H > 0) // positive helicity
+      {
+        for(int irrep_row = 1; irrep_row <= rep_bound; ++irrep_row)
+        {
+          lattice_expr.push_back(
+              makeLatticeIrrepExpr(
+                (*subduce)(irrep_row,1),
+                expr.group,
+                it->irrep ,
+                irrep_row));
+
+        }
+      }
+      else if (expr.H < 0) // negative helicity
+      {
+        for(int irrep_row = 1; irrep_row <= rep_bound; ++irrep_row)
+        {
+          lattice_expr.push_back(
+              makeLatticeIrrepExpr(
+                ENSEM::Real(double(eta_p))*(*subduce)(irrep_row,2),
+                expr.group,
+                it->irrep ,
+                irrep_row));
+
+        }
+      }
+      else
+      {
+        std::cerr << __func__ << " Something went wrong, probably negative zero helicity" << std::endl;
+        exit(1);
+      }
+
+    } // loop over irrep strings 
+
+    return lattice_expr;
+  }
 
 
 
@@ -278,42 +400,11 @@ namespace radmat
 
   ListLatticeIrrepExpr_t invertSubduction(const ContinuumBosonExprPrimitive & expr)
   {
-    std::vector<irrepKey> irreps = getIrreps(expr);
-    std::vector<irrepKey>::const_iterator it;
-    ListLatticeIrrepExpr_t lattice_expr;
-
-    const int Hbase1 = remapHelicity_1based(expr);
-
-    for(it = irreps.begin(); it != irreps.end(); ++it)
-    {
-      Hadron::SubduceTable *subduce = callSubduceFactory(it->subduce_key); 
-      int rep_bound = subduce->dimt();
-
-      for(int irrep_row = 1; irrep_row <= rep_bound; ++irrep_row)
-      {
-
-        /*   
-             std::cout <<"group: " << expr.group << "\n" 
-             << "irrep: " << it->irrep << "\n"
-             << "rep_bound: " << rep_bound << "\n"
-             << "Hbase1: " << Hbase1 << "\n"
-             << "irrep_row: " << irrep_row << std::endl;
-         */
-
-        if(ENSEM::toBool(ENSEM::localNorm2( (*subduce)(irrep_row,Hbase1))  > ENSEM::Real(0.0)))
-          lattice_expr.push_back(
-              makeLatticeIrrepExpr(
-                (*subduce)(irrep_row,Hbase1),
-                expr.group,
-                it->irrep ,
-                irrep_row));
-      } 
-    }
-
-    return lattice_expr; 
+    if(inFlight(expr.group))
+      return invertSubduction_flight(expr);
+    else
+      return invertSubduction_rest(expr);
   }
-
-
 
 
 } // namespace radmat

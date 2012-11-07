@@ -25,11 +25,15 @@ namespace radmat
     {
       typedef typename std::list<ObjExpr_t<Coefficient,Object> > List_t; //! shorthand
       typedef typename List_t::const_iterator const_iterator;            //! iterator type
+      typedef Coefficient Coeff_t;
+      typedef Object Obj_t;
 
       ListObjExpr_t(){}
       ListObjExpr_t(const ObjExpr_t<Coefficient,Object> &expr) {m_expr.push_back(expr);}
       void push_back(const ObjExpr_t<Coefficient,Object> &expr) {m_expr.push_back(expr);}
-
+      const_iterator begin(void) const {return m_expr.begin();}
+      const_iterator end(void) const {return m_expr.end();}
+  
       List_t m_expr;
     };
 

@@ -23,7 +23,7 @@ namespace radmat
     int J;           //! the total angular momentum -
     bool parity;        //! true is positive parity
     int H;           //! the helicity/z projection of spin at rest  (-J..0..J) 1 based is for fortran
-    std::string group;  //! either "oct", "D3" , "D2" , "D4" .. C when I get to it
+    std::string group;  //! either "Oh", "D3" , "D2" , "D4" .. C when I get to it
   };
 
   //! write this into a string 
@@ -42,7 +42,7 @@ namespace radmat
       : group(_group) , irrep(_irrep) , row(_row) 
     {}
 
-    std::string group;  //! either "oct" , "D3" , "D2" , "D4" .. 
+    std::string group;  //! either "Oh" , "D3" , "D2" , "D4" .. 
     std::string irrep;  //! A1 B1 T1 etc 
     int row;            //! the row of the irrep 
   };
