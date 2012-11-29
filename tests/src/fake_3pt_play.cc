@@ -6,7 +6,7 @@
 
  * Creation Date : 17-07-2012
 
- * Last Modified : Tue Jul 17 15:09:25 2012
+ * Last Modified : Fri Nov  9 14:16:02 2012
 
  * Created By : shultz
 
@@ -237,7 +237,7 @@ main(int argc, char *argv[])
     int lorentz(0);
 
     pProp_t mom = handle->ini.dataProps.momenta[0];
-    Fake3ptFactor facGen;
+    ThreePtPropagationFactor<std::complex<double> > facGen;
     FakeMatrixElement matGen;
 
     const SEMBLE::SembleVector<std::complex<double> > *zsource, *zsink;
@@ -275,15 +275,13 @@ main(int argc, char *argv[])
       for(int sink = 0; sink < nsink; sink++)
       {
 
-        SemblePInv_t mom_inv =   makeMomInvariants( (*specsink_ins)(sink),
+        SemblePInv mom_inv =   makeMomInvariants( (*specsink_ins)(sink),
             (*specsource_ins)(source),
             mom.momSink,
             mom.momSource,
             handle->mom_factor);
 
-        SEMBLE::SembleVector<double> q = (mom_inv.first - mom_inv.second);
-        ENSEM::EnsemReal Q2 = (-q(0)*q(0) + q(1)*q(1) + q(2)*q(2) + q(3)*q(3));
-
+               ENSEM::EnsemReal Q2 = mom_inv.Q2(); 
 
         ENSEM::EnsemComplex mat;
         mat = matGen(ss.str(),
@@ -294,7 +292,7 @@ main(int argc, char *argv[])
             SEMBLE::toScalar(ENSEM::mean(Q2)));
 
         ENSEM::EnsemComplex factor;
-        factor = facGen( (*specsink)(sink), (*zsink)(sink), handle->ini.timeProps.tsink,
+        factor = facGen( (*specsink)(sink), (*zsink)(sink), handle->ini.timeProps.tsink,t_ins,
             (*specsource)(source), (*zsource)(source), handle->ini.timeProps.tsource);
 
         bar += (mat * factor);

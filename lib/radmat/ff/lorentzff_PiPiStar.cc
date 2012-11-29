@@ -14,7 +14,7 @@ namespace radmat
 
     std::string F1::ff(void) const
     {
-      return std::string("F_1(Q^2)\\left( p_+^{\\mu}\frac{Q^2}{m_{\\pi*}^2 -m_{\\pi}^2} + p_-\\right)");
+      return std::string("F_1(Q^2)\\left(- p_+^{\\mu}\frac{Q^2}{m_{\\pi*}^2 -m_{\\pi}^2} + p_-\\right)");
     }
 
     Tensor<std::complex<double> , 1> F1::operator()(const Tensor<double,1> &p_f, const Tensor<double,1> &p_i) const
@@ -29,9 +29,10 @@ namespace radmat
       double num = value(contract(p_f-p_i,p_f-p_i,g_dd(),0,0));
       double denom = value(contract(p_f-p_i,p_f+p_i,g_dd(),0,0));
 
-      POW2_ASSERT_DEBUG(denom != 0.);
 
-      return ( (num/denom)*pp +  pm);
+      POW2_ASSERT_DEBUG(fabs(denom) > 1e-14);
+
+      return ( -(num/denom)*pp +  pm);
     }
 
 

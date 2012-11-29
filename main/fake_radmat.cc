@@ -32,6 +32,7 @@
 #include "jackFitter/plot.h"
 
 #include "radmat/driver/radmat_driver.h"
+#include "radmat/driver/radmat_driver_props.h"
 
 #include "semble/semble_file_management.h"
 
@@ -44,9 +45,9 @@ using namespace ADATIO;
   int 
 main(int argc, char *argv[])
 {
-  if(argc != 2)
+  if(argc != 3)
   {
-    SPLASH("usage: test_fake_ini : <xmlinifile> ");
+    SPLASH("usage: test_fake_ini : <xmlinifile> <driverProps> ");
     exit(1);
   }
 
@@ -78,6 +79,36 @@ main(int argc, char *argv[])
   }
 
 
+  std::string xmlinifile2;
+  std::istringstream val2(argv[2]);
+  val2 >> xmlinifile2;
+  std::cout << "Loading xmlinifile: " << xmlinifile2 << std::endl;
+
+  RDriverProps_t driverProps;
+
+  try
+  {
+    XMLReader xml(xmlinifile2);
+    read(xml,"/DriverProps",driverProps);
+  }
+  catch(std::exception &e)
+  {
+    std::cout << "std exception: " << e.what();
+  }
+  catch(std::string &e)
+  {
+    std::cout << __func__ << ": ERROR: can't read xmlinifile (" << xmlinifile << "): " << e << std::endl;
+    exit(1);
+  }
+  catch(...)
+  {
+    SPLASH("An error occured while loading the fake data inifile");
+    exit(1);
+  }
+
+
+  std::cout << "Constructing fake data.. " << std::endl; 
+
   LoadFake3pt<std::complex<double> > loader(fakeinikeys);
 
     
@@ -86,13 +117,18 @@ main(int argc, char *argv[])
   std::vector<LoadFake3pt<std::complex<double> >::ffFunction > formfactors;
   formfactors = loader.get_FF_inputs();
 
-  RDriver<std::complex<double> > driver;
+  
+  std::cout << "Solving llsq.." << std::endl;
+
+  RDriver<std::complex<double> > driver(driverProps);
   driver.load(C3);
   driver.solve_llsq();
 
   
   for(int i = 0; i < driver.getNumFFs(); ++i)
     {
+      std::cout << "Solving F_" << i << "(Q2).." << std::endl;
+
       AxisPlot plot = driver.getPlot(i);
       std::pair<double,double> range = driver.getQ2Range();
       std::vector<double> q2, ff;

@@ -1,0 +1,12 @@
+<?xml version="1.0"?>
+<DriverProps>
+  <threePointComparatorProps>
+    <baseProp>CompareFitsByChisqPerNDoF</baseProp>
+    <biasProp>gaussianBiasFunction3</biasProp>
+    <extraProps>
+      <elem>LeanAmplitudes</elem>
+      <elem>BigE</elem>
+      <elem>LeanConstant</elem>
+    </extraProps>
+  </threePointComparatorProps>
+</DriverProps>

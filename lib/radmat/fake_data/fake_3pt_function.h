@@ -39,106 +39,231 @@ namespace radmat
           const int lorentz, 
           const int hel_source, 
           const int hel_sink, 
-          const pProp_t &mom)
-        : m_inputs(inputs)
-      { 
+          const pProp_t &mom);
 
-        int source = inputs->original->ini.matElemProps.right_target;
-        int sink = inputs->original->ini.matElemProps.left_target;
+      Fake3ptCorr(const Fake3ptCorr<T> &o);
 
-        double Esink,Esource,meanvar;
-        Esink = SEMBLE::toScalar(ENSEM::mean(inputs->original->specsink[0](sink)));
-        Esource = SEMBLE::toScalar(ENSEM::mean(inputs->original->specsource[0](source)));
-        meanvar = inputs->original->ini.stateProps.mProps.sourceVarO + inputs->original->ini.stateProps.mProps.sinkVarO;
-
-        // try to figure out if we are looking at a diagonal guy or not -- duct tape and dreams
-        if( fabs(Esink - Esource)/std::max(Esink,Esource) <= meanvar)
-          m_key.elemIDBase = inputs->working->ini.matElemProps.diag;
-        else  
-          m_key.elemIDBase = inputs->working->ini.matElemProps.off;
-
-        // fill in the key
-        m_key.lorentz = lorentz;
-        m_key.hel_source = hel_source;
-        m_key.hel_sink = hel_sink;
-        m_key.mom = mom;
-        m_key.E_source = getE(inputs->working->specsource,inputs->working->ini.matElemProps.right_target);
-        m_key.E_sink = getE(inputs->working->specsink,inputs->working->ini.matElemProps.left_target);
-        m_key.Z_source = getZ(inputs->working->zsource[inputs->working->ini.timeProps.tsource],
-            inputs->working->ini.matElemProps.right_target);
-        m_key.Z_sink = getZ(inputs->working->zsink[inputs->working->ini.timeProps.tsink],
-            inputs->working->ini.matElemProps.left_target);
-
-        SemblePInv_t mom_inv =   makeMomInvariants( m_key.E_sink,
-            m_key.E_source,
-            mom.momSink,
-            mom.momSource,
-            inputs->working->mom_factor);
-
-        SEMBLE::SembleVector<double> q = (mom_inv.first - mom_inv.second);
-        ENSEM::EnsemReal Q2 = (-q(0)*q(0) + q(1)*q(1) + q(2)*q(2) + q(3)*q(3));
-
-        m_key.Q2 = Q2;
-        m_key.t_source = inputs->working->ini.timeProps.tsource;
-        m_key.t_sink = inputs->working->ini.timeProps.tsink;
-        m_key.mom_factor = inputs->working->mom_factor;
-
-        // fake up the three pt function
-        m_threePtFcn.resize(m_key.E_source.size());
-        m_threePtFcn.resizeObs(inputs->working->specsink.size());
-        m_threePtFcn = SEMBLE::toScalar(T(0.));
-
-        for(unsigned int t = 0; t < inputs->working->specsink.size(); t++)
-          ENSEM::pokeObs(m_threePtFcn, makeFakeDataPoint(inputs,mom,hel_sink,hel_source,t,lorentz) ,t);
-
-      }
-
-
-      Fake3ptCorr(const Fake3ptCorr<T> &o)
-        :m_key(o.m_key) , m_threePtFcn(o.m_threePtFcn) , m_inputs(o.m_inputs)
-      {
-
-      }
-
+      Fake3ptCorr<T>& operator=(const Fake3ptCorr<T> &o);
 
       public:
+      // peek and poke the key
       const Fake3ptKey& getKey(void) const {return m_key;}
       Fake3ptKey& getKey(void) {return m_key;}
+
+      // peek and poke the 3pt corr
       const typename SEMBLE::PromoteEnsemVec<T>::Type& get3pt(void) const {return m_threePtFcn;}
       typename SEMBLE::PromoteEnsemVec<T>::Type& get3pt(void) {return m_threePtFcn;}
+
+      // peek and poke the input parameters
       const typename ADAT::Handle<FakeDataInputs<T> >& getInputs(void) const {return m_inputs;}
       typename ADAT::Handle<FakeDataInputs<T> >& getInputs(void) {return m_inputs;}
 
 
+      // get one of the guys in the sum 
+      typename SEMBLE::PromoteEnsemVec<T>::Type get3ptComponent(const int source_idx, const int sink_idx) const; 
+      int getNSource(void) const;
+      int getNSink(void) const;
+      int getLt(void) const;
+      int getNCfg(void) const;
 
       private:  
-      ENSEM::EnsemReal getE(const std::vector<SEMBLE::SembleVector<double> > &spec, const int target)
-      {
-        ENSEM::EnsemReal ret; 
-        ret.resize(spec[0].getB());
-        ret = SEMBLE::toScalar(double(0));
-        std::vector<SEMBLE::SembleVector<double> >::const_iterator it;
-        for(it = spec.begin(); it != spec.end(); it++)
-          ret += (*it)(target);
-
-        ret /= SEMBLE::toScalar(double(spec.size()));
-
-        return ret;      
-      }
-
-      ENSEM::EnsemComplex getZ(const SEMBLE::SembleVector<std::complex<double> > &zz, const int state)
-      {
-        return zz(state);
-      } 
-
+      ENSEM::EnsemReal getE(const std::vector<SEMBLE::SembleVector<double> > &spec, const int target);
+      ENSEM::EnsemComplex getZ(const std::vector< SEMBLE::SembleVector<std::complex<double> > > &zz, const int target);
 
       private:
-      Fake3ptCorr(void);
+      Fake3ptCorr(void); // hide ctor
 
       Fake3ptKey m_key;
-      typename SEMBLE::PromoteEnsemVec<T>::Type m_threePtFcn;
+      typename SEMBLE::PromoteEnsemVec<T>::Type m_threePtFcn; 
+      typename std::vector<SEMBLE::SembleMatrix<T> > m_three; // vector index is time, matrix is source, sink
       typename ADAT::Handle<FakeDataInputs<T> > m_inputs;
     };
+
+
+  // impl
+
+  template<typename T>
+    Fake3ptCorr<T>::Fake3ptCorr(const typename ADAT::Handle<FakeDataInputs<T> > &inputs, 
+        const int lorentz, 
+        const int hel_source, 
+        const int hel_sink, 
+        const pProp_t &mom)
+
+    {
+
+#pragma omp critical
+      {
+        m_inputs = inputs; 
+      }
+
+      double meanvar = (inputs->original->ini.stateProps.mProps.sourceVarO
+          + inputs->original->ini.stateProps.mProps.sinkVarO)/2.;
+
+
+      // fill in the key
+      m_key.lorentz = lorentz;
+      m_key.hel_source = hel_source;
+      m_key.hel_sink = hel_sink;
+      m_key.mom = mom;
+      m_key.E_source = getE(inputs->working->specsource,inputs->working->ini.matElemProps.right_target);
+      m_key.E_sink = getE(inputs->working->specsink,inputs->working->ini.matElemProps.left_target);
+      m_key.Z_source = getZ(inputs->working->zsource,inputs->working->ini.matElemProps.right_target);
+      m_key.Z_sink = getZ(inputs->working->zsink,inputs->working->ini.matElemProps.left_target);
+
+      SemblePInv mom_inv =   makeMomInvariants( m_key.E_sink,
+          m_key.E_source,
+          mom.momSink,
+          mom.momSource,
+          inputs->working->mom_factor);
+
+      // try to figure out if we are looking at a diagonal guy or not -- duct tape and dreams
+      SEMBLE::SembleVector<double> p1(mom_inv.pf()), p2(mom_inv.pi());
+      double m1,m2;
+      m1 = sqrt(SEMBLE::toScalar(ENSEM::mean(p1(0)*p1(0) - p1(1)*p1(1) - p1(2)*p1(2) - p1(3)*p1(3))));
+      m2 = sqrt(SEMBLE::toScalar(ENSEM::mean(p2(0)*p2(0) - p2(1)*p2(1) - p2(2)*p2(2) - p2(3)*p2(3))));
+      if( fabs(m1 - m2)/std::max(m1,m2) <= meanvar)
+        m_key.elemIDBase = inputs->working->ini.matElemProps.diag;
+      else  
+        m_key.elemIDBase = inputs->working->ini.matElemProps.off;
+
+
+      ENSEM::EnsemReal Q2 = mom_inv.Q2(); 
+
+      m_key.Q2 = Q2;
+      m_key.t_source = inputs->working->ini.timeProps.tsource;
+      m_key.t_sink = inputs->working->ini.timeProps.tsink;
+      m_key.mom_factor = inputs->working->mom_factor;
+
+      // fake up the three pt function
+      m_three.clear();
+      for(unsigned int t = 0; t < inputs->working->specsource.size(); t++)
+        m_three.push_back( makeFakeDataPoint(inputs,mom,hel_sink,hel_source,t,lorentz) );
+
+      m_threePtFcn.resize(m_three[0].getB());
+      m_threePtFcn.resizeObs(m_three.size());
+
+      typename SEMBLE::PromoteEnsem<T>::Type  sum; 
+      sum.resize(m_three[0].getB());
+
+
+      for(unsigned int t=0; t < m_three.size(); ++t)
+      {
+        sum = SEMBLE::toScalar(T(0)); 
+        for(int row = 0; row < m_three[t].getN(); ++row)
+          for(int col = 0; col < m_three[t].getM(); ++col)
+            sum += m_three[t].getEnsemElement(row,col);
+
+        ENSEM::pokeObs(m_threePtFcn,sum,t);
+      }
+
+
+    }
+
+  template<typename T>
+    Fake3ptCorr<T>::Fake3ptCorr(const Fake3ptCorr<T> &o)
+    :m_key(o.m_key) , m_threePtFcn(o.m_threePtFcn)  , m_three(o.m_three) 
+    {
+
+#pragma omp critical
+      {
+        m_inputs = o.m_inputs; 
+      }
+    }
+
+
+  template<typename T>
+    Fake3ptCorr<T>& Fake3ptCorr<T>::operator=(const Fake3ptCorr<T> &o)
+    {
+      if(this != &o)
+      {
+        m_key = o.m_key;
+        m_threePtFcn = o.m_threePtFcn;
+        m_three = o.m_three;
+#pragma omp critical
+        {
+          m_inputs = o.m_inputs;
+        }
+      }
+
+      return *this;
+    }
+
+
+  template<typename T>
+    int Fake3ptCorr<T>::getNSource(void) const
+    {
+      POW2_ASSERT(!!!m_three.empty()); 
+      return m_three[0].getN();
+    }
+
+  template<typename T>
+    int Fake3ptCorr<T>::getNSink(void) const 
+    {
+      POW2_ASSERT(!!!m_three.empty()); 
+      return m_three[0].getM();
+    }
+
+  template<typename T>
+    int  Fake3ptCorr<T>::getLt(void) const 
+    {
+      POW2_ASSERT(!!!m_three.empty()); 
+      return m_three.size();
+    }
+
+  template<typename T>
+    int  Fake3ptCorr<T>::getNCfg(void) const 
+    {
+      POW2_ASSERT(!!!m_three.empty()); 
+      return m_three[0].getB();
+    }
+
+  // get one of the guys in the sum 
+  template<typename T> 
+    typename SEMBLE::PromoteEnsemVec<T>::Type Fake3ptCorr<T>::get3ptComponent(const int source_idx, const int sink_idx) const
+    {
+      typename SEMBLE::PromoteEnsemVec<T>::Type ret; 
+      ret = m_threePtFcn;
+      ret = SEMBLE::toScalar(T(0)); 
+
+      for(unsigned int t = 0; t < m_three.size(); ++t)
+        ENSEM::pokeObs(ret,m_three[t].getEnsemElement(source_idx,sink_idx),t);
+
+      return ret; 
+    } 
+
+
+
+  // private
+  template<typename T>
+    ENSEM::EnsemReal Fake3ptCorr<T>::getE(const std::vector<SEMBLE::SembleVector<double> > &spec, const int target)
+    {
+      ENSEM::EnsemReal ret; 
+      ret.resize(spec[0].getB());
+      ret = SEMBLE::toScalar(double(0));
+      std::vector<SEMBLE::SembleVector<double> >::const_iterator it;
+      for(it = spec.begin(); it != spec.end(); it++)
+        ret += (*it)(target);
+
+      ret /= SEMBLE::toScalar(double(spec.size()));
+
+      return ret;      
+    }
+
+
+  template<typename T>
+    ENSEM::EnsemComplex Fake3ptCorr<T>::getZ(const std::vector< SEMBLE::SembleVector<std::complex<double> > > &zz, const int target)
+    {
+      ENSEM::EnsemComplex ret; 
+      ret.resize(zz[0].getB());
+      ret = SEMBLE::toScalar(std::complex<double>(0,0));
+      std::vector<SEMBLE::SembleVector<std::complex<double> > >::const_iterator it;
+      for(it = zz.begin(); it != zz.end(); ++it)
+        ret += (*it)(target);
+
+      ret /= SEMBLE::toScalar(double(zz.size()));
+
+      return ret; 
+    } 
 
 
 

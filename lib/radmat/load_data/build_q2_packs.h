@@ -7,6 +7,7 @@
 #include "radmat/llsq/llsq_q2_pack.h"
 #include "radmat/utils/pow2assert.h"
 #include "radmat/utils/splash.h"
+#include "radmat/fake_data/fake_3pt_function_aux.h"
 #include "adat/handle.h"
 #include <vector>
 #include <iostream>
@@ -23,7 +24,7 @@
 // #define DEBUG_NASTY_NESTED_STRUCT_WITH_POINTERS_THAT_I_HATE
 // actually its not that bad
 
-// #define DEBUGGIN_BUILD_PACKS
+#define DEBUGGIN_BUILD_PACKS
 
 
 // parallel region in here for normalizing the correlators and such,
@@ -44,9 +45,9 @@ namespace radmat
 
 
       void load(const vCor &cor);
-      void normalizeZ(void);
-      void normalizeExp(void);
-
+      // void normalizeZ(void);
+      // void normalizeExp(void);
+      void strip_propagation_factor(void);
 
       std::vector<ADAT::Handle<LLSQDataPointQ2Pack> > getQ2Packs(void);
 
@@ -197,13 +198,16 @@ namespace radmat
       };
 
 
+
       private:
-      void normZ(const int i);
-      void normE(const int i);
+      //   void normZ(const int i);
+      //   void normE(const int i);
+      void strip(const int i);
 
       bool haveCorr;
-      bool normalizedZ;
-      bool normalizedExp;
+      // bool normalizedZ;
+      // bool normalizedExp;
+      bool stripped_prop_fac;
       vCor m_cor;
     };
 
@@ -214,7 +218,7 @@ namespace radmat
 
   template<typename T>
     BuildQ2Packs<T>::BuildQ2Packs(void)
-    : haveCorr(false) , normalizedZ(false) , normalizedExp(false)
+    : haveCorr(false) , stripped_prop_fac(false) //normalizedZ(false) , normalizedExp(false)
     {}
 
 
@@ -223,11 +227,60 @@ namespace radmat
     {
       m_cor = cor;
       haveCorr = true;
-      normalizedZ = false;
-      normalizedExp = false;
+      stripped_prop_fac = false;
+      // normalizedZ = false;
+      // normalizedExp = false;
+    }
+
+  template<typename T>
+    void BuildQ2Packs<T>::strip_propagation_factor(void)
+    {
+
+      if(!!!stripped_prop_fac)
+      {
+        int i;
+        int sz = m_cor.size();
+#ifdef USE_OMP_LOAD_DATA_BUILDQ2PACKS
+#pragma omp parallel for shared(i,sz)
+#endif
+        for(i = 0; i < sz; i++)   
+          strip(i);
+      }
+
+      stripped_prop_fac = true; 
+
     }
 
 
+  template<typename T>
+    void BuildQ2Packs<T>::strip(const int i)
+    {
+      POW2_ASSERT(haveCorr);
+    //  std::cout << __func__ << "Normalizing.." << std::endl;
+
+      typename SEMBLE::PromoteEnsemVec<T>::Type foo = m_cor.at(i).C3pt;
+      ENSEM::EnsemReal E_source = m_cor.at(i).E_source;
+      ENSEM::EnsemReal E_sink = m_cor.at(i).E_sink;
+      const int t_source = m_cor.at(i).t_source;
+      const int t_sink = m_cor.at(i).t_sink;
+      const int Lt = abs(t_source - t_sink);
+      typename SEMBLE::PromoteEnsem<T>::Type Z_source = m_cor.at(i).Z_source;
+      typename SEMBLE::PromoteEnsem<T>::Type Z_sink = m_cor.at(i).Z_sink; 
+      ThreePtPropagationFactor<T> pFac; 
+
+      for(int t = 0; t <= Lt; ++t)
+      {
+        typename SEMBLE::PromoteEnsem<T>::Type factor; 
+        factor = pFac(E_sink,Z_sink,t_sink,t,
+            E_source,Z_source,t_source);
+        ENSEM::pokeObs(m_cor.at(i).C3pt,ENSEM::peekObs(foo,t)/factor,t);
+      }
+
+
+    }
+
+  // was doing this in two steps but its silly not to reuse the same code, comment for posterity 
+#if 0
   template<typename T>
     void BuildQ2Packs<T>::normalizeZ(void)
     {
@@ -243,14 +296,14 @@ namespace radmat
 
 #ifdef DEBUGGIN_BUILD_PACKS
         std::cout << "pre norm Z" << std::endl;
-      std::cout << SEMBLE::toScalar(ENSEM::mean(ENSEM::peekObs(m_cor.begin()->C3pt,0))) << " +/- " 
-<< std::cout << SEMBLE::toScalar(ENSEM::variance(ENSEM::peekObs(m_cor.begin()->C3pt,0))) << std::endl;
+        std::cout << SEMBLE::toScalar(ENSEM::mean(ENSEM::peekObs(m_cor.begin()->C3pt,0))) << " +/- " 
+          << std::cout << SEMBLE::toScalar(ENSEM::variance(ENSEM::peekObs(m_cor.begin()->C3pt,0))) << std::endl;
         std::cout << "Z_source" << std::endl;
         std::cout << SEMBLE::toScalar(ENSEM::mean(m_cor.begin()->Z_source)) << " +/- " 
-<< SEMBLE::toScalar(ENSEM::variance(m_cor.begin()->Z_source)) << std::endl;
+          << SEMBLE::toScalar(ENSEM::variance(m_cor.begin()->Z_source)) << std::endl;
         std::cout << "Z_sink" << std::endl;
         std::cout << SEMBLE::toScalar(ENSEM::mean(m_cor.begin()->Z_sink)) << " +/- " 
-<<  SEMBLE::toScalar(ENSEM::variance(m_cor.begin()->Z_sink)) << std::endl;
+          <<  SEMBLE::toScalar(ENSEM::variance(m_cor.begin()->Z_sink)) << std::endl;
 #endif
 
 #ifdef USE_OMP_LOAD_DATA_BUILDQ2PACKS
@@ -268,7 +321,7 @@ namespace radmat
       normalizedZ = true;
     }
 
-  // NB the 1/2E energy factor is assumed to be in the Z's
+
   template<typename T>
     void BuildQ2Packs<T>::normZ(const int i)
     {
@@ -335,11 +388,13 @@ namespace radmat
 
         ENSEM::EnsemReal factor;
         factor =  ENSEM::exp(E_sink * SEMBLE::toScalar(double(t_sink - t)))
-          * ENSEM::exp(E_source * SEMBLE::toScalar(double(t - t_source) ) );
+          * ENSEM::exp(E_source * SEMBLE::toScalar(double(t - t_source) ) )
+          * ENSEM::Real(4) * E_source * E_sink;
         pokeObs(m_cor.at(i).C3pt,peekObs(foo,t)*factor,t);
       }
     }
-
+ 
+#endif
 
   // NB: only one type of matrix elem is assumed here, there may 
   // be problems with different irrep Q2 pieces not quite being compatible.. 
@@ -350,7 +405,7 @@ namespace radmat
   template<typename T>
     std::vector<ADAT::Handle<LLSQDataPointQ2Pack> > BuildQ2Packs<T>::getQ2Packs(void)
     {
-      POW2_ASSERT(normalizedZ && normalizedExp);
+      POW2_ASSERT(stripped_prop_fac);
 
       std::vector<std::pair<pMinus,std::vector<int> > > sortQ2; // hold pMinus -> vector by index
 

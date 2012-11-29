@@ -32,9 +32,7 @@ namespace radmat
 
     BuildQ2Packs<std::complex<double> > Q2Builder;
     Q2Builder.load(C3);
-    Q2Builder.normalizeZ();
-    Q2Builder.normalizeExp();
-
+    Q2Builder.strip_propagation_factor();
 
     std::vector<ADAT::Handle<LLSQDataPointQ2Pack> > junk = Q2Builder.getQ2Packs();
 

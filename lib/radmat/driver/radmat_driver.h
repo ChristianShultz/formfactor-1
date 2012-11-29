@@ -6,6 +6,7 @@
 #include "radmat/llsq/llsq_q2_pack.h"
 #include "radmat/fitting/axis_plotter.h"
 #include "radmat/fitting/fit_tins.h"
+#include "radmat_driver_props.h"
 #include "adat/handle.h"
 #include "semble/semble_file_management.h"
 #include "semble/semble_meta.h"
@@ -32,6 +33,7 @@ namespace radmat
     struct RDriver
     {
       RDriver(void);
+      RDriver(const RDriverProps_t &driverProps); 
       RDriver(const RDriver<T> &o);
       ~RDriver(void){clear();}
       RDriver<T>& operator=(const RDriver<T> &o);
@@ -54,6 +56,7 @@ namespace radmat
       void clear(void);
       void makeQ2Plots(void);
 
+      RDriverProps_t m_driverProps; 
 
       bool haveQ2Packs;
       std::vector<ADAT::Handle<LLSQDataPointQ2Pack> > m_q2_packs;
@@ -67,18 +70,24 @@ namespace radmat
 
     };
 
-
+#if 0 // -- hide ctor
   template<typename T>
     RDriver<T>::RDriver(void)
     : haveQ2Packs(false), solvedForFF(false), madePlots(false)
+    {  }
+#endif
+
+  template<typename T>
+    RDriver<T>::RDriver(const RDriverProps_t &driverProps)
+    : m_driverProps(driverProps), haveQ2Packs(false), solvedForFF(false), madePlots(false)
     {  }
 
 
   template<typename T>
     RDriver<T>::RDriver(const RDriver<T> &o)
-    : haveQ2Packs(o.haveQ2Packs) , m_q2_packs(o.m_q2_packs), solvedForFF(o.solvedForFF),
-    m_q2_ff_packs(o.m_q2_ff_packs), m_fits(o.m_fits) , madePlots(o.madePlots),
-    m_ff_of_q2(o.m_ff_of_q2)
+    : m_driverProps(o.m_driverProps),haveQ2Packs(o.haveQ2Packs) , m_q2_packs(o.m_q2_packs), 
+    solvedForFF(o.solvedForFF), m_q2_ff_packs(o.m_q2_ff_packs), m_fits(o.m_fits) , 
+    madePlots(o.madePlots), m_ff_of_q2(o.m_ff_of_q2)
   {  }
 
 
@@ -87,6 +96,7 @@ namespace radmat
     {
       if(this != &o)
       {
+        m_driverProps = o.m_driverProps; 
         haveQ2Packs = o.haveQ2Packs;
         m_q2_packs = o.m_q2_packs;
         solvedForFF = o.solvedForFF;
@@ -132,9 +142,7 @@ namespace radmat
 
       BuildQ2Packs<T> Q2Builder;
       Q2Builder.load(corrs);
-      Q2Builder.normalizeZ();
-      Q2Builder.normalizeExp();
-
+      Q2Builder.strip_propagation_factor();
       load(Q2Builder.getQ2Packs());
     }
 
@@ -182,10 +190,25 @@ namespace radmat
         std::replace(sQ2.begin(),sQ2.end(),'-','m');     
 
 
+        // do/write out fits
         std::stringstream ssfname;
         ssfname << path << "/FF_Q2_" << sQ2;
+        m_fits[pack_index].fit<T>(ssfname.str(),
+            *m_q2_ff_packs[pack_index],
+            m_driverProps.threePointComparatorProps);
 
-        m_fits[pack_index].fit<T>(ssfname.str(),*m_q2_ff_packs[pack_index]);
+        // write out fit logs
+        std::stringstream log;
+        log << path << "/fit_logs";
+        SEMBLE::SEMBLEIO::makeDirectoryPath(log.str());
+        m_fits[pack_index].writeFitLogs(log.str() + std::string("/FF_Q2_") + sQ2);
+
+        // write out the fits with the components plotted
+        std::stringstream componentFits; 
+        componentFits << path << "/ComponentFits";
+        SEMBLE::SEMBLEIO::makeDirectoryPath(componentFits.str());
+        m_fits[pack_index].writeFitPlotsWithComponents(componentFits.str() +  std::string("/FF_Q2_") + sQ2);
+
 
       }
 
@@ -261,9 +284,9 @@ namespace radmat
       for(int elem = 0; elem < nQ2s; ++elem)
         dQ2s.push_back(SEMBLE::toScalar(ENSEM::mean(m_fits[elem].getQ2())));
 
-  
+
       return std::pair<double,double>(*std::min_element(dQ2s.begin(),dQ2s.end()),
-                                      *std::max_element(dQ2s.begin(),dQ2s.end()));
+          *std::max_element(dQ2s.begin(),dQ2s.end()));
     }
 
 

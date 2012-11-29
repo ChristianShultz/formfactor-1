@@ -6,7 +6,7 @@
 
  * Creation Date : 16-07-2012
 
- * Last Modified : Thu Aug  2 09:50:49 2012
+ * Last Modified : Fri Nov  9 11:23:51 2012
 
  * Created By : shultz
 
@@ -165,9 +165,7 @@ main(int argc, char *argv[])
 
   BuildQ2Packs<std::complex<double> > Q2Builder;
   Q2Builder.load(C3);
-  Q2Builder.normalizeZ();
-  Q2Builder.normalizeExp();
-
+  Q2Builder.strip_propagation_factor();
 
   std::vector<ADAT::Handle<LLSQDataPointQ2Pack> > q2_packs = Q2Builder.getQ2Packs();
   std::vector<ADAT::Handle<LLSQDataPointQ2Pack> >::const_iterator q2_pack_iterator;

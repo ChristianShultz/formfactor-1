@@ -5,8 +5,9 @@
 #include "radmat/fake_data/gen_fake_dataset.h"
 #include "three_point.h"
 #include "radmat/fake_data/fake_3pt_function_aux.h"
+#include "radmat/fitting/axis_plotter.h"
 #include <vector>
-
+#include <omp.h>
 namespace radmat
 {
 
@@ -20,6 +21,7 @@ namespace radmat
         : m_ini(ini) 
       {  }
 
+      // parallelize me please ~ 95% of the work oes throuugh me
       std::vector<ThreePointCorrelator<T> > genData(void)
       {
         typename ADAT::Handle<std::vector< typename GenFakeDataSet<T>::Corr> > fake_data;
@@ -31,10 +33,25 @@ namespace radmat
 
         typename std::vector< typename GenFakeDataSet<T>::Corr >::const_iterator it;
         typename std::vector<ThreePointCorrelator<T> > ret;
+        ThreePointCorrelator<T> fill = makeThreePointFromFake((*fake_data)[0]); 
 
-        for(it = fake_data->begin(); it != fake_data->end(); it++)
-          ret.push_back(makeThreePointFromFake(*it));
+        // need to provide a fill else checkResize on ensem will cause failure .. why is it built like this?
+        ret.resize(fake_data->size(), fill); 
+        unsigned int index, stop; 
+        stop = ret.size(); 
 
+#if 0
+        omp_set_num_threads(omp_get_max_threads()); 
+
+#pragma omp parallel for shared(index,stop)
+
+#endif 
+        for(index = 0; index < stop; ++index)
+        {
+          MakeAxisPlots plotter; 
+          plotter.plot( (*fake_data)[index] );
+          ret[index] = makeThreePointFromFake( (*fake_data)[index] ); 
+        }
         return ret;
       }
 

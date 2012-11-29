@@ -5,11 +5,11 @@
     <sameOp>true</sameOp>
     <readZ>true</readZ>
     <mProps>
-      <sourceMasses>0.18</sourceMasses>
+      <sourceMasses>0.18 0.23 0.3 0.4</sourceMasses>
       <sourceVarO>0.0001</sourceVarO>
       <sourceUpdateCovariance>true</sourceUpdateCovariance>
       <sourceUpdateVariance>true</sourceUpdateVariance>
-      <sinkMasses>0.18</sinkMasses>
+      <sinkMasses>0.18 0.23 0.3 0.4</sinkMasses>
       <sinkVarO>0.0001</sinkVarO>
       <sinkUpdateCovariance>true</sinkUpdateCovariance>
       <sinkUpdateVariance>true</sinkUpdateVariance>
@@ -21,13 +21,13 @@
       <suppressionOrder>0.</suppressionOrder>
       <updateCovariance>false</updateCovariance>
       <updateVariance>false</updateVariance>
-      <varianceOrder>0.</varianceOrder>
+      <varianceOrder>0.02</varianceOrder>
     </zProps>
     <readZProps>
-      <zsource_r>1.</zsource_r>
-      <zsource_i>0.</zsource_i>
-      <zsink_r>1.</zsink_r>
-      <zsink_i>0.</zsink_i>
+      <zsource_r>1. 0.1 0.7 0.1</zsource_r>
+      <zsource_i>0. 0. 0. 0.</zsource_i>
+      <zsink_r>1. 0.1 0.7 0.1</zsink_r>
+      <zsink_i>0. 0. 0. 0.</zsink_i>
     </readZProps>
   </stateProps>
   <matElemProps>

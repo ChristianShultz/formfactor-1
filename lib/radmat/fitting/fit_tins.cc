@@ -6,7 +6,7 @@
 
  * Creation Date : 01-08-2012
 
- * Last Modified : Mon Aug  6 10:58:51 2012
+ * Last Modified : Thu Nov 29 11:17:37 2012
 
  * Created By : shultz
 
@@ -22,6 +22,7 @@
 #include "jackFitter/ensem_data.h"
 #include "jackFitter/jackknife_fitter.h"
 #include "jackFitter/ensem_data.h"
+#include "jackFitter/three_point_fit_forms.h"
 #include "adat/handle.h"
 #include <string>
 #include <vector>
@@ -75,7 +76,9 @@ namespace radmat
 
 
   template<>
-    void TinsFitter::fit<double>(const std::string &fname, const LLSQRet_ff_Q2Pack<double> &pack)
+    void TinsFitter::fit<double>(const std::string &fname, 
+        const LLSQRet_ff_Q2Pack<double> &pack,
+        const ThreePointComparatorProps_t &fitProps)
     {
       const unsigned int sz = pack.size();
       const int nbins = pack.Q2().size();
@@ -85,7 +88,7 @@ namespace radmat
       LLSQRet_ff_Q2Pack<double>::const_iterator it;
 
       for(it = pack.begin(); it != pack.end(); ++it)
-        doFit(fname,it->second,it->first);
+        doFit(fname,it->second,it->first,fitProps);
 
       didFit = true;
     }
@@ -94,7 +97,8 @@ namespace radmat
 
   template<>
     void TinsFitter::fit<std::complex<double> >(const std::string &fname , 
-        const LLSQRet_ff_Q2Pack<std::complex<double> > &pack)
+        const LLSQRet_ff_Q2Pack<std::complex<double> > &pack,
+        const ThreePointComparatorProps_t &fitProps)
     {
       const unsigned int sz = pack.size();
       const int nbins = pack.Q2().size();
@@ -104,7 +108,7 @@ namespace radmat
       LLSQRet_ff_Q2Pack<std::complex<double> >::const_iterator it;
 
       for(it = pack.begin(); it != pack.end(); ++it)
-        doFit(fname,convertToReal(it->second),it->first);
+        doFit(fname,convertToReal(it->second),it->first,fitProps);
 
       didFit = true;
     }
@@ -112,12 +116,13 @@ namespace radmat
 
   void TinsFitter::doFit(const std::string &filenameBase, 
       const ENSEM::EnsemVectorReal &data, 
-      const int ffnum)
+      const int ffnum,
+      const ThreePointComparatorProps_t &fitProps)
   {
     std::stringstream ss,jack,ax;
     ss << filenameBase;
-    jack << ss.str() << ".jack";
-    ax << ss.str() << ".ax";
+    jack << ss.str() << "_F_" << ffnum << ".jack";
+    ax << ss.str() << "_F_" << ffnum << ".ax";
 
     std::vector<double> time; 
     const int Lt = data.numElem();
@@ -126,8 +131,10 @@ namespace radmat
       time.push_back(t);
 
     EnsemData corrData(time,data);
-    ADAT::Handle<FitComparator> fitComp(new CompareFitsByChisqPerNDoF);
-    ADAT::Handle<Fit3PtFF_Base> fitCorr(new Fit3PtFF_Constant(corrData,fitComp,0.1,5));
+
+
+    ADAT::Handle<FitComparator> fitComp = constructThreePointFitComparator(fitProps);
+    ADAT::Handle<FitThreePoint> fitCorr (new FitThreePoint(corrData,Lt,0,fitComp,5));
 
     // send to files
     fitCorr->saveFitPlot(ax.str());
@@ -135,7 +142,36 @@ namespace radmat
 
     ff.loadEnsemElement(ffnum,fitCorr->getFF());
 
-    fitters.insert(std::map<int,ADAT::Handle<Fit3PtFF_Base> >::value_type(ffnum,fitCorr));
+    fitters.insert(std::map<int,ADAT::Handle<FitThreePoint> >::value_type(ffnum,fitCorr));
+  }
+
+
+  void TinsFitter::writeFitLogs(const std::string &path) const
+  {
+    std::map<int,ADAT::Handle<FitThreePoint> >::const_iterator it;
+    for(it = fitters.begin(); it != fitters.end(); ++it)
+    {
+      std::stringstream ss;
+      ss << path << "_F_" << it->first << "_fit_log.log";
+      std::ofstream out(ss.str().c_str());
+      out << it->second->getFitSummary();
+      out.close();
+    }
+
+  }
+
+  void TinsFitter::writeFitPlotsWithComponents(const std::string & path) const
+  {
+    std::map<int,ADAT::Handle<FitThreePoint> >::const_iterator it;
+    for(it = fitters.begin(); it != fitters.end(); ++it)
+    {
+      std::stringstream ss; 
+      ss << path <<  "_F_" << it->first << "_component_fit.ax";
+      std::ofstream out(ss.str().c_str());
+      out << it->second->getFitPlotStringWithComponents(); 
+      out.close();
+    }
+
   }
 
 
@@ -153,10 +189,10 @@ namespace radmat
     return ff.getEnsemElement(index);
   }
 
-  ADAT::Handle<Fit3PtFF_Base> TinsFitter::getFit(const int ffnum) const
+  ADAT::Handle<FitThreePoint> TinsFitter::getFit(const int ffnum) const
   {
     POW2_ASSERT(fitters.find(ffnum) != fitters.end());
-    return ADAT::Handle<Fit3PtFF_Base>(fitters.find(ffnum)->second);
+    return ADAT::Handle<FitThreePoint>(fitters.find(ffnum)->second);
   }
 
 

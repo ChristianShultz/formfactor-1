@@ -18,13 +18,13 @@ nobase_include_HEADERS += radmat/fake_data/covarrying_vectors.h radmat/fake_data
 nobase_include_HEADERS += radmat/llsq/llsq_driver.h radmat/llsq/llsq_gen_system.h radmat/llsq/llsq_q2_pack.h radmat/llsq/llsq_solver.h radmat/llsq/llsq_solvers.h
 
 #load_data
-nobase_include_HEADERS += radmat/load_data/build_q2_packs.h radmat/load_data/invert_subduction.h radmat/load_data/load_data_junk.h radmat/load_data/load_fake_data.h radmat/load_data/radmat_database_interface.h radmat/load_data/three_point.h radmat/load_data/simple_world.h radmat/load_data/continuum_projection.h
+nobase_include_HEADERS += radmat/load_data/build_q2_packs.h radmat/load_data/invert_subduction.h radmat/load_data/load_data_junk.h radmat/load_data/load_fake_data.h radmat/load_data/radmat_database_interface.h radmat/load_data/three_point.h radmat/load_data/simple_world.h radmat/load_data/continuum_projection.h radmat/load_data/load_database.h radmat/load_data/read_redstar_key_list_xml.h
 
 #fitting
 nobase_include_HEADERS += radmat/fitting/axis_plotter.h radmat/fitting/fit_three_point_ff.h radmat/fitting/fit_tins.h radmat/fitting/radmat_fit_forms.h
 
 #driver
-nobase_include_HEADERS += radmat/driver/radmat_driver.h
+nobase_include_HEADERS += radmat/driver/radmat_driver.h radmat/driver/radmat_driver_props.h
 
 
 #
@@ -46,12 +46,12 @@ libradmat_a_SOURCES += radmat/fake_data/covarrying_vectors.cc radmat/fake_data/f
 libradmat_a_SOURCES += radmat/llsq/llsq_solvers.cc
 
 #load_data
-libradmat_a_SOURCES +=  radmat/load_data/invert_subduction.cc radmat/load_data/simple_world.cc radmat/load_data/continuum_projection.cc
+libradmat_a_SOURCES +=  radmat/load_data/invert_subduction.cc radmat/load_data/simple_world.cc radmat/load_data/continuum_projection.cc radmat/load_data/read_redstar_key_list_xml.cc
 
 #fitting
 libradmat_a_SOURCES += radmat/fitting/axis_plotter.cc radmat/fitting/fit_three_point_ff.cc radmat/fitting/fit_tins.cc
 
 #driver
-
+libradmat_a_SOURCES += radmat/driver/radmat_driver_props.cc
 
 

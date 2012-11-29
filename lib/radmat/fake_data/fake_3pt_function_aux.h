@@ -56,7 +56,7 @@ namespace radmat
     void applyDispersion(typename ADAT::Handle<FakeDataInputs_p<T> > &input, const pProp_t &mom);
 
   template<typename T>
-    typename SEMBLE::PromoteEnsem<T>::Type  
+    SEMBLE::SembleMatrix<T>  
     makeFakeDataPoint(const ADAT::Handle<FakeDataInputs<T> > &inputs,
         const pProp_t &mom,
         const int hel_sink,
@@ -72,27 +72,27 @@ namespace radmat
   /////////////////////////////////////////////////////////////////////////////
 
 
- //#define DEBUG_FAKE_MAT_ELEM_CJS
 
+
+  // #define DEBUG_FAKE_MAT_ELEM_CJS
+
+  // NB: moved matrix extra time dependence into propagation factor
   struct FakeMatrixElement
   {
-    typedef bind1st_2ParFunction_cc<double,int,double,&HarmonicPlusOne> ffFunction;
+    typedef bind1st_2ParFunction_cc<double,int,double,&One> ffFunction;
 
     ENSEM::EnsemComplex operator()(const std::string &elemID, 
-        const int t,
         const int lorentz,
-        const SemblePInv_t &mom,
+        const SemblePInv &mom,
         const std::vector<ffFunction> &ffgen,
         const double Q2)
     {
-      ENSEM::EnsemReal exp = ENSEM::exp( (mom.first(0) - mom.second(0)) * SEMBLE::toScalar(double(t)));
       ENSEM::EnsemComplex matelem;
       ffKinematicFactors_t<std::complex<double> >
         K(FormFactorDecompositionFactoryEnv::callFactory(elemID));
 
       SEMBLE::SembleVector<std::complex<double> > K_k = (K.genFactors(mom)).getRow(lorentz);
-      matelem.resize(exp.size());
-
+      matelem.resize(K_k.getB());
       matelem = SEMBLE::toScalar(std::complex<double>(0.,0.));
 
       POW2_ASSERT(K_k.getN() == (int)ffgen.size());
@@ -116,19 +116,45 @@ namespace radmat
       }
 #endif
 
-      return matelem * exp;
+      return matelem ;
     }
   };
 
 #undef DEBUG_FAKE_MAT_ELEM_CJS
 
+
+
   /////////////////////////////////////////////////////////////////////////////
   /////////////////////////////////////////////////////////////////////////////
 
+  template<typename T> 
+    struct ThreePtPropagationFactor
+    {
+      typename SEMBLE::PromoteEnsem<T>::Type operator()(const ENSEM::EnsemReal &E_sink,
+          const typename SEMBLE::PromoteEnsem<T>::Type &Z_sink,
+          const int t_sink,
+          const int t_ins,
+          const ENSEM::EnsemReal &E_source, 
+          const typename SEMBLE::PromoteEnsem<T>::Type &Z_source, 
+          const int t_source)
+      {
+        return ((ENSEM::conj(Z_source)*Z_sink/ (E_source * E_sink * SEMBLE::toScalar(4.)))
+            * ENSEM::exp(-E_sink*(SEMBLE::toScalar(double(t_sink - t_ins))))
+            * ENSEM::exp(-E_source*(SEMBLE::toScalar(double(t_ins - t_source))))
+            );
 
+      }
+
+    };
+
+
+
+#if 0
   // returns 1/4EnEm exp(-E_n t_n) exp(E_m t_m) Z_n^* Z_m ~ all the factors not 
   // associated with the matrix elem
   // NB : we do a complex conjugation in here !!!
+
+  // DONT USE ME!!!
   struct Fake3ptFactor
   {
 
@@ -139,6 +165,7 @@ namespace radmat
         const ENSEM::EnsemComplex &Z_m,
         const int t_m)
     {
+      __builtin_trap();
       return  ((ENSEM::exp(-E_n * SEMBLE::toScalar(double(t_n))) 
             * ENSEM::exp(E_m * SEMBLE::toScalar(double(t_m)))
             * ENSEM::conj(Z_n)
@@ -164,11 +191,12 @@ namespace radmat
         const int t_source,
         const int lorentz, 
         const std::vector<FakeMatrixElement::ffFunction> &ffgen,
-        const SemblePInv_t &mom,
+        const SemblePInv &mom,
         const double Q2, 
         const ENSEM::EnsemComplex &Z_sink,
         const ENSEM::EnsemComplex &Z_source)
     {
+      __builtin_trap();
       FakeMatrixElement matelem;
       Fake3ptFactor factor;
 
@@ -178,6 +206,7 @@ namespace radmat
 
   };
 
+#endif 
 
   /////////////////////////////////////////////////////////////////////////////
   /////////////////////////////////////////////////////////////////////////////
@@ -287,6 +316,14 @@ namespace radmat
           }
           ffmv(n,m) = ffv;
         }
+
+      // non-square symmetric..
+      for(int n = 0 ; n < szSource; ++n)
+        if(n < szSink)
+          for(int m = n ; m < szSink; ++m)
+            if(m < szSource)
+              ffmv(m,n) = ffmv(n,m);
+
 
       handle->ffgenerator = ffmv;
       return handle;
@@ -409,7 +446,7 @@ namespace radmat
   /////////////////////////////////////////////////////////////////////////////
 
   template<typename T>
-    typename SEMBLE::PromoteEnsem<T>::Type  
+    SEMBLE::SembleMatrix<T> 
     makeFakeDataPoint(const typename ADAT::Handle<FakeDataInputs<T> > &inputs,
         const pProp_t &mom,
         const int hel_sink,
@@ -418,38 +455,60 @@ namespace radmat
         const int lorentz)
     {
       const SEMBLE::SembleVector<T> *zsource, *zsink;
-      const SEMBLE::SembleVector<double> *specsink, *specsource;
-      const SEMBLE::SembleVector<double> *specsink_ins, *specsource_ins;
+      const SEMBLE::SembleVector<double> *specsink, *specsource, *specsink_ins, *specsource_ins;
       typename ADAT::Handle<FakeDataInputs_p<T> > handle(inputs->working);
 
       zsource = &(handle->zsource[handle->ini.timeProps.tsource]);
       zsink = &(handle->zsink[handle->ini.timeProps.tsink]);
-      specsource = &(handle->specsource[handle->ini.timeProps.tsource]);
-      specsink = &(handle->specsink[handle->ini.timeProps.tsink]);
       specsource_ins = &(handle->specsource[t_ins]);
       specsink_ins = &(handle->specsink[t_ins]);
+      specsource = &(handle->specsource[handle->ini.timeProps.tsource]);
+      specsink = &(handle->specsink[handle->ini.timeProps.tsink]);
+
 
       const int nsource = specsource->getN();
       const int nsink = specsink->getN();
 
-      Fake3ptFactor facGen;
+      // Fake3ptFactor facGen;
+      ThreePtPropagationFactor<T> facGen;
       FakeMatrixElement matGen;
-      typename SEMBLE::PromoteEnsem<T>::Type ret;
-      ret.resize(specsink->getB());
-      ret = SEMBLE::toScalar(T(0.));
+     SEMBLE::SembleMatrix<T> ret(specsink->getB(),nsource,nsink);
+      ret.zeros();
+
 
       for(int source = 0; source < nsource; source++)
         for(int sink = 0; sink < nsink; sink++)
         {
           std::stringstream ss;
 
-          double Esink,Esource,meanvar;
-          Esink = SEMBLE::toScalar(ENSEM::mean(inputs->original->specsink[0](sink)));
-          Esource = SEMBLE::toScalar(ENSEM::mean(inputs->original->specsource[0](source)));
-          meanvar = handle->ini.stateProps.mProps.sourceVarO + handle->ini.stateProps.mProps.sinkVarO;
+          double meanvar;
+          meanvar = (handle->ini.stateProps.mProps.sourceVarO + handle->ini.stateProps.mProps.sinkVarO)/2.;
+
+
+          // there is some implicit covariance structure built in here by using covarrying energy draws
+          SemblePInv mom_inv =   makeMomInvariants( (*specsink_ins)(sink),
+              (*specsource_ins)(source),
+              mom.momSink,
+              mom.momSource,
+              handle->mom_factor);
+
+          ENSEM::EnsemReal Q2 = mom_inv.Q2();
+
+
 
           // try to figure out if we are looking at a diagonal guy or not -- duct tape and dreams
-          if( fabs(Esink - Esource)/std::max(Esink,Esource) <= meanvar)
+          SEMBLE::SembleVector<double> p1(mom_inv.pf()), p2(mom_inv.pi());
+          double m1,m2;
+          m1 = sqrt(SEMBLE::toScalar(ENSEM::mean(p1(0)*p1(0) - p1(1)*p1(1) - p1(2)*p1(2) - p1(3)*p1(3))));
+          m2 = sqrt(SEMBLE::toScalar(ENSEM::mean(p2(0)*p2(0) - p2(1)*p2(1) - p2(2)*p2(2) - p2(3)*p2(3))));
+
+          /* -- DEBUG          
+             std::cout << __func__ << std::endl;
+             std::cout << m1 - m2 << std::endl;
+             std::cout << fabs(m1 - m2)/std::max(m1,m2) << " " << meanvar << std::endl;
+           */ 
+
+          if( fabs(m1 - m2)/std::max(m1,m2) <= meanvar)
             ss << handle->ini.matElemProps.diag;
           else 
             ss << handle->ini.matElemProps.off;
@@ -457,19 +516,8 @@ namespace radmat
           ss << "_" << hel_source << "_" << hel_sink;
 
 
-          SemblePInv_t mom_inv =   makeMomInvariants( (*specsink_ins)(sink),
-              (*specsource_ins)(source),
-              mom.momSink,
-              mom.momSource,
-              handle->mom_factor);
-
-          SEMBLE::SembleVector<double> q = (mom_inv.first - mom_inv.second);
-          ENSEM::EnsemReal Q2 = (-q(0)*q(0) + q(1)*q(1) + q(2)*q(2) + q(3)*q(3));
-
-
           ENSEM::EnsemComplex mat;
           mat = matGen(ss.str(),
-              t_ins,
               lorentz,
               mom_inv,
               handle->ffgenerator(source,sink),
@@ -477,9 +525,9 @@ namespace radmat
 
           ENSEM::EnsemComplex factor;
           factor = facGen( (*specsink)(sink), (*zsink)(sink), handle->ini.timeProps.tsink,
-              (*specsource)(source), (*zsource)(source), handle->ini.timeProps.tsource);
+              t_ins,(*specsource)(source), (*zsource)(source), handle->ini.timeProps.tsource);
 
-          ret += (factor*mat);
+          ret.loadEnsemElement(source,sink, (factor*mat));
         }  
 
       return ret;

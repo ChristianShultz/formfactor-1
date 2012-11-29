@@ -8,6 +8,9 @@
 #include "radmat/utils/pow2assert.h"
 #include "radmat/utils/splash.h"
 #include "adat/handle.h"
+#include "semble/semble_file_management.h"
+#include <string>
+#include <sstream>
 #include <vector>
 
 
@@ -30,6 +33,7 @@ namespace radmat
 
       void generate(void);
       void generate(const FakeDataIni_t &);
+      void write_spectrum_log(const Input_h &iptm, const pProp_t &mom);  
       std::vector<ffFunction> get_FF_inputs(void) const {return m_ff_input_functions;}
 
       typename ADAT::Handle<std::vector<Corr> > get(void);
@@ -77,11 +81,23 @@ namespace radmat
       Array<int> h_i = m_ini.dataProps.hel_source;
       Array<pProp_t> moms = m_ini.dataProps.momenta;
 
-      for(int p = 0; p < moms.size(); p++)
+      int p, sz;
+      sz = moms.size(); 
+#if 0
+#pragma omp parallel for shared(p,sz) 
+#endif 
+
+      for( p = 0; p < sz; p++)
       {
-        Input_h work = copyFakeInput(orig);
+        Input_h work; 
+#pragma omp critical
+        {
+          work = copyFakeInput(orig);
+        }
         applyZSuppression(work->working);
         applyDispersion(work->working,moms[p]);
+        write_spectrum_log(work,moms[p]); 
+
 
         for(int hf = 0; hf < h_f.size(); hf++)
           for(int hi = 0; hi < h_i.size(); hi++)
@@ -91,12 +107,57 @@ namespace radmat
 
       const int left_target = orig->ini.matElemProps.left_target;
       const int right_target = orig->ini.matElemProps.right_target;
-  
+
 
       m_ff_input_functions = orig->ffgenerator(left_target,right_target);
 
       m_have3Pt = true;
     }
+
+  template<typename T>
+    void GenFakeDataSet<T>::write_spectrum_log(const Input_h &ipt, const pProp_t &mom)
+    {
+      std::string pth = SEMBLE::SEMBLEIO::getPath();
+      pth += std::string("fake_data_logs");
+      SEMBLE::SEMBLEIO::makeDirectoryPath(pth);
+      std::stringstream ss; 
+      ss << "/pi_" << mom.momSource[0] << "_" << mom.momSource[1] << "_" << mom.momSource[2] 
+        << "__pf_" << mom.momSink[0] << "_" << mom.momSink[1] << "_" << mom.momSink[2];
+      pth += ss.str();
+
+      std::ofstream out(pth.c_str());
+
+      SEMBLE::SembleVector<double> source_rest(ipt->working->specsink[0]), source_flight, sink_rest(ipt->working->specsource[0]), sink_flight; 
+      source_rest = 0;
+      source_flight = source_rest;
+      sink_rest = 0;
+      sink_flight = sink_rest;
+
+      std::vector<SEMBLE::SembleVector<double> >::const_iterator it; 
+
+      for(it = ipt->original->specsource.begin(); it != ipt->original->specsource.end(); ++it)
+        source_rest += *it; 
+      for(it = ipt->original->specsink.begin(); it != ipt->original->specsink.end(); ++it)
+        sink_rest += *it; 
+      for(it = ipt->working->specsource.begin(); it != ipt->working->specsource.end(); ++it)
+        source_flight += *it;
+      for(it = ipt->working->specsink.begin(); it != ipt->working->specsink.end(); ++it)
+        sink_flight += *it; 
+
+      source_rest /= double(ipt->original->specsource.size());
+      source_flight /= double(ipt->working->specsource.size());
+      sink_rest /= double(ipt->original->specsink.size());
+      sink_flight /= double(ipt->working->specsink.size());
+
+      out << "mean source rest \n" << source_rest.mean() << "\n";
+      out << "mean source flight \n" << source_flight.mean() << "\n";
+      out << "mean sink rest \n" << sink_rest.mean() << "\n";
+      out << "mean sink flight \n" << sink_flight.mean() << "\n";
+
+
+      out.close();
+    }  
+
 
 
   template<typename T>

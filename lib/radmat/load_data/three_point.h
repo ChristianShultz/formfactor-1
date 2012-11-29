@@ -46,11 +46,8 @@ namespace radmat
       C3.t_source = c.getKey().t_source;
       C3.t_sink = c.getKey().t_sink;
 
-      // NB !!
-      // normalization factor included here, the 1/2E from the lorentz invariant metric
-      C3.Z_source = c.getKey().Z_source/c.getKey().E_source/SEMBLE::toScalar(double(2));
-      C3.Z_sink = c.getKey().Z_sink/c.getKey().E_sink/SEMBLE::toScalar(double(2));
-
+      C3.Z_source = c.getKey().Z_source;
+      C3.Z_sink = c.getKey().Z_sink;
       /*
          std::cout << __func__ << std::endl;
          std::cout << SEMBLE::toScalar(ENSEM::mean(c.getKey().E_source)) << std::endl;

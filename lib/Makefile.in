@@ -106,8 +106,10 @@ am_libradmat_a_OBJECTS = breit_frame.$(OBJEXT) euler_angles.$(OBJEXT) \
 	fake_data_ini.$(OBJEXT) fake_overlaps.$(OBJEXT) \
 	fake_spectrum.$(OBJEXT) llsq_solvers.$(OBJEXT) \
 	invert_subduction.$(OBJEXT) simple_world.$(OBJEXT) \
-	continuum_projection.$(OBJEXT) axis_plotter.$(OBJEXT) \
-	fit_three_point_ff.$(OBJEXT) fit_tins.$(OBJEXT)
+	continuum_projection.$(OBJEXT) \
+	read_redstar_key_list_xml.$(OBJEXT) axis_plotter.$(OBJEXT) \
+	fit_three_point_ff.$(OBJEXT) fit_tins.$(OBJEXT) \
+	radmat_driver_props.$(OBJEXT)
 libradmat_a_OBJECTS = $(am_libradmat_a_OBJECTS)
 DEFAULT_INCLUDES = -I.@am__isrc@
 depcomp = $(SHELL) $(top_srcdir)/config/depcomp
@@ -275,10 +277,13 @@ nobase_include_HEADERS = radmat/utils/aux.h radmat/utils/breit_frame.h \
 	radmat/load_data/radmat_database_interface.h \
 	radmat/load_data/three_point.h radmat/load_data/simple_world.h \
 	radmat/load_data/continuum_projection.h \
+	radmat/load_data/load_database.h \
+	radmat/load_data/read_redstar_key_list_xml.h \
 	radmat/fitting/axis_plotter.h \
 	radmat/fitting/fit_three_point_ff.h radmat/fitting/fit_tins.h \
 	radmat/fitting/radmat_fit_forms.h \
-	radmat/driver/radmat_driver.h
+	radmat/driver/radmat_driver.h \
+	radmat/driver/radmat_driver_props.h
 
 #
 # Library
@@ -296,6 +301,8 @@ lib_LIBRARIES = libradmat.a
 #load_data
 
 #fitting
+
+#driver
 libradmat_a_SOURCES = radmat/utils/breit_frame.cc \
 	radmat/utils/euler_angles.cc radmat/utils/pow2assert.cc \
 	radmat/utils/wigner.cc radmat/utils/tensor.cc \
@@ -309,9 +316,11 @@ libradmat_a_SOURCES = radmat/utils/breit_frame.cc \
 	radmat/load_data/invert_subduction.cc \
 	radmat/load_data/simple_world.cc \
 	radmat/load_data/continuum_projection.cc \
+	radmat/load_data/read_redstar_key_list_xml.cc \
 	radmat/fitting/axis_plotter.cc \
 	radmat/fitting/fit_three_point_ff.cc \
-	radmat/fitting/fit_tins.cc
+	radmat/fitting/fit_tins.cc \
+	radmat/driver/radmat_driver_props.cc
 all: all-am
 
 .SUFFIXES:
@@ -406,6 +415,8 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/lorentzff_PiPi.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/lorentzff_PiPiStar.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/pow2assert.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/radmat_driver_props.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/read_redstar_key_list_xml.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/simple_world.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/splash.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/tensor.Po@am__quote@
@@ -691,6 +702,20 @@ continuum_projection.obj: radmat/load_data/continuum_projection.cc
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCXX_FALSE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o continuum_projection.obj `if test -f 'radmat/load_data/continuum_projection.cc'; then $(CYGPATH_W) 'radmat/load_data/continuum_projection.cc'; else $(CYGPATH_W) '$(srcdir)/radmat/load_data/continuum_projection.cc'; fi`
 
+read_redstar_key_list_xml.o: radmat/load_data/read_redstar_key_list_xml.cc
+@am__fastdepCXX_TRUE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT read_redstar_key_list_xml.o -MD -MP -MF $(DEPDIR)/read_redstar_key_list_xml.Tpo -c -o read_redstar_key_list_xml.o `test -f 'radmat/load_data/read_redstar_key_list_xml.cc' || echo '$(srcdir)/'`radmat/load_data/read_redstar_key_list_xml.cc
+@am__fastdepCXX_TRUE@	$(am__mv) $(DEPDIR)/read_redstar_key_list_xml.Tpo $(DEPDIR)/read_redstar_key_list_xml.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='radmat/load_data/read_redstar_key_list_xml.cc' object='read_redstar_key_list_xml.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o read_redstar_key_list_xml.o `test -f 'radmat/load_data/read_redstar_key_list_xml.cc' || echo '$(srcdir)/'`radmat/load_data/read_redstar_key_list_xml.cc
+
+read_redstar_key_list_xml.obj: radmat/load_data/read_redstar_key_list_xml.cc
+@am__fastdepCXX_TRUE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT read_redstar_key_list_xml.obj -MD -MP -MF $(DEPDIR)/read_redstar_key_list_xml.Tpo -c -o read_redstar_key_list_xml.obj `if test -f 'radmat/load_data/read_redstar_key_list_xml.cc'; then $(CYGPATH_W) 'radmat/load_data/read_redstar_key_list_xml.cc'; else $(CYGPATH_W) '$(srcdir)/radmat/load_data/read_redstar_key_list_xml.cc'; fi`
+@am__fastdepCXX_TRUE@	$(am__mv) $(DEPDIR)/read_redstar_key_list_xml.Tpo $(DEPDIR)/read_redstar_key_list_xml.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='radmat/load_data/read_redstar_key_list_xml.cc' object='read_redstar_key_list_xml.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o read_redstar_key_list_xml.obj `if test -f 'radmat/load_data/read_redstar_key_list_xml.cc'; then $(CYGPATH_W) 'radmat/load_data/read_redstar_key_list_xml.cc'; else $(CYGPATH_W) '$(srcdir)/radmat/load_data/read_redstar_key_list_xml.cc'; fi`
+
 axis_plotter.o: radmat/fitting/axis_plotter.cc
 @am__fastdepCXX_TRUE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT axis_plotter.o -MD -MP -MF $(DEPDIR)/axis_plotter.Tpo -c -o axis_plotter.o `test -f 'radmat/fitting/axis_plotter.cc' || echo '$(srcdir)/'`radmat/fitting/axis_plotter.cc
 @am__fastdepCXX_TRUE@	$(am__mv) $(DEPDIR)/axis_plotter.Tpo $(DEPDIR)/axis_plotter.Po
@@ -732,6 +757,20 @@ fit_tins.obj: radmat/fitting/fit_tins.cc
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='radmat/fitting/fit_tins.cc' object='fit_tins.obj' libtool=no @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCXX_FALSE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o fit_tins.obj `if test -f 'radmat/fitting/fit_tins.cc'; then $(CYGPATH_W) 'radmat/fitting/fit_tins.cc'; else $(CYGPATH_W) '$(srcdir)/radmat/fitting/fit_tins.cc'; fi`
+
+radmat_driver_props.o: radmat/driver/radmat_driver_props.cc
+@am__fastdepCXX_TRUE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT radmat_driver_props.o -MD -MP -MF $(DEPDIR)/radmat_driver_props.Tpo -c -o radmat_driver_props.o `test -f 'radmat/driver/radmat_driver_props.cc' || echo '$(srcdir)/'`radmat/driver/radmat_driver_props.cc
+@am__fastdepCXX_TRUE@	$(am__mv) $(DEPDIR)/radmat_driver_props.Tpo $(DEPDIR)/radmat_driver_props.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='radmat/driver/radmat_driver_props.cc' object='radmat_driver_props.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o radmat_driver_props.o `test -f 'radmat/driver/radmat_driver_props.cc' || echo '$(srcdir)/'`radmat/driver/radmat_driver_props.cc
+
+radmat_driver_props.obj: radmat/driver/radmat_driver_props.cc
+@am__fastdepCXX_TRUE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT radmat_driver_props.obj -MD -MP -MF $(DEPDIR)/radmat_driver_props.Tpo -c -o radmat_driver_props.obj `if test -f 'radmat/driver/radmat_driver_props.cc'; then $(CYGPATH_W) 'radmat/driver/radmat_driver_props.cc'; else $(CYGPATH_W) '$(srcdir)/radmat/driver/radmat_driver_props.cc'; fi`
+@am__fastdepCXX_TRUE@	$(am__mv) $(DEPDIR)/radmat_driver_props.Tpo $(DEPDIR)/radmat_driver_props.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='radmat/driver/radmat_driver_props.cc' object='radmat_driver_props.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o radmat_driver_props.obj `if test -f 'radmat/driver/radmat_driver_props.cc'; then $(CYGPATH_W) 'radmat/driver/radmat_driver_props.cc'; else $(CYGPATH_W) '$(srcdir)/radmat/driver/radmat_driver_props.cc'; fi`
 install-nobase_includeHEADERS: $(nobase_include_HEADERS)
 	@$(NORMAL_INSTALL)
 	@list='$(nobase_include_HEADERS)'; test -n "$(includedir)" || list=; \
@@ -962,8 +1001,6 @@ uninstall-am: uninstall-libLIBRARIES uninstall-nobase_includeHEADERS
 	uninstall-am uninstall-libLIBRARIES \
 	uninstall-nobase_includeHEADERS
 
-
-#driver
 
 # Tell versions [3.59,3.63) of GNU make to not export all variables.
 # Otherwise a system limit (for SysV at least) may be exceeded.
