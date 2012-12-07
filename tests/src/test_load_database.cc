@@ -6,14 +6,14 @@
 
  * Creation Date : 25-09-2012
 
- * Last Modified : Tue Sep 25 14:32:43 2012
+ * Last Modified : Fri Dec  7 15:29:50 2012
 
  * Created By : shultz
 
  _._._._._._._._._._._._._._._._._._._._._.*/
 
 
-#include "radmat/load_data/radmat_database_interface.h"
+// #include "radmat/load_data/radmat_database_interface.h"
 #include "hadron/hadron_npart_npt_corr.h"
 #include "ensem/ensem.h"
 #include "radmat/utils/splash.h"
@@ -24,10 +24,10 @@
 #include <string>
 #include <iostream>
 
-using namespace radmat;
+// using namespace radmat;
 using namespace Hadron;
 using namespace ENSEM;
-using namespace FILEDB;
+// using namespace FILEDB;
 
 typedef KeyHadronNPartNPtCorr_t KEY;
 typedef EnsemVectorComplex DATA;
@@ -43,7 +43,7 @@ int main(int argc, char *argv[])
     SPLASH("usage: test_load_database : <path/to/database>");
     exit(1);
   }
-
+#if 0
 
   std::istringstream arg1(argv[1]);
   std::string dbfile;
@@ -103,5 +103,6 @@ int main(int argc, char *argv[])
 
   POW2_ASSERT(success);
 
+#endif
   return 0;
 }

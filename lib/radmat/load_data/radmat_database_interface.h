@@ -2,134 +2,127 @@
 #define RADMAT_DATABASE_INTERFACE_H
 
 
-#include <string>
 #include <vector>
-
-#include "AllConfStoreDB.h"
-#include "io/key_val_db.h"
-#include "ensem/ensem.h"
-
-#include "radmat/utils/pow2assert.h"
-
-#include <iostream>
 #include <exception>
-
+#include "ensem/ensem.h"
+#include "adat/handle.h"
+#include "AllConfStoreDB.h"
+#include "io/adat_io.h"
+#include "io/adat_xmlio.h"
+#include "io/key_val_db.h"
 
 
 namespace radmat
 {
 
-  template<typename KEY, typename DATA>
-    struct RadmatDBInterface
+  struct dbProp_t
+  {
+    std::string dbname;
+    std::string badlist;
+  };
+
+
+  std::string toString(const dbProp_t &);
+  std::ostream& operator<<(std::ostream&,const dbProp_t&);
+  void read(ADATXML::XMLReader &xml, const std::string &path, dbProp_t &);
+  void write(ADATXML::XMLWriter &xml, const std::string &path, const dbProp_t &);
+
+
+  struct radmatDBProp_t
+  {
+    dbProp_t threePointDatabase;
+    dbProp_t normalizationDatabase;
+  };
+
+  std::string toString(const radmatDBProp_t &);
+  std::ostream& operator<<(std::ostream&, const radmatDBProp_t &);
+  void read(ADATXML::XMLReader &xml, const std::string &path, radmatDBProp_t &);
+  void write(ADATXML::XMLWriter &xml, const std::string &path, const radmatDBProp_t &);
+
+
+  // some templated structure to deal with all of the database nastyness 
+  template<typename CORRKEY, typename CORRDATA, typename NORMKEY, typename NORMDATA>
+    struct radmatAllConfDatabaseInterface
     {
-      //! nested to hold path to db, and a key file we may use
-      struct DBParams
-      { 
-        std::string dbFile;  //! path to the database, member of xml input
-        std::string keyFile; //! path to a key file, member of xml input, can be blank
-        bool useKeyFile;     //! do we want to use the key file 
-      };
+      typedef typename ADATIO::SerialDBKey<CORRKEY> S_C_KEY;
+      typedef typename ENSEM::EnsemScalar<CORRDATA>::Type_t ESCALARDATA;
+      typedef typename ADATIO::SerialDBData<ESCALARDATA> S_C_DATA;
+      typedef typename ADATIO::SerialDBKey<NORMKEY> S_N_KEY;
+      typedef typename ADATIO::SerialDBData<NORMDATA> S_N_DATA; 
+
+      radmatAllConfDatabaseInterface(void); // hide ctor
+      radmatAllConfDatabaseInterface(const radmatDBProp_t &);
 
 
-      //! Default constructor
-      RadmatDBInterface(void)
-        : m_haveparams(false) 
-      {}
+      void alloc(void);
+      bool exists(const CORRKEY &) const;
+      bool exists(const NORMKEY &) const;
+      CORRDATA fetch(const CORRKEY &) const;
+      NORMDATA fetch(const NORMKEY &) const; 
 
-      //! constructor taking the parameters we want to use
-      RadmatDBInterface(const DBParams &pars)
-        : m_params(pars) , m_haveparams(true)
-      {}
 
-      //! load or update parameters
-      void loadParams(const DBParams &pars) 
-      {
-        m_params(pars);
-        m_haveparams(true);
-      }
-
-      //! get the keys, eiter from the file or all keys in the db
-      std::vector<KEY> getKeys(void) const;
-
-      //! get the data corresponding to a key one at a time (slow)
-      DATA getEnsem(const KEY &k) const; 
-
-      //! get lots of data at once
-      std::vector<DATA> getEnsem(const std::vector<KEY> &k) const;
-
-      DBParams m_params;  //! struct holding params from xml input
-      bool m_haveparams;  //! internal check variable
-
+      ADAT::Handle<FILEDB::AllConfStoreDB<S_C_KEY,S_C_DATA> > m_corr_db;
+      ADAT::Handle<FILEDB::AllConfStoreDB<S_N_KEY,S_N_DATA> > m_norm_db;  
+      radmatDBProp_t db_props; 
     };
 
-
-  // get the set of keys we will be working with
-  template<typename K, typename D>
-    std::vector<K> RadmatDBInterface<K,D>::getKeys(void) const
+  template<typename CORRKEY, typename CORRDATA, typename NORMKEY, typename NORMDATA >
+    radmatAllConfDatabaseInterface<CORRKEY,CORRDATA,NORMKEY,NORMDATA>::radmatAllConfDatabaseInterface(const radmatDBProp_t &prop)
+    : db_props(prop)
     {
-      POW2_ASSERT(m_haveparams);
-
-            typedef typename ENSEM::EnsemScalar<D>::Type_t SD;
-
-
-      std::vector<K> keys;
-
-      // TODO
-      if(m_params.useKeyFile)
-      {
-        std::cerr << __func__ << "Christian is a moron and forgot to implement this.." 
-          <<" either fix it yourself or bother him" << std::endl;
-        exit(1);
-      }
-      else
-      {
-        FILEDB::AllConfStoreDB<ADATIO::SerialDBKey<K> , ADATIO::SerialDBData<SD> > database;
-        if (database.open(m_params.dbFile, O_RDONLY, 0400) != 0)
-        {
-          std::cerr << __func__ << ": error opening dbase= " << m_params.dbFile << std::endl;
-          exit(1);
-        }
-
-        std::vector< ADATIO::SerialDBKey<K> > serial_keys;
-        database.keys(serial_keys);
-
-        const unsigned int sz = serial_keys.size();
-
-        keys.resize(sz);    
-
-        for(unsigned int index = 0; index < sz; ++index)
-          keys[index] = serial_keys[index].key();
-      }
-
-      return keys;
+      alloc();
     }
 
 
-  // get the value of a single key
-  template<typename K, typename D>
-    D RadmatDBInterface<K,D>::getEnsem(const K &k) const
+  // set up some handles and check that we can open it
+  template<typename CORRKEY, typename CORRDATA, typename NORMKEY, typename NORMDATA>
+    void radmatAllConfDatabaseInterface<CORRKEY,CORRDATA,NORMKEY,NORMDATA>::alloc(void)
     {
-      typedef typename ENSEM::EnsemScalar<D>::Type_t SD;
 
-      POW2_ASSERT(m_haveparams);
+      m_corr_db = ADAT::Handle<FILEDB::AllConfStoreDB<S_C_KEY,S_C_DATA> > (new FILEDB::AllConfStoreDB<S_C_KEY,S_C_DATA>() );
+      m_norm_db = ADAT::Handle<FILEDB::AllConfStoreDB<S_N_KEY,S_N_DATA> > (new FILEDB::AllConfStoreDB<S_N_KEY,S_N_DATA>() );
 
-      FILEDB::AllConfStoreDB<ADATIO::SerialDBKey<K> , ADATIO::SerialDBData<SD> > database;
-      if (database.open(m_params.dbFile, O_RDONLY, 0400) != 0)
+      if(m_corr_db->open(db_props.threePointDatabase.dbname, O_RDWR | O_TRUNC | O_CREAT, 0664) != 0)
       {
-        std::cerr << __func__ << ": error opening dbase= " << m_params.dbFile << std::endl;
+        std::cerr << __func__ << ": error opening dbase= " << db_props.threePointDatabase.dbname << std::endl;
         exit(1);
       }
 
-      D eval;
 
+      if(m_norm_db->open(db_props.normalizationDatabase.dbname, O_RDWR | O_TRUNC | O_CREAT, 0664) != 0)
+      {
+        std::cerr << __func__ << ": error opening dbase= " << db_props.normalizationDatabase.dbname << std::endl;
+        exit(1);
+      }
+    }
+
+  template<typename CORRKEY, typename CORRDATA, typename NORMKEY, typename NORMDATA>
+    bool radmatAllConfDatabaseInterface<CORRKEY,CORRDATA,NORMKEY,NORMDATA>::exists(const CORRKEY &k) const
+    {
+      S_C_KEY key;
+      key.key() = k;
+      return m_corr_db->exist(key);     
+    }
+
+  template<typename CORRKEY, typename CORRDATA, typename NORMKEY, typename NORMDATA>
+    bool radmatAllConfDatabaseInterface<CORRKEY,CORRDATA,NORMKEY,NORMDATA>::exists(const NORMKEY &k) const
+    {
+      S_N_KEY key;
+      key.key() = k;
+      return m_norm_db->exist(key);
+    }
+
+  template<typename CORRKEY, typename CORRDATA, typename NORMKEY, typename NORMDATA>
+    CORRDATA  radmatAllConfDatabaseInterface<CORRKEY,CORRDATA,NORMKEY,NORMDATA>::fetch(const CORRKEY &k) const
+    {
+      CORRDATA eval;
       try
       {
-        ADATIO::SerialDBKey<K> key;
+        S_C_KEY key;
         key.key() = k;
-
-        std::vector< ADATIO::SerialDBData<SD> > vals;
-        int ret;
-        if ((ret = database.get(key, vals)) != 0)
+        std::vector<S_C_DATA> vals;
+        int ret(0);
+        if ((ret = m_corr_db->get(key, vals)) != 0)
         {
           std::cerr << __func__ << ": key not found\n" << k;
           exit(1);
@@ -138,9 +131,9 @@ namespace radmat
         eval.resize(vals.size());
         eval.resizeObs(vals[0].data().numElem());
 
-        for(int i=0; i < vals.size(); ++i)
+        for(unsigned int i=0; i < vals.size(); ++i)
         {
-          SD sval = vals[i].data();
+          ESCALARDATA sval = vals[i].data();
           ENSEM::pokeEnsem(eval, sval, i);
         }
 
@@ -160,53 +153,23 @@ namespace radmat
     }
 
 
-  template<typename K, typename D>
-    std::vector<D> RadmatDBInterface<K,D>::getEnsem(const std::vector<K> &kys) const
+  template<typename CORRKEY, typename CORRDATA, typename NORMKEY, typename NORMDATA>
+    NORMDATA  radmatAllConfDatabaseInterface<CORRKEY,CORRDATA,NORMKEY,NORMDATA>::fetch(const NORMKEY &k) const
     {
-
-      typedef typename ENSEM::EnsemScalar<D>::Type_t SD;
-
-      POW2_ASSERT(m_haveparams);
-
-      FILEDB::AllConfStoreDB<ADATIO::SerialDBKey<K> , ADATIO::SerialDBData<SD> > database;
-      if (database.open(m_params.dbFile, O_RDONLY, 0400) != 0)
-      {
-        std::cerr << __func__ << ": error opening dbase= " << m_params.dbFile << std::endl;
-        exit(1);
-      }
-
-      std::vector<D> data;
-
+      NORMDATA eval;
       try
       {
-        typename std::vector<K>::const_iterator k;
-
-        for(k = kys.begin(); k != kys.end(); ++k)
+        S_N_KEY key;
+        key.key() = k;
+        std::vector<S_N_DATA> val; // hacky thingy we did
+        int ret(0);
+        if ((ret = m_norm_db->get(key, val)) != 0)
         {
-          D eval;
-
-          ADATIO::SerialDBKey<K> key;
-          key.key() = *k;
-
-          std::vector< ADATIO::SerialDBData<SD> > vals;
-          int ret;
-          if ((ret = database.get(key, vals)) != 0)
-          {
-            std::cerr << __func__ << ": key not found\n" << *k;
-            exit(1);
-          }
-
-          eval.resize(vals.size());
-          eval.resizeObs(vals[0].data().numElem());
-
-          for(unsigned int i=0; i < vals.size(); ++i)
-          {
-            SD sval = vals[i].data();
-            ENSEM::pokeEnsem(eval, sval, i);
-          }
-
-          data.push_back(eval);
+          std::cerr << __func__ << ": key not found\n" << k;
+          exit(1);
         }
+
+        eval = val[0].data(); // if this worked right we stored the entire thing in a single ensemble slot.. 
 
       }
       catch(const std::string& e) 
@@ -220,15 +183,16 @@ namespace radmat
         exit(1);
       }
 
-      return data;
-
-    }
+      return eval;
+    } 
 
 
 
 
 
 } // namespace radmat
+
+
 
 
 

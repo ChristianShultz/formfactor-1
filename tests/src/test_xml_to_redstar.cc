@@ -6,7 +6,7 @@
 
  * Creation Date : 24-10-2012
 
- * Last Modified : Wed Nov  7 10:39:38 2012
+ * Last Modified : Thu Nov 29 16:51:04 2012
 
  * Created By : shultz
 
@@ -15,7 +15,7 @@
 
 #include "../headers/tester.h"
 #include "../headers/test_common.h"
-#include "radmat/load_data/continuum_projection.h"
+// -- doesnt exist anymore #include "radmat/load_data/continuum_projection.h"
 #include "hadron/hadron_npart_npt_corr.h"
 #include "io/adat_xmlio.h"
 #include "semble/semble_meta.h"
@@ -48,7 +48,7 @@ namespace radmat
   {
     tester m_test(__func__);
 
-
+#if 0 // --- old junk 
     simpleWorld::ContinuumStatePrimitive csxml;
 
     csxml.J = 1;
@@ -112,7 +112,7 @@ namespace radmat
     out << log.str();
     out.close();
 
-
+#endif
     return m_test;
   }   
 

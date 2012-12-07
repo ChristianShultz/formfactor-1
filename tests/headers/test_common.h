@@ -47,10 +47,6 @@ namespace radmat
   tester test_load_fake_data(void);
 
 
-  // fitting
-  tester test_fit_constant(void);
-
-
   // readers
   tester test_readers(void);
   tester test_invert_subduction(void);

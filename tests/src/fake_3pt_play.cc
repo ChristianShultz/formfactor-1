@@ -6,7 +6,7 @@
 
  * Creation Date : 17-07-2012
 
- * Last Modified : Fri Nov  9 14:16:02 2012
+ * Last Modified : Thu Nov 29 16:40:54 2012
 
  * Created By : shultz
 
@@ -285,7 +285,6 @@ main(int argc, char *argv[])
 
         ENSEM::EnsemComplex mat;
         mat = matGen(ss.str(),
-            t_ins,
             lorentz,
             mom_inv,
             handle->ffgenerator(source,sink),

@@ -6,7 +6,7 @@
 
  * Creation Date : 01-08-2012
 
- * Last Modified : Thu Nov 29 11:17:37 2012
+ * Last Modified : Thu Nov 29 16:44:04 2012
 
  * Created By : shultz
 
@@ -14,8 +14,6 @@
 
 
 #include "fit_tins.h"
-#include "fit_three_point_ff.h"
-#include "radmat_fit_forms.h"
 #include "ensem/ensem.h"
 #include "semble/semble_meta.h"
 #include "semble/semble_vector.h"

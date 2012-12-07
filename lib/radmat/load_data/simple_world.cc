@@ -6,14 +6,16 @@
 
  * Creation Date : 19-10-2012
 
- * Last Modified : Wed Oct 24 15:05:15 2012
+ * Last Modified : Mon Dec  3 14:34:51 2012
 
  * Created By : shultz
 
  _._._._._._._._._._._._._._._._._._._._._.*/
 
 
+#include "hadron/irrep_util.h"
 
+#include "radmat/utils/pow2assert.h"
 #include "simple_world.h"
 #include <sstream>
 
@@ -50,16 +52,17 @@ namespace radmat
     } // namespace anonomyous 
 
 
-
+    // ContinuumStatePrimitive
+    //------------------------------------------------------------------------------------------
 
     //! write it to a string for error
     std::string toString(const ContinuumStatePrimitive &op)
     {
       std::stringstream ss;
-      ss << "J = " << op.J << " H = " << op.H << " parity " << op.parity 
-        << " mom = " << op.mom[0] << " " << op.mom[1] << " " << op.mom[2] 
-        << " twoI_z " << op.twoI_z << " name " << op.name << " create " 
-        << op.creation_op << " smear " << op.smearedP;
+      ss << "J = " << op.J << " H = " << op.H << " parity " << op.parity; 
+      ss << " mom = " << op.mom[0] << " " << op.mom[1] << " " << op.mom[2];
+      ss  << " twoI_z " << op.twoI_z << " name " << op.name << " create "; 
+      ss << op.creation_op << " smear " << op.smearedP;
       return ss.str();
     }
 
@@ -69,6 +72,10 @@ namespace radmat
       o << toString(op);
       return o;
     }
+
+    // ContinuumStateXML
+    //------------------------------------------------------------------------------------------
+
 
     //! write to a string for error
     std::string toString(const ContinuumStateXML &op)
@@ -122,6 +129,115 @@ namespace radmat
     }
 
 
+    // ContinuumInsertion
+    //------------------------------------------------------------------------------------------
+
+    std::string toString(const ContinuumInsertion & ins) 
+    {
+      std::stringstream ss;
+      std::map<std::string,ContinuumInsertion::op_insertion>::const_iterator it;
+      ss << "t_slice = " << ins.t_slice << "\n";
+      for(it = ins.insertion_map.begin(); it != ins.insertion_map.end(); ++it)
+        ss << it->first << " = " <<  it->second << "\n";
+      return ss.str(); 
+    }
+
+    std::ostream& operator<<(std::ostream & o , const ContinuumInsertion &ins)
+    {
+      o << toString(ins);
+      return o; 
+    }
+
+
+
+    // ContinuumInsertionXML
+    //------------------------------------------------------------------------------------------
+
+    //! write to a string for error
+    std::string toString(const ContinuumInsertionXML::Insertion &op)
+    {
+      std::stringstream ss;
+      ss << "J = " << op.J << " H = {";
+      for(int i = 0; i < op.H.size(); ++i)
+        ss << op.H[i] << " ";
+      ss << "} parity = " << op.parity << " twoI_z = " << op.twoI_z
+        << " op_stem " << op.op_stem << " create = " << op.creation_op
+        << " smeared = " << op.smearedP;
+      return ss.str();
+    }
+
+    //! stream this thing
+    std::ostream& operator<<(std::ostream& o , const ContinuumInsertionXML::Insertion &op)
+    {
+      o << toString(op);
+      return o;
+    }
+
+    //! xml reader
+    void read(ADATXML::XMLReader &xml, const std::string &path, ContinuumInsertionXML::Insertion &op)
+    {   
+      ADATXML::XMLReader ptop(xml,path);
+      doXMLRead(ptop,"J",op.J,__PRETTY_FUNCTION__);
+      doXMLRead(ptop,"H",op.H,__PRETTY_FUNCTION__);
+      doXMLRead(ptop,"parity",op.parity,__PRETTY_FUNCTION__);      
+      doXMLRead(ptop,"twoI_z",op.twoI_z,__PRETTY_FUNCTION__);
+      doXMLRead(ptop,"op_stem",op.op_stem,__PRETTY_FUNCTION__);
+      doXMLRead(ptop,"creation_op",op.creation_op,__PRETTY_FUNCTION__);
+      doXMLRead(ptop,"smearedP",op.smearedP,__PRETTY_FUNCTION__);
+    } 
+
+    //! xml writer
+    void write(ADATXML::XMLWriter &xml, const std::string &path, const ContinuumInsertionXML::Insertion &op)
+    {
+      ADATXML::push(xml,path);
+      write(xml,"J",op.J);
+      write(xml,"H",op.H);
+      write(xml,"parity",op.parity);
+      write(xml,"twoI_z",op.twoI_z);
+      write(xml,"op_stem",op.op_stem);
+      write(xml,"creation_op",op.creation_op);
+      write(xml,"smearedP",op.smearedP);
+      ADATXML::pop(xml);
+    }
+
+    //! write to a string for error
+    std::string toString(const ContinuumInsertionXML &op)
+    {
+      std::stringstream ss;
+      ss << "t_slice = " << op.t_slice << "\ntime = " << op.time << "\nspace = " << op.space; 
+      return ss.str();
+    }
+
+    //! stream this thing
+    std::ostream& operator<<(std::ostream& o , const ContinuumInsertionXML &op)
+    {
+      o << toString(op); 
+      return o;
+    }
+
+    //! xml reader
+    void read(ADATXML::XMLReader &xml, const std::string &path, ContinuumInsertionXML &op)
+    {
+      ADATXML::XMLReader ptop(xml,path);
+      doXMLRead(ptop,"t_slice",op.t_slice,__PRETTY_FUNCTION__);
+      doXMLRead(ptop,"time",op.time,__PRETTY_FUNCTION__);
+      doXMLRead(ptop,"space",op.space,__PRETTY_FUNCTION__);
+    }
+
+    //! xml writer
+    void write(ADATXML::XMLWriter &xml, const std::string &path, const ContinuumInsertionXML &op)
+    {
+      ADATXML::push(xml,path);
+      write(xml,"t_slice",op.t_slice);
+      write(xml,"time",op.time);
+      write(xml,"space",op.space);
+      ADATXML::pop(xml);
+    }
+
+
+    // ContinuumMatElem
+    //------------------------------------------------------------------------------------------
+
 
     //! write state to a string
     std::string toString(const ContinuumMatElem::State &s)
@@ -144,8 +260,7 @@ namespace radmat
     {
       std::stringstream ss;
       ss << " source = " << s.source << "\n";
-      for(int ins = 0; ins < s.insertion.size(); ++ins)
-        ss << "ins_" << ins << " = " << s.insertion[ins] << "\n";
+      ss << "insertion = " << s.insertion << "\n";
       ss << "sink = " << s.sink;
       return ss.str();
     }
@@ -157,21 +272,23 @@ namespace radmat
       return o;
     }
 
+    // ContinuumMatElemXML
+    //------------------------------------------------------------------------------------------
+
 
 
     //! write it to a string
-    std::string toString(const ContinuumLorentzMatElem &s)
+    std::string toString(const ContinuumMatElemXML &s)
     {
       std::stringstream ss;
       ss << "source = " << s.source << "\n";
-      for(int i = 0; i < 4; ++i)
-        ss << " mu_" << i << " = " << s.lorentz[i] << "\n";
+      ss << "insertion " << s.insertion << "\n";
       ss << "sink = " << s.sink;
       return ss.str();
     }
 
     //! stream it
-    std::ostream& operator<<(std::ostream& o, const ContinuumLorentzMatElem &s)
+    std::ostream& operator<<(std::ostream& o, const ContinuumMatElemXML &s)
     {
       o << toString(s);
       return o;
@@ -179,21 +296,21 @@ namespace radmat
 
 
     //! write state to a string
-    std::string toString(const ContinuumLorentzMatElem::State &s)
+    std::string toString(const ContinuumMatElemXML::State &s)
     {
       std::stringstream ss;
       ss << "state = " << s.state << " t_slice = " << s.t_slice;
       return ss.str(); 
     }
 
-    std::ostream& operator<<(std::ostream& o , const ContinuumLorentzMatElem::State &s)
+    std::ostream& operator<<(std::ostream& o , const ContinuumMatElemXML::State &s)
     {
       o << toString(s);
       return o;
     }
 
 
-    void read(ADATXML::XMLReader &xml, const std::string &path, ContinuumLorentzMatElem::State &op)
+    void read(ADATXML::XMLReader &xml, const std::string &path, ContinuumMatElemXML::State &op)
     {   
       ADATXML::XMLReader ptop(xml,path);
       doXMLRead(ptop,"t_slice",op.t_slice,__PRETTY_FUNCTION__);
@@ -201,7 +318,7 @@ namespace radmat
 
     }
 
-    void write(ADATXML::XMLWriter &xml, const std::string &path, const ContinuumLorentzMatElem::State &op)
+    void write(ADATXML::XMLWriter &xml, const std::string &path, const ContinuumMatElemXML::State &op)
     { 
       ADATXML::push(xml,path);
       write(xml,"state",op.state);
@@ -212,22 +329,215 @@ namespace radmat
 
 
     //! xml reader
-    void read(ADATXML::XMLReader &xml, const std::string &path, ContinuumLorentzMatElem &op)
+    void read(ADATXML::XMLReader &xml, const std::string &path, ContinuumMatElemXML &op)
     {
       ADATXML::XMLReader ptop(xml,path);
       doXMLRead(ptop,"source",op.source,__PRETTY_FUNCTION__);
-      doXMLRead(ptop,"lorentz",op.lorentz,__PRETTY_FUNCTION__);
+      doXMLRead(ptop,"insertion",op.insertion,__PRETTY_FUNCTION__);
       doXMLRead(ptop,"sink",op.sink,__PRETTY_FUNCTION__);
     }
 
     //! xml writer
-    void write(ADATXML::XMLWriter &xml, const std::string &path, const ContinuumLorentzMatElem &op)
+    void write(ADATXML::XMLWriter &xml, const std::string &path, const ContinuumMatElemXML &op)
     {
       ADATXML::push(xml,path);
       write(xml,"source",op.source);
-      write(xml,"lorentz",op.lorentz);
+      write(xml,"insertion",op.insertion);
       write(xml,"sink",op.sink);
       ADATXML::pop(xml);
+    }
+
+
+
+    namespace
+    {
+      std::vector<ContinuumStatePrimitive> getContinuumStatePrimitiveFromXML(const ContinuumStateXML &xmlin)
+      {
+        ContinuumStatePrimitive base; 
+        base.J = xmlin.J;
+        base.parity = xmlin.parity;
+        base.twoI_z = xmlin.twoI_z;
+        base.name = xmlin.op_stem;
+        base.creation_op = xmlin.creation_op;
+        base.smearedP = xmlin.smearedP;
+        base.mom.resize(3);
+
+
+        std::vector<ContinuumStatePrimitive> ret; 
+
+
+        for(int p = 0; p < xmlin.mom.size(); ++p)
+        {
+          POW2_ASSERT(xmlin.mom[p].size() == 3); 
+
+          base.mom[0] = xmlin.mom[p][0];
+          base.mom[1] = xmlin.mom[p][1];
+          base.mom[2] = xmlin.mom[p][2];
+
+
+          // allow for leaving the helicity bit blank so we dont always have to type them all in
+          if(xmlin.H.size() == 0)
+          {
+            for(int h = -base.J; h < base.J + 1; ++h)
+            {
+              base.H = h;
+              ret.push_back(base); 
+            }
+          }
+          else
+          {
+            for(int h = 0; h < xmlin.H.size(); ++h)
+            {
+              base.H = xmlin.H[h];
+              ret.push_back(base);
+            }
+          }
+
+        } // loop momenta
+
+#if 0
+        std::vector<ContinuumStatePrimitive>::const_iterator it;
+        std::cout << __func__ << std::endl;
+        for(it = ret.begin(); it != ret.end(); ++it)
+          std::cout << *it << std::endl;
+#endif
+
+        return ret; 
+      }
+
+
+      ContinuumStatePrimitive makeTemporalInsertion(const ContinuumInsertionXML::Insertion &time)
+      { 
+        POW2_ASSERT(time.J == 0);
+        ContinuumStatePrimitive ret; 
+        ret.J = 0;
+        ret.H = 0;
+        ret.parity = time.parity;
+        ret.twoI_z = time.twoI_z;
+        ret.name = time.op_stem;
+        ret.creation_op = time.creation_op;
+        ret.smearedP = time.smearedP;
+        return ret; 
+      } 
+
+      namespace
+      {
+        struct triplet
+        {
+          triplet(const ContinuumInsertionXML::Insertion &space)
+          {
+            POW2_ASSERT(space.J == 1);
+            plus.J = 1;
+            plus.parity = space.parity;
+            plus.twoI_z = space.twoI_z;
+            plus.name = space.op_stem;
+            plus.creation_op = space.creation_op;
+            plus.smearedP = space.smearedP; 
+            minus = plus;
+            zero = plus; 
+            plus.H = 1;
+            minus.H = -1;
+            zero.H = 0; 
+          }
+          ContinuumStatePrimitive plus,minus,zero;
+        };
+      } // namespace anonomyous 
+
+
+      triplet makeCircularSpatialInsertion(const ContinuumInsertionXML::Insertion &space)
+      {
+        triplet circ(space); 
+        return circ; 
+      } 
+
+
+      ContinuumInsertion getContinuumInsertionFromXML(const ContinuumInsertionXML &xmlin)
+      {
+        ContinuumInsertion ret;
+        ret.t_slice = xmlin.t_slice; 
+        ContinuumStatePrimitive t = makeTemporalInsertion(xmlin.time);
+        triplet circ = makeCircularSpatialInsertion(xmlin.space); 
+
+        ret.insert("t",t);
+
+        // allow for not considering certain bits of the insertion 
+        for(int h = 0; h < xmlin.space.H.size(); ++h)
+        {
+          if(xmlin.space.H[h] == -1)
+          {
+            ret.insert("m",circ.minus);
+            continue;
+          }
+          else if (xmlin.space.H[h] == 0)
+          {
+            ret.insert("0",circ.zero);
+            continue;
+          }
+          else if (xmlin.space.H[h] == 1)
+          {
+            ret.insert("p",circ.plus);
+          }
+        }
+
+        return ret; 
+      }
+
+
+      std::vector<ContinuumMatElem::State> getMatElemState(const ContinuumMatElemXML::State &xmlin)
+      {
+        std::vector<ContinuumMatElem::State> ret; 
+        std::vector<ContinuumStatePrimitive> states =  getContinuumStatePrimitiveFromXML(xmlin.state); 
+        std::vector<ContinuumStatePrimitive>::const_iterator it; 
+
+        for(it = states.begin(); it != states.end(); ++it)
+          ret.push_back(ContinuumMatElem::State(*it,xmlin.t_slice)); 
+
+        return ret;
+      }
+
+
+      ADATXML::Array<int> getMomentumTransfer(const ContinuumMatElem::State &source, const ContinuumMatElem::State &sink)
+      {
+        ADATXML::Array<int> ret;
+        ret.resize(3);
+        ret[0] = source.state.mom[0] - sink.state.mom[0];
+        ret[1] = source.state.mom[1] - sink.state.mom[1];
+        ret[2] = source.state.mom[2] - sink.state.mom[2];
+        return ret; 
+      } 
+
+    } // namespace anonomyous 
+
+
+
+    std::vector<ContinuumMatElem> getContinuumMatElemFromXML(const ContinuumMatElemXML &xmlin)
+    {
+      std::vector<ContinuumMatElem> ret; 
+      std::vector<ContinuumMatElem::State> source,sink;
+      std::vector<ContinuumMatElem::State>::const_iterator it_source, it_sink;
+      ContinuumInsertion ins; 
+
+      source = getMatElemState(xmlin.source);
+      sink = getMatElemState(xmlin.sink);
+      ins = getContinuumInsertionFromXML(xmlin.insertion);
+
+      for(it_source = source.begin(); it_source != source.end(); ++it_source)
+        for(it_sink = sink.begin(); it_sink != sink.end(); ++it_sink)
+        {
+          ContinuumMatElem dum;
+          dum.source = *it_source;
+          dum.sink = *it_sink;
+          dum.insertion = ins;
+          
+          ADATXML::Array<int> q = getMomentumTransfer(*it_source,*it_sink);
+          std::map<std::string,ContinuumInsertion::op_insertion>::iterator it;
+
+          for(it = dum.insertion.insertion_map.begin(); it != dum.insertion.insertion_map.end(); ++it)
+            it->second.mom = q;
+
+          ret.push_back(dum);
+        }
+      return ret; 
     }
 
 

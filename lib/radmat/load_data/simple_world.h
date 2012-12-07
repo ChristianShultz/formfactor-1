@@ -5,8 +5,13 @@
 #include "hadron/hadron_npart_irrep.h"
 #include "io/adat_xmlio.h"
 
+#include "radmat/load_data/invert_subduction.h"
+
 #include <string>
 #include <iostream>
+#include <vector>
+#include <map>
+
 
 namespace radmat
 {
@@ -67,18 +72,97 @@ namespace radmat
     //-------------------------------------------------------------------------------------------   
 
 
-    //! internal representation of the states we're sandwiching an op between
+
+    /// here
+
+    // internal representation of the guys 
+    struct ContinuumInsertion
+    {
+      typedef ContinuumStatePrimitive op_insertion;   
+   
+      int t_slice; 
+
+      void insert(const std::string &s, const op_insertion &o)
+      {
+        insertion_map.insert(std::map<std::string,op_insertion>::value_type(s,o));
+      }
+
+      std::map<std::string,op_insertion> insertion_map;  // keys are "t" , "p", "m", "0" .. not found == don't use
+    };
+
+
+    std::string toString(const ContinuumInsertion &);
+    std::ostream& operator<<(std::ostream &, const ContinuumInsertion &); 
+
+    //-------------------------------------------------------------------------------------------   
+
+
+    //// here
+
+
+    struct ContinuumInsertionXML
+    {
+      struct Insertion
+      {
+        int J;
+        ADATXML::Array<int> H; // take note of circular basis!!!
+        bool parity;
+        int twoI_z;
+        std::string op_stem; 
+        bool creation_op;
+        bool smearedP; 
+      };
+
+      int t_slice; 
+      Insertion time; 
+      Insertion space; 
+    };
+
+    //! write state to a string
+    std::string toString(const ContinuumInsertionXML::Insertion &);
+
+    //! stream a state
+    std::ostream& operator<<(std::ostream& , const ContinuumInsertionXML::Insertion &);
+
+    //! state xml reader
+    void read(ADATXML::XMLReader &xml, const std::string &path, ContinuumInsertionXML::Insertion &);
+
+    //! state xml writer
+    void write(ADATXML::XMLWriter &xml, const std::string &path, ContinuumInsertionXML::Insertion &);
+
+
+
+    //! write to a string for error
+    std::string toString(const ContinuumInsertionXML &);
+
+    //! stream this thing
+    std::ostream& operator<<(std::ostream& , const ContinuumInsertionXML &);
+
+    //! xml reader
+    void read(ADATXML::XMLReader &xml, const std::string &, ContinuumInsertionXML &);
+
+    //! xml writer
+    void write(ADATXML::XMLWriter &xml, const std::string &path, const ContinuumInsertionXML &);
+
+    //-------------------------------------------------------------------------------------------   
+
+
+    /// here
+
+    //! internal representation of the matrix element we're sandwiching an op between
     struct ContinuumMatElem 
     {
-
       struct State
       {
+        State(void) {}
+        State(const ContinuumStatePrimitive &s, const int t) : state(s), t_slice(t) {}
+
         ContinuumStatePrimitive state;
         int t_slice;
       };
 
       State source;
-      ADATXML::Array<State> insertion;
+      ContinuumInsertion insertion; 
       State sink;
 
       std::string ensemble;
@@ -99,8 +183,9 @@ namespace radmat
 
     //----------------------------------------------------------------------------------------
 
+    /// here
 
-    struct ContinuumLorentzMatElem
+    struct ContinuumMatElemXML
     {
 
       struct State
@@ -110,34 +195,39 @@ namespace radmat
       };
 
       State source;
-      ADATXML::Array<State> lorentz;  // indexed by lorentz value
+      ContinuumInsertionXML insertion; 
       State sink;
 
     }; 
 
     //! write state to a string
-    std::string toString(const ContinuumLorentzMatElem::State &);
+    std::string toString(const ContinuumMatElemXML::State &);
 
     //! stream a state
-    std::ostream& operator<<(std::ostream& , const ContinuumLorentzMatElem::State &);
+    std::ostream& operator<<(std::ostream& , const ContinuumMatElemXML::State &);
 
     //! state xml reader
-    void read(ADATXML::XMLReader &xml, const std::string &path, ContinuumLorentzMatElem::State &);
+    void read(ADATXML::XMLReader &xml, const std::string &path, ContinuumMatElemXML::State &);
 
     //! state xml writer
-    void write(ADATXML::XMLWriter &xml, const std::string &path, ContinuumLorentzMatElem::State &);
+    void write(ADATXML::XMLWriter &xml, const std::string &path, ContinuumMatElemXML::State &);
 
     //! write it to a string
-    std::string toString(const ContinuumLorentzMatElem &);
+    std::string toString(const ContinuumMatElemXML &);
 
     //! stream it
-    std::ostream& operator<<(std::ostream&, const ContinuumLorentzMatElem &);
+    std::ostream& operator<<(std::ostream&, const ContinuumMatElemXML &);
 
     //! xml reader
-    void read(ADATXML::XMLReader &xml, const std::string &path, ContinuumLorentzMatElem &);
+    void read(ADATXML::XMLReader &xml, const std::string &path, ContinuumMatElemXML &);
 
     //! xml writer
-    void write(ADATXML::XMLWriter &xml, const std::string &path, const ContinuumLorentzMatElem &);
+    void write(ADATXML::XMLWriter &xml, const std::string &path, const ContinuumMatElemXML &);
+
+
+
+    //! transform from xml to something we can loop on 
+    std::vector<ContinuumMatElem> getContinuumMatElemFromXML(const ContinuumMatElemXML &);
 
 
   } // namespace simpleWorld

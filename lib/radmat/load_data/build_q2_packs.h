@@ -425,7 +425,7 @@ namespace radmat
 
       // now they are sorted by p_minus_spatial which effectively sorts by 
       // Q2 w/o dealing with the nasty business of defining equality 
-      // between ensembles
+      // between ensembles ------ this only works for guys of the same mass !!!!!
 
       int packnum;
       int npacks = sortQ2.size();

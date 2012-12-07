@@ -6,7 +6,7 @@
 
  * Creation Date : 15-08-2012
 
- * Last Modified : Tue Oct 23 11:41:00 2012
+ * Last Modified : Fri Nov 30 14:42:52 2012
 
  * Created By : shultz
 
@@ -17,6 +17,7 @@
 #include <stdio.h>
 #include <fstream>
 #include <string>
+#include <vector>
 #include <iostream>
 #include "radmat/load_data/simple_world.h"
 #include "io/adat_xmlio.h"
@@ -45,29 +46,32 @@ namespace radmat
     csxml.smearedP = true;
 
 
-    simpleWorld::ContinuumLorentzMatElem CLME, CLME_in;
-    simpleWorld::ContinuumLorentzMatElem::State source,sink,ins;
+    simpleWorld::ContinuumInsertionXML::Insertion csxml2; 
+    simpleWorld::ContinuumInsertionXML insertion; 
+
+    csxml2.J = 0;
+    csxml2.parity = true;
+    csxml2.op_stem = "b_b0xD0_J0__J0_";
+    csxml2.twoI_z = 0;
+    csxml2.creation_op = true;
+    csxml2.smearedP = true;
+
+    insertion.t_slice = -3; 
+    insertion.time = csxml2;
+    csxml2.op_stem = "rho_rhoxD0_J0__J1_";
+    csxml2.J = 1; 
+    insertion.space = csxml2;
+
+
+    simpleWorld::ContinuumMatElemXML CLME, CLME_in;
+    simpleWorld::ContinuumMatElemXML::State source,sink,ins;
     
     source.state = csxml;
     source.t_slice = 0;
-    csxml.creation_op = false;
-    sink.t_slice = 24;
-    sink.state = csxml;
-    csxml.op_stem = "b_b0xD0_J0__J0_";
-    csxml.twoI_z = 0;
-    ins.state = csxml;
-    ins.t_slice = -3;
 
     CLME.source = source;
-    CLME.sink = sink;
-    CLME.lorentz.resize(4);
-    CLME.lorentz[0] = ins;
-
-    ins.state.op_stem = "rho_rhoxD0_J0__J1_";
-    CLME.lorentz[1] = ins;
-    CLME.lorentz[2] = ins;
-    CLME.lorentz[3] = ins;
-
+    CLME.sink = source;
+    CLME.insertion = insertion; 
 
     ADATXML::XMLBufferWriter xml;
     simpleWorld::write(xml,"Key",CLME);
@@ -86,6 +90,13 @@ namespace radmat
     std::ofstream out2(xml_name2.c_str());
     xml2.print(out2);
     out2.close();
+
+
+    std::vector<simpleWorld::ContinuumMatElem> lots_of_stuff = getContinuumMatElemFromXML(CLME);
+    std::vector<simpleWorld::ContinuumMatElem>::const_iterator print_lots_of_stuff;
+
+    for(print_lots_of_stuff = lots_of_stuff.begin(); print_lots_of_stuff != lots_of_stuff.end(); ++print_lots_of_stuff)
+      std::cout << *print_lots_of_stuff << std::endl;
 
     // user should run diff on two output files if they care
     TESTER_TEST(m_test,true,"foobar");

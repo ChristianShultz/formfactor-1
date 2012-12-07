@@ -137,8 +137,14 @@ namespace radmat
 
     //print(std::string("dispersion"), input);
 
+    SEMBLE::SembleMatrix<std::complex<double> > boobar;
     SEMBLE::PromoteEnsem<std::complex<double> >::Type foobar;
-    foobar =  makeFakeDataPoint(input,ini.dataProps.momenta[0],0,0,15,0);
+    boobar =  makeFakeDataPoint(input,ini.dataProps.momenta[0],0,0,15,0);
+    
+    foobar = boobar.getEnsemElement(0,0)*SEMBLE::toScalar(std::complex<double>(0.,0.));; 
+    for(int n = 0; n < boobar.getN(); ++n)
+      for(int m = 0; m < boobar.getM(); ++m)
+        foobar += boobar.getEnsemElement(n,m);
 
     //////////////////////////////////////////////////////
     //////////////////////////////////////////////////////
