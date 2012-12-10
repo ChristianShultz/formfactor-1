@@ -3,6 +3,7 @@
 
 #include "radmat/load_data/three_point.h"
 #include "radmat/load_data/build_q2_packs.h"
+#include "radmat/load_data/build_correlators.h"
 #include "radmat/llsq/llsq_q2_pack.h"
 #include "radmat/fitting/axis_plotter.h"
 #include "radmat/fitting/fit_tins.h"
@@ -39,7 +40,6 @@ namespace radmat
       RDriver<T>& operator=(const RDriver<T> &o);
 
 
-
       void load(const std::vector<ThreePointCorrelator<T> > &corrs);
       void load(const std::vector<ADAT::Handle<LLSQDataPointQ2Pack> > &q2_packs);
 
@@ -57,6 +57,7 @@ namespace radmat
       void makeQ2Plots(void);
 
       RDriverProps_t m_driverProps; 
+      
 
       bool haveQ2Packs;
       std::vector<ADAT::Handle<LLSQDataPointQ2Pack> > m_q2_packs;

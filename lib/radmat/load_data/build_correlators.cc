@@ -6,7 +6,7 @@
 
  * Creation Date : 04-12-2012
 
- * Last Modified : Fri Dec  7 15:22:55 2012
+ * Last Modified : Mon Dec 10 09:42:29 2012
 
  * Created By : shultz
 
@@ -77,9 +77,9 @@ namespace radmat
   void write(ADATXML::XMLWriter &xml, const std::string &path, const ThreePointCorrXMLIni_t &prop)
   {
     ADATXML::push(xml,path);
-    write(xml,"continuumMatElemXMl",prop.continuumMatElemXML);
+    write(xml,"continuumMatElemXML",prop.continuumMatElemXML);
     write(xml,"source_id",prop.source_id);
-    write(xml,"source_id",prop.sink_id);
+    write(xml,"sink_id",prop.sink_id);
     write(xml,"isDiagonal",prop.isDiagonal);
     ADATXML::pop(xml);
   }
@@ -155,10 +155,11 @@ namespace radmat
         : active(false) , success(true) , momentum_factor(0.)
       {
         ENSEM::EnsemComplex Ezero;
-        Ezero.resize(1); 
+        Ezero.resize(1);
         Ezero = SEMBLE::toScalar(std::complex<double>(0.,0.));
+        corr.resize(1);
         corr.resizeObs(1);
-        corr = Ezero; 
+        corr = SEMBLE::toScalar(std::complex<double>(0.,0.));
         E_f = ENSEM::real(Ezero);
         E_i = E_f; 
 

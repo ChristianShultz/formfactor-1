@@ -49,8 +49,8 @@ POST_INSTALL = :
 NORMAL_UNINSTALL = :
 PRE_UNINSTALL = :
 POST_UNINSTALL = :
-noinst_PROGRAMS = hello$(EXEEXT) plot_fake_3pt$(EXEEXT) \
-	fake_radmat$(EXEEXT)
+noinst_PROGRAMS = plot_fake_3pt$(EXEEXT) fake_radmat$(EXEEXT) \
+	radmat$(EXEEXT)
 subdir = main
 DIST_COMMON = $(srcdir)/Makefile.am $(srcdir)/Makefile.in
 ACLOCAL_M4 = $(top_srcdir)/aclocal.m4
@@ -66,14 +66,14 @@ am_fake_radmat_OBJECTS = fake_radmat.$(OBJEXT)
 fake_radmat_OBJECTS = $(am_fake_radmat_OBJECTS)
 fake_radmat_LDADD = $(LDADD)
 fake_radmat_DEPENDENCIES =
-am_hello_OBJECTS = hello.$(OBJEXT)
-hello_OBJECTS = $(am_hello_OBJECTS)
-hello_LDADD = $(LDADD)
-hello_DEPENDENCIES =
 am_plot_fake_3pt_OBJECTS = plot_fake_3pt.$(OBJEXT)
 plot_fake_3pt_OBJECTS = $(am_plot_fake_3pt_OBJECTS)
 plot_fake_3pt_LDADD = $(LDADD)
 plot_fake_3pt_DEPENDENCIES =
+am_radmat_OBJECTS = radmat.$(OBJEXT)
+radmat_OBJECTS = $(am_radmat_OBJECTS)
+radmat_LDADD = $(LDADD)
+radmat_DEPENDENCIES =
 DEFAULT_INCLUDES = -I.@am__isrc@
 depcomp = $(SHELL) $(top_srcdir)/config/depcomp
 am__depfiles_maybe = depfiles
@@ -83,10 +83,10 @@ CXXCOMPILE = $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) \
 CXXLD = $(CXX)
 CXXLINK = $(CXXLD) $(AM_CXXFLAGS) $(CXXFLAGS) $(AM_LDFLAGS) $(LDFLAGS) \
 	-o $@
-SOURCES = $(fake_radmat_SOURCES) $(hello_SOURCES) \
-	$(plot_fake_3pt_SOURCES)
-DIST_SOURCES = $(fake_radmat_SOURCES) $(hello_SOURCES) \
-	$(plot_fake_3pt_SOURCES)
+SOURCES = $(fake_radmat_SOURCES) $(plot_fake_3pt_SOURCES) \
+	$(radmat_SOURCES)
+DIST_SOURCES = $(fake_radmat_SOURCES) $(plot_fake_3pt_SOURCES) \
+	$(radmat_SOURCES)
 am__can_run_installinfo = \
   case $$AM_UPDATE_INFO_DIR in \
     n|no|NO) false;; \
@@ -209,9 +209,9 @@ AM_LDFLAGS = -L@top_builddir@/lib/ \
                @LDFLAGS@ @SEMBLE_LDFLAGS@ @JACKFITTER_LDFLAGS@ @ADAT_LDFLAGS@
 
 LDADD = -lradmat @SEMBLE_LIBS@ @JACKFITTER_LIBS@ @ADAT_LIBS@ @ITPP_LIBS@ @LIBS@ 
-hello_SOURCES = hello.cc
 plot_fake_3pt_SOURCES = plot_fake_3pt.cc
 fake_radmat_SOURCES = fake_radmat.cc
+radmat_SOURCES = radmat.cc
 
 # no idea how/why this works, cut paste job
 #
@@ -259,12 +259,12 @@ clean-noinstPROGRAMS:
 fake_radmat$(EXEEXT): $(fake_radmat_OBJECTS) $(fake_radmat_DEPENDENCIES) $(EXTRA_fake_radmat_DEPENDENCIES) 
 	@rm -f fake_radmat$(EXEEXT)
 	$(CXXLINK) $(fake_radmat_OBJECTS) $(fake_radmat_LDADD) $(LIBS)
-hello$(EXEEXT): $(hello_OBJECTS) $(hello_DEPENDENCIES) $(EXTRA_hello_DEPENDENCIES) 
-	@rm -f hello$(EXEEXT)
-	$(CXXLINK) $(hello_OBJECTS) $(hello_LDADD) $(LIBS)
 plot_fake_3pt$(EXEEXT): $(plot_fake_3pt_OBJECTS) $(plot_fake_3pt_DEPENDENCIES) $(EXTRA_plot_fake_3pt_DEPENDENCIES) 
 	@rm -f plot_fake_3pt$(EXEEXT)
 	$(CXXLINK) $(plot_fake_3pt_OBJECTS) $(plot_fake_3pt_LDADD) $(LIBS)
+radmat$(EXEEXT): $(radmat_OBJECTS) $(radmat_DEPENDENCIES) $(EXTRA_radmat_DEPENDENCIES) 
+	@rm -f radmat$(EXEEXT)
+	$(CXXLINK) $(radmat_OBJECTS) $(radmat_LDADD) $(LIBS)
 
 mostlyclean-compile:
 	-rm -f *.$(OBJEXT)
@@ -273,8 +273,8 @@ distclean-compile:
 	-rm -f *.tab.c
 
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/fake_radmat.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/hello.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/plot_fake_3pt.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/radmat.Po@am__quote@
 
 .cc.o:
 @am__fastdepCXX_TRUE@	$(CXXCOMPILE) -MT $@ -MD -MP -MF $(DEPDIR)/$*.Tpo -c -o $@ $<

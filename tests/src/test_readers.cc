@@ -6,7 +6,7 @@
 
  * Creation Date : 15-08-2012
 
- * Last Modified : Fri Nov 30 14:42:52 2012
+ * Last Modified : Mon Dec 10 09:17:59 2012
 
  * Created By : shultz
 
@@ -20,6 +20,7 @@
 #include <vector>
 #include <iostream>
 #include "radmat/load_data/simple_world.h"
+#include "radmat/load_data/build_correlators.h"
 #include "io/adat_xmlio.h"
 
 namespace radmat
@@ -101,6 +102,14 @@ namespace radmat
     // user should run diff on two output files if they care
     TESTER_TEST(m_test,true,"foobar");
 
+
+    ThreePointCorrIni_t empty_ini; 
+    ADATXML::XMLBufferWriter empty_writer; 
+    write(empty_writer,"inikeys",empty_ini);
+    std::string empty_name("radmat.inikeys.xml");
+    std::ofstream empty_out(empty_name.c_str());
+    empty_writer.print(empty_out);
+    empty_out.close(); 
     return m_test;
   }
 

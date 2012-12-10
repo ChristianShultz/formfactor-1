@@ -9,13 +9,13 @@ AM_LDFLAGS  = -L@top_builddir@/lib/ \
 
 LDADD = -lradmat @SEMBLE_LIBS@ @JACKFITTER_LIBS@ @ADAT_LIBS@ @ITPP_LIBS@ @LIBS@ 
 
-noinst_PROGRAMS = hello plot_fake_3pt fake_radmat
-
-hello_SOURCES = hello.cc
+noinst_PROGRAMS = plot_fake_3pt fake_radmat radmat
 
 plot_fake_3pt_SOURCES = plot_fake_3pt.cc
 
 fake_radmat_SOURCES = fake_radmat.cc
+
+radmat_SOURCES = radmat.cc
 
 
 # no idea how/why this works, cut paste job

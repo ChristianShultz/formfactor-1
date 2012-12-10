@@ -6,7 +6,7 @@
 
  * Creation Date : 12-10-2012
 
- * Last Modified : Tue Oct 23 12:57:15 2012
+ * Last Modified : Mon Dec 10 09:44:07 2012
 
  * Created By : shultz
 
@@ -134,7 +134,7 @@ namespace  // a bunch of local stuff to make my life easier
 
   bool inFlight(const std::string &group)
   {
-    if(group == "oct")
+    if(group == "Oh")
       return false;
     if(group == "D4")
       return true;
