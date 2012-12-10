@@ -170,8 +170,8 @@ main(int argc, char *argv[])
   std::vector<ADAT::Handle<LLSQDataPointQ2Pack> > q2_packs = Q2Builder.getQ2Packs();
   std::vector<ADAT::Handle<LLSQDataPointQ2Pack> >::const_iterator q2_pack_iterator;
 
-  int major(0);
-  for(q2_pack_iterator = q2_packs.begin(); q2_pack_iterator != q2_packs.end(); ++q2_pack_iterator, ++major)
+  int major_index(0);
+  for(q2_pack_iterator = q2_packs.begin(); q2_pack_iterator != q2_packs.end(); ++q2_pack_iterator, ++major_index)
   {
     LLSQRet_ff_Q2Pack<std::complex<double> > foobar;
     LLSQDriver_t<std::complex<double> > llsq_driver(std::string("SVDMakeSquare"));
@@ -185,17 +185,12 @@ main(int argc, char *argv[])
 
       ENSEM::EnsemVectorComplex tmp = it->second;
       std::stringstream ss, ss_rawj, ss_rawx, ss_cplx, ss_real;
-      ss << "FF_Q2_" << major << "_ffnum_" << it->first;
+      ss << "FF_Q2_" << major_index << "_ffnum_" << it->first;
 
       ss_rawj << ss.str() << "_raw.jack";
       ss_rawx << ss.str() << "_raw.ax" ;
       ss_real << ss.str() << "_real.ax";
       ss_cplx << ss.str() << "_cplx.ax";
-
-
-
-    
-
 
 
       std::string raw = std::string(ss_rawj.str());
@@ -221,9 +216,7 @@ main(int argc, char *argv[])
       Cplot.sendToFile(std::string(ss_cplx.str()));
       plot.sendToFile(std::string(ss_rawx.str()));
 
-
     }
-
   }
 
 
