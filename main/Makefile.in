@@ -50,7 +50,9 @@ NORMAL_UNINSTALL = :
 PRE_UNINSTALL = :
 POST_UNINSTALL = :
 noinst_PROGRAMS = plot_fake_3pt$(EXEEXT) fake_radmat$(EXEEXT) \
-	radmat$(EXEEXT)
+	mass_overlap_db_create$(EXEEXT) \
+	mass_overlap_db_combine$(EXEEXT) single_plot$(EXEEXT)
+bin_PROGRAMS = radmat$(EXEEXT)
 subdir = main
 DIST_COMMON = $(srcdir)/Makefile.am $(srcdir)/Makefile.in
 ACLOCAL_M4 = $(top_srcdir)/aclocal.m4
@@ -61,11 +63,22 @@ am__configure_deps = $(am__aclocal_m4_deps) $(CONFIGURE_DEPENDENCIES) \
 mkinstalldirs = $(install_sh) -d
 CONFIG_CLEAN_FILES =
 CONFIG_CLEAN_VPATH_FILES =
-PROGRAMS = $(noinst_PROGRAMS)
+am__installdirs = "$(DESTDIR)$(bindir)"
+PROGRAMS = $(bin_PROGRAMS) $(noinst_PROGRAMS)
 am_fake_radmat_OBJECTS = fake_radmat.$(OBJEXT)
 fake_radmat_OBJECTS = $(am_fake_radmat_OBJECTS)
 fake_radmat_LDADD = $(LDADD)
 fake_radmat_DEPENDENCIES =
+am_mass_overlap_db_combine_OBJECTS =  \
+	mass_overlap_db_combine.$(OBJEXT)
+mass_overlap_db_combine_OBJECTS =  \
+	$(am_mass_overlap_db_combine_OBJECTS)
+mass_overlap_db_combine_LDADD = $(LDADD)
+mass_overlap_db_combine_DEPENDENCIES =
+am_mass_overlap_db_create_OBJECTS = mass_overlap_db_create.$(OBJEXT)
+mass_overlap_db_create_OBJECTS = $(am_mass_overlap_db_create_OBJECTS)
+mass_overlap_db_create_LDADD = $(LDADD)
+mass_overlap_db_create_DEPENDENCIES =
 am_plot_fake_3pt_OBJECTS = plot_fake_3pt.$(OBJEXT)
 plot_fake_3pt_OBJECTS = $(am_plot_fake_3pt_OBJECTS)
 plot_fake_3pt_LDADD = $(LDADD)
@@ -74,6 +87,10 @@ am_radmat_OBJECTS = radmat.$(OBJEXT)
 radmat_OBJECTS = $(am_radmat_OBJECTS)
 radmat_LDADD = $(LDADD)
 radmat_DEPENDENCIES =
+am_single_plot_OBJECTS = single_plot.$(OBJEXT)
+single_plot_OBJECTS = $(am_single_plot_OBJECTS)
+single_plot_LDADD = $(LDADD)
+single_plot_DEPENDENCIES =
 DEFAULT_INCLUDES = -I.@am__isrc@
 depcomp = $(SHELL) $(top_srcdir)/config/depcomp
 am__depfiles_maybe = depfiles
@@ -83,10 +100,13 @@ CXXCOMPILE = $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) \
 CXXLD = $(CXX)
 CXXLINK = $(CXXLD) $(AM_CXXFLAGS) $(CXXFLAGS) $(AM_LDFLAGS) $(LDFLAGS) \
 	-o $@
-SOURCES = $(fake_radmat_SOURCES) $(plot_fake_3pt_SOURCES) \
-	$(radmat_SOURCES)
-DIST_SOURCES = $(fake_radmat_SOURCES) $(plot_fake_3pt_SOURCES) \
-	$(radmat_SOURCES)
+SOURCES = $(fake_radmat_SOURCES) $(mass_overlap_db_combine_SOURCES) \
+	$(mass_overlap_db_create_SOURCES) $(plot_fake_3pt_SOURCES) \
+	$(radmat_SOURCES) $(single_plot_SOURCES)
+DIST_SOURCES = $(fake_radmat_SOURCES) \
+	$(mass_overlap_db_combine_SOURCES) \
+	$(mass_overlap_db_create_SOURCES) $(plot_fake_3pt_SOURCES) \
+	$(radmat_SOURCES) $(single_plot_SOURCES)
 am__can_run_installinfo = \
   case $$AM_UPDATE_INFO_DIR in \
     n|no|NO) false;; \
@@ -211,6 +231,9 @@ AM_LDFLAGS = -L@top_builddir@/lib/ \
 LDADD = -lradmat @SEMBLE_LIBS@ @JACKFITTER_LIBS@ @ADAT_LIBS@ @ITPP_LIBS@ @LIBS@ 
 plot_fake_3pt_SOURCES = plot_fake_3pt.cc
 fake_radmat_SOURCES = fake_radmat.cc
+mass_overlap_db_create_SOURCES = mass_overlap_db_create.cc
+mass_overlap_db_combine_SOURCES = mass_overlap_db_combine.cc
+single_plot_SOURCES = single_plot.cc
 radmat_SOURCES = radmat.cc
 
 # no idea how/why this works, cut paste job
@@ -253,18 +276,67 @@ $(top_srcdir)/configure:  $(am__configure_deps)
 $(ACLOCAL_M4):  $(am__aclocal_m4_deps)
 	cd $(top_builddir) && $(MAKE) $(AM_MAKEFLAGS) am--refresh
 $(am__aclocal_m4_deps):
+install-binPROGRAMS: $(bin_PROGRAMS)
+	@$(NORMAL_INSTALL)
+	@list='$(bin_PROGRAMS)'; test -n "$(bindir)" || list=; \
+	if test -n "$$list"; then \
+	  echo " $(MKDIR_P) '$(DESTDIR)$(bindir)'"; \
+	  $(MKDIR_P) "$(DESTDIR)$(bindir)" || exit 1; \
+	fi; \
+	for p in $$list; do echo "$$p $$p"; done | \
+	sed 's/$(EXEEXT)$$//' | \
+	while read p p1; do if test -f $$p; \
+	  then echo "$$p"; echo "$$p"; else :; fi; \
+	done | \
+	sed -e 'p;s,.*/,,;n;h' -e 's|.*|.|' \
+	    -e 'p;x;s,.*/,,;s/$(EXEEXT)$$//;$(transform);s/$$/$(EXEEXT)/' | \
+	sed 'N;N;N;s,\n, ,g' | \
+	$(AWK) 'BEGIN { files["."] = ""; dirs["."] = 1 } \
+	  { d=$$3; if (dirs[d] != 1) { print "d", d; dirs[d] = 1 } \
+	    if ($$2 == $$4) files[d] = files[d] " " $$1; \
+	    else { print "f", $$3 "/" $$4, $$1; } } \
+	  END { for (d in files) print "f", d, files[d] }' | \
+	while read type dir files; do \
+	    if test "$$dir" = .; then dir=; else dir=/$$dir; fi; \
+	    test -z "$$files" || { \
+	      echo " $(INSTALL_PROGRAM_ENV) $(INSTALL_PROGRAM) $$files '$(DESTDIR)$(bindir)$$dir'"; \
+	      $(INSTALL_PROGRAM_ENV) $(INSTALL_PROGRAM) $$files "$(DESTDIR)$(bindir)$$dir" || exit $$?; \
+	    } \
+	; done
+
+uninstall-binPROGRAMS:
+	@$(NORMAL_UNINSTALL)
+	@list='$(bin_PROGRAMS)'; test -n "$(bindir)" || list=; \
+	files=`for p in $$list; do echo "$$p"; done | \
+	  sed -e 'h;s,^.*/,,;s/$(EXEEXT)$$//;$(transform)' \
+	      -e 's/$$/$(EXEEXT)/' `; \
+	test -n "$$list" || exit 0; \
+	echo " ( cd '$(DESTDIR)$(bindir)' && rm -f" $$files ")"; \
+	cd "$(DESTDIR)$(bindir)" && rm -f $$files
+
+clean-binPROGRAMS:
+	-test -z "$(bin_PROGRAMS)" || rm -f $(bin_PROGRAMS)
 
 clean-noinstPROGRAMS:
 	-test -z "$(noinst_PROGRAMS)" || rm -f $(noinst_PROGRAMS)
 fake_radmat$(EXEEXT): $(fake_radmat_OBJECTS) $(fake_radmat_DEPENDENCIES) $(EXTRA_fake_radmat_DEPENDENCIES) 
 	@rm -f fake_radmat$(EXEEXT)
 	$(CXXLINK) $(fake_radmat_OBJECTS) $(fake_radmat_LDADD) $(LIBS)
+mass_overlap_db_combine$(EXEEXT): $(mass_overlap_db_combine_OBJECTS) $(mass_overlap_db_combine_DEPENDENCIES) $(EXTRA_mass_overlap_db_combine_DEPENDENCIES) 
+	@rm -f mass_overlap_db_combine$(EXEEXT)
+	$(CXXLINK) $(mass_overlap_db_combine_OBJECTS) $(mass_overlap_db_combine_LDADD) $(LIBS)
+mass_overlap_db_create$(EXEEXT): $(mass_overlap_db_create_OBJECTS) $(mass_overlap_db_create_DEPENDENCIES) $(EXTRA_mass_overlap_db_create_DEPENDENCIES) 
+	@rm -f mass_overlap_db_create$(EXEEXT)
+	$(CXXLINK) $(mass_overlap_db_create_OBJECTS) $(mass_overlap_db_create_LDADD) $(LIBS)
 plot_fake_3pt$(EXEEXT): $(plot_fake_3pt_OBJECTS) $(plot_fake_3pt_DEPENDENCIES) $(EXTRA_plot_fake_3pt_DEPENDENCIES) 
 	@rm -f plot_fake_3pt$(EXEEXT)
 	$(CXXLINK) $(plot_fake_3pt_OBJECTS) $(plot_fake_3pt_LDADD) $(LIBS)
 radmat$(EXEEXT): $(radmat_OBJECTS) $(radmat_DEPENDENCIES) $(EXTRA_radmat_DEPENDENCIES) 
 	@rm -f radmat$(EXEEXT)
 	$(CXXLINK) $(radmat_OBJECTS) $(radmat_LDADD) $(LIBS)
+single_plot$(EXEEXT): $(single_plot_OBJECTS) $(single_plot_DEPENDENCIES) $(EXTRA_single_plot_DEPENDENCIES) 
+	@rm -f single_plot$(EXEEXT)
+	$(CXXLINK) $(single_plot_OBJECTS) $(single_plot_LDADD) $(LIBS)
 
 mostlyclean-compile:
 	-rm -f *.$(OBJEXT)
@@ -273,8 +345,11 @@ distclean-compile:
 	-rm -f *.tab.c
 
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/fake_radmat.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/mass_overlap_db_combine.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/mass_overlap_db_create.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/plot_fake_3pt.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/radmat.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/single_plot.Po@am__quote@
 
 .cc.o:
 @am__fastdepCXX_TRUE@	$(CXXCOMPILE) -MT $@ -MD -MP -MF $(DEPDIR)/$*.Tpo -c -o $@ $<
@@ -376,6 +451,9 @@ check-am: all-am
 check: check-am
 all-am: Makefile $(PROGRAMS)
 installdirs:
+	for dir in "$(DESTDIR)$(bindir)"; do \
+	  test -z "$$dir" || $(MKDIR_P) "$$dir"; \
+	done
 install: install-am
 install-exec: install-exec-am
 install-data: install-data-am
@@ -408,7 +486,8 @@ maintainer-clean-generic:
 	@echo "it deletes files that may require special tools to rebuild."
 clean: clean-am
 
-clean-am: clean-generic clean-noinstPROGRAMS mostlyclean-am
+clean-am: clean-binPROGRAMS clean-generic clean-noinstPROGRAMS \
+	mostlyclean-am
 
 distclean: distclean-am
 	-rm -rf ./$(DEPDIR)
@@ -434,7 +513,7 @@ install-dvi: install-dvi-am
 
 install-dvi-am:
 
-install-exec-am:
+install-exec-am: install-binPROGRAMS
 
 install-html: install-html-am
 
@@ -473,22 +552,22 @@ ps: ps-am
 
 ps-am:
 
-uninstall-am:
+uninstall-am: uninstall-binPROGRAMS
 
 .MAKE: install-am install-strip
 
-.PHONY: CTAGS GTAGS all all-am check check-am clean clean-generic \
-	clean-noinstPROGRAMS ctags distclean distclean-compile \
-	distclean-generic distclean-tags distdir dvi dvi-am html \
-	html-am info info-am install install-am install-data \
-	install-data-am install-dvi install-dvi-am install-exec \
-	install-exec-am install-html install-html-am install-info \
-	install-info-am install-man install-pdf install-pdf-am \
-	install-ps install-ps-am install-strip installcheck \
-	installcheck-am installdirs maintainer-clean \
-	maintainer-clean-generic mostlyclean mostlyclean-compile \
-	mostlyclean-generic pdf pdf-am ps ps-am tags uninstall \
-	uninstall-am
+.PHONY: CTAGS GTAGS all all-am check check-am clean clean-binPROGRAMS \
+	clean-generic clean-noinstPROGRAMS ctags distclean \
+	distclean-compile distclean-generic distclean-tags distdir dvi \
+	dvi-am html html-am info info-am install install-am \
+	install-binPROGRAMS install-data install-data-am install-dvi \
+	install-dvi-am install-exec install-exec-am install-html \
+	install-html-am install-info install-info-am install-man \
+	install-pdf install-pdf-am install-ps install-ps-am \
+	install-strip installcheck installcheck-am installdirs \
+	maintainer-clean maintainer-clean-generic mostlyclean \
+	mostlyclean-compile mostlyclean-generic pdf pdf-am ps ps-am \
+	tags uninstall uninstall-am uninstall-binPROGRAMS
 
 ${bin_PROGRAMS}: ${DEPENDENCIES}   # uncomment this when there are binprograms
 #${check_PROGRAMS}: ${DEPENDENCIES}

@@ -6,7 +6,7 @@
 #include "radmat_database_interface.h"
 #include "generate_redstar_xml.h"  
 #include "radmat/llsq/llsq_q2_pack.h"
-#include "semble/semble_key_val_db.h"
+#include "radmat_overlap_key_val_db.h"
 #include "hadron/hadron_npart_npt_corr.h"
 #include "io/adat_xmlio.h"
 #include <string>
@@ -22,7 +22,8 @@ namespace radmat
     simpleWorld::ContinuumMatElemXML continuumMatElemXML;
     std::string source_id;
     std::string sink_id;
-    bool isDiagonal; 
+    bool isDiagonal;
+    bool isProjected; 
   };
 
 

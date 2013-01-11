@@ -6,7 +6,7 @@
 
  * Creation Date : 19-10-2012
 
- * Last Modified : Mon Dec  3 14:34:51 2012
+ * Last Modified : Fri Jan 11 10:15:16 2013
 
  * Created By : shultz
 
@@ -111,6 +111,15 @@ namespace radmat
       doXMLRead(ptop,"op_stem",op.op_stem,__PRETTY_FUNCTION__);
       doXMLRead(ptop,"creation_op",op.creation_op,__PRETTY_FUNCTION__);
       doXMLRead(ptop,"smearedP",op.smearedP,__PRETTY_FUNCTION__);
+
+
+      // update for empty helicities here.. if you dont want to consider one then explicitly provide a list
+      if (op.H.size() == 0)
+      {
+        op.H.resize(2*op.J +1); 
+        for(int h = -op.J; h < op.J +1; ++h)
+          op.H[h + op.J] = h;
+      }
     } 
 
     //! xml writer
@@ -184,6 +193,14 @@ namespace radmat
       doXMLRead(ptop,"op_stem",op.op_stem,__PRETTY_FUNCTION__);
       doXMLRead(ptop,"creation_op",op.creation_op,__PRETTY_FUNCTION__);
       doXMLRead(ptop,"smearedP",op.smearedP,__PRETTY_FUNCTION__);
+
+      // update for empty helicities here.. if you dont want to consider one then explicitly provide a list
+      if (op.H.size() == 0)
+      {
+        op.H.resize(2*op.J +1); 
+        for(int h = -op.J; h < op.J +1; ++h)
+          op.H[h + op.J] = h;
+      }
     } 
 
     //! xml writer
@@ -261,7 +278,8 @@ namespace radmat
       std::stringstream ss;
       ss << " source = " << s.source << "\n";
       ss << "insertion = " << s.insertion << "\n";
-      ss << "sink = " << s.sink;
+      ss << "sink = " << s.sink << "\n";
+      ss << "ensemble = " << s.ensemble; 
       return ss.str();
     }
 
@@ -283,7 +301,8 @@ namespace radmat
       std::stringstream ss;
       ss << "source = " << s.source << "\n";
       ss << "insertion " << s.insertion << "\n";
-      ss << "sink = " << s.sink;
+      ss << "sink = " << s.sink << "\n";
+      ss << "ensemble = " << s.ensemble; 
       return ss.str();
     }
 
@@ -335,6 +354,7 @@ namespace radmat
       doXMLRead(ptop,"source",op.source,__PRETTY_FUNCTION__);
       doXMLRead(ptop,"insertion",op.insertion,__PRETTY_FUNCTION__);
       doXMLRead(ptop,"sink",op.sink,__PRETTY_FUNCTION__);
+      doXMLRead(ptop,"ensemble",op.ensemble,__PRETTY_FUNCTION__); 
     }
 
     //! xml writer
@@ -344,6 +364,7 @@ namespace radmat
       write(xml,"source",op.source);
       write(xml,"insertion",op.insertion);
       write(xml,"sink",op.sink);
+      write(xml,"ensemble",op.ensemble); 
       ADATXML::pop(xml);
     }
 
@@ -373,7 +394,6 @@ namespace radmat
           base.mom[0] = xmlin.mom[p][0];
           base.mom[1] = xmlin.mom[p][1];
           base.mom[2] = xmlin.mom[p][2];
-
 
           // allow for leaving the helicity bit blank so we dont always have to type them all in
           if(xmlin.H.size() == 0)
@@ -460,20 +480,33 @@ namespace radmat
 
         ret.insert("t",t);
 
+
+        // allow for leaving the helicity bit blank so we dont always have to type them all in
+        ContinuumInsertionXML my_insertion(xmlin);
+
+        if(my_insertion.space.H.size() == 0)
+        {
+          my_insertion.space.H.resize(2*my_insertion.space.J + 1);
+
+          for(int h = -my_insertion.space.J ; h < my_insertion.space.J +1; ++h)
+            my_insertion.space.H[h + my_insertion.space.J] = h;
+        }
+
+        // hardwire for J = 1 xml input type
         // allow for not considering certain bits of the insertion 
         for(int h = 0; h < xmlin.space.H.size(); ++h)
         {
-          if(xmlin.space.H[h] == -1)
+          if(my_insertion.space.H[h] == -1)
           {
             ret.insert("m",circ.minus);
             continue;
           }
-          else if (xmlin.space.H[h] == 0)
+          else if (my_insertion.space.H[h] == 0)
           {
             ret.insert("0",circ.zero);
             continue;
           }
-          else if (xmlin.space.H[h] == 1)
+          else if (my_insertion.space.H[h] == 1)
           {
             ret.insert("p",circ.plus);
           }
@@ -500,9 +533,11 @@ namespace radmat
       {
         ADATXML::Array<int> ret;
         ret.resize(3);
-        ret[0] = source.state.mom[0] - sink.state.mom[0];
-        ret[1] = source.state.mom[1] - sink.state.mom[1];
-        ret[2] = source.state.mom[2] - sink.state.mom[2];
+        // NB: need that extra minus sign or else all of the correlators are zero b/c of phase convention chosen for the insertion
+        // to be daggered (un-daggered.. can't remember which but this is the way it needs to be)
+        ret[0] = -(source.state.mom[0] - sink.state.mom[0]);
+        ret[1] = -(source.state.mom[1] - sink.state.mom[1]);
+        ret[2] = -(source.state.mom[2] - sink.state.mom[2]);
         return ret; 
       } 
 
@@ -528,7 +563,8 @@ namespace radmat
           dum.source = *it_source;
           dum.sink = *it_sink;
           dum.insertion = ins;
-          
+          dum.ensemble = xmlin.ensemble;
+
           ADATXML::Array<int> q = getMomentumTransfer(*it_source,*it_sink);
           std::map<std::string,ContinuumInsertion::op_insertion>::iterator it;
 

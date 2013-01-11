@@ -6,7 +6,7 @@
 #include "radmat/utils/obj_expr_t.h"
 #include "radmat/utils/pow2assert.h"
 #include "hadron/hadron_npart_npt_corr.h"
-#include "semble/semble_key_val_db.h"
+#include "radmat_overlap_key_val_db.h"
 #include "ensem/ensem.h"
 #include "semble/semble_meta.h"
 
@@ -23,7 +23,7 @@ namespace radmat
   struct redstarCircularMatElem_t
   {
     typedef Hadron::KeyHadronNPartNPtCorr_t::NPoint_t redKey; 
-    typedef SEMBLE::SembleExtendedKeyHadronNPartIrrep_t normKey;
+    typedef RadmatExtendedKeyHadronNPartIrrep_t normKey;
 
     struct OperatorKeyData
     {
@@ -80,6 +80,7 @@ namespace radmat
     redstarCartesianMatElem_p(const simpleWorld::ContinuumMatElem &a, const std::string &source_id, const std::string &sink_id)
     {
       redstarCircularMatElem_t dum(a,source_id,sink_id);
+      ensemble = a.ensemble; 
       makeCartesian(dum);
     }
 
@@ -91,9 +92,8 @@ namespace radmat
       m_source = tmp.m_source;
       m_sink = tmp.m_sink;
 
-      if(tmp.m_time.first)
-        m_t = tmp.m_time;
-      m_z = tmp.m_time;
+      m_t = tmp.m_time;
+      m_z = tmp.m_zero;
       m_x = std::pair<bool,listSubducedInsertion>(tmp.m_plus.first && tmp.m_minus.first,
           SEMBLE::toScalar(std::complex<double>(1./sqrt(2.),0.))*(tmp.m_plus.second + tmp.m_minus.second));
       m_y = std::pair<bool,listSubducedInsertion>(tmp.m_plus.first && tmp.m_minus.first,
@@ -106,7 +106,8 @@ namespace radmat
     std::pair<bool,listSubducedInsertion> m_t; 
     std::pair<bool,listSubducedInsertion> m_x;
     std::pair<bool,listSubducedInsertion> m_y;
-    std::pair<bool,listSubducedInsertion> m_z; 
+    std::pair<bool,listSubducedInsertion> m_z;
+    std::string ensemble;  
   };
 
 
@@ -133,13 +134,13 @@ namespace radmat
       {
 
         threePointKey(const Hadron::KeyHadronNPartNPtCorr_t &red_xml, 
-            const SEMBLE::SembleExtendedKeyHadronNPartIrrep_t  &source_xml,
-            const SEMBLE::SembleExtendedKeyHadronNPartIrrep_t &sink_xml)
+            const RadmatExtendedKeyHadronNPartIrrep_t  &source_xml,
+            const RadmatExtendedKeyHadronNPartIrrep_t &sink_xml)
           : redstar_xml(red_xml), source_normalization(source_xml) , sink_normalization(sink_xml)  { }
 
         Hadron::KeyHadronNPartNPtCorr_t redstar_xml;
-        SEMBLE::SembleExtendedKeyHadronNPartIrrep_t source_normalization;
-        SEMBLE::SembleExtendedKeyHadronNPartIrrep_t sink_normalization;
+        RadmatExtendedKeyHadronNPartIrrep_t source_normalization;
+        RadmatExtendedKeyHadronNPartIrrep_t sink_normalization;
       };
 
       // make a list of these keys with a given weight determined by the subduction procedure 
@@ -152,7 +153,8 @@ namespace radmat
       // even though this is quantum mechanics we are going to read from left to right..
       redstarCartMatElemLorentzComponent(const listSubducedOp &source,
           const std::pair<bool,listSubducedInsertion> &ins,
-          const listSubducedOp &sink);
+          const listSubducedOp &sink,
+          const std::string &ensemble);
 
       // stl like overloads for looping once we start spaming database fetches 
       const_iterator begin(void) const {return m_list.begin();}

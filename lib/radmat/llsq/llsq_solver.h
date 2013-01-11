@@ -21,10 +21,10 @@ namespace radmat
 
     LLSQSolver_t(void) {}
 
-    LLSQRetTypeBase_h operator()(const std::vector<LLSQDataPoint> &data, const std::string &solverID) const
+    LLSQRetTypeBase_h operator()(const std::vector<LLSQDataPoint> &data, const std::string &solverID, const int t_ins) const
     {
       LLSQBaseSolver_h solver = LLSQSolverFactoryEnv::callFactory(solverID);
-      return (*solver)(generateLLSQSystem<T>(data));
+      return (*solver)(generateLLSQSystem<T>(data), t_ins);
     }
 
   };

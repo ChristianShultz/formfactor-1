@@ -198,6 +198,7 @@ namespace radmat
       ContinuumInsertionXML insertion; 
       State sink;
 
+      std::string ensemble; 
     }; 
 
     //! write state to a string

@@ -30,7 +30,7 @@ namespace radmat
         LLSQRet_t_Q2Pack<T> tmp;
 
         for(it = in->begin(); it != in->end(); it++)
-          tmp.insert(it->first, m_solver(it->second, m_solverID));
+          tmp.insert(it->first, m_solver(it->second, m_solverID,it->first));
 
 
         tmp.setQ2(in->Q2());

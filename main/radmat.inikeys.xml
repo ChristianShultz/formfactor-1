@@ -55,20 +55,23 @@
         </state>
         <t_slice>0</t_slice>
       </sink>
+      <ensemble>fred</ensemble>
     </continuumMatElemXML>
     <source_id>pion</source_id>
     <sink_id>pion</sink_id>
     <isDiagonal>true</isDiagonal>
+    <isProjected>false</isProjected>
   </threePointCorrXMLIni>
   <radmatDBProp>
     <threePointDatabase>
-      <dbname>/Users/shultz/jlab/database/radmat_3pt/test_dbs/743/pipi/smeared_ins/10cfg/pi_pi_10cfg_all_combo_REST_D4_D3_D2___szscl3_16_128_b1p50_t_x4p300_um0p0743_n1p265_per.sdb</dbname>
+      <dbname>pi_pi_10cfg_all_combo_REST_D4_D3_D2___szscl3_16_128_b1p50_t_x4p300_um0p0743_n1p265_per.sdb</dbname>
       <badlist>bad_corrs.xml</badlist>
     </threePointDatabase>
     <normalizationDatabase>
-      <dbname></dbname>
-      <badlist></badlist>
+      <dbname>faked_up_dbnew_normalization_db_pion_10cfg.sdb</dbname>
+      <badlist>bad_norms.xml</badlist>
     </normalizationDatabase>
+    <allow_daggering>true</allow_daggering>
   </radmatDBProp>
   <matElemID>PiPi</matElemID>
   <xi>3.6</xi>

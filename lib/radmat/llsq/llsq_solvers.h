@@ -46,15 +46,20 @@ namespace radmat
     typedef typename LLSQBaseSolver_t<T>::LLSQRetTypeBase_h LLSQRetTypeBase_h;
     typedef typename LLSQBaseSolver_t<T>::LLSQInputType_h LLSQInputType_h;
 
-    LLSQRetTypeBase_h operator()(const LLSQInputType_h & input) const
+    LLSQRetTypeBase_h operator()(const LLSQInputType_h & input, const int t_ins) const
     {
+      print_llsq_system(input, t_ins); 
       LLSQRetTypeBase_t<T> *foo = new LLSQRetTypeBase_t<T>();
       POW2_ASSERT(foo);
       POW2_ASSERT(input->m_KFacs.getN() == input->m_KFacs.getM()); // square linear system
       SEMBLE::SembleMatrix<T> Kinv;
       SEMBLE::inv(input->m_KFacs,Kinv);
       foo->m_FF = Kinv*(input->m_MatElems);
-      return LLSQRetTypeBase_h(foo);
+    
+      LLSQRetTypeBase_h ret(foo);
+      print_llsq_soln(input,ret,t_ins);
+  
+      return ret;
     }
 
     std::string echo(void) const {return std::string("LLSQSolverLU_t");}
@@ -73,8 +78,9 @@ namespace radmat
     typedef typename LLSQBaseSolver_t<T>::LLSQRetTypeBase_h LLSQRetTypeBase_h;
     typedef typename LLSQBaseSolver_t<T>::LLSQInputType_h LLSQInputType_h;
     
-    LLSQRetTypeBase_h operator()(const LLSQInputType_h &input) const
+    LLSQRetTypeBase_h operator()(const LLSQInputType_h &input, const int t_ins) const
     {
+      print_llsq_system(input, t_ins);
       LLSQRetTypeBase_t<T> *foo = new LLSQRetTypeBase_t<T>();
       POW2_ASSERT(foo);                                              // check pointer alloc 
       POW2_ASSERT(input->m_KFacs.getN() >= input->m_KFacs.getM());   // check LLSQ is not underdetermined -- it would still work
@@ -83,7 +89,12 @@ namespace radmat
       std::string svd_log = SEMBLE::svd(KinvDag_Kinv,U,s,V);
       SEMBLE::pseudoInvert(s,s.getN(),true); // s -> 1/s
       foo->m_FF = V * (SEMBLE::diagAsym<T,double>(s) )* (SEMBLE::adj(U) ) * SEMBLE::adj(input->m_KFacs) * (input->m_MatElems);
-      return LLSQRetTypeBase_h(foo);
+
+      LLSQRetTypeBase_h ret(foo);
+      print_llsq_soln(input,ret,t_ins);
+  
+      return ret;
+
     };
 
     std::string echo(void) const {return std::string("LLSQSolverSVDMakeSquare_t");}

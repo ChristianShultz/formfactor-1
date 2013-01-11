@@ -18,7 +18,7 @@ nobase_include_HEADERS += radmat/fake_data/covarrying_vectors.h radmat/fake_data
 nobase_include_HEADERS += radmat/llsq/llsq_driver.h radmat/llsq/llsq_gen_system.h radmat/llsq/llsq_q2_pack.h radmat/llsq/llsq_solver.h radmat/llsq/llsq_solvers.h
 
 #load_data
-nobase_include_HEADERS +=radmat/load_data/build_correlators.h radmat/load_data/build_q2_packs.h radmat/load_data/generate_redstar_xml.h radmat/load_data/invert_subduction.h radmat/load_data/load_fake_data.h radmat/load_data/radmat_database_interface.h radmat/load_data/simple_world.h radmat/load_data/three_point.h 
+nobase_include_HEADERS +=radmat/load_data/build_correlators.h radmat/load_data/build_q2_packs.h radmat/load_data/generate_redstar_xml.h radmat/load_data/invert_subduction.h radmat/load_data/load_fake_data.h radmat/load_data/radmat_database_interface.h radmat/load_data/simple_world.h radmat/load_data/three_point.h radmat/load_data/radmat_overlap_key_val_db.h 
 
 #fitting
 nobase_include_HEADERS += radmat/fitting/axis_plotter.h radmat/fitting/fit_tins.h
@@ -46,7 +46,7 @@ libradmat_a_SOURCES += radmat/fake_data/covarrying_vectors.cc radmat/fake_data/f
 libradmat_a_SOURCES += radmat/llsq/llsq_solvers.cc
 
 #load_data
-libradmat_a_SOURCES +=radmat/load_data/build_correlators.cc radmat/load_data/generate_redstar_xml.cc radmat/load_data/invert_subduction.cc radmat/load_data/radmat_database_interface.cc radmat/load_data/simple_world.cc 
+libradmat_a_SOURCES +=radmat/load_data/build_correlators.cc radmat/load_data/generate_redstar_xml.cc radmat/load_data/invert_subduction.cc radmat/load_data/radmat_database_interface.cc radmat/load_data/simple_world.cc radmat/load_data/radmat_overlap_key_val_db.cc
 
 #fitting
 libradmat_a_SOURCES += radmat/fitting/axis_plotter.cc radmat/fitting/fit_tins.cc

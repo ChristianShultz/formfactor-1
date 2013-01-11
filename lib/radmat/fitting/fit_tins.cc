@@ -6,7 +6,7 @@
 
  * Creation Date : 01-08-2012
 
- * Last Modified : Thu Nov 29 16:44:04 2012
+ * Last Modified : Wed Jan  9 14:42:18 2013
 
  * Created By : shultz
 
@@ -21,6 +21,7 @@
 #include "jackFitter/jackknife_fitter.h"
 #include "jackFitter/ensem_data.h"
 #include "jackFitter/three_point_fit_forms.h"
+#include "jackFitter/plot.h"
 #include "adat/handle.h"
 #include <string>
 #include <vector>
@@ -42,7 +43,8 @@ namespace radmat
       return 3.14159 * deg/180.;
     }
 
-    ENSEM::EnsemVectorReal convertToReal(const ENSEM::EnsemVectorComplex & in)
+    // this is a bit hackey since it includes contact terms and the ones where the insertion has run out past the source/sink
+    ENSEM::EnsemVectorReal convertToReal(const TinsFitter &fitter, const ENSEM::EnsemVectorComplex & in, const int tlow, const int thigh)
     {
       ENSEM::EnsemVectorReal real, imag;
       ENSEM::EnsemReal ephase;
@@ -50,7 +52,13 @@ namespace radmat
       real = ENSEM::real(in);
       imag = ENSEM::imag(in);
 
-      ephase = ENSEM::atan2(ENSEM::peekObs(imag,0),ENSEM::peekObs(real,0));
+      ephase = ENSEM::peekObs(imag,0);
+      ephase = SEMBLE::toScalar(0.);
+
+      for(int i = tlow; i < thigh; ++i)
+        ephase = ephase + ENSEM::atan2(ENSEM::peekObs(imag,i),ENSEM::peekObs(real,i));
+
+      ephase = ephase / SEMBLE::toScalar(double(thigh - tlow)); 
 
       double phase = SEMBLE::toScalar( ENSEM::mean(ephase) );
 
@@ -64,11 +72,22 @@ namespace radmat
         return imag;
       else
       {
-        std::cout << "The calculated phase was " << phase*180./3.14159 << " (deg)" << std::endl; 
+        std::cout << "The calculated phase was " << phase*180./3.14159 << " (deg)" << std::endl;
+        std::cout << "for Q2 = " << SEMBLE::toScalar(ENSEM::mean(fitter.getQ2())) << std::endl;  
+        SPLASH("check bad_corr.jack, bad_corr.ax for the correlator"); 
+
+        AxisPlot plot; 
+        plot.addEnsemData(ENSEM::real(in),"//sq",1);
+        plot.addEnsemData(ENSEM::imag(in),"//sq",2);
+        plot.sendToFile("bad_corr.ax");
+
+        ENSEM::write("bad_corr.jack",in); 
+
         SPLASH("An error occured while trying to pull the real/imag part of the solution vector,exiting.");
         exit(1);
       }
     }
+
 
   } // anonymous
 
@@ -106,7 +125,7 @@ namespace radmat
       LLSQRet_ff_Q2Pack<std::complex<double> >::const_iterator it;
 
       for(it = pack.begin(); it != pack.end(); ++it)
-        doFit(fname,convertToReal(it->second),it->first,fitProps);
+        doFit(fname,convertToReal(*this,it->second,fitProps.tlow,fitProps.thigh),it->first,fitProps);
 
       didFit = true;
     }

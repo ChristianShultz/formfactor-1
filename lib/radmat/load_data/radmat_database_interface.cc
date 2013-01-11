@@ -6,7 +6,7 @@
 
  * Creation Date : 04-12-2012
 
- * Last Modified : Fri Dec  7 15:28:35 2012
+ * Last Modified : Tue Dec 11 10:06:10 2012
 
  * Created By : shultz
 
@@ -86,6 +86,7 @@ namespace radmat
     ADATXML::XMLReader ptop(xml,path);
     doXMLRead(ptop,"threePointDatabase",prop.threePointDatabase,__PRETTY_FUNCTION__);
     doXMLRead(ptop,"normalizationDatabase",prop.normalizationDatabase,__PRETTY_FUNCTION__);
+    doXMLRead(ptop,"allow_daggering",prop.allow_daggering,__PRETTY_FUNCTION__); 
   }
 
   void write(ADATXML::XMLWriter &xml, const std::string &path, const radmatDBProp_t &prop)
@@ -93,6 +94,7 @@ namespace radmat
     ADATXML::push(xml,path);
     write(xml,"threePointDatabase",prop.threePointDatabase);
     write(xml,"normalizationDatabase",prop.normalizationDatabase);
+    write(xml,"allow_daggering",prop.allow_daggering); 
     ADATXML::pop(xml);
   }
 

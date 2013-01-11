@@ -29,6 +29,16 @@ namespace radmat
     iterator end(void) {return m_map.end();}
     const_iterator end(void) const {return m_map.end();}
     void insert(const value_type &v) {m_map.insert(v);}
+
+
+    // once again we need to initialize the ensems
+    LLSQDataPointQ2Pack(void)
+    {
+      m_Q2.resize(1);
+      m_Q2 = SEMBLE::toScalar(double(10000000.)); 
+    }
+
+
     ENSEM::EnsemReal Q2(void) const {return m_Q2;}
     void setQ2(const ENSEM::EnsemReal &Q2) {m_Q2 = Q2;}
 
@@ -96,7 +106,7 @@ namespace radmat
     {
 
       LLSQRet_ff_Q2Pack(void)
-     {
+      {
         m_Q2.resize(1);
         m_Q2 = SEMBLE::toScalar(double(10000000));
       }
@@ -162,11 +172,11 @@ namespace radmat
 
 
   template<typename T>
-   ADAT::Handle<LLSQRet_ff_Q2Pack<T> >  transformLLSQRetPack(const LLSQRet_t_Q2Pack<T> &in)
+    ADAT::Handle<LLSQRet_ff_Q2Pack<T> >  transformLLSQRetPack(const LLSQRet_t_Q2Pack<T> &in)
     {
-      
-    
-     ADAT::Handle<LLSQRet_ff_Q2Pack<T> > out(new LLSQRet_ff_Q2Pack<T>);      
+
+
+      ADAT::Handle<LLSQRet_ff_Q2Pack<T> > out(new LLSQRet_ff_Q2Pack<T>);      
       typename SEMBLE::PromoteEnsemVec<T>::Type zero;
 
       int ncfg = in.begin()->second.getB();

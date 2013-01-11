@@ -6,7 +6,7 @@
 
  * Creation Date : 03-12-2012
 
- * Last Modified : Tue Dec  4 13:45:15 2012
+ * Last Modified : Tue Jan  8 09:24:20 2013
 
  * Created By : shultz
 
@@ -21,7 +21,7 @@
 #include "hadron/hadron_npart_npt_corr.h"
 #include "hadron/hadron_npart_irrep.h"
 #include "hadron/irrep_util.h"
-#include "semble/semble_key_val_db.h"
+#include "radmat_overlap_key_val_db.h"
 #include "ensem/ensem.h"
 #include "formfac/formfac_qsq.h"; 
 
@@ -35,7 +35,7 @@
 struct redstarCircularMatElem_t
 {
   typedef Hadron::KeyHadronNPartNPtCorr_t::NPoint_t redKey; 
-  typedef SEMBLE::SembleExtendedKeyHadronNPartIrrep_t normKey;
+  typedef RadmatExtendedKeyHadronNPartIrrep_t normKey;
 
   struct OperatorKeyData
   {
@@ -103,7 +103,11 @@ namespace radmat
       for(it = lattice_boson.begin(); it != lattice_boson.end(); ++it)
       {
         std::stringstream concat_name; 
-        concat_name << cont.name;
+        concat_name << cont.name << "_" << it->m_obj.irrep;
+
+#if 0
+        std::cout << __PRETTY_FUNCTION__ << std::endl;
+        std::cout << cont.name << std::endl;
 
         if(boson.group == "Oh")
         {
@@ -111,8 +115,16 @@ namespace radmat
         }
         else
         {
-          concat_name << "_H" << boson.H << it->m_obj.group << it->m_obj.irrep;
+          std::cout << __PRETTY_FUNCTION__ << std::endl;
+          std::cout << "group " << it->m_obj.group << std::endl;
+          std::cout << "irrep " << it->m_obj.irrep << std::endl;
+
+          concat_name << "_" << it->m_obj.irrep;
         }
+
+        std::cout << __PRETTY_FUNCTION__ << std::endl;
+        std::cout << concat_name.str() << std::endl; 
+#endif
 
         Hadron::KeyHadronNPartIrrep_t base; 
         base.ops.resize(1); 
@@ -128,7 +140,7 @@ namespace radmat
         npt.t_slice = t_slice;
         npt.irrep = base;   
 
-        SEMBLE::SembleExtendedKeyHadronNPartIrrep_t norm(pid,base);     
+        RadmatExtendedKeyHadronNPartIrrep_t norm(pid,base);     
         redstarCircularMatElem_t::OperatorKeyData key(npt,norm);
 
         ret.push_back(subducedOp(it->m_coeff,key));
@@ -225,13 +237,15 @@ namespace radmat
   {
     redstarCartMatElem::redstarCartMatElemLorentzComponent::threePointKey genThreePointKey(const listSubducedOp::ListObj_t &source, 
         const listSubducedInsertion::ListObj_t &ins,
-        const listSubducedOp::ListObj_t &sink)
+        const listSubducedOp::ListObj_t &sink,
+        const std::string &ensemble)
     {
       Hadron::KeyHadronNPartNPtCorr_t redstar_xml;
       redstar_xml.npoint.resize(3); // 1 based array
       redstar_xml.npoint[1] = source.m_obj.operatorKey;
       redstar_xml.npoint[2] = ins.m_obj;
       redstar_xml.npoint[3] = sink.m_obj.operatorKey;
+      redstar_xml.ensemble = ensemble; 
 
       return redstarCartMatElem::redstarCartMatElemLorentzComponent::threePointKey(redstar_xml,source.m_obj.normalizationKey,sink.m_obj.normalizationKey); 
     }
@@ -241,7 +255,8 @@ namespace radmat
 
   redstarCartMatElem::redstarCartMatElemLorentzComponent::redstarCartMatElemLorentzComponent(const listSubducedOp &source,
         const std::pair<bool,listSubducedInsertion> &ins,
-        const listSubducedOp &sink) : active(false)
+        const listSubducedOp &sink,
+        const std::string &ensemble) : active(false)
   {
     // leave the list empty if the init variable from the xml was false for whatever reason
     if(ins.first)
@@ -254,7 +269,7 @@ namespace radmat
         for(it_ins = ins.second.begin(); it_ins != ins.second.end(); ++it_ins)
           for(it_sink = sink.begin(); it_sink != sink.end(); ++it_sink)
             m_list.push_back(threePointXMLKey(it_source->m_coeff * it_ins->m_coeff * it_sink->m_coeff,
-                  genThreePointKey(*it_source,*it_ins,*it_sink)
+                  genThreePointKey(*it_source,*it_ins,*it_sink,ensemble)
                   )
                 );
       active = true; 
@@ -271,19 +286,19 @@ namespace radmat
 
     lorentz_components.insert(
         std::map<int,redstarCartMatElemLorentzComponent>::value_type(0,
-          redstarCartMatElemLorentzComponent(foobar.m_source,foobar.m_t,foobar.m_sink))
+          redstarCartMatElemLorentzComponent(foobar.m_source,foobar.m_t,foobar.m_sink,foobar.ensemble))
         );
     lorentz_components.insert(
         std::map<int,redstarCartMatElemLorentzComponent>::value_type(1,
-          redstarCartMatElemLorentzComponent(foobar.m_source,foobar.m_x,foobar.m_sink))
+          redstarCartMatElemLorentzComponent(foobar.m_source,foobar.m_x,foobar.m_sink,foobar.ensemble))
         );
     lorentz_components.insert(
         std::map<int,redstarCartMatElemLorentzComponent>::value_type(2,
-          redstarCartMatElemLorentzComponent(foobar.m_source,foobar.m_y,foobar.m_sink))
+          redstarCartMatElemLorentzComponent(foobar.m_source,foobar.m_y,foobar.m_sink,foobar.ensemble))
         );
     lorentz_components.insert(
         std::map<int,redstarCartMatElemLorentzComponent>::value_type(3,
-          redstarCartMatElemLorentzComponent(foobar.m_source,foobar.m_z,foobar.m_sink))
+          redstarCartMatElemLorentzComponent(foobar.m_source,foobar.m_z,foobar.m_sink,foobar.ensemble))
         );
 
     if(foobar.m_t.first)

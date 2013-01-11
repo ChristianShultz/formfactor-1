@@ -12,6 +12,12 @@
 #include "io/key_val_db.h"
 
 
+// #define DEBUGGING_RADMAT_DB_INTERFACE
+
+#ifdef DEBUGGING_RADMAT_DB_INTERFACE
+#include "semble/semble_meta.h" 
+#endif
+
 namespace radmat
 {
 
@@ -32,6 +38,7 @@ namespace radmat
   {
     dbProp_t threePointDatabase;
     dbProp_t normalizationDatabase;
+    bool allow_daggering;          // are the daggered normalizations and energies the same?  ie; is the data real 
   };
 
   std::string toString(const radmatDBProp_t &);
@@ -52,18 +59,25 @@ namespace radmat
 
       radmatAllConfDatabaseInterface(void); // hide ctor
       radmatAllConfDatabaseInterface(const radmatDBProp_t &);
+      ~radmatAllConfDatabaseInterface(void) {outlog.close();}
 
 
       void alloc(void);
       bool exists(const CORRKEY &) const;
       bool exists(const NORMKEY &) const;
       CORRDATA fetch(const CORRKEY &) const;
-      NORMDATA fetch(const NORMKEY &) const; 
+      NORMDATA fetch(const NORMKEY &) const;
 
+      private: 
+      NORMDATA fetch_dagger(const NORMKEY &) const;  
 
+      public:
       ADAT::Handle<FILEDB::AllConfStoreDB<S_C_KEY,S_C_DATA> > m_corr_db;
       ADAT::Handle<FILEDB::AllConfStoreDB<S_N_KEY,S_N_DATA> > m_norm_db;  
-      radmatDBProp_t db_props; 
+      radmatDBProp_t db_props;
+
+      mutable std::ofstream outlog; // this is naughty but i wanted to move all of the 
+                                    // output from the screen to a log w/o recoding any of the const methods.. 
     };
 
   template<typename CORRKEY, typename CORRDATA, typename NORMKEY, typename NORMDATA >
@@ -71,6 +85,7 @@ namespace radmat
     : db_props(prop)
     {
       alloc();
+      outlog.open("database_search_log.txt", std::ios::out | std::ios::app);
     }
 
 
@@ -82,16 +97,17 @@ namespace radmat
       m_corr_db = ADAT::Handle<FILEDB::AllConfStoreDB<S_C_KEY,S_C_DATA> > (new FILEDB::AllConfStoreDB<S_C_KEY,S_C_DATA>() );
       m_norm_db = ADAT::Handle<FILEDB::AllConfStoreDB<S_N_KEY,S_N_DATA> > (new FILEDB::AllConfStoreDB<S_N_KEY,S_N_DATA>() );
 
-      if(m_corr_db->open(db_props.threePointDatabase.dbname, O_RDWR | O_TRUNC | O_CREAT, 0664) != 0)
+      if(m_corr_db->open(db_props.threePointDatabase.dbname, O_RDONLY, 0400) != 0)
       {
-        std::cerr << __func__ << ": error opening dbase= " << db_props.threePointDatabase.dbname << std::endl;
+        
+        outlog << __func__ << ": error opening dbase= " << db_props.threePointDatabase.dbname << std::endl;
         exit(1);
       }
 
 
-      if(m_norm_db->open(db_props.normalizationDatabase.dbname, O_RDWR | O_TRUNC | O_CREAT, 0664) != 0)
+      if(m_norm_db->open(db_props.normalizationDatabase.dbname, O_RDONLY, 0400) != 0)
       {
-        std::cerr << __func__ << ": error opening dbase= " << db_props.normalizationDatabase.dbname << std::endl;
+        outlog << __func__ << ": error opening dbase= " << db_props.normalizationDatabase.dbname << std::endl;
         exit(1);
       }
     }
@@ -109,7 +125,20 @@ namespace radmat
     {
       S_N_KEY key;
       key.key() = k;
-      return m_norm_db->exist(key);
+
+      if(!!! m_norm_db->exist(key))
+      {
+        if(!!!db_props.allow_daggering)
+          return false;
+
+        NORMKEY dag(k);
+        dag.dagger();
+        key.key() = dag;
+
+        return m_norm_db->exist(key);
+      }
+
+      return true; 
     }
 
   template<typename CORRKEY, typename CORRDATA, typename NORMKEY, typename NORMDATA>
@@ -124,7 +153,7 @@ namespace radmat
         int ret(0);
         if ((ret = m_corr_db->get(key, vals)) != 0)
         {
-          std::cerr << __func__ << ": key not found\n" << k;
+          outlog << __func__ << ": key not found\n" << k;
           exit(1);
         }
 
@@ -140,17 +169,19 @@ namespace radmat
       }
       catch(const std::string& e) 
       {
-        std::cerr << __func__ << ": Caught Exception: " << e << std::endl;
+        outlog << __func__ << ": Caught Exception: " << e << std::endl;
         exit(1);
       }
       catch(std::exception& e) 
       {
-        std::cerr << __func__ << ": Caught standard library exception: " << e.what() << std::endl;
+        outlog << __func__ << ": Caught standard library exception: " << e.what() << std::endl;
         exit(1);
       }
 
       return eval;
     }
+
+
 
 
   template<typename CORRKEY, typename CORRDATA, typename NORMKEY, typename NORMDATA>
@@ -165,7 +196,59 @@ namespace radmat
         int ret(0);
         if ((ret = m_norm_db->get(key, val)) != 0)
         {
-          std::cerr << __func__ << ": key not found\n" << k;
+          outlog << __func__ << ": key not found\n" << k << std::endl;
+
+          if(db_props.allow_daggering)
+          {
+            NORMKEY kdag(k);
+            kdag.dagger(); 
+            outlog << __func__ << ": looking for the daggered key\n" << kdag << std::endl;
+            return fetch_dagger(kdag); 
+          }
+          else
+            exit(1);
+        }
+
+        eval = val[0].data(); // if this worked right we stored the entire thing in a single ensemble slot.. 
+
+      }
+      catch(const std::string& e) 
+      {
+        outlog << __func__ << ": Caught Exception: " << e << std::endl;
+        exit(1);
+      }
+      catch(std::exception& e) 
+      {
+        outlog << __func__ << ": Caught standard library exception: " << e.what() << std::endl;
+        exit(1);
+      }
+
+#ifdef DEBUGGING_RADMAT_DB_INTERFACE
+    std::cout << __PRETTY_FUNCTION__ << std::endl;
+    std::cout << "KEY ----- " << k << std::endl;
+    std::cout << "ENERGY -- " << SEMBLE::toScalar(ENSEM::mean(eval.E())) << std::endl;
+    std::cout << "       -- size " << eval.E().size() << std::endl;
+    std::cout << "OVERLAP - " << SEMBLE::toScalar(ENSEM::mean(eval.Z())) << std::endl;
+    std::cout << "       -- size " << eval.Z().size() << std::endl;
+#endif
+
+      return eval;
+    } 
+
+  // apply method dagger to key type and look again
+  template<typename CORRKEY, typename CORRDATA, typename NORMKEY, typename NORMDATA>
+    NORMDATA  radmatAllConfDatabaseInterface<CORRKEY,CORRDATA,NORMKEY,NORMDATA>::fetch_dagger(const NORMKEY &k) const
+    {
+      NORMDATA eval;
+      try
+      {
+        S_N_KEY key;
+        key.key() = k;
+        std::vector<S_N_DATA> val; // hacky thingy we did
+        int ret(0);
+        if ((ret = m_norm_db->get(key, val)) != 0)
+        {
+          outlog << __func__ << ": key not found\n" << k;
           exit(1);
         }
 
@@ -174,24 +257,33 @@ namespace radmat
       }
       catch(const std::string& e) 
       {
-        std::cerr << __func__ << ": Caught Exception: " << e << std::endl;
+        outlog << __func__ << ": Caught Exception: " << e << std::endl;
         exit(1);
       }
       catch(std::exception& e) 
       {
-        std::cerr << __func__ << ": Caught standard library exception: " << e.what() << std::endl;
+        outlog << __func__ << ": Caught standard library exception: " << e.what() << std::endl;
         exit(1);
       }
+
+
+#ifdef DEBUGGING_RADMAT_DB_INTERFACE
+    std::cout << __PRETTY_FUNCTION__ << std::endl;
+    std::cout << "KEY ----- " << k << std::endl;
+    std::cout << "ENERGY -- " << SEMBLE::toScalar(ENSEM::mean(eval.E())) << std::endl;
+    std::cout << "       -- size " << eval.E().size() << std::endl;
+    std::cout << "OVERLAP - " << SEMBLE::toScalar(ENSEM::mean(eval.Z())) << std::endl;
+    std::cout << "       -- size " << eval.Z().size() << std::endl;
+#endif
 
       return eval;
     } 
 
-
-
-
-
 } // namespace radmat
 
+
+
+#undef DEBUGGING_RADMAT_DB_INTERFACE
 
 
 

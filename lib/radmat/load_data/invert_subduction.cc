@@ -6,7 +6,7 @@
 
  * Creation Date : 12-10-2012
 
- * Last Modified : Mon Dec 10 09:44:07 2012
+ * Last Modified : Wed Jan  2 11:16:58 2013
 
  * Created By : shultz
 
@@ -265,11 +265,14 @@ namespace  // a bunch of local stuff to make my life easier
     std::vector<irrepKey>::const_iterator it;
     radmat::ListLatticeIrrepExpr_t lattice_expr;
 
-  std::cout << radmat::toString( expr ) << std::endl;
-  for(it = irreps.begin(); it != irreps.end(); ++it)
-  {
-    std::cout << it->irrep << std::endl;
-  }
+#if 0
+    std::cout << __PRETTY_FUNCTION__ << std::endl; 
+    std::cout << radmat::toString( expr ) << std::endl;
+    for(it = irreps.begin(); it != irreps.end(); ++it)
+    {
+      std::cout << it->irrep << std::endl;
+    }
+#endif
 
     for(it = irreps.begin(); it != irreps.end(); ++it)
     {

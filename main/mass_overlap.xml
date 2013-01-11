@@ -1,0 +1,11 @@
+<?xml version="1.0"?>
+
+<Params>
+    <mass_file></mass_file>
+    <overlap_file></overlap_file>
+    <ncfg></ncfg>
+    <resize></resize>
+    <dbname></dbname>
+    <pid></pid>
+    <redstar></redstar>
+</Params>

@@ -20,7 +20,7 @@
 #include <utility>
 #include <iostream>
 
-#define USE_OMP_RADAMAT_DRIVER_SOLVE_LLSQ
+//#define USE_OMP_RADAMAT_DRIVER_SOLVE_LLSQ
 
 #ifdef  USE_OMP_RADAMAT_DRIVER_SOLVE_LLSQ
 #include <omp.h>

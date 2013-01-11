@@ -6,7 +6,7 @@
 
  * Creation Date : 04-12-2012
 
- * Last Modified : Mon Dec 10 09:42:29 2012
+ * Last Modified : Wed Jan  9 13:44:21 2013
 
  * Created By : shultz
 
@@ -20,12 +20,18 @@
 #include "radmat/utils/pow2assert.h"
 #include "radmat/llsq/llsq_gen_system.h"
 #include "semble/semble_meta.h"
-#include "semble/semble_key_val_db.h"
+#include "semble/semble_file_management.h"
+#include "radmat_overlap_key_val_db.h"
 #include "io/adat_xmlio.h"
 #include "ensem/ensem.h"
+#include "formfac/formfac_qsq.h"
+#include "jackFitter/plot.h"
+#include "ensem/ensem.h"
+#include <iostream>
 #include <sstream>
 #include <string>
 #include <vector>
+#include <set>
 
 namespace radmat
 {
@@ -52,7 +58,8 @@ namespace radmat
   { 
     std::stringstream ss;
     ss << "continuumMatElemXML = " <<  o.continuumMatElemXML << "\nsource_id " 
-      << o.source_id << " sink_id " << o.sink_id << " isDiagonal = " << o.isDiagonal;
+      << o.source_id << " sink_id " << o.sink_id << " isDiagonal = " << o.isDiagonal
+      << " isProjected = " << o.isProjected;
     return ss.str();
   }
 
@@ -71,6 +78,7 @@ namespace radmat
     doXMLRead(ptop,"source_id",prop.source_id,__PRETTY_FUNCTION__);
     doXMLRead(ptop,"sink_id",prop.sink_id,__PRETTY_FUNCTION__);
     doXMLRead(ptop,"isDiagonal",prop.isDiagonal,__PRETTY_FUNCTION__);
+    doXMLRead(ptop,"isProjected",prop.isProjected,__PRETTY_FUNCTION__); 
   }
 
   //! xml writer
@@ -81,6 +89,7 @@ namespace radmat
     write(xml,"source_id",prop.source_id);
     write(xml,"sink_id",prop.sink_id);
     write(xml,"isDiagonal",prop.isDiagonal);
+    write(xml,"isProjected",prop.isProjected);
     ADATXML::pop(xml);
   }
 
@@ -141,8 +150,8 @@ namespace radmat
 
     typedef radmatAllConfDatabaseInterface< Hadron::KeyHadronNPartNPtCorr_t,
             ENSEM::EnsemVectorComplex,
-            SEMBLE::SembleExtendedKeyHadronNPartIrrep_t,
-            SEMBLE::SembleMassOverlapData_t> DatabaseInterface_t;
+            RadmatExtendedKeyHadronNPartIrrep_t,
+            RadmatMassOverlapData_t> DatabaseInterface_t;
 
 
     // hurray a continuum three point correlator..
@@ -189,7 +198,10 @@ namespace radmat
         }
 
         // break early if not successful 
-        if((!!!m_bad_corrs.empty()) && (m_bad_norms.empty()))
+        if(!!!m_bad_corrs.empty())
+          success = false; 
+
+        if(!!!m_bad_norms.empty())
           success = false; 
 
         if(!!!success)
@@ -206,7 +218,7 @@ namespace radmat
         p_f = it->m_obj.redstar_xml.npoint[3].irrep.mom; 
         p_i = it->m_obj.redstar_xml.npoint[1].irrep.mom;
 
-        SEMBLE::SembleMassOverlapData_t source_tmp = db.fetch(it->m_obj.source_normalization); 
+        RadmatMassOverlapData_t source_tmp = db.fetch(it->m_obj.source_normalization); 
 
         E_f = source_tmp.E();
         E_f = SEMBLE::toScalar(0.);
@@ -216,18 +228,21 @@ namespace radmat
         for(it = data.begin(); it != data.end(); ++it)
         {
           ENSEM::EnsemVectorComplex corr_tmp = db.fetch(it->m_obj.redstar_xml);
-          SEMBLE::SembleMassOverlapData_t source = db.fetch(it->m_obj.source_normalization); 
-          SEMBLE::SembleMassOverlapData_t sink = db.fetch(it->m_obj.sink_normalization); 
+          RadmatMassOverlapData_t source = db.fetch(it->m_obj.source_normalization); 
+          RadmatMassOverlapData_t sink = db.fetch(it->m_obj.sink_normalization); 
 
           // the hadron key uses 1 based arrays
           const int t_source(it->m_obj.redstar_xml.npoint[1].t_slice);
           const int t_sink(it->m_obj.redstar_xml.npoint[3].t_slice); 
 
-          for(int t_ins = 0; t_ins < corr_tmp.size(); ++t_ins)
+          for(int t_ins = 0; t_ins < corr_tmp.numElem(); ++t_ins)
           {
+
             ENSEM::EnsemReal prop = propagation_factor(sink.E(),sink.Z(),t_sink,t_ins,
                 source.E(),source.Z(),t_source);
+
             ENSEM::pokeObs(corr_tmp,ENSEM::peekObs(corr_tmp,t_ins)/prop,t_ins);
+
           }
 
           E_f = E_f + sink.E();
@@ -253,18 +268,71 @@ namespace radmat
       ADATXML::Array<int> p_i; 
       double momentum_factor; // 1/xi * 2pi/L_s -- the "unit" size  
       std::vector<Hadron::KeyHadronNPartNPtCorr_t > m_bad_corrs;
-      std::vector<SEMBLE::SembleExtendedKeyHadronNPartIrrep_t> m_bad_norms; 
+      std::vector<RadmatExtendedKeyHadronNPartIrrep_t> m_bad_norms; 
     };
 
+    namespace
+    {
+      std::string append_momentum(const std::string &name, const ADATXML::Array<int> &mom)
+      {
+        std::stringstream ss; 
+        ADATXML::Array<int> can_mom = FF::canonicalOrder(mom);
+        ss << name << "_p" << can_mom[0] << can_mom[1] << can_mom[2];
+        return ss.str();  
+      }
 
+
+      // adapted from something i found on stack overflow
+      // pair<iterator,bool> insert (const value_type& val);
+      // return a pair, with its member pair::first set to an iterator pointing to either the newly inserted 
+      // element or to the equivalent element already in the set. The pair::second element in the pair is set
+      // to true if a new element was inserted or false if an equivalent element already existed.
+      // 
+      // since we don't have a comparator we will use the string output of the keys for simplicity
+      // I think this should still be unique but didn't check carefully
+      template<typename T>
+        struct NotDuplicate
+        {
+          bool operator()(const T &elem)
+          {
+            std::stringstream ss; 
+            ss << elem;
+            return s_.insert(ss.str()).second; 
+          }
+
+          private: 
+          std::set<std::string> s_; 
+        };
+
+    }
 
     struct CartesianMatrixElement
     {
-      CartesianMatrixElement(void) {}
+      CartesianMatrixElement(void) 
+      {
+        // cant copy around uninitialized ensems and std vector
+        // loves to move around empty objects so fake up and ensem
+        // to avoid the checkResize error in ENSEM
+        E_f.resize(1);
+        E_f = SEMBLE::toScalar(double(0.)); 
+        E_i = E_f; 
+      }
+
+
       CartesianMatrixElement(const ThreePointCorrIni_t &ini, const simpleWorld::ContinuumMatElem &elem)
         : have_active_data(false) , success(true) , m_ini(ini) , m_elem(elem)
       {
-        redstarCartMatElem celem(elem,ini.threePointCorrXMLIni.source_id,ini.threePointCorrXMLIni.sink_id);
+
+
+        // hardwire some assumptions about projected operator naming here.. if something changes we can just build some
+        // sort of hash to retreive the correct name but the current convetions should be good for a bit
+        if(m_ini.threePointCorrXMLIni.isProjected)
+        {
+          m_elem.source.state.name = append_momentum(m_elem.source.state.name,m_elem.source.state.mom);
+          m_elem.sink.state.name = append_momentum(m_elem.sink.state.name,m_elem.sink.state.mom);
+        }
+
+        redstarCartMatElem celem(m_elem,ini.threePointCorrXMLIni.source_id,ini.threePointCorrXMLIni.sink_id);
         t.eat(celem.get_component(0),m_ini);
         x.eat(celem.get_component(1),m_ini);
         y.eat(celem.get_component(2),m_ini);
@@ -331,7 +399,69 @@ namespace radmat
           m_bad_norms.insert(m_bad_norms.end(),y.m_bad_norms.begin(),y.m_bad_norms.end());
           m_bad_norms.insert(m_bad_norms.end(),z.m_bad_norms.begin(),z.m_bad_norms.end());
 
+#if 0
+          std::cout << __PRETTY_FUNCTION__ << std::endl;
+          std::cout << "size <" << t.m_bad_corrs.size() << " " << x.m_bad_corrs.size()
+            << " " << y.m_bad_corrs.size() << " " << z.m_bad_corrs.size() << std::endl;
+
+          std::vector<Hadron::KeyHadronNPartNPtCorr_t >::const_iterator corr_it;
+          std::vector<RadmatExtendedKeyHadronNPartIrrep_t>::const_iterator norm_it; 
+          const std::vector<Hadron::KeyHadronNPartNPtCorr_t >* corr_ptr;
+          const std::vector<RadmatExtendedKeyHadronNPartIrrep_t>* norm_ptr; 
+          std::string idx;
+
+          idx = "t";
+          corr_ptr = &t.m_bad_corrs; 
+          if(!!!corr_ptr->empty())
+          {
+            std::cout << idx << std::endl;
+            for(corr_it = corr_ptr->begin(); corr_it != corr_ptr->end(); ++corr_it)
+              std::cout << *corr_it << std::endl;
+          }
+
+          idx = "x";
+          corr_ptr = &x.m_bad_corrs; 
+          if(!!!corr_ptr->empty())
+          {
+            std::cout << idx << std::endl;
+            for(corr_it = corr_ptr->begin(); corr_it != corr_ptr->end(); ++corr_it)
+              std::cout << *corr_it << std::endl;
+          }
+
+
+          idx = "y";
+          corr_ptr = &y.m_bad_corrs; 
+          if(!!!corr_ptr->empty())
+          {
+            std::cout << idx << std::endl;
+            for(corr_it = corr_ptr->begin(); corr_it != corr_ptr->end(); ++corr_it)
+              std::cout << *corr_it << std::endl;
+          }
+
+
+          idx = "z";
+          corr_ptr = &z.m_bad_corrs; 
+          if(!!!corr_ptr->empty())
+          {
+            std::cout << idx << std::endl;
+            for(corr_it = corr_ptr->begin(); corr_it != corr_ptr->end(); ++corr_it)
+              std::cout << *corr_it << std::endl;
+          }
+
+
+#endif
+
+
           success = false;
+        }
+
+        // if we don't have any active data we need to initialize the 
+        // ensembles to avoid checkResize error in the event that we copy
+        // this non active data matrix element around for some reason
+        if(!!!have_active_data)
+        {
+          E_f = t.E_f;
+          E_i = t.E_i; 
         }
       }
 
@@ -383,7 +513,7 @@ namespace radmat
       accumulator t,x,y,z;
       int tmax;
       std::vector<Hadron::KeyHadronNPartNPtCorr_t > m_bad_corrs;
-      std::vector<SEMBLE::SembleExtendedKeyHadronNPartIrrep_t> m_bad_norms; 
+      std::vector<RadmatExtendedKeyHadronNPartIrrep_t> m_bad_norms; 
 
 
     }; // cartesianMatrixElement
@@ -475,6 +605,30 @@ namespace radmat
     };
 
 
+    double Mink_qsq(const CartesianMatrixElement & elem, const double E_f , const double E_i, const double factor)
+    { 
+      ADATXML::Array<double> p_f,p_i; 
+      p_f.resize(3);
+      p_i.resize(3); 
+      double p_i_sq(0.);
+      double p_f_sq(0.); 
+      double q_space_sq(0.);
+
+      for(int i = 0; i < 3; ++i)
+      {
+        p_f[i] = factor * double(elem.p_f[i]); 
+        p_i[i] = factor * double(elem.p_i[i]);
+        p_f_sq += p_f[i]*p_f[i];
+        p_i_sq += p_i[i]*p_i[i];
+        q_space_sq += (p_i[i] - p_f[i])*(p_i[i] - p_f[i]);
+      }
+  
+      double q_time =  sqrt(E_i*E_i + p_i_sq) - sqrt(E_f*E_f + p_f_sq);  
+
+      return -((q_time*q_time) - q_space_sq); 
+    }
+
+
     struct manageWork
     {
       manageWork(const ThreePointCorrIni_t & ini)
@@ -489,15 +643,27 @@ namespace radmat
       ~manageWork(void)
       {
 
+         write_projected_matrix_elements();
+
         // dump the accumulated bad lists 
         if(!!!m_bad_corrs.empty())
         {
           ADATXML::XMLBufferWriter corrs;
           ADATXML::Array<Hadron::KeyHadronNPartNPtCorr_t> bc;
-          bc.resize(m_bad_corrs.size());
-          for(unsigned int i = 0; i < m_bad_corrs.size(); ++i)
-            bc[i] = m_bad_corrs[i];
-          write(corrs,"BadCorrs",bc);
+
+          std::vector<Hadron::KeyHadronNPartNPtCorr_t> seen;
+          std::vector<Hadron::KeyHadronNPartNPtCorr_t>::const_iterator it;
+          NotDuplicate<Hadron::KeyHadronNPartNPtCorr_t> predicate; 
+
+          for(it = m_bad_corrs.begin(); it != m_bad_corrs.end(); ++it)
+            if (predicate(*it))
+              seen.push_back(*it); 
+
+          bc.resize(seen.size()); 
+
+          for(unsigned int i = 0; i < seen.size(); ++i)
+            bc[i] = seen[i];
+          write(corrs,"NPointList",bc);
           std::ofstream out("missing_three_point_correlators.xml");
           corrs.print(out);
           out.close();
@@ -506,10 +672,20 @@ namespace radmat
         if(!!!m_bad_norms.empty())
         {
           ADATXML::XMLBufferWriter norms;
-          ADATXML::Array<SEMBLE::SembleExtendedKeyHadronNPartIrrep_t> bn;
-          bn.resize(m_bad_norms.size());
-          for(unsigned int i = 0; i < m_bad_norms.size(); ++i)
-            bn[i] = m_bad_norms[i];
+          ADATXML::Array<RadmatExtendedKeyHadronNPartIrrep_t> bn;
+
+          std::vector<RadmatExtendedKeyHadronNPartIrrep_t> seen;
+          std::vector<RadmatExtendedKeyHadronNPartIrrep_t>::const_iterator it;
+          NotDuplicate<RadmatExtendedKeyHadronNPartIrrep_t> predicate; 
+
+          for(it = m_bad_norms.begin(); it != m_bad_norms.end(); ++it)
+            if (predicate(*it))
+              seen.push_back(*it); 
+
+          bn.resize(seen.size());
+          for(unsigned int i = 0; i < seen.size(); ++i)
+            bn[i] = seen[i];
+
           write(norms,"BadNorms",bn);
           std::ofstream out("missing_normalizations.xml");
           norms.print(out);
@@ -518,6 +694,91 @@ namespace radmat
       }
 
 
+      void sort(const std::vector<CartesianMatrixElement> &unsorted, const bool isDiagonal)
+      {
+          
+        double E_f, E_i; // rest energies..       
+        std::vector<CartesianMatrixElement>::const_iterator it;
+        bool found_f(false) , found_i(false); 
+
+        for(it = unsorted.begin(); it != unsorted.end(); ++it)
+        {
+
+          if(!!!it->have_active_data)
+            continue; 
+
+
+          if(!!!found_f)
+          {
+            ADATXML::Array<int> p_f = it->p_f;
+            if( (p_f[0] == 0) && (p_f[1] == 0) && (p_f[2] == 0) )
+            {
+              E_f = SEMBLE::toScalar(ENSEM::mean(it->E_f)); 
+              found_f = true; 
+            }
+          }
+
+
+          if(!!!found_i)
+          {
+            ADATXML::Array<int> p_i = it->p_i;
+            if( (p_i[0] == 0) && (p_i[1] == 0) && (p_i[2] == 0) )
+            {
+              E_i = SEMBLE::toScalar(ENSEM::mean(it->E_i)); 
+              found_i = true; 
+            }
+
+          }
+
+          if(found_f && found_i)
+            break;
+
+        } // for it
+
+
+        if(!!!(found_f && found_i))
+        {
+          std::cerr << "Error performing qsq sort, need to include rest matrix elements" << std::endl;
+          exit(1); // abort and write out bad xml files
+        }
+
+        const double xi = unsorted.begin()->m_ini.xi; 
+        const double L_s = unsorted.begin()->m_ini.L_s; 
+        const double factor = 1./xi * 2. * acos(-1.) / L_s; 
+
+        std::map<double,std::vector<CartesianMatrixElement> > m_map; 
+        std::map<double,std::vector<CartesianMatrixElement> >::iterator mapit; 
+        for(it = unsorted.begin(); it != unsorted.end(); ++it)
+        {
+          // skip the baddies
+          if(!!!it->have_active_data)
+            continue; 
+
+          // ignore any type of level splittings across different irreps 
+          // also ignore any statistical fluctuations associated w/ different mom directions
+          double q2 = Mink_qsq(*it, E_f, E_i, factor);           
+          mapit = m_map.find(q2); 
+
+          if(mapit == m_map.end()) 
+          {
+            std::vector<CartesianMatrixElement> dum(1,*it); 
+            m_map.insert(std::pair<double,std::vector<CartesianMatrixElement> >(q2,dum)); 
+          }
+          else
+            mapit->second.push_back(*it); 
+
+        }
+
+        sorted_by_Q2.clear(); 
+        for(mapit = m_map.begin(); mapit != m_map.end(); ++mapit)
+          sorted_by_Q2.push_back(mapit->second); 
+      }
+
+
+
+      // this did not actially work.. 
+
+#if 0
       // brute force sort using momenta 
       void sort(const std::vector<CartesianMatrixElement> &unsorted, const bool isDiagonal)
       {   
@@ -530,7 +791,7 @@ namespace radmat
 
         std::vector<CartesianMatrixElement>::const_iterator it;
         my_map_iterator_t map_it; 
-        
+
         for(it = unsorted.begin(); it != unsorted.end(); ++it)
         {
           if(!!!it->success)
@@ -551,19 +812,12 @@ namespace radmat
         }
 
         sorted_by_Q2.clear(); 
-        std::vector<CartesianMatrixElement>::const_iterator vector_iterator; 
         for(map_it = my_map.begin(); map_it != my_map.end(); ++map_it)
-        {
-          std::vector<CartesianMatrixElement> tmp; 
+          sorted_by_Q2.push_back(map_it->second); 
 
-          for(vector_iterator = map_it->second.begin(); 
-              vector_iterator != map_it->second.end(); 
-              ++vector_iterator)
-            tmp.push_back(*it); 
-
-          sorted_by_Q2.push_back(tmp); 
-        }
       }
+
+#endif 
 
 
       void push_bad_list(const CartesianMatrixElement &elem)
@@ -580,11 +834,119 @@ namespace radmat
           return sorted_by_Q2; 
         }
 
+
+      ENSEM::EnsemReal computeQ2(const std::vector<CartesianMatrixElement> &elems)
+      {
+        std::vector<CartesianMatrixElement>::const_iterator it;
+        for(it = elems.begin(); it != elems.end(); ++it)
+          if(it->have_active_data)
+            break;
+
+        POW2_ASSERT(it != elems.end()); 
+
+        ENSEM::EnsemReal E_f , E_i, Q;
+        ADATXML::Array<int> p_f,p_i,q;
+        double xi = it->m_ini.xi;
+        double L_s = it->m_ini.L_s;
+        double mom_fac =  1./xi * 2.*acos(-1.)/L_s;
+        int qq; 
+        E_f = it->E_f;
+        E_i = it->E_i;
+        p_f = it->p_f;
+        p_i = it->p_i; 
+
+        Q = E_i - E_f; 
+        q = p_i;
+        q[0] -= p_f[0];
+        q[1] -= p_f[1];
+        q[2] -= p_f[2];
+        qq = 0; 
+        qq += q[0]*q[0];
+        qq += q[1]*q[1];
+        qq += q[2]*q[2];
+
+        return (-Q*Q + SEMBLE::toScalar(mom_fac*mom_fac*double(qq)));
+      }
+
+
+      void write_projected_matrix_elements(void)
+      {
+        std::vector<std::vector<CartesianMatrixElement> >::const_iterator it; 
+    
+        for(it = sorted_by_Q2.begin(); it != sorted_by_Q2.end(); ++it)
+          write_proj(*it); 
+      }
+
+
+      void write_proj(const std::vector<CartesianMatrixElement> &elems)
+      {
+        double Q2 = SEMBLE::toScalar(ENSEM::mean(computeQ2(elems))); 
+        std::vector<CartesianMatrixElement>::const_iterator it;
+        for(it = elems.begin(); it != elems.end(); ++it)
+          write_proj(*it, Q2);
+      }
+
+      void write_proj(const CartesianMatrixElement &elem, const double q2)
+      {
+        if(!!!elem.have_active_data)
+          return;
+
+        std::string path = SEMBLE::SEMBLEIO::getPath();
+        std::stringstream ss;
+        ss << path << "cont_projected_matrix_elements";
+        SEMBLE::SEMBLEIO::makeDirectoryPath(ss.str());
+        ss << "/Q2_" << q2;
+        SEMBLE::SEMBLEIO::makeDirectoryPath(ss.str());
+        write_proj(elem.t,elem.m_elem,ss.str(),"t");
+        write_proj(elem.x,elem.m_elem,ss.str(),"x");
+        write_proj(elem.y,elem.m_elem,ss.str(),"y");
+        write_proj(elem.z,elem.m_elem,ss.str(),"z");
+      }
+
+      std::string elem_str(const simpleWorld::ContinuumStatePrimitive &s)
+      {
+        std::stringstream ss;
+        ss << "J" << s.J << "_H" << s.H << "_p" << s.mom[0] << s.mom[1] << s.mom[2]; 
+        return ss.str(); 
+      }
+
+      void write_proj(const accumulator &a, const simpleWorld::ContinuumMatElem &elem,
+          const std::string &pth, const std::string &comp)
+      {
+        if(!!!a.active)
+          return;
+        if(!!!a.success)
+          return;
+
+        std::stringstream fname; 
+        fname << pth << "/SINK_V_SOURCE_" << elem_str(elem.sink.state) 
+          << "__V_" << comp << "__" << elem_str(elem.source.state) ;
+
+        std::string real, imag, jack;
+        real = fname.str() + std::string("__real.ax");
+        imag = fname.str() + std::string("__imag.ax");
+        jack = fname.str() + std::string("__corr.jack"); 
+
+        AxisPlot preal, pimag; 
+
+        preal.addEnsemData(ENSEM::real(a.corr),"\\sq",1);
+        pimag.addEnsemData(ENSEM::imag(a.corr),"\\sq",1);
+
+        preal.sendToFile(real);
+        pimag.sendToFile(imag);
+        ENSEM::write(jack,a.corr); 
+
+      }
+
+
+
+
+
       // data 
       ThreePointCorrIni_t m_ini; 
       std::vector<std::vector<CartesianMatrixElement> > sorted_by_Q2; 
       std::vector<Hadron::KeyHadronNPartNPtCorr_t > m_bad_corrs;
-      std::vector<SEMBLE::SembleExtendedKeyHadronNPartIrrep_t> m_bad_norms; 
+      std::vector<RadmatExtendedKeyHadronNPartIrrep_t> m_bad_norms; 
 
     }; // manageWork
 
@@ -625,6 +987,8 @@ namespace radmat
           tmp->insert(LLSQDataPointQ2Pack::value_type(t_ins,points_at_this_t_ins)); 
         }
 
+        ENSEM::EnsemReal Q2 = work_manager.computeQ2(*it_q2); 
+        tmp->setQ2(Q2); 
         ret.push_back(tmp);
       }
 
