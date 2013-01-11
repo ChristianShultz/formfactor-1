@@ -8,5 +8,7 @@
       <elem>BigE</elem>
       <elem>LeanConstant</elem>
     </extraProps>
+    <tlow>0</tlow>
+    <thigh>32</thigh>
   </threePointComparatorProps>
 </DriverProps>

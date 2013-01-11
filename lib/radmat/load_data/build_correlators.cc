@@ -6,7 +6,7 @@
 
  * Creation Date : 04-12-2012
 
- * Last Modified : Wed Jan  9 13:44:21 2013
+ * Last Modified : Fri Jan 11 10:48:53 2013
 
  * Created By : shultz
 
@@ -622,7 +622,7 @@ namespace radmat
         p_i_sq += p_i[i]*p_i[i];
         q_space_sq += (p_i[i] - p_f[i])*(p_i[i] - p_f[i]);
       }
-  
+
       double q_time =  sqrt(E_i*E_i + p_i_sq) - sqrt(E_f*E_f + p_f_sq);  
 
       return -((q_time*q_time) - q_space_sq); 
@@ -643,8 +643,13 @@ namespace radmat
       ~manageWork(void)
       {
 
-         write_projected_matrix_elements();
+        write_projected_matrix_elements();
+        dump_xml();
+      }
 
+
+      void dump_xml(void)
+      {
         // dump the accumulated bad lists 
         if(!!!m_bad_corrs.empty())
         {
@@ -691,12 +696,15 @@ namespace radmat
           norms.print(out);
           out.close(); 
         }
+
       }
+
+
 
 
       void sort(const std::vector<CartesianMatrixElement> &unsorted, const bool isDiagonal)
       {
-          
+
         double E_f, E_i; // rest energies..       
         std::vector<CartesianMatrixElement>::const_iterator it;
         bool found_f(false) , found_i(false); 
@@ -704,9 +712,11 @@ namespace radmat
         for(it = unsorted.begin(); it != unsorted.end(); ++it)
         {
 
-          if(!!!it->have_active_data)
-            continue; 
+          if(!!!it->success)
+            push_bad_list(*it);
 
+          if(!!!it->have_active_data)
+            continue;
 
           if(!!!found_f)
           {
@@ -730,15 +740,13 @@ namespace radmat
 
           }
 
-          if(found_f && found_i)
-            break;
-
         } // for it
 
 
         if(!!!(found_f && found_i))
         {
           std::cerr << "Error performing qsq sort, need to include rest matrix elements" << std::endl;
+          dump_xml(); 
           exit(1); // abort and write out bad xml files
         }
 
@@ -872,7 +880,7 @@ namespace radmat
       void write_projected_matrix_elements(void)
       {
         std::vector<std::vector<CartesianMatrixElement> >::const_iterator it; 
-    
+
         for(it = sorted_by_Q2.begin(); it != sorted_by_Q2.end(); ++it)
           write_proj(*it); 
       }
