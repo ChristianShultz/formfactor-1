@@ -104,9 +104,9 @@ am_libradmat_a_OBJECTS = breit_frame.$(OBJEXT) euler_angles.$(OBJEXT) \
 	formfactor_factory.$(OBJEXT) lorentzff_PiPi.$(OBJEXT) \
 	lorentzff_PiPiStar.$(OBJEXT) covarrying_vectors.$(OBJEXT) \
 	fake_data_ini.$(OBJEXT) fake_overlaps.$(OBJEXT) \
-	fake_spectrum.$(OBJEXT) llsq_solvers.$(OBJEXT) \
-	build_correlators.$(OBJEXT) generate_redstar_xml.$(OBJEXT) \
-	invert_subduction.$(OBJEXT) \
+	fake_spectrum.$(OBJEXT) llsq_q2_pack.$(OBJEXT) \
+	llsq_solvers.$(OBJEXT) build_correlators.$(OBJEXT) \
+	generate_redstar_xml.$(OBJEXT) invert_subduction.$(OBJEXT) \
 	radmat_database_interface.$(OBJEXT) simple_world.$(OBJEXT) \
 	radmat_overlap_key_val_db.$(OBJEXT) axis_plotter.$(OBJEXT) \
 	fit_tins.$(OBJEXT) radmat_driver_props.$(OBJEXT)
@@ -309,7 +309,8 @@ libradmat_a_SOURCES = radmat/utils/breit_frame.cc \
 	radmat/fake_data/covarrying_vectors.cc \
 	radmat/fake_data/fake_data_ini.cc \
 	radmat/fake_data/fake_overlaps.cc \
-	radmat/fake_data/fake_spectrum.cc radmat/llsq/llsq_solvers.cc \
+	radmat/fake_data/fake_spectrum.cc radmat/llsq/llsq_q2_pack.cc \
+	radmat/llsq/llsq_solvers.cc \
 	radmat/load_data/build_correlators.cc \
 	radmat/load_data/generate_redstar_xml.cc \
 	radmat/load_data/invert_subduction.cc \
@@ -408,6 +409,7 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/generate_redstar_xml.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/harmonic.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/invert_subduction.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/llsq_q2_pack.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/llsq_solvers.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/lorentzff_PiPi.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/lorentzff_PiPiStar.Po@am__quote@
@@ -643,6 +645,20 @@ fake_spectrum.obj: radmat/fake_data/fake_spectrum.cc
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='radmat/fake_data/fake_spectrum.cc' object='fake_spectrum.obj' libtool=no @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCXX_FALSE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o fake_spectrum.obj `if test -f 'radmat/fake_data/fake_spectrum.cc'; then $(CYGPATH_W) 'radmat/fake_data/fake_spectrum.cc'; else $(CYGPATH_W) '$(srcdir)/radmat/fake_data/fake_spectrum.cc'; fi`
+
+llsq_q2_pack.o: radmat/llsq/llsq_q2_pack.cc
+@am__fastdepCXX_TRUE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT llsq_q2_pack.o -MD -MP -MF $(DEPDIR)/llsq_q2_pack.Tpo -c -o llsq_q2_pack.o `test -f 'radmat/llsq/llsq_q2_pack.cc' || echo '$(srcdir)/'`radmat/llsq/llsq_q2_pack.cc
+@am__fastdepCXX_TRUE@	$(am__mv) $(DEPDIR)/llsq_q2_pack.Tpo $(DEPDIR)/llsq_q2_pack.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='radmat/llsq/llsq_q2_pack.cc' object='llsq_q2_pack.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o llsq_q2_pack.o `test -f 'radmat/llsq/llsq_q2_pack.cc' || echo '$(srcdir)/'`radmat/llsq/llsq_q2_pack.cc
+
+llsq_q2_pack.obj: radmat/llsq/llsq_q2_pack.cc
+@am__fastdepCXX_TRUE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT llsq_q2_pack.obj -MD -MP -MF $(DEPDIR)/llsq_q2_pack.Tpo -c -o llsq_q2_pack.obj `if test -f 'radmat/llsq/llsq_q2_pack.cc'; then $(CYGPATH_W) 'radmat/llsq/llsq_q2_pack.cc'; else $(CYGPATH_W) '$(srcdir)/radmat/llsq/llsq_q2_pack.cc'; fi`
+@am__fastdepCXX_TRUE@	$(am__mv) $(DEPDIR)/llsq_q2_pack.Tpo $(DEPDIR)/llsq_q2_pack.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='radmat/llsq/llsq_q2_pack.cc' object='llsq_q2_pack.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o llsq_q2_pack.obj `if test -f 'radmat/llsq/llsq_q2_pack.cc'; then $(CYGPATH_W) 'radmat/llsq/llsq_q2_pack.cc'; else $(CYGPATH_W) '$(srcdir)/radmat/llsq/llsq_q2_pack.cc'; fi`
 
 llsq_solvers.o: radmat/llsq/llsq_solvers.cc
 @am__fastdepCXX_TRUE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT llsq_solvers.o -MD -MP -MF $(DEPDIR)/llsq_solvers.Tpo -c -o llsq_solvers.o `test -f 'radmat/llsq/llsq_solvers.cc' || echo '$(srcdir)/'`radmat/llsq/llsq_solvers.cc

@@ -6,7 +6,7 @@
 
  * Creation Date : 19-10-2012
 
- * Last Modified : Fri Jan 11 10:15:16 2013
+ * Last Modified : Wed Jan 23 14:48:16 2013
 
  * Created By : shultz
 
@@ -14,10 +14,11 @@
 
 
 #include "hadron/irrep_util.h"
-
 #include "radmat/utils/pow2assert.h"
+#include "formfac/formfac_qsq.h"
 #include "simple_world.h"
 #include <sstream>
+#include <omp.h>
 
 
 using namespace ENSEM;
@@ -49,6 +50,56 @@ namespace radmat
           }
         }
 
+
+        std::string stringmom(const ADATXML::Array<int> &inp)
+        {
+          ADATXML::Array<int> can = FF::canonicalOrder(inp);
+          std::stringstream ss;
+          ss << can[0] << can[1] << can[2];
+          return ss.str(); 
+        }
+
+
+        ADATXML::Array<ADATXML::Array<int> > star_p(const ADATXML::Array<ADATXML::Array<int> > &pin)
+        {
+
+          std::list<ADATXML::Array<int> > work;
+          std::map<std::string,std::list<ADATXML::Array<int> > > seen;
+          std::map<std::string,std::list<ADATXML::Array<int> > >::const_iterator it;
+          std::list<ADATXML::Array<int> >::const_iterator listit; 
+
+          int nele(0); 
+
+          const unsigned int sz = pin.size(); 
+
+          for(unsigned int elem = 0; elem < sz; ++elem)
+          {
+            std::string p = stringmom(pin[elem]);
+            it = seen.find(p);
+            if (it == seen.end())
+            {
+              work = Hadron::generateLittleGroupMom(Hadron::generateLittleGroup(pin[elem]),
+                                                    FF::canonicalOrder(pin[elem]));
+              nele += work.size();
+              seen.insert(std::pair<std::string,std::list<ADATXML::Array<int> > >(p,work)); 
+            }        
+          }
+
+
+          ADATXML::Array<ADATXML::Array<int> > ret(nele);
+          nele = 0;
+
+          for(it = seen.begin(); it != seen.end(); ++it)
+            for(listit = it->second.begin(); listit != it->second.end(); ++listit)
+            {
+              ret[nele] = *listit; 
+              ++nele; 
+            }
+
+          return ret; 
+        }
+
+
     } // namespace anonomyous 
 
 
@@ -59,7 +110,7 @@ namespace radmat
     std::string toString(const ContinuumStatePrimitive &op)
     {
       std::stringstream ss;
-      ss << "J = " << op.J << " H = " << op.H << " parity " << op.parity; 
+      ss << "J = " << op.J << " H = " << op.H << " parity " << op.parity;
       ss << " mom = " << op.mom[0] << " " << op.mom[1] << " " << op.mom[2];
       ss  << " twoI_z " << op.twoI_z << " name " << op.name << " create "; 
       ss << op.creation_op << " smear " << op.smearedP;
@@ -71,6 +122,14 @@ namespace radmat
     {
       o << toString(op);
       return o;
+    }
+
+  
+    std::string stateFileName(const ContinuumStatePrimitive &s)
+    {
+      std::stringstream ss; 
+      ss << s.name << ",J" << s.J << ",H" << s.H << ",p" << s.mom[0] << s.mom[1] << s.mom[2] << ",Iz" << s.twoI_z;
+      return ss.str(); 
     }
 
     // ContinuumStateXML
@@ -85,6 +144,8 @@ namespace radmat
       for(int i = 0; i < op.H.size(); ++i)
         ss << op.H[i] << " ";
       ss << "} parity = " << op.parity << " mom = { ";
+      ss << " fill_star " << op.fill_star;  
+
       for(int i = 0; i < op.mom.size(); ++i)
         ss <<  "(" <<op.mom[i][0] << " " << op.mom[i][1] << " " << op.mom[i][2] << ") ";
       ss << "} twoI_z = " << op.twoI_z << " op_stem " << op.op_stem << " create = "
@@ -105,7 +166,8 @@ namespace radmat
       ADATXML::XMLReader ptop(xml,path);
       doXMLRead(ptop,"J",op.J,__PRETTY_FUNCTION__);
       doXMLRead(ptop,"H",op.H,__PRETTY_FUNCTION__);
-      doXMLRead(ptop,"parity",op.parity,__PRETTY_FUNCTION__);      
+      doXMLRead(ptop,"parity",op.parity,__PRETTY_FUNCTION__);  
+      doXMLRead(ptop,"fill_star",op.fill_star,__PRETTY_FUNCTION__);     
       doXMLRead(ptop,"mom",op.mom,__PRETTY_FUNCTION__);
       doXMLRead(ptop,"twoI_z",op.twoI_z,__PRETTY_FUNCTION__);
       doXMLRead(ptop,"op_stem",op.op_stem,__PRETTY_FUNCTION__);
@@ -120,6 +182,9 @@ namespace radmat
         for(int h = -op.J; h < op.J +1; ++h)
           op.H[h + op.J] = h;
       }
+
+      if(op.fill_star)
+        op.mom = star_p(op.mom);
     } 
 
     //! xml writer
@@ -236,6 +301,7 @@ namespace radmat
     void read(ADATXML::XMLReader &xml, const std::string &path, ContinuumInsertionXML &op)
     {
       ADATXML::XMLReader ptop(xml,path);
+      doXMLRead(ptop,"pmax",op.pmax,__PRETTY_FUNCTION__); 
       doXMLRead(ptop,"t_slice",op.t_slice,__PRETTY_FUNCTION__);
       doXMLRead(ptop,"time",op.time,__PRETTY_FUNCTION__);
       doXMLRead(ptop,"space",op.space,__PRETTY_FUNCTION__);
@@ -288,6 +354,13 @@ namespace radmat
     {
       o << toString(s);
       return o;
+    }
+
+    std::string stateFileName(const ContinuumMatElem::State &s)
+    {
+      std::stringstream ss;
+      ss << stateFileName(s.state) << ",t" << s.t_slice;
+      return ss.str(); 
     }
 
     // ContinuumMatElemXML
@@ -541,6 +614,7 @@ namespace radmat
         return ret; 
       } 
 
+
     } // namespace anonomyous 
 
 
@@ -566,6 +640,13 @@ namespace radmat
           dum.ensemble = xmlin.ensemble;
 
           ADATXML::Array<int> q = getMomentumTransfer(*it_source,*it_sink);
+  
+          int qq = q[0]*q[0] + q[1]*q[1] + q[2]*q[2];
+  
+          // skip the guys for qq_space > pmax 
+          if(qq > xmlin.insertion.pmax)
+            continue; 
+
           std::map<std::string,ContinuumInsertion::op_insertion>::iterator it;
 
           for(it = dum.insertion.insertion_map.begin(); it != dum.insertion.insertion_map.end(); ++it)

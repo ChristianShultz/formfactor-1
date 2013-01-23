@@ -43,7 +43,9 @@ namespace radmat
 
 
     // overload this constructor to deal with optimized operators???
-    redstarCircularMatElem_t(const simpleWorld::ContinuumMatElem &, const std::string &source_id, const std::string &sink_id); 
+    redstarCircularMatElem_t(const simpleWorld::ContinuumMatElem &,
+        const std::string &source_id,
+        const std::string &sink_id); 
 
     // the extra name of the state for the normalization database
     const std::string m_source_id;
@@ -57,60 +59,6 @@ namespace radmat
     std::pair<bool,listSubducedInsertion> m_zero;
     std::pair<bool,listSubducedInsertion> m_minus; 
   };
-
-
-  // the lattice matrix elements are in a helicity basis but the linear system
-  // solvers are set up to use a cartesian basis.. use this to do a trivial change of basis
-  struct redstarCartesianMatElem_p
-  {
-    // save some typing and in the process make this virtually unreadable to anyone other than myself..
-    typedef redstarCircularMatElem_t::redKey redKey;
-    typedef redstarCircularMatElem_t::normKey normKey;
-    typedef redstarCircularMatElem_t::subducedOp subducedOp;
-    typedef redstarCircularMatElem_t::listSubducedOp listSubducedOp;
-    typedef redstarCircularMatElem_t::subducedInsertion subducedInsertion;
-    typedef redstarCircularMatElem_t::listSubducedInsertion listSubducedInsertion;
-
-
-    redstarCartesianMatElem_p(const redstarCircularMatElem_t &elem) 
-    {
-      makeCartesian(elem);
-    }
-
-    redstarCartesianMatElem_p(const simpleWorld::ContinuumMatElem &a, const std::string &source_id, const std::string &sink_id)
-    {
-      redstarCircularMatElem_t dum(a,source_id,sink_id);
-      ensemble = a.ensemble; 
-      makeCartesian(dum);
-    }
-
-    // !! NB:
-    // project out the x,y components from the +,- helicity components .. assumed the usual normalization but 
-    // this should be checked for consistency in case theres some strange lattice thingy I don't know about 
-    void makeCartesian(const redstarCircularMatElem_t &tmp)
-    {
-      m_source = tmp.m_source;
-      m_sink = tmp.m_sink;
-
-      m_t = tmp.m_time;
-      m_z = tmp.m_zero;
-      m_x = std::pair<bool,listSubducedInsertion>(tmp.m_plus.first && tmp.m_minus.first,
-          SEMBLE::toScalar(std::complex<double>(1./sqrt(2.),0.))*(tmp.m_plus.second + tmp.m_minus.second));
-      m_y = std::pair<bool,listSubducedInsertion>(tmp.m_plus.first && tmp.m_minus.first,
-          SEMBLE::toScalar(std::complex<double>(0.,-1./sqrt(2.)))*(tmp.m_plus.second - tmp.m_minus.second));
-
-    }
-
-    listSubducedOp m_source;
-    listSubducedOp m_sink;
-    std::pair<bool,listSubducedInsertion> m_t; 
-    std::pair<bool,listSubducedInsertion> m_x;
-    std::pair<bool,listSubducedInsertion> m_y;
-    std::pair<bool,listSubducedInsertion> m_z;
-    std::string ensemble;  
-  };
-
-
 
 
   // the actual real world interface 
@@ -174,12 +122,16 @@ namespace radmat
 
     redstarCartMatElem(const simpleWorld::ContinuumMatElem & , const std::string &source_id, const std::string &sink_id);
 
+    ~redstarCartMatElem(void); 
+
     redstarCartMatElemLorentzComponent get_component(const int lorentz_index)
     {
       POW2_ASSERT(lorentz_components.find(lorentz_index) != lorentz_components.end());
       return lorentz_components.find(lorentz_index)->second; 
     }
 
+
+    simpleWorld::ContinuumMatElem m_elem; 
     std::map<int,redstarCartMatElemLorentzComponent> lorentz_components; 
 
   };

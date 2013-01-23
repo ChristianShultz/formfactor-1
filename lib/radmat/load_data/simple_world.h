@@ -40,6 +40,8 @@ namespace radmat
     //! stream a ContinuumExprPrim
     std::ostream& operator<<(std::ostream& , const ContinuumStatePrimitive &);
 
+    std::string stateFileName(const ContinuumStatePrimitive &s); 
+
 
     //------------------------------------------------------------------------------------------
 
@@ -50,6 +52,7 @@ namespace radmat
       int J;
       ADATXML::Array<int> H; 
       bool parity;
+      bool fill_star;
       ADATXML::Array<ADATXML::Array<int> > mom;
       int twoI_z;
       std::string op_stem; 
@@ -113,6 +116,7 @@ namespace radmat
         bool smearedP; 
       };
 
+      int pmax;    // we currently dont have the meson elementals for 
       int t_slice; 
       Insertion time; 
       Insertion space; 
@@ -173,6 +177,8 @@ namespace radmat
 
     //! stream a state
     std::ostream& operator<<(std::ostream &, const ContinuumMatElem::State &);
+
+    std::string stateFileName(const ContinuumMatElem::State &); 
 
     //! write it to a string for error
     std::string toString(const ContinuumMatElem &);

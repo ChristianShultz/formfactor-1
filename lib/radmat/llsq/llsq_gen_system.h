@@ -7,6 +7,7 @@
 #include "radmat/utils/splash.h"
 #include "semble/semble_vector.h"
 #include "semble/semble_matrix.h"
+#include "semble/semble_algebra.h"
 #include "semble/semble_file_management.h"
 #include "adat/handle.h"
 #include <vector>
@@ -129,11 +130,13 @@ namespace radmat
       double qsq; 
     };
 
+
+
   ///////////////////////////////////////////////////////////////////////////////////////////
   ///////////////////////////////////////////////////////////////////////////////////////////
 
   template<typename T>
-    ADAT::Handle<LLSQInputType_t<T> > generateLLSQSystem(const std::vector<LLSQDataPoint> &data)
+    ADAT::Handle<LLSQInputType_t<T> > generateLLSQSystem(const std::vector<LLSQDataPoint> &data, const int t_ins)
     {
 
       typename LLSQInputType_t<T>::KinematicFactors K,KWork;
@@ -281,7 +284,7 @@ namespace radmat
         ss << path << "/Q2_" << d->qsq << "__t_ins_" << t_ins <<"__"; 
         std::string A = ss.str() + std::string("A.txt");
         std::string b = ss.str() + std::string("b.txt"); 
-        
+
         std::ofstream AA, bb;
         AA.open(A.c_str()); 
         AA << d->m_KFacs.mean(); 

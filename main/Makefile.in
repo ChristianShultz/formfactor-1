@@ -51,7 +51,8 @@ PRE_UNINSTALL = :
 POST_UNINSTALL = :
 noinst_PROGRAMS = plot_fake_3pt$(EXEEXT) fake_radmat$(EXEEXT) \
 	mass_overlap_db_create$(EXEEXT) \
-	mass_overlap_db_combine$(EXEEXT) single_plot$(EXEEXT)
+	mass_overlap_db_combine$(EXEEXT) single_plot$(EXEEXT) \
+	phases$(EXEEXT)
 bin_PROGRAMS = radmat$(EXEEXT)
 subdir = main
 DIST_COMMON = $(srcdir)/Makefile.am $(srcdir)/Makefile.in
@@ -79,6 +80,10 @@ am_mass_overlap_db_create_OBJECTS = mass_overlap_db_create.$(OBJEXT)
 mass_overlap_db_create_OBJECTS = $(am_mass_overlap_db_create_OBJECTS)
 mass_overlap_db_create_LDADD = $(LDADD)
 mass_overlap_db_create_DEPENDENCIES =
+am_phases_OBJECTS = phases.$(OBJEXT)
+phases_OBJECTS = $(am_phases_OBJECTS)
+phases_LDADD = $(LDADD)
+phases_DEPENDENCIES =
 am_plot_fake_3pt_OBJECTS = plot_fake_3pt.$(OBJEXT)
 plot_fake_3pt_OBJECTS = $(am_plot_fake_3pt_OBJECTS)
 plot_fake_3pt_LDADD = $(LDADD)
@@ -101,12 +106,14 @@ CXXLD = $(CXX)
 CXXLINK = $(CXXLD) $(AM_CXXFLAGS) $(CXXFLAGS) $(AM_LDFLAGS) $(LDFLAGS) \
 	-o $@
 SOURCES = $(fake_radmat_SOURCES) $(mass_overlap_db_combine_SOURCES) \
-	$(mass_overlap_db_create_SOURCES) $(plot_fake_3pt_SOURCES) \
-	$(radmat_SOURCES) $(single_plot_SOURCES)
+	$(mass_overlap_db_create_SOURCES) $(phases_SOURCES) \
+	$(plot_fake_3pt_SOURCES) $(radmat_SOURCES) \
+	$(single_plot_SOURCES)
 DIST_SOURCES = $(fake_radmat_SOURCES) \
 	$(mass_overlap_db_combine_SOURCES) \
-	$(mass_overlap_db_create_SOURCES) $(plot_fake_3pt_SOURCES) \
-	$(radmat_SOURCES) $(single_plot_SOURCES)
+	$(mass_overlap_db_create_SOURCES) $(phases_SOURCES) \
+	$(plot_fake_3pt_SOURCES) $(radmat_SOURCES) \
+	$(single_plot_SOURCES)
 am__can_run_installinfo = \
   case $$AM_UPDATE_INFO_DIR in \
     n|no|NO) false;; \
@@ -234,6 +241,7 @@ fake_radmat_SOURCES = fake_radmat.cc
 mass_overlap_db_create_SOURCES = mass_overlap_db_create.cc
 mass_overlap_db_combine_SOURCES = mass_overlap_db_combine.cc
 single_plot_SOURCES = single_plot.cc
+phases_SOURCES = phases.cc
 radmat_SOURCES = radmat.cc
 
 # no idea how/why this works, cut paste job
@@ -328,6 +336,9 @@ mass_overlap_db_combine$(EXEEXT): $(mass_overlap_db_combine_OBJECTS) $(mass_over
 mass_overlap_db_create$(EXEEXT): $(mass_overlap_db_create_OBJECTS) $(mass_overlap_db_create_DEPENDENCIES) $(EXTRA_mass_overlap_db_create_DEPENDENCIES) 
 	@rm -f mass_overlap_db_create$(EXEEXT)
 	$(CXXLINK) $(mass_overlap_db_create_OBJECTS) $(mass_overlap_db_create_LDADD) $(LIBS)
+phases$(EXEEXT): $(phases_OBJECTS) $(phases_DEPENDENCIES) $(EXTRA_phases_DEPENDENCIES) 
+	@rm -f phases$(EXEEXT)
+	$(CXXLINK) $(phases_OBJECTS) $(phases_LDADD) $(LIBS)
 plot_fake_3pt$(EXEEXT): $(plot_fake_3pt_OBJECTS) $(plot_fake_3pt_DEPENDENCIES) $(EXTRA_plot_fake_3pt_DEPENDENCIES) 
 	@rm -f plot_fake_3pt$(EXEEXT)
 	$(CXXLINK) $(plot_fake_3pt_OBJECTS) $(plot_fake_3pt_LDADD) $(LIBS)
@@ -347,6 +358,7 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/fake_radmat.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/mass_overlap_db_combine.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/mass_overlap_db_create.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/phases.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/plot_fake_3pt.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/radmat.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/single_plot.Po@am__quote@

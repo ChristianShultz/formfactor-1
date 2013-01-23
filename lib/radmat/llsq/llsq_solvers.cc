@@ -56,7 +56,8 @@ namespace radmat
 
           registered = true;
         }
-      }
+      } // critical
+
       return success;
     }
 

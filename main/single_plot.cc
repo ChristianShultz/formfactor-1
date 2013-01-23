@@ -6,7 +6,7 @@
 
  * Creation Date : 10-01-2013
 
- * Last Modified : Thu Jan 10 17:11:36 2013
+ * Last Modified : Mon Jan 14 14:29:50 2013
 
  * Created By : shultz
 
@@ -127,27 +127,27 @@ V printKeyValue(const K& ky,
 void doPlot(const DATA &m_d, const XML_input_t &ini , const KEY &k)
 {
 
-  int nele = m_d.numElem(); 
+  int nele = m_d.numElem();
+
   ENSEM::EnsemVectorReal real= ENSEM::real(m_d);
   ENSEM::EnsemVectorReal imag = ENSEM::imag(m_d); 
 
-  SEMBLE::SembleVector<double> sr, si; 
-  itpp::Vec<double> rm, rv, im, iv; 
+  ENSEM::VectorReal rm,rv;
+  ENSEM::VectorReal im,iv;
 
-  sr = real;
-  si = imag;
-  rm = sr.mean();
-  rv = sr.variance();
-  im = si.mean();
-  iv = si.variance(); 
+  rm = ENSEM::mean(real);
+  rv = ENSEM::variance(real);
+  im = ENSEM::mean(imag); 
+  iv = ENSEM::variance(imag); 
+
 
   std::stringstream ssi, ssr; 
 
 
   for(int i = 0; i < nele; ++i)
   {
-    ssi << i << " " << im[i] << " " << iv[i] << "\n";
-    ssr << i << " " << rm[i] << " " << rv[i] << "\n";
+    ssi << i << " " << ENSEM::toDouble(im.elem().elem(i)) << " " << sqrt(ENSEM::toDouble(iv.elem().elem(i))) << "\n";
+    ssr << i << " " << ENSEM::toDouble(rm.elem().elem(i)) << " " << sqrt(ENSEM::toDouble(rv.elem().elem(i))) << "\n";
   }
 
 
@@ -192,6 +192,8 @@ void doPlot(const DATA &m_d, const XML_input_t &ini , const KEY &k)
 
   std::string corrf = ini.gnu_name + std::string("_corr.jack"); 
   ENSEM::write(corrf,m_d);
+  ENSEM::write(ini.gnu_name + std::string("_corr_real.jack") , real); 
+  ENSEM::write(ini.gnu_name + std::string("_corr_imag.jack") , imag); 
 
 
   std::stringstream do_plot; 

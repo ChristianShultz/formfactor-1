@@ -39,6 +39,9 @@ namespace radmat
     }
 
 
+    void zeroFilter(void);
+
+
     ENSEM::EnsemReal Q2(void) const {return m_Q2;}
     void setQ2(const ENSEM::EnsemReal &Q2) {m_Q2 = Q2;}
 

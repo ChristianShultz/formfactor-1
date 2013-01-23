@@ -6,7 +6,7 @@
 
  * Creation Date : 04-12-2012
 
- * Last Modified : Fri Jan 11 10:48:53 2013
+ * Last Modified : Wed Jan 23 13:06:17 2013
 
  * Created By : shultz
 
@@ -22,6 +22,7 @@
 #include "semble/semble_meta.h"
 #include "semble/semble_file_management.h"
 #include "radmat_overlap_key_val_db.h"
+#include "hadron/ensem_filenames.h"
 #include "io/adat_xmlio.h"
 #include "ensem/ensem.h"
 #include "formfac/formfac_qsq.h"
@@ -232,10 +233,17 @@ namespace radmat
           RadmatMassOverlapData_t sink = db.fetch(it->m_obj.sink_normalization); 
 
           // the hadron key uses 1 based arrays
-          const int t_source(it->m_obj.redstar_xml.npoint[1].t_slice);
-          const int t_sink(it->m_obj.redstar_xml.npoint[3].t_slice); 
 
-          for(int t_ins = 0; t_ins < corr_tmp.numElem(); ++t_ins)
+          // NB: assumption that npt is organized like <sink, ins , source>
+
+          const int t_source(it->m_obj.redstar_xml.npoint[3].t_slice);
+          const int t_sink(it->m_obj.redstar_xml.npoint[1].t_slice); 
+
+          
+          POW2_ASSERT(t_source < t_sink); 
+
+
+          for(int t_ins = t_source; t_ins <= t_sink; ++t_ins)
           {
 
             ENSEM::EnsemReal prop = propagation_factor(sink.E(),sink.Z(),t_sink,t_ins,
@@ -665,13 +673,23 @@ namespace radmat
               seen.push_back(*it); 
 
           bc.resize(seen.size()); 
-
           for(unsigned int i = 0; i < seen.size(); ++i)
             bc[i] = seen[i];
           write(corrs,"NPointList",bc);
-          std::ofstream out("missing_three_point_correlators.xml");
+
+          std::string pth = SEMBLE::SEMBLEIO::getPath();
+          SEMBLE::SEMBLEIO::makeDirectoryPath(pth + std::string("missing")); 
+
+          std::ofstream out("missing/npt.list.xml");
           corrs.print(out);
           out.close();
+
+
+          out.open("missing/npt.ensemFileNames.list"); 
+          for(it = seen.begin(); it != seen.end(); ++it)
+            out << Hadron::ensemFileName(*it) << "\n";
+          out.close(); 
+
         }
 
         if(!!!m_bad_norms.empty())
@@ -692,7 +710,11 @@ namespace radmat
             bn[i] = seen[i];
 
           write(norms,"BadNorms",bn);
-          std::ofstream out("missing_normalizations.xml");
+
+          std::string pth = SEMBLE::SEMBLEIO::getPath();
+          SEMBLE::SEMBLEIO::makeDirectoryPath(pth + std::string("missing")); 
+
+          std::ofstream out("missing/normalizations.list.xml");
           norms.print(out);
           out.close(); 
         }
@@ -746,6 +768,14 @@ namespace radmat
         if(!!!(found_f && found_i))
         {
           std::cerr << "Error performing qsq sort, need to include rest matrix elements" << std::endl;
+      
+          if(!!!found_f)
+            std::cerr << "Couldn't find the final state" << std::endl;
+
+          if(!!!found_i)
+            std::cerr << "Couldn't find the initial state" << std::endl;
+
+
           dump_xml(); 
           exit(1); // abort and write out bad xml files
         }
@@ -937,8 +967,8 @@ namespace radmat
 
         AxisPlot preal, pimag; 
 
-        preal.addEnsemData(ENSEM::real(a.corr),"\\sq",1);
-        pimag.addEnsemData(ENSEM::imag(a.corr),"\\sq",1);
+        preal.addEnsemData(ENSEM::real(a.corr),"//sq",1);
+        pimag.addEnsemData(ENSEM::imag(a.corr),"//sq",1);
 
         preal.sendToFile(real);
         pimag.sendToFile(imag);
@@ -996,7 +1026,8 @@ namespace radmat
         }
 
         ENSEM::EnsemReal Q2 = work_manager.computeQ2(*it_q2); 
-        tmp->setQ2(Q2); 
+        tmp->setQ2(Q2);
+        tmp->zeroFilter(); 
         ret.push_back(tmp);
       }
 

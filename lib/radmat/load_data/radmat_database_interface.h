@@ -38,7 +38,8 @@ namespace radmat
   {
     dbProp_t threePointDatabase;
     dbProp_t normalizationDatabase;
-    bool allow_daggering;          // are the daggered normalizations and energies the same?  ie; is the data real 
+    bool allow_daggering;          // are the daggered normalizations and energies the same?  ie; is the data real
+    bool LG_symmetry;              // does everything in the star of p have the same value AND row independent 
   };
 
   std::string toString(const radmatDBProp_t &);
@@ -77,7 +78,7 @@ namespace radmat
       radmatDBProp_t db_props;
 
       mutable std::ofstream outlog; // this is naughty but i wanted to move all of the 
-                                    // output from the screen to a log w/o recoding any of the const methods.. 
+      // output from the screen to a log w/o recoding any of the const methods.. 
     };
 
   template<typename CORRKEY, typename CORRDATA, typename NORMKEY, typename NORMDATA >
@@ -99,8 +100,9 @@ namespace radmat
 
       if(m_corr_db->open(db_props.threePointDatabase.dbname, O_RDONLY, 0400) != 0)
       {
-        
+
         outlog << __func__ << ": error opening dbase= " << db_props.threePointDatabase.dbname << std::endl;
+        std::cout << __func__ << ": error opening dbase= " << db_props.threePointDatabase.dbname << std::endl;
         exit(1);
       }
 
@@ -108,6 +110,7 @@ namespace radmat
       if(m_norm_db->open(db_props.normalizationDatabase.dbname, O_RDONLY, 0400) != 0)
       {
         outlog << __func__ << ": error opening dbase= " << db_props.normalizationDatabase.dbname << std::endl;
+        std::cerr << __func__ << ": error opening dbase= " << db_props.threePointDatabase.dbname << std::endl;
         exit(1);
       }
     }
@@ -126,6 +129,9 @@ namespace radmat
       S_N_KEY key;
       key.key() = k;
 
+      if(db_props.LG_symmetry)
+        key.key().doLG_symmetry(); 
+
       if(!!! m_norm_db->exist(key))
       {
         if(!!!db_props.allow_daggering)
@@ -134,6 +140,9 @@ namespace radmat
         NORMKEY dag(k);
         dag.dagger();
         key.key() = dag;
+
+        if(db_props.LG_symmetry)
+          key.key().doLG_symmetry(); 
 
         return m_norm_db->exist(key);
       }
@@ -154,6 +163,7 @@ namespace radmat
         if ((ret = m_corr_db->get(key, vals)) != 0)
         {
           outlog << __func__ << ": key not found\n" << k;
+          std::cerr << __func__ << ": key not found\n" << k;
           exit(1);
         }
 
@@ -170,11 +180,13 @@ namespace radmat
       catch(const std::string& e) 
       {
         outlog << __func__ << ": Caught Exception: " << e << std::endl;
+        std::cerr << __func__ << ": Caught Exception: " << e << std::endl; 
         exit(1);
       }
       catch(std::exception& e) 
       {
         outlog << __func__ << ": Caught standard library exception: " << e.what() << std::endl;
+        std::cerr << __func__ << ": Caught standard library exception: " << e.what() << std::endl;
         exit(1);
       }
 
@@ -192,6 +204,11 @@ namespace radmat
       {
         S_N_KEY key;
         key.key() = k;
+
+        if(db_props.LG_symmetry)
+          key.key().doLG_symmetry(); 
+
+
         std::vector<S_N_DATA> val; // hacky thingy we did
         int ret(0);
         if ((ret = m_norm_db->get(key, val)) != 0)
@@ -206,7 +223,10 @@ namespace radmat
             return fetch_dagger(kdag); 
           }
           else
+          {
+            std::cerr <<  __func__ << ": key not found\n" << k << std::endl;
             exit(1);
+          }
         }
 
         eval = val[0].data(); // if this worked right we stored the entire thing in a single ensemble slot.. 
@@ -215,21 +235,23 @@ namespace radmat
       catch(const std::string& e) 
       {
         outlog << __func__ << ": Caught Exception: " << e << std::endl;
+        std::cerr << __func__ << ": Caught Exception: " << e << std::endl; 
         exit(1);
       }
       catch(std::exception& e) 
       {
         outlog << __func__ << ": Caught standard library exception: " << e.what() << std::endl;
+        std::cerr << __func__ << ": Caught standard library exception: " << e.what() << std::endl;
         exit(1);
       }
 
 #ifdef DEBUGGING_RADMAT_DB_INTERFACE
-    std::cout << __PRETTY_FUNCTION__ << std::endl;
-    std::cout << "KEY ----- " << k << std::endl;
-    std::cout << "ENERGY -- " << SEMBLE::toScalar(ENSEM::mean(eval.E())) << std::endl;
-    std::cout << "       -- size " << eval.E().size() << std::endl;
-    std::cout << "OVERLAP - " << SEMBLE::toScalar(ENSEM::mean(eval.Z())) << std::endl;
-    std::cout << "       -- size " << eval.Z().size() << std::endl;
+      std::cout << __PRETTY_FUNCTION__ << std::endl;
+      std::cout << "KEY ----- " << k << std::endl;
+      std::cout << "ENERGY -- " << SEMBLE::toScalar(ENSEM::mean(eval.E())) << std::endl;
+      std::cout << "       -- size " << eval.E().size() << std::endl;
+      std::cout << "OVERLAP - " << SEMBLE::toScalar(ENSEM::mean(eval.Z())) << std::endl;
+      std::cout << "       -- size " << eval.Z().size() << std::endl;
 #endif
 
       return eval;
@@ -244,6 +266,11 @@ namespace radmat
       {
         S_N_KEY key;
         key.key() = k;
+
+        if(db_props.LG_symmetry)
+          key.key().doLG_symmetry(); 
+
+
         std::vector<S_N_DATA> val; // hacky thingy we did
         int ret(0);
         if ((ret = m_norm_db->get(key, val)) != 0)
@@ -258,22 +285,24 @@ namespace radmat
       catch(const std::string& e) 
       {
         outlog << __func__ << ": Caught Exception: " << e << std::endl;
+        std::cerr << __func__ << ": Caught Exception: " << e << std::endl;
         exit(1);
       }
       catch(std::exception& e) 
       {
         outlog << __func__ << ": Caught standard library exception: " << e.what() << std::endl;
+        std::cerr << __func__ << ": Caught standard library exception: " << e.what() << std::endl;
         exit(1);
       }
 
 
 #ifdef DEBUGGING_RADMAT_DB_INTERFACE
-    std::cout << __PRETTY_FUNCTION__ << std::endl;
-    std::cout << "KEY ----- " << k << std::endl;
-    std::cout << "ENERGY -- " << SEMBLE::toScalar(ENSEM::mean(eval.E())) << std::endl;
-    std::cout << "       -- size " << eval.E().size() << std::endl;
-    std::cout << "OVERLAP - " << SEMBLE::toScalar(ENSEM::mean(eval.Z())) << std::endl;
-    std::cout << "       -- size " << eval.Z().size() << std::endl;
+      std::cout << __PRETTY_FUNCTION__ << std::endl;
+      std::cout << "KEY ----- " << k << std::endl;
+      std::cout << "ENERGY -- " << SEMBLE::toScalar(ENSEM::mean(eval.E())) << std::endl;
+      std::cout << "       -- size " << eval.E().size() << std::endl;
+      std::cout << "OVERLAP - " << SEMBLE::toScalar(ENSEM::mean(eval.Z())) << std::endl;
+      std::cout << "       -- size " << eval.Z().size() << std::endl;
 #endif
 
       return eval;

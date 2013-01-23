@@ -31,6 +31,14 @@ namespace radmat
       m_basic_key.creation_op = !!!m_basic_key.creation_op; 
     }
 
+    void doLG_symmetry(void)
+    {
+      m_basic_key.mom[0] = 0;
+      m_basic_key.mom[1] = 0;
+      m_basic_key.mom[2] = 0;
+      m_basic_key.row = 0; 
+    }
+
     std::string m_particle_id;    
     Hadron::KeyHadronNPartIrrep_t m_basic_key;
   };

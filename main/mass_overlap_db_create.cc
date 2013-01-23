@@ -6,7 +6,7 @@
 
  * Creation Date : 08-01-2013
 
- * Last Modified : Tue Jan  8 13:08:13 2013
+ * Last Modified : Tue Jan 22 10:20:50 2013
 
  * Created By : shultz
 
@@ -27,6 +27,7 @@
 #include "ensem/ensem.h"
 #include "radmat/load_data/radmat_overlap_key_val_db.h"
 #include "hadron/hadron_npart_irrep.h"
+#include "hadron/irrep_util.h"
 #include "semble/semble_meta.h"
 
 
@@ -45,7 +46,9 @@ struct XML_input_t
   bool isProjected;
   std::string dbname;
   std::string pid; 
-  KeyHadronNPartIrrep_t redstar; 
+  KeyHadronNPartIrrep_t redstar;
+  bool LG;  // does everything in the star of p and each row share the same value 
+  int t0_extract; 
 };
 
 
@@ -78,7 +81,12 @@ void read(ADATXML::XMLReader &xml, const std::string &path, XML_input_t &prop)
   doXMLRead(ptop,"dbname",prop.dbname,__PRETTY_FUNCTION__);
   doXMLRead(ptop,"pid",prop.pid,__PRETTY_FUNCTION__);
   doXMLRead(ptop,"redstar",prop.redstar,__PRETTY_FUNCTION__);
+  doXMLRead(ptop,"LG",prop.LG,__PRETTY_FUNCTION__); 
+  doXMLRead(ptop,"t0_extract",prop.t0_extract,__PRETTY_FUNCTION__); 
 }
+
+
+
 
 
 
@@ -125,10 +133,9 @@ struct dbInterface
         exit(1);
       }
 
-    SK key;
+
     SD data;
 
-    key.key() = K(m_xml.pid,m_xml.redstar);
     std::stringstream E,Z;
     ENSEM::read(m_xml.mass_file,data.data().E());
     ENSEM::read(m_xml.overlap_file,data.data().Z());
@@ -162,19 +169,29 @@ struct dbInterface
         data.data().Z() = ENSEM::rescaleEnsemUp(tmpZZ); 
       }
 
-    if(m_xml.isProjected)
-      data.data().Z() = SEMBLE::toScalar(1.); 
+    if(m_xml.isProjected)   // root(2m)exp(mt/2) -- is this what robert uses???
+      data.data().Z() = ENSEM::sqrt(data.data().E()*SEMBLE::toScalar(2.) * ENSEM::exp(data.data().E()*SEMBLE::toScalar(double(m_xml.t0_extract))));
 
-    if(m_db->insert(key,std::vector<SD>(1,data)) != 0)
-    {
-      std::cerr << __func__ << ": could not insert key \n" << key.key() << std::endl;
-      exit(1);
-    }
+    SK key;
+    key.key() = K(m_xml.pid,m_xml.redstar);
+
+    if(m_xml.LG)
+      key.key().doLG_symmetry();
+
+      if(m_db->insert(key,std::vector<SD>(1,data)) != 0)
+      {
+        std::cerr << __func__ << ": could not insert key \n" << key.key() << std::endl;
+        exit(1);
+      }
+
+    
   }
 
   XML_input_t m_xml; 
   FILEDB::AllConfStoreDB< SK , SD > *m_db;
 };
+
+
 
 
 int main(int argc , char *argv[])
@@ -203,7 +220,7 @@ int main(int argc , char *argv[])
 
 
   dbInterface foo(ini); 
-  
+
   if(!!!foo.alloc())
   {
     std::cout << "something bad happened" << std::endl;

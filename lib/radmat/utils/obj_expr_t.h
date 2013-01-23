@@ -30,6 +30,7 @@ namespace radmat
       typedef Object Obj_t;
 
       ListObjExpr_t(){}
+      ListObjExpr_t(const int &) {} // for itpp
       ListObjExpr_t(const ListObjExpr_t<Coefficient,Object> &o) : m_expr(o.m_expr) {}
       ListObjExpr_t(const ObjExpr_t<Coefficient,Object> &expr) {m_expr.push_back(expr);}
       ListObjExpr_t<Coefficient,Object>& operator=(const ListObjExpr_t<Coefficient,Object> &o)
