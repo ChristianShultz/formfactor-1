@@ -6,7 +6,7 @@
 
  * Creation Date : 19-10-2012
 
- * Last Modified : Wed Jan 23 14:48:16 2013
+ * Last Modified : Fri Jan 25 14:14:52 2013
 
  * Created By : shultz
 
@@ -231,7 +231,7 @@ namespace radmat
     std::string toString(const ContinuumInsertionXML::Insertion &op)
     {
       std::stringstream ss;
-      ss << "J = " << op.J << " H = {";
+      ss << "active = " << op.active << " J = " << op.J << " H = {";
       for(int i = 0; i < op.H.size(); ++i)
         ss << op.H[i] << " ";
       ss << "} parity = " << op.parity << " twoI_z = " << op.twoI_z
@@ -251,6 +251,7 @@ namespace radmat
     void read(ADATXML::XMLReader &xml, const std::string &path, ContinuumInsertionXML::Insertion &op)
     {   
       ADATXML::XMLReader ptop(xml,path);
+      doXMLRead(ptop,"active",op.active,__PRETTY_FUNCTION__); 
       doXMLRead(ptop,"J",op.J,__PRETTY_FUNCTION__);
       doXMLRead(ptop,"H",op.H,__PRETTY_FUNCTION__);
       doXMLRead(ptop,"parity",op.parity,__PRETTY_FUNCTION__);      
@@ -272,6 +273,7 @@ namespace radmat
     void write(ADATXML::XMLWriter &xml, const std::string &path, const ContinuumInsertionXML::Insertion &op)
     {
       ADATXML::push(xml,path);
+      write(xml,"active",op.active); 
       write(xml,"J",op.J);
       write(xml,"H",op.H);
       write(xml,"parity",op.parity);
@@ -468,23 +470,12 @@ namespace radmat
           base.mom[1] = xmlin.mom[p][1];
           base.mom[2] = xmlin.mom[p][2];
 
-          // allow for leaving the helicity bit blank so we dont always have to type them all in
-          if(xmlin.H.size() == 0)
+          for(int h = 0; h < xmlin.H.size(); ++h)
           {
-            for(int h = -base.J; h < base.J + 1; ++h)
-            {
-              base.H = h;
-              ret.push_back(base); 
-            }
+            base.H = xmlin.H[h];
+            ret.push_back(base);
           }
-          else
-          {
-            for(int h = 0; h < xmlin.H.size(); ++h)
-            {
-              base.H = xmlin.H[h];
-              ret.push_back(base);
-            }
-          }
+
 
         } // loop momenta
 
@@ -551,37 +542,39 @@ namespace radmat
         ContinuumStatePrimitive t = makeTemporalInsertion(xmlin.time);
         triplet circ = makeCircularSpatialInsertion(xmlin.space); 
 
-        ret.insert("t",t);
+
+
+        // are we doing temporal matelems
+        if(xmlin.time.active)
+          ret.insert("t",t);
 
 
         // allow for leaving the helicity bit blank so we dont always have to type them all in
         ContinuumInsertionXML my_insertion(xmlin);
 
-        if(my_insertion.space.H.size() == 0)
-        {
-          my_insertion.space.H.resize(2*my_insertion.space.J + 1);
 
-          for(int h = -my_insertion.space.J ; h < my_insertion.space.J +1; ++h)
-            my_insertion.space.H[h + my_insertion.space.J] = h;
-        }
-
-        // hardwire for J = 1 xml input type
-        // allow for not considering certain bits of the insertion 
-        for(int h = 0; h < xmlin.space.H.size(); ++h)
+        // are we doing spatial matelems
+        if(my_insertion.space.active)
         {
-          if(my_insertion.space.H[h] == -1)
+
+          // hardwire for J = 1 xml input type
+          // allow for not considering certain bits of the insertion 
+          for(int h = 0; h < xmlin.space.H.size(); ++h)
           {
-            ret.insert("m",circ.minus);
-            continue;
-          }
-          else if (my_insertion.space.H[h] == 0)
-          {
-            ret.insert("0",circ.zero);
-            continue;
-          }
-          else if (my_insertion.space.H[h] == 1)
-          {
-            ret.insert("p",circ.plus);
+            if(my_insertion.space.H[h] == -1)
+            {
+              ret.insert("m",circ.minus);
+              continue;
+            }
+            else if (my_insertion.space.H[h] == 0)
+            {
+              ret.insert("0",circ.zero);
+              continue;
+            }
+            else if (my_insertion.space.H[h] == 1)
+            {
+              ret.insert("p",circ.plus);
+            }
           }
         }
 
@@ -608,9 +601,9 @@ namespace radmat
         ret.resize(3);
         // NB: need that extra minus sign or else all of the correlators are zero b/c of phase convention chosen for the insertion
         // to be daggered (un-daggered.. can't remember which but this is the way it needs to be)
-        ret[0] = -(source.state.mom[0] - sink.state.mom[0]);
-        ret[1] = -(source.state.mom[1] - sink.state.mom[1]);
-        ret[2] = -(source.state.mom[2] - sink.state.mom[2]);
+        ret[0] = source.state.mom[0] - sink.state.mom[0];
+        ret[1] = source.state.mom[1] - sink.state.mom[1];
+        ret[2] = source.state.mom[2] - sink.state.mom[2];
         return ret; 
       } 
 
@@ -628,6 +621,13 @@ namespace radmat
 
       source = getMatElemState(xmlin.source);
       sink = getMatElemState(xmlin.sink);
+
+      /*
+         std::cout << __func__ << std::endl; 
+         std::cout << " source = " << source[0] << std::endl;
+         std::cout << " sink =   " << sink[0] << std::endl; 
+       */
+
       ins = getContinuumInsertionFromXML(xmlin.insertion);
 
       for(it_source = source.begin(); it_source != source.end(); ++it_source)
@@ -640,9 +640,9 @@ namespace radmat
           dum.ensemble = xmlin.ensemble;
 
           ADATXML::Array<int> q = getMomentumTransfer(*it_source,*it_sink);
-  
+
           int qq = q[0]*q[0] + q[1]*q[1] + q[2]*q[2];
-  
+
           // skip the guys for qq_space > pmax 
           if(qq > xmlin.insertion.pmax)
             continue; 

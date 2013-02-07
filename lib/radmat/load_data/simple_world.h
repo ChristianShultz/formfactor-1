@@ -107,6 +107,7 @@ namespace radmat
     {
       struct Insertion
       {
+        bool active;           // do we want to do time/space/ mix both of them together? 
         int J;
         ADATXML::Array<int> H; // take note of circular basis!!!
         bool parity;

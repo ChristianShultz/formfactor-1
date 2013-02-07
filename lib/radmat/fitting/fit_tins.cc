@@ -6,7 +6,7 @@
 
  * Creation Date : 01-08-2012
 
- * Last Modified : Wed Jan  9 14:42:18 2013
+ * Last Modified : Sun Jan 27 13:27:43 2013
 
  * Created By : shultz
 
@@ -24,8 +24,10 @@
 #include "jackFitter/plot.h"
 #include "adat/handle.h"
 #include <string>
+#include <math.h>
 #include <vector>
 #include <iostream>
+#include <complex>
 #include "radmat/utils/splash.h"
 #include "radmat/utils/pow2assert.h"
 
@@ -47,20 +49,38 @@ namespace radmat
     ENSEM::EnsemVectorReal convertToReal(const TinsFitter &fitter, const ENSEM::EnsemVectorComplex & in, const int tlow, const int thigh)
     {
       ENSEM::EnsemVectorReal real, imag;
-      ENSEM::EnsemReal ephase;
+
+      double mean_phase(0); 
 
       real = ENSEM::real(in);
       imag = ENSEM::imag(in);
 
-      ephase = ENSEM::peekObs(imag,0);
-      ephase = SEMBLE::toScalar(0.);
 
       for(int i = tlow; i < thigh; ++i)
-        ephase = ephase + ENSEM::atan2(ENSEM::peekObs(imag,i),ENSEM::peekObs(real,i));
+      {
+        double rl,im;
+        rl = SEMBLE::toScalar(ENSEM::mean(ENSEM::peekObs(real,i)));
+        im = SEMBLE::toScalar(ENSEM::mean(ENSEM::peekObs(imag,i)));
+        
+        double phase = std::arg(std::complex<double>(rl,im)); 
+        
+        
+        // std::cout << __func__ << " t = " << i << " phase = " << phase << " (" << phase*180./3.14159 <<" deg)"<< std::endl;
 
-      ephase = ephase / SEMBLE::toScalar(double(thigh - tlow)); 
+      
+        if(phase < -3.*3.14159/4.)
+          phase = - phase; 
+    
 
-      double phase = SEMBLE::toScalar( ENSEM::mean(ephase) );
+        //  std::cout << __func__ << " t = " << i << " phase = " << phase << " (" << phase*180./3.14159 <<" deg)"<< std::endl;
+
+        mean_phase += phase; 
+      }
+
+
+      double phase = mean_phase/double(thigh - tlow); 
+
+
 
       if( (phase < 0.174528) && (phase > -0.174708) ) // +/- 10 degree about 0 in rad
         return real;
@@ -77,8 +97,8 @@ namespace radmat
         SPLASH("check bad_corr.jack, bad_corr.ax for the correlator"); 
 
         AxisPlot plot; 
-        plot.addEnsemData(ENSEM::real(in),"//sq",1);
-        plot.addEnsemData(ENSEM::imag(in),"//sq",2);
+        plot.addEnsemData(ENSEM::real(in),"\\sq",1);
+        plot.addEnsemData(ENSEM::imag(in),"\\sq",2);
         plot.sendToFile("bad_corr.ax");
 
         ENSEM::write("bad_corr.jack",in); 
@@ -136,8 +156,9 @@ namespace radmat
       const int ffnum,
       const ThreePointComparatorProps_t &fitProps)
   {
-    std::stringstream ss,jack,ax;
+    std::stringstream ss,jack,ax,fit;
     ss << filenameBase;
+    fit << ss.str() << "_F_" << ffnum << "_fit.jack";
     jack << ss.str() << "_F_" << ffnum << ".jack";
     ax << ss.str() << "_F_" << ffnum << ".ax";
 
@@ -151,13 +172,14 @@ namespace radmat
 
 
     ADAT::Handle<FitComparator> fitComp = constructThreePointFitComparator(fitProps);
-    ADAT::Handle<FitThreePoint> fitCorr (new FitThreePoint(corrData,Lt,0,fitComp,5));
+    ADAT::Handle<FitThreePoint> fitCorr (new FitThreePoint(corrData,Lt,0,fitComp,5,fitProps.fit_type));
 
     // send to files
     fitCorr->saveFitPlot(ax.str());
     write(jack.str(),data);
 
     ff.loadEnsemElement(ffnum,fitCorr->getFF());
+    write(fit.str(),fitCorr->getFF()); 
 
     fitters.insert(std::map<int,ADAT::Handle<FitThreePoint> >::value_type(ffnum,fitCorr));
   }

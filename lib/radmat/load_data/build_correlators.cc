@@ -6,7 +6,7 @@
 
  * Creation Date : 04-12-2012
 
- * Last Modified : Wed Jan 23 13:06:17 2013
+ * Last Modified : Thu Jan 31 15:53:54 2013
 
  * Created By : shultz
 
@@ -34,6 +34,11 @@
 #include <vector>
 #include <set>
 
+
+
+#define DEBUG_CORRELATOR_NORMALIZATION // do loads of printing at the normalization stage
+
+
 namespace radmat
 {
 
@@ -60,7 +65,8 @@ namespace radmat
     std::stringstream ss;
     ss << "continuumMatElemXML = " <<  o.continuumMatElemXML << "\nsource_id " 
       << o.source_id << " sink_id " << o.sink_id << " isDiagonal = " << o.isDiagonal
-      << " isProjected = " << o.isProjected;
+      << " isProjected = " << o.isProjected << " maSource = " << o.maSource
+      << " maSink = " << o.maSink; 
     return ss.str();
   }
 
@@ -79,7 +85,9 @@ namespace radmat
     doXMLRead(ptop,"source_id",prop.source_id,__PRETTY_FUNCTION__);
     doXMLRead(ptop,"sink_id",prop.sink_id,__PRETTY_FUNCTION__);
     doXMLRead(ptop,"isDiagonal",prop.isDiagonal,__PRETTY_FUNCTION__);
-    doXMLRead(ptop,"isProjected",prop.isProjected,__PRETTY_FUNCTION__); 
+    doXMLRead(ptop,"isProjected",prop.isProjected,__PRETTY_FUNCTION__);
+    doXMLRead(ptop,"maSource",prop.maSource,__PRETTY_FUNCTION__);
+    doXMLRead(ptop,"maSink",prop.maSink,__PRETTY_FUNCTION__); 
   }
 
   //! xml writer
@@ -91,6 +99,8 @@ namespace radmat
     write(xml,"sink_id",prop.sink_id);
     write(xml,"isDiagonal",prop.isDiagonal);
     write(xml,"isProjected",prop.isProjected);
+    write(xml,"maSource",prop.maSource);
+    write(xml,"maSink",prop.maSink); 
     ADATXML::pop(xml);
   }
 
@@ -180,7 +190,12 @@ namespace radmat
         // break early if not active
         active = data.is_active();
         if(!!!active)
+        {
+#ifdef DEBUG_CORRELATOR_NORMALIZATION
+          std::cout << __func__ << ": unsuccessful " << std::endl;
+#endif
           return;
+        }
 
         m_ini = ini; 
 
@@ -232,6 +247,17 @@ namespace radmat
           RadmatMassOverlapData_t source = db.fetch(it->m_obj.source_normalization); 
           RadmatMassOverlapData_t sink = db.fetch(it->m_obj.sink_normalization); 
 
+#ifdef DEBUG_CORRELATOR_NORMALIZATION
+          std::string outstem = Hadron::ensemFileName(it->m_obj.redstar_xml); 
+          std::string pth = SEMBLE::SEMBLEIO::getPath();
+          std::stringstream path;
+          path << pth << "debug_normalization";
+          SEMBLE::SEMBLEIO::makeDirectoryPath(path.str());
+          path << "/" << outstem;
+          ENSEM::write(path.str() + std::string("_corr_pre") , corr_tmp); 
+          ENSEM::EnsemVectorComplex norm = corr_tmp * SEMBLE::toScalar(0.); 
+#endif
+
           // the hadron key uses 1 based arrays
 
           // NB: assumption that npt is organized like <sink, ins , source>
@@ -239,7 +265,7 @@ namespace radmat
           const int t_source(it->m_obj.redstar_xml.npoint[3].t_slice);
           const int t_sink(it->m_obj.redstar_xml.npoint[1].t_slice); 
 
-          
+
           POW2_ASSERT(t_source < t_sink); 
 
 
@@ -251,7 +277,16 @@ namespace radmat
 
             ENSEM::pokeObs(corr_tmp,ENSEM::peekObs(corr_tmp,t_ins)/prop,t_ins);
 
+#ifdef DEBUG_CORRELATOR_NORMALIZATION
+            ENSEM::pokeObs(norm,prop,t_ins); 
+#endif
           }
+
+#ifdef DEBUG_CORRELATOR_NORMALIZATION
+          ENSEM::write(path.str() + std::string("_corr_post"), corr_tmp);
+          ENSEM::write(path.str() + std::string("_norm") , norm);
+#endif      
+
 
           E_f = E_f + sink.E();
           E_i = E_i + source.E();
@@ -264,6 +299,7 @@ namespace radmat
         // fill in the rest of the relevant data
         E_f = E_f/SEMBLE::toScalar(double(ct));
         E_i = E_i/SEMBLE::toScalar(double(ct));
+
       }
 
       bool active; 
@@ -328,16 +364,23 @@ namespace radmat
 
 
       CartesianMatrixElement(const ThreePointCorrIni_t &ini, const simpleWorld::ContinuumMatElem &elem)
-        : have_active_data(false) , success(true) , m_ini(ini) , m_elem(elem)
+        : have_active_data(false) , success(true) , m_ini(ini) , m_elem(elem) 
       {
 
-
+        am_i = ini.threePointCorrXMLIni.maSource;
+        am_f = ini.threePointCorrXMLIni.maSink;
         // hardwire some assumptions about projected operator naming here.. if something changes we can just build some
         // sort of hash to retreive the correct name but the current convetions should be good for a bit
         if(m_ini.threePointCorrXMLIni.isProjected)
         {
           m_elem.source.state.name = append_momentum(m_elem.source.state.name,m_elem.source.state.mom);
           m_elem.sink.state.name = append_momentum(m_elem.sink.state.name,m_elem.sink.state.mom);
+
+          if(am_i != am_f)
+          {
+            std::cerr << __func__ << ": WARNING: you chose a diagonal matrix element"
+              <<" but gave different rest masses for source and sink. " << std::endl;
+          }
         }
 
         redstarCartMatElem celem(m_elem,ini.threePointCorrXMLIni.source_id,ini.threePointCorrXMLIni.sink_id);
@@ -512,7 +555,8 @@ namespace radmat
 
 
       bool have_active_data;
-      bool success; 
+      bool success;
+      double am_f, am_i; 
       ENSEM::EnsemReal E_f,E_i; 
       ADATXML::Array<int> p_f, p_i; 
       ThreePointCorrIni_t m_ini; 
@@ -650,7 +694,6 @@ namespace radmat
 
       ~manageWork(void)
       {
-
         write_projected_matrix_elements();
         dump_xml();
       }
@@ -727,9 +770,16 @@ namespace radmat
       void sort(const std::vector<CartesianMatrixElement> &unsorted, const bool isDiagonal)
       {
 
+
+        std::cout << __func__ << ": unsorted.size() " << unsorted.size() << std::endl;
+
+
         double E_f, E_i; // rest energies..       
         std::vector<CartesianMatrixElement>::const_iterator it;
-        bool found_f(false) , found_i(false); 
+
+        E_f = unsorted.begin()->am_f; 
+        E_i = unsorted.begin()->am_i;
+
 
         for(it = unsorted.begin(); it != unsorted.end(); ++it)
         {
@@ -737,48 +787,8 @@ namespace radmat
           if(!!!it->success)
             push_bad_list(*it);
 
-          if(!!!it->have_active_data)
-            continue;
-
-          if(!!!found_f)
-          {
-            ADATXML::Array<int> p_f = it->p_f;
-            if( (p_f[0] == 0) && (p_f[1] == 0) && (p_f[2] == 0) )
-            {
-              E_f = SEMBLE::toScalar(ENSEM::mean(it->E_f)); 
-              found_f = true; 
-            }
-          }
-
-
-          if(!!!found_i)
-          {
-            ADATXML::Array<int> p_i = it->p_i;
-            if( (p_i[0] == 0) && (p_i[1] == 0) && (p_i[2] == 0) )
-            {
-              E_i = SEMBLE::toScalar(ENSEM::mean(it->E_i)); 
-              found_i = true; 
-            }
-
-          }
-
-        } // for it
-
-
-        if(!!!(found_f && found_i))
-        {
-          std::cerr << "Error performing qsq sort, need to include rest matrix elements" << std::endl;
-      
-          if(!!!found_f)
-            std::cerr << "Couldn't find the final state" << std::endl;
-
-          if(!!!found_i)
-            std::cerr << "Couldn't find the initial state" << std::endl;
-
-
-          dump_xml(); 
-          exit(1); // abort and write out bad xml files
         }
+
 
         const double xi = unsorted.begin()->m_ini.xi; 
         const double L_s = unsorted.begin()->m_ini.L_s; 
@@ -790,8 +800,10 @@ namespace radmat
         {
           // skip the baddies
           if(!!!it->have_active_data)
+          {
+            std::cout << __func__ << ": skipping a baddie" << std::endl;
             continue; 
-
+          }
           // ignore any type of level splittings across different irreps 
           // also ignore any statistical fluctuations associated w/ different mom directions
           double q2 = Mink_qsq(*it, E_f, E_i, factor);           
@@ -810,6 +822,9 @@ namespace radmat
         sorted_by_Q2.clear(); 
         for(mapit = m_map.begin(); mapit != m_map.end(); ++mapit)
           sorted_by_Q2.push_back(mapit->second); 
+
+
+        std::cout << __func__ << ": sorted_by_Q2.size() = " << sorted_by_Q2.size() << std::endl;
       }
 
 
@@ -1019,17 +1034,34 @@ namespace radmat
         {
           // at each t_ins make a vector of all the points in the linear system 
           std::vector<LLSQDataPoint> points_at_this_t_ins; 
+
           for(it_pack = it_q2->begin(); it_pack != it_q2->end(); ++it_pack)
             points_at_this_t_ins.push_back(it_pack->getLLSQPoint(t_ins));  
+
+          /*
+             std::vector<LLSQDataPoint>::const_iterator print_it; 
+             std::cout << __func__ << ": t_ins = " << t_ins << std::endl;
+             for(print_it = points_at_this_t_ins.begin(); print_it != points_at_this_t_ins.end(); ++print_it)
+             std::cout << print_it->toString() << std::endl;
+           */
 
           tmp->insert(LLSQDataPointQ2Pack::value_type(t_ins,points_at_this_t_ins)); 
         }
 
         ENSEM::EnsemReal Q2 = work_manager.computeQ2(*it_q2); 
         tmp->setQ2(Q2);
-        tmp->zeroFilter(); 
-        ret.push_back(tmp);
+        tmp->zeroFilter();
+
+        // only send back guys with active data into the llsq
+        if(!!!tmp->haveData())
+        {
+          std::cout << __func__ << ": removing Q2 = " << SEMBLE::toScalar(ENSEM::mean(Q2)) << " from llsq system (no active data) " << std::endl;
+          continue; 
+        }
+        else
+          ret.push_back(tmp);
       }
+
 
       return ret; 
     }

@@ -6,7 +6,7 @@
 
  * Creation Date : 03-12-2012
 
- * Last Modified : Mon Jan 21 17:31:43 2013
+ * Last Modified : Thu Jan 31 15:57:39 2013
 
  * Created By : shultz
 
@@ -254,7 +254,7 @@ namespace radmat
     //////////////////////////
     //////////////////////////
 
-  
+
     // a bunch of overloads and functions to move to cartesian coordinates
 
 
@@ -269,7 +269,7 @@ namespace radmat
       {
         return SEMBLE::toScalar(c)*l; 
       }
-  
+
 
     itpp::Vec<redstarCircularMatElem_t::listSubducedInsertion> 
       operator*(const itpp::Mat<std::complex<double> > &m, const itpp::Vec<redstarCircularMatElem_t::listSubducedInsertion> &v)
@@ -479,7 +479,17 @@ namespace radmat
       m_t = tmp.m_time;
       m_x = std::pair<bool,listSubducedInsertion>(j_i_have[0],j_i[0]);    
       m_y = std::pair<bool,listSubducedInsertion>(j_i_have[1],j_i[1]);  
-      m_z = std::pair<bool,listSubducedInsertion>(j_i_have[2],j_i[2]);   
+      m_z = std::pair<bool,listSubducedInsertion>(j_i_have[2],j_i[2]);  
+
+      /*      
+              std::cout << "false = " << false << std::endl;
+              std::cout << "j_lambda_have 0 , 1 , 2 ---" << j_lambda_have[0] 
+              << "  " << j_lambda_have[1]
+              << "  " << j_lambda_have[2] << std::endl;
+              std::cout << "j_i_have 0 , 1 , 2 --- " << j_i_have[0]
+              << "  " << j_i_have[1] 
+              << "  " << j_i_have[2] << std::endl; 
+       */
     }
 
 
@@ -494,6 +504,13 @@ namespace radmat
   {
     m_source = getLatticeSubducedOp(cont.source,m_source_id);
     m_sink = getLatticeSubducedOp(cont.sink,m_sink_id);
+
+    /*
+       std::cout << __func__ << std::endl;
+       std::cout << "source " << cont.source << std::endl;
+       std::cout << "sink   " << cont.sink << std::endl;
+     */
+
     circLorentzInsertion foo = getLatticeSubducedInsertion(cont.insertion,std::string("foobar"));
     m_time = foo.time;
     m_plus = foo.plus;
@@ -524,10 +541,16 @@ namespace radmat
     {
       Hadron::KeyHadronNPartNPtCorr_t redstar_xml;
       redstar_xml.npoint.resize(3); // 1 based array
-      redstar_xml.npoint[1] = source.m_obj.operatorKey;
+      redstar_xml.npoint[1] = sink.m_obj.operatorKey;
       redstar_xml.npoint[2] = ins.m_obj;
-      redstar_xml.npoint[3] = sink.m_obj.operatorKey;
+      redstar_xml.npoint[3] = source.m_obj.operatorKey;
       redstar_xml.ensemble = ensemble; 
+
+      /*
+         std::cout << __func__ << Hadron::ensemFileName(redstar_xml) << std::endl;
+         std::cout << "        source " << source.m_obj.normalizationKey << std::endl;
+         std::cout << "        sink   " << sink.m_obj.normalizationKey << std::endl;
+       */
 
       return redstarCartMatElem::redstarCartMatElemLorentzComponent::threePointKey(redstar_xml,source.m_obj.normalizationKey,sink.m_obj.normalizationKey); 
     }
@@ -540,6 +563,7 @@ namespace radmat
       const listSubducedOp &sink,
       const std::string &ensemble) : active(false)
   {
+
     // leave the list empty if the init variable from the xml was false for whatever reason
     if(ins.first)
     {

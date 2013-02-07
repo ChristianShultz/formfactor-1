@@ -41,11 +41,12 @@ namespace radmat
 
     void zeroFilter(void);
 
+    bool haveData(void);     
 
     ENSEM::EnsemReal Q2(void) const {return m_Q2;}
     void setQ2(const ENSEM::EnsemReal &Q2) {m_Q2 = Q2;}
 
-
+    
     LLSQDataPointmap_t m_map;
     ENSEM::EnsemReal m_Q2;
 

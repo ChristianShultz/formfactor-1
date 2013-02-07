@@ -165,6 +165,8 @@ namespace radmat
 
       m_fits.resize(sz);
 
+     // std::cout << __func__ << "    sz = " << sz << std::endl;
+
 #ifdef  USE_OMP_RADAMAT_DRIVER_SOLVE_LLSQ
 #pragma omp parallel for shared(pack_index, sz)
 #endif
@@ -172,13 +174,6 @@ namespace radmat
       // solve the llsq and then fit out the t_ins dependence
       for(pack_index = 0; pack_index < sz; ++pack_index)
       {
-        LLSQDriver_t<T> m_llsq_driver(std::string("SVDMakeSquare"));
-        m_q2_ff_packs[pack_index] = m_llsq_driver(m_q2_packs[pack_index]);
-
-        // write out the axis plot of F_n(Q2,t_ins)
-        std::string path = SEMBLE::SEMBLEIO::getPath();
-        path += std::string("t_ins_fits");
-        SEMBLE::SEMBLEIO::makeDirectoryPath(path);  
 
         // convert Q2 to a string format
         ENSEM::EnsemReal EQ2 = m_q2_packs[pack_index]->begin()->second.begin()->Q2();
@@ -187,8 +182,21 @@ namespace radmat
         ssQ2 << Q2;
         std::string sQ2 = ssQ2.str();
 
+
+        std::cout << __func__ << ": solving Q2 = " << sQ2 << std::endl; 
+
         std::replace(sQ2.begin(),sQ2.end(),'.','p');
         std::replace(sQ2.begin(),sQ2.end(),'-','m');     
+
+
+        LLSQDriver_t<T> m_llsq_driver(std::string("SVDNonSquare"));
+        m_q2_ff_packs[pack_index] = m_llsq_driver(m_q2_packs[pack_index]);
+
+        // write out the axis plot of F_n(Q2,t_ins)
+        std::string path = SEMBLE::SEMBLEIO::getPath();
+        path += std::string("t_ins_fits");
+        SEMBLE::SEMBLEIO::makeDirectoryPath(path);  
+
 
 
         // do/write out fits

@@ -23,7 +23,9 @@ namespace radmat
     std::string source_id;
     std::string sink_id;
     bool isDiagonal;
-    bool isProjected; 
+    bool isProjected;
+    double maSource;
+    double maSink;  
   };
 
 

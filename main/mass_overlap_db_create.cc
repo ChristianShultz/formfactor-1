@@ -6,7 +6,7 @@
 
  * Creation Date : 08-01-2013
 
- * Last Modified : Tue Jan 22 10:20:50 2013
+ * Last Modified : Wed Jan 23 15:21:13 2013
 
  * Created By : shultz
 
@@ -169,8 +169,12 @@ struct dbInterface
         data.data().Z() = ENSEM::rescaleEnsemUp(tmpZZ); 
       }
 
-    if(m_xml.isProjected)   // root(2m)exp(mt/2) -- is this what robert uses???
-      data.data().Z() = ENSEM::sqrt(data.data().E()*SEMBLE::toScalar(2.) * ENSEM::exp(data.data().E()*SEMBLE::toScalar(double(m_xml.t0_extract))));
+    if(m_xml.isProjected)  
+      data.data().Z() = SEMBLE::toScalar(1.); 
+
+    // from his scripts it looks like this factor is included with the optimal overlaps
+      // root(2m)exp(mt/2) -- is this what robert uses???
+     // data.data().Z() = ENSEM::sqrt(data.data().E()*SEMBLE::toScalar(2.) * ENSEM::exp(data.data().E()*SEMBLE::toScalar(double(m_xml.t0_extract))));
 
     SK key;
     key.key() = K(m_xml.pid,m_xml.redstar);

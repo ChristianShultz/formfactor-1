@@ -6,7 +6,7 @@
 
  * Creation Date : 17-01-2013
 
- * Last Modified : Fri Jan 18 09:20:34 2013
+ * Last Modified : Sun Jan 27 09:26:28 2013
 
  * Created By : shultz
 
@@ -79,6 +79,11 @@ namespace radmat
 
       ENSEM::write(ss.str(),e);
     }
+
+  bool isActive(const LLSQDataPoint &d)
+  { 
+    return !!!(!d.zero.first && !d.one.first && !d.two.first && !d.three.first);   // true if active so see if we can accumulate a false and then if we do it had active
+  }
 
 
 
@@ -160,6 +165,19 @@ namespace radmat
 
     }
 
+  }
+
+
+  bool LLSQDataPointQ2Pack::haveData(void)
+  {
+    std::vector<LLSQDataPoint> chk = begin()->second;
+    std::vector<LLSQDataPoint>::const_iterator it;
+ 
+    for(it = chk.begin(); it != chk.end(); ++it)
+      if( isActive(*it) )
+        return true;
+  
+    return false; 
   }
 
 

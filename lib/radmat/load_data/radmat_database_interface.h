@@ -120,6 +120,13 @@ namespace radmat
     {
       S_C_KEY key;
       key.key() = k;
+
+      if( m_corr_db->exist(key) == 0)
+      {
+        outlog << __func__ << ": MISSED CORRELATOR KEY!!!" << std::endl;
+        outlog << key.key() << std::endl;
+      }
+
       return m_corr_db->exist(key);     
     }
 
@@ -143,6 +150,14 @@ namespace radmat
 
         if(db_props.LG_symmetry)
           key.key().doLG_symmetry(); 
+
+
+        if(!!! m_norm_db->exist(key))
+        {
+          outlog << __func__ << ": MISSED DAGGER TOO!!!!" << std::endl;
+          outlog << key.key() << std::endl;
+        }
+
 
         return m_norm_db->exist(key);
       }

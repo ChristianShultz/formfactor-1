@@ -59,6 +59,19 @@ namespace radmat
       return ( - (E_f-E_i)*(E_f-E_i) + SEMBLE::toScalar(pp));
     }
 
+    std::string toString(void) const
+    {
+      std::stringstream ss;
+ 
+      ss << matElemID << "_pf" << p_f[0] << p_f[1] << p_f[2] << "_pi" << p_i[0] << p_i[1] << p_i[2]; 
+      ss << "_t" << zero.first << "_" << SEMBLE::toScalar(ENSEM::mean(zero.second));
+      ss << "_x" << one.first << "_" << SEMBLE::toScalar(ENSEM::mean(one.second));
+      ss << "_y" << two.first << "_" << SEMBLE::toScalar(ENSEM::mean(two.second));
+      ss << "_z" << three.first << "_" << SEMBLE::toScalar(ENSEM::mean(three.second));
+
+      return ss.str(); 
+    }
+
 
     std::string matElemID;                      // in the h_f h_i language
     std::pair<bool,ENSEM::EnsemComplex> zero;   // lorentz index of measurements
@@ -72,6 +85,9 @@ namespace radmat
     double mom_fac;                           // 1/xi * 2pi/L_s -- the "unit" size  
 
   };
+
+
+
 
   /////////////////////////////////////////////////////////////////////////////////
   /////////////////////////////////////////////////////////////////////////////////
@@ -131,17 +147,21 @@ namespace radmat
     };
 
 
+  // put the guys with active data to the left
+  std::vector<LLSQDataPoint> left_sort(const std::vector<LLSQDataPoint> &indata); 
+
 
   ///////////////////////////////////////////////////////////////////////////////////////////
   ///////////////////////////////////////////////////////////////////////////////////////////
 
   template<typename T>
-    ADAT::Handle<LLSQInputType_t<T> > generateLLSQSystem(const std::vector<LLSQDataPoint> &data, const int t_ins)
+    ADAT::Handle<LLSQInputType_t<T> > generateLLSQSystem(const std::vector<LLSQDataPoint> &unsorted_data, const int t_ins)
     {
 
       typename LLSQInputType_t<T>::KinematicFactors K,KWork;
       std::vector<ENSEM::EnsemComplex> vectorData;
       std::vector<LLSQDataPoint>::const_iterator it;
+      std::vector<LLSQDataPoint> data = left_sort(unsorted_data); 
       bool initK = false;
 
       it = data.begin();
@@ -180,7 +200,7 @@ namespace radmat
           K.reDim(KWork.getB(),1,KWork.getM());
           for(int i = 0; i < KWork.getM(); i++)
             K.loadEnsemElement(0,i,KWork(1,i));
-          vectorData.push_back(it->zero.second);
+          vectorData.push_back(it->one.second);
 
           if(it->two.first)
           {
@@ -199,7 +219,7 @@ namespace radmat
           K.reDim(KWork.getB(),1,KWork.getM());
           for(int i = 0; i < KWork.getM(); i++)
             K.loadEnsemElement(0,i,KWork(2,i));
-          vectorData.push_back(it->zero.second);
+          vectorData.push_back(it->two.second);
 
           if(it->three.first)
           {
@@ -213,7 +233,7 @@ namespace radmat
           K.reDim(KWork.getB(),1,KWork.getM());
           for(int i = 0; i < KWork.getM(); i++)
             K.loadEnsemElement(0,i,KWork(3,i));
-          vectorData.push_back(it->zero.second);
+          vectorData.push_back(it->three.second);
         }
         else
         {
@@ -275,7 +295,9 @@ namespace radmat
       {
         std::string path = SEMBLE::SEMBLEIO::getPath(); 
         path += std::string("llsq");
-        SEMBLE::SEMBLEIO::makeDirectoryPath(path); 
+        SEMBLE::SEMBLEIO::makeDirectoryPath(path);
+        path += std::string("/system");
+        SEMBLE::SEMBLEIO::makeDirectoryPath(path);  
         std::stringstream Q2;
         Q2 << "/Q2_" << d->qsq; 
         path += Q2.str(); 
@@ -298,6 +320,8 @@ namespace radmat
         std::string path = SEMBLE::SEMBLEIO::getPath(); 
         path += std::string("llsq");
         SEMBLE::SEMBLEIO::makeDirectoryPath(path); 
+        path += std::string("/system");
+        SEMBLE::SEMBLEIO::makeDirectoryPath(path);  
         std::stringstream Q2;
         Q2 << "/Q2_" << d->qsq; 
         path += Q2.str(); 

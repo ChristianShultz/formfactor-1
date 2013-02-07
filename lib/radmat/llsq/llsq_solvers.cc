@@ -53,6 +53,10 @@ namespace radmat
           success &= Factory::Instance().registerObject(std::string("SVDMakeSquare"),
               FacEnv::upCast<LLSQBaseSolver_t<std::complex<double> >, 
               LLSQSolverSVDMakeSquare_t<std::complex<double> > > );
+          success &= Factory::Instance().registerObject(std::string("SVDNonSquare"),
+              FacEnv::upCast<LLSQBaseSolver_t<std::complex<double> >, 
+              LLSQSolverSVDNonSquare_t<std::complex<double> > > );
+
 
           registered = true;
         }

@@ -12,7 +12,7 @@
           <J>0</J>
           <H></H>
           <parity>false</parity>
-          <fill_star>true</fill_star>
+          <fill_star>false</fill_star>
           <mom>
             <elem>0 0 0</elem>
             <elem>1 0 0</elem>
@@ -22,15 +22,16 @@
           </mom>
           <twoI_z>2</twoI_z>
           <op_stem>pion_proj0</op_stem>
-          <creation_op>false</creation_op>
+          <creation_op>true</creation_op>
           <smearedP>true</smearedP>
         </state>
-        <t_slice>32</t_slice>
+        <t_slice>0</t_slice>
       </source>
       <insertion>
         <pmax>4</pmax> <!-- don't consider matrix elements w/ q^2_space > pmax-->
         <t_slice>-3</t_slice>
         <time>
+          <active>false</active>
           <J>0</J>
           <H></H>
           <parity>true</parity>
@@ -40,6 +41,7 @@
           <smearedP>true</smearedP>
         </time>
         <space>
+          <active>true</active>
           <J>1</J>
           <H></H>
           <parity>false</parity>
@@ -54,7 +56,7 @@
           <J>0</J>
           <H></H>
           <parity>false</parity>
-          <fill_star>true</fill_star>
+          <fill_star>false</fill_star>
           <mom>
             <elem>0 0 0</elem>
             <elem>1 0 0</elem>
@@ -64,10 +66,10 @@
           </mom>
           <twoI_z>2</twoI_z>
           <op_stem>pion_proj0</op_stem>
-          <creation_op>true</creation_op>
+          <creation_op>false</creation_op>
           <smearedP>true</smearedP>
         </state>
-        <t_slice>0</t_slice>
+        <t_slice>32</t_slice>
       </sink>
       <ensemble>szscl21_20_128_b1p50_t_x4p300_um0p0840_sm0p0743_n1p265_per_n128</ensemble>
     </continuumMatElemXML>
@@ -77,6 +79,8 @@
     <sink_id>pion</sink_id>
     <isDiagonal>true</isDiagonal>
     <isProjected>true</isProjected>
+    <maSource>0.0693861</maSource>
+    <maSink>0.0693861</maSink>
 
 
   </threePointCorrXMLIni>
@@ -85,11 +89,11 @@
 
   <radmatDBProp>
     <threePointDatabase>
-      <dbname>/Users/shultz/jlab/database/radmat_3pt/data/840/n128/pipi/gen_xml/pi_pi_10cfg_all_combo_REST_D4_D3_D2___szscl3_16_128_b1p50_t_x4p300_um0p0743_n1p265_per.sdb</dbname>
+      <dbname>trash/szscl21_20_128_b1p50_t_x4p300_um0p0840_sm0p0743_n1p265_per.n128.pion_proj0.pion_proj0.sdb</dbname>
       <badlist>bad_corrs.xml</badlist>
     </threePointDatabase>
     <normalizationDatabase>
-      <dbname>/Users/shultz/jlab/database/radmat_3pt/data/840/n128/pipi/gen_xml/faked_up_dbnew_normalization_db_pion_10cfg.sdb</dbname>
+      <dbname>/Users/shultz/jlab/database/radmat_3pt/analysis/840/n128/meson_2pt/mass_overlaps/pion/pion_proj0.sdb</dbname>
       <badlist>bad_norms.xml</badlist>
     </normalizationDatabase>
 
@@ -101,6 +105,6 @@
     <LG_symmetry>true</LG_symmetry>
   </radmatDBProp>
   <matElemID>PiPi</matElemID>
-  <xi>3.6</xi>
-  <L_s>2</L_s>
+  <xi>3.446</xi>
+  <L_s>20</L_s>
 </inikeys>
