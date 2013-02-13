@@ -6,7 +6,7 @@
 
  * Creation Date : 12-10-2012
 
- * Last Modified : Wed Jan  2 11:16:58 2013
+ * Last Modified : Wed Feb 13 11:49:42 2013
 
  * Created By : shultz
 
@@ -152,10 +152,19 @@ namespace  // a bunch of local stuff to make my life easier
     exit(1);
   }
 
-  //! move from (-j..0..j) to (1..(2j + 1)) indexing 
+  //! move from (-j..0..j) to (1..(2j + 1)) indexing using the convention that the most positive helicity is mapped to 1
   int remapHelicity_1based(const radmat::ContinuumBosonExprPrimitive &expr)
   {
-    return expr.H + expr.J + 1;
+    const int H = expr.H; 
+    const int J = expr.J;
+
+    if( abs(H) > abs(J) )
+    {
+      std::cerr << __func__ << ": error: out of bounds" << std::endl;
+      exit(1);
+    }
+
+    return J - H + 1;
   }
 
   struct irrepKey

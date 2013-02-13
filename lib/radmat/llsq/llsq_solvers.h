@@ -138,7 +138,7 @@ namespace radmat
         Sinv.loadEnsemElement(diag,diag,s.getEnsemElement(diag)); 
 
       Smul = SEMBLE::recast<T,double>(Sinv);
-    
+
       foo->m_FF = V * Smul * SEMBLE::adj(U)  *  (input->m_MatElems);
 
       LLSQRetTypeBase_h ret(foo);
@@ -152,6 +152,55 @@ namespace radmat
 
 
   };
+
+
+  namespace FancyChisqExtremization 
+  {
+    void doExtremization(const SEMBLE::SembleVector<double> &C, 
+        const SEMBLE::SembleMatrix<double> &K, 
+        SEMBLE::SembleVector<double> &FF); 
+    void doExtremization(const SEMBLE::SembleVector<std::complex<double> > &C, 
+        const SEMBLE::SembleMatrix<std::complex<double> > &K ,
+        SEMBLE::SembleVector<double> &FF);
+
+  }
+
+
+  // transform the llsq and return the soln that minimizes chisq 
+  template<typename T> 
+    struct LLSQExtremizeChisq_t : public LLSQBaseSolver_t<T>
+  {
+    // technically we will always be returning real types b/c the solution method 
+    // explicitly requires it but we can get away free by just returning ensemble zero 
+    // for the imaginary part
+    typedef typename LLSQBaseSolver_t<T>::LLSQRetTypeBase_h LLSQRetTypeBase_h;
+    typedef typename LLSQBaseSolver_t<T>::LLSQInputType_h LLSQInputType_h;
+
+
+    LLSQRetTypeBase_h operator()(const LLSQInputType_h &input, const int t_ins) const
+    {
+      print_llsq_system(input, t_ins);
+
+
+
+      LLSQRetTypeBase_t<T> *foo = new LLSQRetTypeBase_t<T>();
+      POW2_ASSERT(foo);                                              // check pointer alloc 
+      POW2_ASSERT(input->m_KFacs.getN() >= input->m_KFacs.getM());   // check LLSQ is not underdetermined -- it would still work
+
+      FancyChisqExtremization::doExtremization(input->m_MatElems,input->m_KFacs,foo->m_FF);
+
+      LLSQRetTypeBase_h ret(foo);
+      print_llsq_soln(input,ret,t_ins);
+
+      return ret;
+
+    };
+
+    std::string echo(void) const {return std::string("LLSQExtremizeChisq_t");}
+
+
+  };
+
 
 
 

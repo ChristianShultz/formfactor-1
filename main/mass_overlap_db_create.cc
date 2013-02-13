@@ -6,7 +6,7 @@
 
  * Creation Date : 08-01-2013
 
- * Last Modified : Wed Jan 23 15:21:13 2013
+ * Last Modified : Wed Feb 13 14:36:05 2013
 
  * Created By : shultz
 
@@ -44,6 +44,7 @@ struct XML_input_t
   int ncfg;
   bool resize;
   bool isProjected;
+  std::string Z_type;
   std::string dbname;
   std::string pid; 
   KeyHadronNPartIrrep_t redstar;
@@ -78,6 +79,7 @@ void read(ADATXML::XMLReader &xml, const std::string &path, XML_input_t &prop)
   doXMLRead(ptop,"ncfg",prop.ncfg,__PRETTY_FUNCTION__);
   doXMLRead(ptop,"resize",prop.resize,__PRETTY_FUNCTION__);
   doXMLRead(ptop,"isProjected",prop.isProjected,__PRETTY_FUNCTION__); 
+  doXMLRead(ptop,"Z_type",prop.Z_type,__PRETTY_FUNCTION__);
   doXMLRead(ptop,"dbname",prop.dbname,__PRETTY_FUNCTION__);
   doXMLRead(ptop,"pid",prop.pid,__PRETTY_FUNCTION__);
   doXMLRead(ptop,"redstar",prop.redstar,__PRETTY_FUNCTION__);
@@ -170,7 +172,19 @@ struct dbInterface
       }
 
     if(m_xml.isProjected)  
-      data.data().Z() = SEMBLE::toScalar(1.); 
+    { 
+      if(m_xml.Z_type == "one")
+        data.data().Z() = SEMBLE::toScalar(1.); 
+      else if(m_xml.Z_type == "root2E")
+        data.data().Z() = ENSEM::sqrt(SEMBLE::toScalar(2.)*data.data().E());
+      else if(m_xml.Z_type == "2E")
+        data.data().Z() = SEMBLE::toScalar(2.) * data.data().E(); 
+      else
+      {
+        std::cerr << __func__ <<  ": error: Z_type unrecognized, options are \"one\", \"2E\" and \"root2E\" " << std::endl;
+        exit(1);
+      }
+    }
 
     // from his scripts it looks like this factor is included with the optimal overlaps
       // root(2m)exp(mt/2) -- is this what robert uses???

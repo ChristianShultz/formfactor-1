@@ -6,7 +6,7 @@
 
  * Creation Date : 04-12-2012
 
- * Last Modified : Thu Jan 31 15:53:54 2013
+ * Last Modified : Wed Feb 13 14:40:47 2013
 
  * Created By : shultz
 
@@ -37,6 +37,7 @@
 
 
 #define DEBUG_CORRELATOR_NORMALIZATION // do loads of printing at the normalization stage
+// #define SERIOUSLY_DEBUG_CORRELATOR_NORMALIZATION  // turn on annoying printing
 
 
 namespace radmat
@@ -268,6 +269,17 @@ namespace radmat
 
           POW2_ASSERT(t_source < t_sink); 
 
+#ifdef  SERIOUSLY_DEBUG_CORRELATOR_NORMALIZATION 
+          std::cout << __func__ << std::endl;
+          std::cout << "Z_sink = " << SEMBLE::toScalar(ENSEM::mean(sink.Z())) << std::endl;
+          std::cout << "Z_source = " << SEMBLE::toScalar(ENSEM::mean(source.Z())) << std::endl;
+          std::cout << "E_sink = " << SEMBLE::toScalar(ENSEM::mean(sink.E())) << std::endl;
+          std::cout << "E_source = " << SEMBLE::toScalar(ENSEM::mean(source.E())) << std::endl;
+          std::cout << "tsink - tsource  " << double(t_sink - t_source) << "  " << t_sink - t_source << std::endl;
+
+#endif 
+
+
 
           for(int t_ins = t_source; t_ins <= t_sink; ++t_ins)
           {
@@ -277,7 +289,15 @@ namespace radmat
 
             ENSEM::pokeObs(corr_tmp,ENSEM::peekObs(corr_tmp,t_ins)/prop,t_ins);
 
+#ifdef SERIOUSLY_DEBUG_CORRELATOR_NORMALIZATION
+            if(t_ins == 0) 
+              std::cout << "norm = " << SEMBLE::toScalar(ENSEM::mean(prop)) << std::endl;
+#endif
+
+
+
 #ifdef DEBUG_CORRELATOR_NORMALIZATION
+
             ENSEM::pokeObs(norm,prop,t_ins); 
 #endif
           }
@@ -285,6 +305,9 @@ namespace radmat
 #ifdef DEBUG_CORRELATOR_NORMALIZATION
           ENSEM::write(path.str() + std::string("_corr_post"), corr_tmp);
           ENSEM::write(path.str() + std::string("_norm") , norm);
+  
+    //      std::cout << __func__ << std::endl; 
+    //      std::cout << SEMBLE::toScalar(it->m_coeff) << " X " << Hadron::ensemFileName(it->m_obj.redstar_xml) << std::endl;
 #endif      
 
 
@@ -771,7 +794,7 @@ namespace radmat
       {
 
 
-        std::cout << __func__ << ": unsorted.size() " << unsorted.size() << std::endl;
+   //     std::cout << __func__ << ": unsorted.size() " << unsorted.size() << std::endl;
 
 
         double E_f, E_i; // rest energies..       
@@ -824,7 +847,7 @@ namespace radmat
           sorted_by_Q2.push_back(mapit->second); 
 
 
-        std::cout << __func__ << ": sorted_by_Q2.size() = " << sorted_by_Q2.size() << std::endl;
+  //      std::cout << __func__ << ": sorted_by_Q2.size() = " << sorted_by_Q2.size() << std::endl;
       }
 
 

@@ -110,7 +110,7 @@ namespace radmat
       if(m_norm_db->open(db_props.normalizationDatabase.dbname, O_RDONLY, 0400) != 0)
       {
         outlog << __func__ << ": error opening dbase= " << db_props.normalizationDatabase.dbname << std::endl;
-        std::cerr << __func__ << ": error opening dbase= " << db_props.threePointDatabase.dbname << std::endl;
+        std::cerr << __func__ << ": error opening dbase= " << db_props.normalizationDatabase.dbname << std::endl;
         exit(1);
       }
     }

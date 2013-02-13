@@ -6,7 +6,7 @@
 
  * Creation Date : 03-12-2012
 
- * Last Modified : Thu Jan 31 15:57:39 2013
+ * Last Modified : Mon Feb 11 14:37:14 2013
 
  * Created By : shultz
 
@@ -313,7 +313,7 @@ namespace radmat
         return ret; 
       }
 
-    itpp::Vec<std::complex<double> > eps3_z(const std::string &qn)
+    itpp::Vec<std::complex<double> > eps3_z(const std::string &qn, const bool create)
     {
       itpp::Vec<std::complex<double> > ret(3);
       ret.zeros(); 
@@ -338,14 +338,17 @@ namespace radmat
         exit(1);
       }
 
-      return ret;
+      if(create)
+        return ret;
+      else
+        return itpp::conj(ret); 
     }
 
 
     // columns are indexed -m to m
     // rows go -lambda to lambda
 
-    itpp::Mat<std::complex<double> > Wigner_D(const ADATXML::Array<int> mom, const int J)
+    itpp::Mat<std::complex<double> > Wigner_D(const ADATXML::Array<int> mom, const int J, const bool create)
     {
 
       if((mom[0] == 0) &&(mom[1] == 0) && (mom[2] == 0))
@@ -375,20 +378,36 @@ namespace radmat
             ret(lambda+J,m+J) = tmp; 
         }
 
-      return ret; 
+      // std::cout << __func__ << " Wigner_D (lambda,m)" << std::endl;
+      // std::cout << ret << std::endl; 
+
+      if(create)
+        return ret; 
+      else
+        return itpp::conj(ret);
     }
 
 
 
     // a bunch of hardwires since itpp and ensem don't get along..
-    itpp::Mat<std::complex<double> > inver2Cart(const ADATXML::Array<int> mom)
+    itpp::Mat<std::complex<double> > inver2Cart(const ADATXML::Array<int> mom, const bool create)
     { 
       itpp::Mat<std::complex<double> > epsz(3,3), D;
-      epsz.set_row(0,eps3_z("m"));
-      epsz.set_row(1,eps3_z("0"));
-      epsz.set_row(2,eps3_z("p"));
+      epsz.set_row(0,eps3_z("m",create));
+      epsz.set_row(1,eps3_z("0",create));
+      epsz.set_row(2,eps3_z("p",create));
 
-      D = Wigner_D(mom,1); 
+      D = Wigner_D(mom,1,create);
+
+      /*
+         std::cout << __func__ << "epsz (hel,x) " << std::endl;
+         std::cout << epsz << std::endl;
+
+         std::cout << __func__ << " D * epsz" << std::endl;
+         std::cout << D * epsz << std::endl;
+
+       */
+
       return itpp::inv(D*epsz); 
     }
 
@@ -424,11 +443,36 @@ namespace radmat
         ensemble = a.ensemble; 
         m_source = dum.m_source;
         m_sink = dum.m_sink;
-        makeCartesian(dum);
+
+        bool create_t(false), create_s(false); 
+
+        simpleWorld::ContinuumInsertion::map_type m_map = a.insertion.insertion_map;
+        simpleWorld::ContinuumInsertion::map_type::const_iterator it;
+        it = m_map.find("t");
+        if(it != m_map.end())
+          create_t = it->second.creation_op;
+
+        it = m_map.find("m");
+        if(it == m_map.end())
+        {  
+          it = m_map.find("p");
+          if(it == m_map.end())
+          {
+            it = m_map.find("0");
+            if(it != m_map.end())
+              create_s = it->second.creation_op; 
+
+          }
+          else
+            create_s = it->second.creation_op;
+        }
+        else
+          create_s = it->second.creation_op;
+        makeCartesian(dum,create_t,create_s);
       }
 
       // move from a circular basis to the cartesian basis 
-      void makeCartesian(const redstarCircularMatElem_t &tmp);
+      void makeCartesian(const redstarCircularMatElem_t &tmp, const bool create_t, const bool create_s);
 
       ADATXML::Array<int> mom(void)
       {
@@ -457,7 +501,7 @@ namespace radmat
 
 
 
-    void redstarCartesianMatElem_p::makeCartesian(const redstarCircularMatElem_t &tmp)
+    void redstarCartesianMatElem_p::makeCartesian(const redstarCircularMatElem_t &tmp, const bool create_t, const bool create_s)
     {
       itpp::Vec<listSubducedInsertion> j_lambda(3),j_i(3);
       itpp::Vec<bool> j_lambda_have(3),j_i_have(3);
@@ -471,7 +515,7 @@ namespace radmat
       j_lambda_have[2] = tmp.m_plus.first; 
 
 
-      itpp::Mat<std::complex<double> > tform = inver2Cart(mom());
+      itpp::Mat<std::complex<double> > tform = inver2Cart(mom(),create_s);
 
       j_i = tform * j_lambda;
       j_i_have = tform * j_lambda_have; 
@@ -490,6 +534,21 @@ namespace radmat
               << "  " << j_i_have[1] 
               << "  " << j_i_have[2] << std::endl; 
        */
+
+
+      /*
+         redstarCartesianMatElem_p::listSubducedInsertion::const_iterator it; 
+         std::cout << __func__ << " cart components " << std::endl;
+         std::cout << "list_x " << std::endl;
+         for(it = m_x.second.begin(); it != m_x.second.end(); ++it)
+         std::cout << SEMBLE::toScalar(it->m_coeff) << " X " << Hadron::ensemFileName(it->m_obj.irrep) << std::endl;
+
+         std::cout << "list_y " << std::endl;
+         for(it = m_y.second.begin(); it != m_y.second.end(); ++it)
+         std::cout << SEMBLE::toScalar(it->m_coeff) << " X " << Hadron::ensemFileName(it->m_obj.irrep) << std::endl;
+       */
+
+
     }
 
 

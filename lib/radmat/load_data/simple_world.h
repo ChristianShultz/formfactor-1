@@ -81,7 +81,8 @@ namespace radmat
     // internal representation of the guys 
     struct ContinuumInsertion
     {
-      typedef ContinuumStatePrimitive op_insertion;   
+      typedef ContinuumStatePrimitive op_insertion;  
+      typedef std::map<std::string,op_insertion> map_type;  
    
       int t_slice; 
 
