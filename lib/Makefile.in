@@ -267,7 +267,7 @@ nobase_include_HEADERS = radmat/utils/aux.h radmat/utils/breit_frame.h \
 	radmat/ff/ff_gen_llsq_row.h radmat/ff/formfactor_factory.h \
 	radmat/ff/lorentzff_PiPi.h radmat/ff/lorentzff_PiPiStar.h \
 	radmat/ff/lorentzff_polarization_embedding.h \
-	radmat/ff/lorentzff_PiRho.h \
+	radmat/ff/lorentzff_PiRho.h radmat/ff/lorentzff_RhoPi.h \
 	radmat/fake_data/covarrying_vectors.h \
 	radmat/fake_data/fake_3pt_function.h \
 	radmat/fake_data/fake_3pt_function_aux.h \

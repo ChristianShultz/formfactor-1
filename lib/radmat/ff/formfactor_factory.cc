@@ -15,6 +15,7 @@
 #include "lorentzff_PiPi.h"
 #include "lorentzff_PiPiStar.h"
 #include "lorentzff_PiRho.h"
+#include "lorentzff_RhoPi.h"
 
 #include <omp.h>
 
@@ -69,17 +70,27 @@ namespace radmat
     {
 
       bool success = true;
+
+      // guard with critical block for when I inevitably do something stupid
 #pragma omp critical
       {
 
         if(!!!registered)
         {
+          // <Pi | jmu | Pi >
           success &= Factory::Instance().registerObject(std::string("PiPi"),FacEnv::upCast<ffBase_t<std::complex<double> > ,radmat::PiPi::PiPi>);
           success &= Factory::Instance().registerObject(std::string("PiPi_0_0"),FacEnv::upCast<ffBase_t<std::complex<double> > ,radmat::PiPi::PiPi>);
           success &= Factory::Instance().registerObject(std::string("PiPiStar_0_0"),FacEnv::upCast<ffBase_t<std::complex<double> > ,radmat::PiPiStar::PiPiStar>);
+
+          // <Pi | jmu | Rho>
           success &= Factory::Instance().registerObject(std::string("PiRho_0_-1"),FacEnv::upCast<ffBase_t<std::complex<double> >, radmat::PiRho::PiRho<-1> >);
           success &= Factory::Instance().registerObject(std::string("PiRho_0_0"),FacEnv::upCast<ffBase_t<std::complex<double> >, radmat::PiRho::PiRho<0> >);
           success &= Factory::Instance().registerObject(std::string("PiRho_0_1"),FacEnv::upCast<ffBase_t<std::complex<double> >, radmat::PiRho::PiRho<1> >);
+
+          // <Rho | jmu | Pi> 
+          success &= Factory::Instance().registerObject(std::string("RhoPi_-1_0"),FacEnv::upCast<ffBase_t<std::complex<double> >, radmat::RhoPi::RhoPi<-1> >);
+          success &= Factory::Instance().registerObject(std::string("RhoPi_0_0"),FacEnv::upCast<ffBase_t<std::complex<double> >, radmat::RhoPi::RhoPi<0> >);
+          success &= Factory::Instance().registerObject(std::string("RhoPi_1_0"),FacEnv::upCast<ffBase_t<std::complex<double> >, radmat::RhoPi::RhoPi<1> >);
 
 
           registered = true;

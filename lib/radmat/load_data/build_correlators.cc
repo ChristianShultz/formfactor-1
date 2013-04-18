@@ -6,7 +6,7 @@
 
  * Creation Date : 04-12-2012
 
- * Last Modified : Thu Mar 21 17:06:55 2013
+ * Last Modified : Thu Apr 18 12:20:12 2013
 
  * Created By : shultz
 
@@ -40,11 +40,11 @@
 
 
 #define DEBUG_CORRELATOR_NORMALIZATION // do loads of printing at the normalization stage
-// #define SERIOUSLY_DEBUG_CORRELATOR_NORMALIZATION  // turn on annoying printing
+#define SERIOUSLY_DEBUG_CORRELATOR_NORMALIZATION  // turn on annoying printing
 
 // #define BUILD_CORRS_USE_OMP_PARALLEL
 
-// #define  DEBUG_AT_MAKE_MOM_INV_TAGS // are we making the tags right?
+#define  DEBUG_AT_MAKE_MOM_INV_TAGS // are we making the tags right?
 
 
 namespace radmat
@@ -244,8 +244,7 @@ namespace radmat
 
         RadmatMassOverlapData_t source_tmp = db.fetch(it->m_obj.source_normalization); 
 
-        E_f = source_tmp.E();
-        E_f = SEMBLE::toScalar(0.);
+        E_f = source_tmp.E()*SEMBLE::toScalar(0.);
         E_i = E_f;
         int ct = 0;
 
@@ -282,13 +281,14 @@ namespace radmat
           std::cout << "Z_source = " << SEMBLE::toScalar(ENSEM::mean(source.Z())) << std::endl;
           std::cout << "E_sink = " << SEMBLE::toScalar(ENSEM::mean(sink.E())) << std::endl;
           std::cout << "E_source = " << SEMBLE::toScalar(ENSEM::mean(source.E())) << std::endl;
-          std::cout << "tsink - tsource  " << double(t_sink - t_source) << "  " << t_sink - t_source << std::endl;
+          std::cout << "tsink = " << t_sink << " tsource =   " << t_source << std::endl;
 
 #endif 
 
+          
 
 
-          for(int t_ins = t_source; t_ins <= t_sink; ++t_ins)
+          for(int t_ins = t_source; t_ins < t_sink; ++t_ins)
           {
 
             ENSEM::EnsemReal prop = propagation_factor(sink.E(),sink.Z(),t_sink,t_ins,
@@ -298,7 +298,7 @@ namespace radmat
 
 #ifdef SERIOUSLY_DEBUG_CORRELATOR_NORMALIZATION
             if(t_ins == 0) 
-              std::cout << "norm = " << SEMBLE::toScalar(ENSEM::mean(prop)) << std::endl;
+              std::cout << "t_ins = " << t_ins << " norm = " << SEMBLE::toScalar(ENSEM::mean(prop)) << std::endl;
 #endif
 
 
@@ -307,14 +307,14 @@ namespace radmat
 
             ENSEM::pokeObs(norm,prop,t_ins); 
 #endif
-          }
+          } // end loop over t_ins
 
 #ifdef DEBUG_CORRELATOR_NORMALIZATION
           ENSEM::write(path.str() + std::string("_corr_post"), corr_tmp);
           ENSEM::write(path.str() + std::string("_norm") , norm);
   
-    //      std::cout << __func__ << std::endl; 
-    //      std::cout << SEMBLE::toScalar(it->m_coeff) << " X " << Hadron::ensemFileName(it->m_obj.redstar_xml) << std::endl;
+          std::cout << __func__ << std::endl; 
+          std::cout << SEMBLE::toScalar(it->m_coeff) << " X " << Hadron::ensemFileName(it->m_obj.redstar_xml) << std::endl;
 #endif      
 
 
@@ -324,7 +324,8 @@ namespace radmat
           corr = corr + it->m_coeff*corr_tmp; 
 
           ++ct;
-        }
+
+        }  // end loop over data (iterator loop)
 
         // fill in the rest of the relevant data
         E_f = E_f/SEMBLE::toScalar(double(ct));
@@ -403,21 +404,21 @@ namespace radmat
         // hardwire some assumptions about projected 
         // operator naming here.. if something changes we can just build some
         // sort of hash to retreive the correct name but the current
-       // convetions should be good for a bit
+        // convetions should be good for a bit
         if(m_ini.threePointCorrXMLIni.isProjected)
         {
           m_elem.source.state.name = append_momentum(m_elem.source.state.name,
               m_elem.source.state.mom);
           m_elem.sink.state.name = append_momentum(m_elem.sink.state.name,
               m_elem.sink.state.mom);
-
-          if(ini.threePointCorrXMLIni.isDiagonal)
-            if(am_i != am_f)
-            {
-              std::cerr << __func__ << ": WARNING: you chose a diagonal matrix element"
-                <<" but gave different rest masses for source and sink. " << std::endl;
-            }
         }
+
+        if(m_ini.threePointCorrXMLIni.isDiagonal)
+          if(am_i != am_f)
+          {
+            std::cerr << __func__ << ": WARNING: you chose a diagonal matrix element"
+              <<" but gave different rest masses for source and sink. " << std::endl;
+          }
 
         redstarCartMatElem celem(m_elem,ini.threePointCorrXMLIni.source_id,
             ini.threePointCorrXMLIni.sink_id);
@@ -598,8 +599,8 @@ namespace radmat
         std::stringstream ss; 
         ss << m_mat_elem_id << ".p_f"  << p_f[0] << p_f[1] << p_f[2] << ".p_i"  
           << p_i[0] << p_i[1] << p_i[2] << ".am_f" << std::setw(3) << am_f << ".am_i" 
-         << std::setw(3) << am_i; 
-       return ss.str();  
+          << std::setw(3) << am_i; 
+        return ss.str();  
       }
 
 
@@ -637,12 +638,12 @@ namespace radmat
     std::vector<CartesianMatrixElement>
       getCartesianMatrixElementsParallel(const std::vector<simpleWorld::ContinuumMatElem> &elems, const ThreePointCorrIni_t &ini)
       {
-/*
-        std::cout << __func__ << ": debugging is on, elems contains" << std::endl;
-        std::vector<simpleWorld::ContinuumMatElem>::const_iterator it; 
-        for(it = elems.begin(); it != elems.end(); ++it)
-          std::cout << *it << std::endl;
-*/
+        /*
+           std::cout << __func__ << ": debugging is on, elems contains" << std::endl;
+           std::vector<simpleWorld::ContinuumMatElem>::const_iterator it; 
+           for(it = elems.begin(); it != elems.end(); ++it)
+           std::cout << *it << std::endl;
+         */
 
         std::vector<CartesianMatrixElement> collect;
         registerSubductionTables(); // do this mono to avoid race 

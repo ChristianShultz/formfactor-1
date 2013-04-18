@@ -1,6 +1,8 @@
 #ifndef LORENTZFF_POLARIZATION_EMBEDDING_H
 #define LORENTZFF_POLARIZATION_EMBEDDING_H
 
+#include <complex>
+
 #include "radmat/utils/polarisation_tensors.h"
 #include "ensem/ensem.h"
 #include "semble/semble_meta.h"
@@ -40,15 +42,26 @@ namespace radmat
       }
     };
 
-
   template<idx_t J, int hel>
     struct embedHelicityPolarizationTensor
     {
-      Tensor<std::complex<double> , J> ptensor(const Tensor<double,1> &p, const double mom_factor) const
+      virtual Tensor<std::complex<double> , J> ptensor(const Tensor<double,1> &p, const double mom_factor) const
       {
         HelicityPolarizationTensor<J> foo;
         return foo(p,hel,mom_factor); 
       }
+
+      virtual Tensor<std::complex<double> , J> conjugate(const Tensor<std::complex<double> , J> &inp) const
+      {
+        Tensor<std::complex<double> , J> foo = inp;
+        typename Tensor<std::complex<double> , J>::iterator it;
+
+        for(it = foo.begin(); it != foo.end(); ++it)
+          *it = std::conj(*it); 
+
+        return foo;
+      }
+
     };
 
 }
