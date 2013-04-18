@@ -14,6 +14,7 @@
 // ffs
 #include "lorentzff_PiPi.h"
 #include "lorentzff_PiPiStar.h"
+#include "lorentzff_PiRho.h"
 
 #include <omp.h>
 
@@ -76,6 +77,9 @@ namespace radmat
           success &= Factory::Instance().registerObject(std::string("PiPi"),FacEnv::upCast<ffBase_t<std::complex<double> > ,radmat::PiPi::PiPi>);
           success &= Factory::Instance().registerObject(std::string("PiPi_0_0"),FacEnv::upCast<ffBase_t<std::complex<double> > ,radmat::PiPi::PiPi>);
           success &= Factory::Instance().registerObject(std::string("PiPiStar_0_0"),FacEnv::upCast<ffBase_t<std::complex<double> > ,radmat::PiPiStar::PiPiStar>);
+          success &= Factory::Instance().registerObject(std::string("PiRho_0_-1"),FacEnv::upCast<ffBase_t<std::complex<double> >, radmat::PiRho::PiRho<-1> >);
+          success &= Factory::Instance().registerObject(std::string("PiRho_0_0"),FacEnv::upCast<ffBase_t<std::complex<double> >, radmat::PiRho::PiRho<0> >);
+          success &= Factory::Instance().registerObject(std::string("PiRho_0_1"),FacEnv::upCast<ffBase_t<std::complex<double> >, radmat::PiRho::PiRho<1> >);
 
 
           registered = true;

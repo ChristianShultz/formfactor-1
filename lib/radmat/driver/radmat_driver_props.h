@@ -4,12 +4,14 @@
 #include <string>
 #include "io/adat_xmlio.h"
 #include "jackFitter/three_point_fit_forms.h"
+#include "radmat/load_data/build_correlators.h"
 
 namespace radmat
 {
   struct RDriverProps_t
   {
-    ThreePointComparatorProps_t threePointComparatorProps;   
+    ThreePointComparatorProps_t threePointComparatorProps;
+    ThreePointCorrIni_t threePointIni;    
   };
 
 

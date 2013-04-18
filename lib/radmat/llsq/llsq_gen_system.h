@@ -82,7 +82,7 @@ namespace radmat
     Array<int> p_i;
     ENSEM::EnsemReal E_f;                              // these are in flight energies 
     ENSEM::EnsemReal E_i;                              //  ie: sqrt(m*m + p*p)
-    double mom_fac;                           // 1/xi * 2pi/L_s -- the "unit" size  
+    double mom_fac;                           // (1/ xi) * 2pi/L_s -- the "unit" size  
 
   };
 
@@ -336,6 +336,10 @@ namespace radmat
         xx.close();
       }
       virtual LLSQRetTypeBase_h operator()(const LLSQInputType_h &, const int t_ins) const = 0;
+      
+      virtual bool invertable(void) const = 0;  
+      virtual SEMBLE::SembleMatrix<T> inv(const SEMBLE::SembleMatrix<T> &in) const = 0;
+      
       virtual std::string echo(void) const = 0;
       virtual ~LLSQBaseSolver_t(void) {}
     };

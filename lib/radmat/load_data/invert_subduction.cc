@@ -6,7 +6,7 @@
 
  * Creation Date : 12-10-2012
 
- * Last Modified : Wed Feb 13 11:49:42 2013
+ * Last Modified : Thu Mar  7 19:48:19 2013
 
  * Created By : shultz
 
@@ -365,7 +365,10 @@ namespace radmat
 
 
 
-
+  void registerSubductionTables(void)
+  {
+    doRegistration(); 
+  }
 
 
 

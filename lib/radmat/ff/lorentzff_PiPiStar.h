@@ -27,7 +27,7 @@ namespace radmat
     {
       std::string ff(void) const;
       Tensor<std::complex<double> , 1> operator()(const Tensor<double,1> &p_f, 
-						  const Tensor<double,1> &p_i) const;
+						  const Tensor<double,1> &p_i, const double mom_fac) const;
     };
 
 // generate a list for the PiPi constructor

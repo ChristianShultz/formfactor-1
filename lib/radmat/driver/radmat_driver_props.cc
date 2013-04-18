@@ -6,7 +6,7 @@
 
 * Creation Date : 29-11-2012
 
-* Last Modified : Thu Nov 29 11:18:03 2012
+* Last Modified : Mon Feb 25 14:32:54 2013
 
 * Created By : shultz
 
@@ -44,7 +44,8 @@ namespace radmat
   std::string toString (const RDriverProps_t &prop)
   {
     std::stringstream ss;
-      ss << "threePointComparatorProps = " << prop.threePointComparatorProps; 
+      ss << "threePointComparatorProps = " << prop.threePointComparatorProps;
+      ss << " \nthreePointIni = " << prop.threePointIni; 
       return ss.str(); 
   }
 
@@ -57,6 +58,7 @@ namespace radmat
   {
     ADATXML::XMLReader ptop(xml,path);
     doXMLRead(ptop,"threePointComparatorProps",prop.threePointComparatorProps,__PRETTY_FUNCTION__);
+    doXMLRead(ptop,"threePointIni",prop.threePointIni,__PRETTY_FUNCTION__); 
   } 
 
 

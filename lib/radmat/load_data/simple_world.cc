@@ -6,7 +6,7 @@
 
  * Creation Date : 19-10-2012
 
- * Last Modified : Fri Jan 25 14:14:52 2013
+ * Last Modified : Wed Feb 20 10:13:12 2013
 
  * Created By : shultz
 
@@ -542,6 +542,36 @@ namespace radmat
         ContinuumStatePrimitive t = makeTemporalInsertion(xmlin.time);
         triplet circ = makeCircularSpatialInsertion(xmlin.space); 
 
+        bool t_creationOp, s_creationOp;
+
+        t_creationOp = xmlin.time.creation_op;
+        s_creationOp = xmlin.space.creation_op;
+
+        if( xmlin.time.active )
+        {
+          if ( xmlin.space.active)
+          {
+            if ( t_creationOp != s_creationOp)
+            {
+              std::cerr << __func__ << ": error, I don't know what to do for the case where you choose"
+                << " daggered and undaggered ops for the inserion, check the xml, did you mean to have"
+                << " both temporal and spatial currents active at the same time? " << std::endl;
+              exit(1);
+            }
+          }
+
+         ret.set_create(t_creationOp); 
+
+        }
+        else if (xmlin.space.active)
+        {
+          ret.set_create(s_creationOp);
+        }
+        else
+        {
+          std::cerr << __func__ << ": error, no active current insertions, exiting" << std::endl;
+          exit(1);
+        }
 
 
         // are we doing temporal matelems
@@ -595,15 +625,18 @@ namespace radmat
       }
 
 
-      ADATXML::Array<int> getMomentumTransfer(const ContinuumMatElem::State &source, const ContinuumMatElem::State &sink)
+      ADATXML::Array<int> getMomentumTransfer(const ContinuumMatElem::State &source, const ContinuumMatElem::State &sink, const bool create)
       {
         ADATXML::Array<int> ret;
         ret.resize(3);
-        // NB: need that extra minus sign or else all of the correlators are zero b/c of phase convention chosen for the insertion
-        // to be daggered (un-daggered.. can't remember which but this is the way it needs to be)
+
         ret[0] = source.state.mom[0] - sink.state.mom[0];
         ret[1] = source.state.mom[1] - sink.state.mom[1];
         ret[2] = source.state.mom[2] - sink.state.mom[2];
+
+        if (create) 
+          return -ret;
+
         return ret; 
       } 
 
@@ -639,7 +672,7 @@ namespace radmat
           dum.insertion = ins;
           dum.ensemble = xmlin.ensemble;
 
-          ADATXML::Array<int> q = getMomentumTransfer(*it_source,*it_sink);
+          ADATXML::Array<int> q = getMomentumTransfer(*it_source,*it_sink,ins.create());
 
           int qq = q[0]*q[0] + q[1]*q[1] + q[2]*q[2];
 

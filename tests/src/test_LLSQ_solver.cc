@@ -46,7 +46,7 @@ namespace radmat
     POW2_ASSERT(inputPtr);
     ADAT::Handle<LLSQInputType_t<dc> > inputHandle(inputPtr);
    
-    cret_h solnHandle = (*svd_h)(inputHandle);
+    cret_h solnHandle = (*svd_h)(inputHandle,4);
     x = solnHandle->m_FF;
    
     SEMBLE::SembleMatrix<dc> U,V;

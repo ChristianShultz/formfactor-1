@@ -94,6 +94,7 @@ namespace radmat
   Tensor<double,2> g_uu(void);
 
   Tensor<double,2> genRotationMatrix(const XMLArray::Array<int> &mom);
+
   /////////////////////////////////////////////////////////////////////////////////////////////////////////
   /////////////////////////////////////////////////////////////////////////////////////////////////////////
   /////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -624,8 +625,8 @@ namespace radmat
       return foo;
     }
 
-    // allow for inheritance
-    protected:
+// use everything below this at your own risk..
+
 
     //! get elements via pointers, useful for contracting things
     T &getElem(idx_t const *const _pos)
@@ -1116,7 +1117,7 @@ namespace radmat
           pElem = new T;
         *pElem = ini;
         numElem = 1;
-  return true;
+        return true;
       }
 
       virtual bool empty(void) const
@@ -2700,7 +2701,7 @@ namespace radmat
       {
       return contract(a, b, 0, 0);
       }
-      */
+   */
 
   //! overload wedge to tensor product
   template<typename T, typename U, idx_t N, idx_t M>
@@ -2747,6 +2748,7 @@ namespace radmat
     {
       return Tensor<T,0> (T(value(u)));
     }
+
 
 } // close radmat namespace
 #endif

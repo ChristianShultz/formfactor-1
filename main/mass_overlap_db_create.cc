@@ -6,7 +6,7 @@
 
  * Creation Date : 08-01-2013
 
- * Last Modified : Wed Feb 13 14:36:05 2013
+ * Last Modified : Thu Mar  7 14:18:56 2013
 
  * Created By : shultz
 
@@ -44,6 +44,8 @@ struct XML_input_t
   int ncfg;
   bool resize;
   bool isProjected;
+  double phase_real;
+  double phase_imag; 
   std::string Z_type;
   std::string dbname;
   std::string pid; 
@@ -79,12 +81,22 @@ void read(ADATXML::XMLReader &xml, const std::string &path, XML_input_t &prop)
   doXMLRead(ptop,"ncfg",prop.ncfg,__PRETTY_FUNCTION__);
   doXMLRead(ptop,"resize",prop.resize,__PRETTY_FUNCTION__);
   doXMLRead(ptop,"isProjected",prop.isProjected,__PRETTY_FUNCTION__); 
+  doXMLRead(ptop,"phase_real",prop.phase_real,__PRETTY_FUNCTION__);
+  doXMLRead(ptop,"phase_imag",prop.phase_imag,__PRETTY_FUNCTION__); 
   doXMLRead(ptop,"Z_type",prop.Z_type,__PRETTY_FUNCTION__);
-  doXMLRead(ptop,"dbname",prop.dbname,__PRETTY_FUNCTION__);
+// use redstar instead..  doXMLRead(ptop,"dbname",prop.dbname,__PRETTY_FUNCTION__);
   doXMLRead(ptop,"pid",prop.pid,__PRETTY_FUNCTION__);
   doXMLRead(ptop,"redstar",prop.redstar,__PRETTY_FUNCTION__);
   doXMLRead(ptop,"LG",prop.LG,__PRETTY_FUNCTION__); 
-  doXMLRead(ptop,"t0_extract",prop.t0_extract,__PRETTY_FUNCTION__); 
+
+  prop.dbname = prop.redstar.ops[1].name + std::string(".sdb");
+
+
+  if(prop.phase_imag != 0.)
+  {
+    std::cerr << __func__ << ": error: only phases of +/- are currently supported" << std::endl;
+    exit(1);
+  }
 }
 
 
@@ -186,9 +198,7 @@ struct dbInterface
       }
     }
 
-    // from his scripts it looks like this factor is included with the optimal overlaps
-      // root(2m)exp(mt/2) -- is this what robert uses???
-     // data.data().Z() = ENSEM::sqrt(data.data().E()*SEMBLE::toScalar(2.) * ENSEM::exp(data.data().E()*SEMBLE::toScalar(double(m_xml.t0_extract))));
+    data.data().Z() = SEMBLE::toScalar(m_xml.phase_real) * data.data().Z();
 
     SK key;
     key.key() = K(m_xml.pid,m_xml.redstar);

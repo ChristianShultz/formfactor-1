@@ -25,41 +25,52 @@ radmat::Tensor<std::complex<double>, 1 > genEps(const double E, const short h, c
   radmat::Tensor<std::complex<double> , 1> eps((radmat::TensorShape<1>())[4],0.);
   radmat::Tensor<double,2> R = radmat::genRotationMatrix(mom);
   if(h == 1)
-    {
-      eps[1] = -1./sqrt(2.);
-      eps[2] = std::complex<double>(0.,-1./sqrt(2));
-      return R*eps;
-    }
+  {
+    eps[1] = -1./sqrt(2.);
+    eps[2] = std::complex<double>(0.,-1./sqrt(2));
+    return R*eps;
+  }
   if(h == -1)
-    {
-      eps[1] = 1./sqrt(2.);
-      eps[2] = std::complex<double>(0.,-1./sqrt(2));
-      return R*eps;  
-    }
+  {
+    eps[1] = 1./sqrt(2.);
+    eps[2] = std::complex<double>(0.,-1./sqrt(2));
+    return R*eps;  
+  }
   if(h == 0)
-    {
-      double m = sqrt(E*E - (mom[0]*mom[0] + mom[1]*mom[1] + mom[2]*mom[2]));
-      double p = sqrt(mom[0]*mom[0] + mom[1]*mom[1] + mom[2]*mom[2]);
-      eps[0] = p/m;
-      eps[3] = E/m;
-      return R*eps;
-    }
+  {
+    double m = sqrt(E*E - (mom[0]*mom[0] + mom[1]*mom[1] + mom[2]*mom[2]));
+    double p = sqrt(mom[0]*mom[0] + mom[1]*mom[1] + mom[2]*mom[2]);
+    eps[0] = p/m;
+    eps[3] = E/m;
+    return R*eps;
+  }
 
   POW2_ASSERT(false);
   return eps; // dummy to get the compiler to shut up
 }
 
 // Lists of momentum directions
-const int momListD2[][3] = {{1, 1, 0}, {0, 1, 1}, {1, 0, 1}, {1, -1, 0}, {0, 1, -1}, {-1, 0, 1}, {-1, 1, 0}, {0, -1, 1}, {1, 0, -1}, {-1, -1, 0}, {0, -1, -1}, {-1, 0, -1}};
+const int momListD2[][3] = {{1, 1, 0}, {0, 1, 1}, {1, 0, 1}, {1, -1, 0}, 
+  {0, 1, -1}, {-1, 0, 1}, {-1, 1, 0}, {0, -1, 1}, {1, 0, -1}, {-1, -1, 0},
+  {0, -1, -1}, {-1, 0, -1}};
 const int dimMomListD2 = 12;
 
-const int momListD3[][3] = {{1, 1, 1}, {-1, 1, 1}, {1, -1, 1}, {1, 1, -1}, {-1, -1, 1}, {1, -1, -1}, {-1, 1, -1}, {-1, -1, -1}};
+const int momListD3[][3] = {{1, 1, 1}, {-1, 1, 1}, {1, -1, 1}, {1, 1, -1},
+  {-1, -1, 1}, {1, -1, -1}, {-1, 1, -1}, {-1, -1, -1}};
 const int dimMomListD3 = 8;
 
-const int momListC4nm0[][3] = {{0, 1, 2}, {1, 2, 0}, {2, 0, 1}, {0, 2, 1}, {2, 1, 0}, {1, 0, 2}, {0, 1, -2}, {1, -2, 0}, {-2, 0, 1}, {0, -2, 1}, {-2, 1, 0}, {1, 0, -2}, {0, -1, 2}, {-1, 2, 0}, {2, 0, -1}, {0, 2, -1}, {2, -1, 0}, {-1, 0, 2}, {0, -1, -2}, {-1, -2, 0}, {-2, 0, -1}, {0, -2, -1}, {-2, -1, 0}, {-1, 0, -2}};
+const int momListC4nm0[][3] = {{0, 1, 2}, {1, 2, 0}, {2, 0, 1}, {0, 2, 1},
+  {2, 1, 0}, {1, 0, 2}, {0, 1, -2}, {1, -2, 0}, {-2, 0, 1}, {0, -2, 1},
+  {-2, 1, 0}, {1, 0, -2}, {0, -1, 2}, {-1, 2, 0}, {2, 0, -1}, {0, 2, -1},
+  {2, -1, 0}, {-1, 0, 2}, {0, -1, -2}, {-1, -2, 0}, {-2, 0, -1}, {0, -2, -1}, 
+  {-2, -1, 0}, {-1, 0, -2}};
 const int dimMomListC4nm0 = 24;
 
-const int momListC4nnm[][3] = {{1, 1, 2}, {1, 2, 1}, {2, 1, 1}, {-1, 1, 2}, {-1, 2, 1}, {1, -1, 2}, {1, 2, -1}, {2, -1, 1}, {2, 1, -1}, {1, 1, -2}, {1, -2, 1}, {-2, 1, 1}, {-1, -1, 2}, {-1, 2, -1}, {2, -1, -1}, {-1, 1, -2}, {-1, -2, 1}, {1, -1, -2}, {1, -2, -1}, {-2, -1, 1}, {-2, 1, -1}, {-1, -1, -2}, {-1, -2, -1}, {-2, -1, -1}};
+const int momListC4nnm[][3] = {{1, 1, 2}, {1, 2, 1}, {2, 1, 1}, {-1, 1, 2},
+  {-1, 2, 1}, {1, -1, 2}, {1, 2, -1}, {2, -1, 1}, {2, 1, -1}, {1, 1, -2},
+  {1, -2, 1}, {-2, 1, 1}, {-1, -1, 2}, {-1, 2, -1}, {2, -1, -1}, {-1, 1, -2},
+  {-1, -2, 1}, {1, -1, -2}, {1, -2, -1}, {-2, -1, 1}, {-2, 1, -1}, {-1, -1, -2},
+  {-1, -2, -1}, {-2, -1, -1}};
 const int dimMomListC4nnm = 24;
 
 
@@ -83,7 +94,7 @@ std::vector<triplet> genMomList(void)
     ret.push_back(triplet(momListC4nm0[i][0],momListC4nm0[i][1],momListC4nm0[i][2]));
   for(int i = 0; i < dimMomListC4nnm; ++i)
     ret.push_back(triplet(momListC4nnm[i][0],momListC4nnm[i][1],momListC4nnm[i][2]));
-  
+
   return ret;
 }
 
@@ -105,78 +116,78 @@ namespace radmat
 
     // start at J = 1
     for(it = moms.begin(); it != moms.end(); it++)
+    {
+      mom[0] = it->x;
+      mom[1] = it->y;
+      mom[2] = it->z;
+
+      double m = itpp::randu() + 0.01;
+      genPolTens<1> first_rank(mom);
+
+      for(short i = -1; i < 2; ++i)
       {
-	mom[0] = it->x;
-	mom[1] = it->y;
-	mom[2] = it->z;
+        bool eq = equals(first_rank(genE(mom,m),i,1.), 
+            genEps(genE(mom,m),i,mom),
+            std::complex<double>(precision,precision)) ;
+        TESTER_TEST(m_test,eq,"construction of base failed");
 
-	double m = itpp::randu() + 0.01;
-	genPolTens<1> first_rank(mom);
-
-	for(short i = -1; i < 2; ++i)
-	  {
-	    bool eq = equals(first_rank(genE(mom,m),i), 
-			     genEps(genE(mom,m),i,mom),
-			     std::complex<double>(precision,precision)) ;
-	    TESTER_TEST(m_test,eq,"construction of base failed");
-
-	    if(!!!eq) 
-	      std::cout << first_rank(genE(mom,m),i)- genEps(genE(mom,m),i,mom) << std::endl;
-	  }
+        if(!!!eq) 
+          std::cout << first_rank(genE(mom,m),i,1.)- genEps(genE(mom,m),i,mom) << std::endl;
       }
+    }
 
     Tensor<std::complex<double> , 2> coupled((TensorShape<2>())[4][4],0.);
     std::complex<double> zero(0.,0.);
 
     // check J = 2 explicitly
     for(it = moms.begin(); it != moms.end(); ++it)
+    {
+      mom[0] = it->x;
+      mom[1] = it->y;
+      mom[2] = it->z;
+
+      double m = itpp::randu() + 0.01;
+      genPolTens<1> first_rank(mom);
+      genPolTens<2> second_rank(mom);
+
+      for(short i = -2; i <3; ++i)
       {
-	mom[0] = it->x;
-	mom[1] = it->y;
-	mom[2] = it->z;
+        coupled.fill(zero);
+        for(short h1 = -1; h1 < 2; ++h1)
+          for(short h2 = -1; h2 < 2; ++h2)
+            coupled += Hadron::clebsch(2,2*h1,2,2*h2,4,2*i) * 
+              (first_rank(genE(mom,m),h1,1.)  ^ first_rank(genE(mom,m),h2,1.)) ;  // ^ is tensor product
 
-	double m = itpp::randu() + 0.01;
-	genPolTens<1> first_rank(mom);
-	genPolTens<2> second_rank(mom);
-
-	for(short i = -2; i <3; ++i)
-	  {
-	    coupled.fill(zero);
-	    for(short h1 = -1; h1 < 2; ++h1)
-	      for(short h2 = -1; h2 < 2; ++h2)
-		coupled += Hadron::clebsch(2,2*h1,2,2*h2,4,2*i) * 
-		  (first_rank(genE(mom,m),h1)  ^ first_rank(genE(mom,m),h2) ) ;  // ^ is tensor product
-	    
-	    bool eq = equals(coupled,second_rank(genE(mom,m),i),std::complex<double>(precision,precision));
-	    TESTER_TEST(m_test,eq,"construction of rank 2 failed");
-	  }
+        bool eq = equals(coupled,second_rank(genE(mom,m),i,1.),std::complex<double>(precision,precision));
+        TESTER_TEST(m_test,eq,"construction of rank 2 failed");
       }
+    }
 
     // check J = 3 explicitly
     Tensor<std::complex<double> , 3> coupled3((TensorShape<3>())[4][4][4],0.);
     for(it = moms.begin(); it != moms.end(); ++it)
+    {
+      mom[0] = it->x;
+      mom[1] = it->y;
+      mom[2] = it->z;
+
+      double m = itpp::randu() + 0.01;
+      genPolTens<1> first_rank(mom);
+      genPolTens<2> second_rank(mom);
+      genPolTens<3> third_rank(mom);
+
+      for(short i = -3; i <4; ++i)
       {
-	mom[0] = it->x;
-	mom[1] = it->y;
-	mom[2] = it->z;
+        coupled3.fill(zero);
+        for(short h1 = -1; h1 < 2; ++h1)
+          for(short h2 = -2; h2 < 3; ++h2)
+            coupled3 += Hadron::clebsch(2,2*h1,4,2*h2,6,2*i) * 
+              (first_rank(genE(mom,m),h1,1.)  ^ second_rank(genE(mom,m),h2,1.)) ; // ^ is tensor product
 
-	double m = itpp::randu() + 0.01;
-	genPolTens<1> first_rank(mom);
-	genPolTens<2> second_rank(mom);
-	genPolTens<3> third_rank(mom);
-
-	for(short i = -3; i <4; ++i)
-	  {
-	    coupled3.fill(zero);
-	    for(short h1 = -1; h1 < 2; ++h1)
-	      for(short h2 = -2; h2 < 3; ++h2)
-		coupled3 += Hadron::clebsch(2,2*h1,4,2*h2,6,2*i) * 
-		  (first_rank(genE(mom,m),h1)  ^ second_rank(genE(mom,m),h2) ) ; // ^ is tensor product
-	    
-	    bool eq = equals(coupled3,third_rank(genE(mom,m),i),std::complex<double>(precision,precision));
-	    TESTER_TEST(m_test,eq,"construction of rank 3 failed");
-	  }
+        bool eq = equals(coupled3,third_rank(genE(mom,m),i,1.),std::complex<double>(precision,precision));
+        TESTER_TEST(m_test,eq,"construction of rank 3 failed");
       }
+    }
 
     return m_test;
   }

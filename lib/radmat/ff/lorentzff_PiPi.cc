@@ -21,7 +21,7 @@ namespace radmat
 
     // return a complex version of p_+
     Tensor<std::complex<double> , 1> F1::operator()(const Tensor<double,1> &p_f,
-						    const Tensor<double,1> &p_i) const
+						    const Tensor<double,1> &p_i, const double mom_fac) const
     {
       return convertTensorUnderlyingType<std::complex<double>,double,1>( pPlus(p_f,p_i) );
     }

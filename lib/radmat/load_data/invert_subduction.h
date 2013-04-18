@@ -65,7 +65,7 @@ namespace radmat
   //! determine the coefficients for inverting subduction
   ListLatticeIrrepExpr_t invertSubduction(const ContinuumBosonExprPrimitive &);
 
-
+  void registerSubductionTables(void);
 
 
 } // namespace radmat

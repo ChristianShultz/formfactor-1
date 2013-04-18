@@ -6,21 +6,22 @@
 
  * Creation Date : 04-12-2012
 
- * Last Modified : Wed Feb 13 14:40:47 2013
+ * Last Modified : Thu Mar 21 17:06:55 2013
 
  * Created By : shultz
 
  _._._._._._._._._._._._._._._._._._._._._.*/
 
 #include "build_correlators.h"
+#include "invert_subduction.h"
 #include "simple_world.h"
 #include "generate_redstar_xml.h"  
 #include "radmat_database_interface.h"
 #include "radmat/fake_data/fake_3pt_function_aux.h"
 #include "radmat/utils/pow2assert.h"
+#include "radmat/utils/perThreadStorage.h"
 #include "radmat/llsq/llsq_gen_system.h"
-#include "semble/semble_meta.h"
-#include "semble/semble_file_management.h"
+#include "semble/semble_semble.h"
 #include "radmat_overlap_key_val_db.h"
 #include "hadron/ensem_filenames.h"
 #include "io/adat_xmlio.h"
@@ -29,15 +30,21 @@
 #include "jackFitter/plot.h"
 #include "ensem/ensem.h"
 #include <iostream>
+#include <iomanip>
 #include <sstream>
 #include <string>
 #include <vector>
 #include <set>
+#include <omp.h>
 
 
 
 #define DEBUG_CORRELATOR_NORMALIZATION // do loads of printing at the normalization stage
 // #define SERIOUSLY_DEBUG_CORRELATOR_NORMALIZATION  // turn on annoying printing
+
+// #define BUILD_CORRS_USE_OMP_PARALLEL
+
+// #define  DEBUG_AT_MAKE_MOM_INV_TAGS // are we making the tags right?
 
 
 namespace radmat
@@ -231,9 +238,9 @@ namespace radmat
         ThreePtPropagationFactor<double> propagation_factor;
 
         // initialize some variables
-        momentum_factor = 1./ini.xi * 2.*acos(-1.)/ini.L_s;      
-        p_f = it->m_obj.redstar_xml.npoint[3].irrep.mom; 
-        p_i = it->m_obj.redstar_xml.npoint[1].irrep.mom;
+        momentum_factor = mom_factor(ini.xi,ini.L_s);      
+        p_f = it->m_obj.redstar_xml.npoint[1].irrep.mom; 
+        p_i = it->m_obj.redstar_xml.npoint[3].irrep.mom;
 
         RadmatMassOverlapData_t source_tmp = db.fetch(it->m_obj.source_normalization); 
 
@@ -386,27 +393,34 @@ namespace radmat
       }
 
 
-      CartesianMatrixElement(const ThreePointCorrIni_t &ini, const simpleWorld::ContinuumMatElem &elem)
+      CartesianMatrixElement(const ThreePointCorrIni_t &ini, 
+          const simpleWorld::ContinuumMatElem &elem)
         : have_active_data(false) , success(true) , m_ini(ini) , m_elem(elem) 
       {
 
         am_i = ini.threePointCorrXMLIni.maSource;
         am_f = ini.threePointCorrXMLIni.maSink;
-        // hardwire some assumptions about projected operator naming here.. if something changes we can just build some
-        // sort of hash to retreive the correct name but the current convetions should be good for a bit
+        // hardwire some assumptions about projected 
+        // operator naming here.. if something changes we can just build some
+        // sort of hash to retreive the correct name but the current
+       // convetions should be good for a bit
         if(m_ini.threePointCorrXMLIni.isProjected)
         {
-          m_elem.source.state.name = append_momentum(m_elem.source.state.name,m_elem.source.state.mom);
-          m_elem.sink.state.name = append_momentum(m_elem.sink.state.name,m_elem.sink.state.mom);
+          m_elem.source.state.name = append_momentum(m_elem.source.state.name,
+              m_elem.source.state.mom);
+          m_elem.sink.state.name = append_momentum(m_elem.sink.state.name,
+              m_elem.sink.state.mom);
 
-          if(am_i != am_f)
-          {
-            std::cerr << __func__ << ": WARNING: you chose a diagonal matrix element"
-              <<" but gave different rest masses for source and sink. " << std::endl;
-          }
+          if(ini.threePointCorrXMLIni.isDiagonal)
+            if(am_i != am_f)
+            {
+              std::cerr << __func__ << ": WARNING: you chose a diagonal matrix element"
+                <<" but gave different rest masses for source and sink. " << std::endl;
+            }
         }
 
-        redstarCartMatElem celem(m_elem,ini.threePointCorrXMLIni.source_id,ini.threePointCorrXMLIni.sink_id);
+        redstarCartMatElem celem(m_elem,ini.threePointCorrXMLIni.source_id,
+            ini.threePointCorrXMLIni.sink_id);
         t.eat(celem.get_component(0),m_ini);
         x.eat(celem.get_component(1),m_ini);
         y.eat(celem.get_component(2),m_ini);
@@ -415,7 +429,7 @@ namespace radmat
         check(); 
 
         std::stringstream ss; 
-        ss << m_ini.matElemID << "_" << m_elem.source.state.H << "_" << m_elem.sink.state.H;
+        ss << m_ini.matElemID << "_" << m_elem.sink.state.H << "_" << m_elem.source.state.H;
         m_mat_elem_id = ss.str(); 
 
       }
@@ -458,6 +472,8 @@ namespace radmat
           have_active_data = true;
           tmax = z.corr.numElem();  
         }
+        else
+          have_active_data = false;
 
         if(!!!(t.success && x.success && y.success && z.success))
         {
@@ -547,7 +563,7 @@ namespace radmat
         ret.p_i = p_i;
         ret.E_f = E_f;
         ret.E_i = E_i; 
-        ret.mom_fac = 1./m_ini.xi * 2.*acos(-1.)/m_ini.L_s;     
+        ret.mom_fac = mom_factor(m_ini.xi , m_ini.L_s);     
         ENSEM::EnsemComplex EZERO;
         EZERO.resize(E_f.size());
         EZERO = SEMBLE::toScalar(std::complex<double>(0.,0.));
@@ -577,6 +593,16 @@ namespace radmat
       }
 
 
+      std::string write_me(void) const
+      {
+        std::stringstream ss; 
+        ss << m_mat_elem_id << ".p_f"  << p_f[0] << p_f[1] << p_f[2] << ".p_i"  
+          << p_i[0] << p_i[1] << p_i[2] << ".am_f" << std::setw(3) << am_f << ".am_i" 
+         << std::setw(3) << am_i; 
+       return ss.str();  
+      }
+
+
       bool have_active_data;
       bool success;
       double am_f, am_i; 
@@ -594,6 +620,8 @@ namespace radmat
     }; // cartesianMatrixElement
 
 
+
+    // this is the main work horse..
     std::vector<CartesianMatrixElement> 
       getCartesianMatrixElements(const std::vector<simpleWorld::ContinuumMatElem> & elems, const ThreePointCorrIni_t &ini)
       {
@@ -602,6 +630,32 @@ namespace radmat
         for(it = elems.begin(); it != elems.end(); ++it)
           ret.push_back(CartesianMatrixElement(ini,*it)); 
         return ret; 
+      }
+
+
+    // this is a threaded main workhorse -- on my mac(4core, 8threads) I saw a factor of ~2 speed up running parallel 
+    std::vector<CartesianMatrixElement>
+      getCartesianMatrixElementsParallel(const std::vector<simpleWorld::ContinuumMatElem> &elems, const ThreePointCorrIni_t &ini)
+      {
+/*
+        std::cout << __func__ << ": debugging is on, elems contains" << std::endl;
+        std::vector<simpleWorld::ContinuumMatElem>::const_iterator it; 
+        for(it = elems.begin(); it != elems.end(); ++it)
+          std::cout << *it << std::endl;
+*/
+
+        std::vector<CartesianMatrixElement> collect;
+        registerSubductionTables(); // do this mono to avoid race 
+        int index;
+        int sz = elems.size();
+        collect.resize(sz);
+
+#pragma omp parallel for shared(index,sz)
+
+        for(index =0; index < sz; ++index)
+          collect[index] = CartesianMatrixElement(ini,elems[index]);
+
+        return collect; 
       }
 
 
@@ -680,7 +734,8 @@ namespace radmat
     };
 
 
-    double Mink_qsq(const CartesianMatrixElement & elem, const double E_f , const double E_i, const double factor)
+    double Mink_qsq(const CartesianMatrixElement & elem, 
+        const double E_f , const double E_i, const double factor)
     { 
       ADATXML::Array<double> p_f,p_i; 
       p_f.resize(3);
@@ -711,8 +766,26 @@ namespace radmat
       {
 
         std::vector<CartesianMatrixElement> unsorted;
-        unsorted = getCartesianMatrixElements(simpleWorld::getContinuumMatElemFromXML(m_ini.threePointCorrXMLIni.continuumMatElemXML),m_ini);
+
+#ifdef  BUILD_CORRS_USE_OMP_PARALLEL 
+
+        unsorted = getCartesianMatrixElementsParallel(
+            simpleWorld::getContinuumMatElemFromXML(m_ini.threePointCorrXMLIni.continuumMatElemXML),
+            m_ini);
+
+#else
+
+        unsorted = getCartesianMatrixElements(
+            simpleWorld::getContinuumMatElemFromXML(m_ini.threePointCorrXMLIni.continuumMatElemXML),
+            m_ini);
+
+#endif
+
         sort(unsorted,m_ini.threePointCorrXMLIni.isDiagonal);
+
+        dump_unsorted(unsorted);
+        dump_sorted();
+
       }
 
       ~manageWork(void)
@@ -794,7 +867,7 @@ namespace radmat
       {
 
 
-   //     std::cout << __func__ << ": unsorted.size() " << unsorted.size() << std::endl;
+        //     std::cout << __func__ << ": unsorted.size() " << unsorted.size() << std::endl;
 
 
         double E_f, E_i; // rest energies..       
@@ -815,7 +888,7 @@ namespace radmat
 
         const double xi = unsorted.begin()->m_ini.xi; 
         const double L_s = unsorted.begin()->m_ini.L_s; 
-        const double factor = 1./xi * 2. * acos(-1.) / L_s; 
+        const double factor = mom_factor(xi , L_s); 
 
         std::map<double,std::vector<CartesianMatrixElement> > m_map; 
         std::map<double,std::vector<CartesianMatrixElement> >::iterator mapit; 
@@ -847,53 +920,11 @@ namespace radmat
           sorted_by_Q2.push_back(mapit->second); 
 
 
-  //      std::cout << __func__ << ": sorted_by_Q2.size() = " << sorted_by_Q2.size() << std::endl;
+        //      std::cout << __func__ << ": sorted_by_Q2.size() = " << sorted_by_Q2.size() << std::endl;
       }
 
 
 
-      // this did not actially work.. 
-
-#if 0
-      // brute force sort using momenta 
-      void sort(const std::vector<CartesianMatrixElement> &unsorted, const bool isDiagonal)
-      {   
-        // this deals with some stupid ambiguity associated with the "Anything that *might be* a declaration *is* a declaration" idea
-        // the result of which was a headache and realization that one can't construct the comparator inplace..
-        compareQ2HashKey my_comparator(isDiagonal);
-        std::map<Q2HashKey,std::vector<CartesianMatrixElement>, compareQ2HashKey > my_map(my_comparator);
-        typedef std::map<Q2HashKey,std::vector<CartesianMatrixElement>, compareQ2HashKey >::value_type value_type; 
-        typedef std::map<Q2HashKey,std::vector<CartesianMatrixElement>, compareQ2HashKey >::iterator my_map_iterator_t; 
-
-        std::vector<CartesianMatrixElement>::const_iterator it;
-        my_map_iterator_t map_it; 
-
-        for(it = unsorted.begin(); it != unsorted.end(); ++it)
-        {
-          if(!!!it->success)
-            push_bad_list(*it);
-          if(!!!it->have_active_data)
-            continue;
-
-          map_it = my_map.find(Q2HashKey(*it));
-
-          if(map_it == my_map.end())
-          {
-            std::vector<CartesianMatrixElement> dum;
-            dum.push_back(*it);
-            my_map.insert(value_type(Q2HashKey(*it),dum));
-          }
-          else
-            map_it->second.push_back(*it);
-        }
-
-        sorted_by_Q2.clear(); 
-        for(map_it = my_map.begin(); map_it != my_map.end(); ++map_it)
-          sorted_by_Q2.push_back(map_it->second); 
-
-      }
-
-#endif 
 
 
       void push_bad_list(const CartesianMatrixElement &elem)
@@ -924,7 +955,7 @@ namespace radmat
         ADATXML::Array<int> p_f,p_i,q;
         double xi = it->m_ini.xi;
         double L_s = it->m_ini.L_s;
-        double mom_fac =  1./xi * 2.*acos(-1.)/L_s;
+        double mom_fac =  mom_factor(xi , L_s);
         int qq; 
         E_f = it->E_f;
         E_i = it->E_i;
@@ -1017,6 +1048,34 @@ namespace radmat
 
 
 
+      void dump_unsorted(const std::vector<CartesianMatrixElement> &elems)
+      {
+        std::ofstream out("unsorted_cart.txt");
+        std::vector<CartesianMatrixElement>::const_iterator it;
+        for(it = elems.begin(); it != elems.end(); ++it)
+          out << it->write_me() << "\n";
+        out.close(); 
+      }
+
+
+      void dump_sorted(void)
+      {
+        std::vector<std::vector<CartesianMatrixElement> >::const_iterator it; 
+        std::vector<CartesianMatrixElement>::const_iterator vit;
+        std::ofstream out("sorted_cart.txt");
+
+        for(it = sorted_by_Q2.begin(); it != sorted_by_Q2.end(); ++it)
+        {
+          out << "MARK////////////////////////////" << std::endl;
+          for(vit = it->begin(); vit != it->end(); ++vit)
+            out << vit->write_me() << std::endl; 
+        }
+
+        out.close(); 
+
+      }
+
+
 
       // data 
       ThreePointCorrIni_t m_ini; 
@@ -1025,6 +1084,101 @@ namespace radmat
       std::vector<RadmatExtendedKeyHadronNPartIrrep_t> m_bad_norms; 
 
     }; // manageWork
+
+
+    LatticeMultiDataTag get_lattice_multi_data_tag(const CartesianMatrixElement &c, const int jmu)
+    {
+      LatticeMultiDataTag out;
+
+      std::stringstream ss;
+      ss << simpleWorld::stateFileName(c.m_elem.sink) << ".V_" << jmu << "." << simpleWorld::stateFileName(c.m_elem.source); 
+      out.file_id = ss.str(); 
+      out.jmu = jmu;
+      out.mat_elem_id = c.m_mat_elem_id;
+      out.p_f = c.p_f; 
+      out.p_i = c.p_i;
+      out.E_f = c.E_f;
+      out.E_i = c.E_i;
+      out.mom_fac = mom_factor(c.m_ini.xi, c.m_ini.L_s);
+
+
+
+
+#ifdef DEBUG_AT_MAKE_MOM_INV_TAGS 
+
+      std::cout << __func__ << ": debuggin on" << std::endl;
+      out.print_me();
+      std::cout << "mom_string = " << out.mom_string() << std::endl;
+      std::cout << "E_string = " << out.E_string() << std::endl;
+#endif
+
+
+
+      return out;
+    }
+
+
+    ADAT::Handle<LLSQLatticeMultiData> get_lattice_multi_data(const std::vector<CartesianMatrixElement> &in)
+    {
+      ADAT::Handle<LLSQLatticeMultiData> out(new LLSQLatticeMultiData);
+      POW2_ASSERT(&*out); // alloc check 
+      std::vector<CartesianMatrixElement>::const_iterator it; 
+
+
+      for(it = in.begin(); it != in.end(); ++it)
+      {
+        if(!!!it->have_active_data)
+          continue; 
+
+        LatticeMultiDataTag t,x,y,z; 
+        bool tt,xx,yy,zz;     
+
+        tt = it->t.success && it->t.active; 
+        xx = it->x.success && it->x.active;
+        yy = it->y.success && it->y.active;
+        zz = it->z.success && it->z.active; 
+
+
+        if(tt)
+        {
+          //          SEMBLE::SembleVector<std::complex<double> > foo;
+          //          foo = it->t.corr; 
+          //          std::cout << "t = " << foo.mean() << std::endl;
+          out->append_row_ensem(it->t.corr,get_lattice_multi_data_tag(*it,0));
+        } 
+        if(xx)
+        {
+          //          SEMBLE::SembleVector<std::complex<double> > foo;
+          //          foo = it->x.corr; 
+          //          std::cout << "x = " << foo.mean() << std::endl;
+          out->append_row_ensem(it->x.corr,get_lattice_multi_data_tag(*it,1));
+        }
+        if(yy)
+        {
+          //          SEMBLE::SembleVector<std::complex<double> > foo;
+          //          foo = it->y.corr; 
+          //          std::cout << "y = " << foo.mean() << std::endl;
+          out->append_row_ensem(it->y.corr,get_lattice_multi_data_tag(*it,2));
+        }
+        if(zz)
+        {          
+          //          SEMBLE::SembleVector<std::complex<double> > foo;
+          //          foo = it->z.corr; 
+          //          std::cout << "z = " << foo.mean() << std::endl;
+          out->append_row_ensem(it->z.corr,get_lattice_multi_data_tag(*it,3)); 
+        }
+
+      }
+
+
+      return out; 
+
+    }
+
+
+
+
+
 
 
 
@@ -1078,7 +1232,8 @@ namespace radmat
         // only send back guys with active data into the llsq
         if(!!!tmp->haveData())
         {
-          std::cout << __func__ << ": removing Q2 = " << SEMBLE::toScalar(ENSEM::mean(Q2)) << " from llsq system (no active data) " << std::endl;
+          std::cout << __func__ << ": removing Q2 = " << SEMBLE::toScalar(ENSEM::mean(Q2)) 
+            << " from llsq system (no active data) " << std::endl;
           continue; 
         }
         else
@@ -1090,8 +1245,29 @@ namespace radmat
     }
 
 
+  std::vector<ADAT::Handle<LLSQLatticeMultiData> > BuildCorrelators::build_multi_correlators(void)
+  {
+    POW2_ASSERT(have_ini);
+    manageWork work_manager(m_ini);
+    std::vector<std::vector<CartesianMatrixElement> > sorted_by_q2(work_manager.get_sorted_data());
+    std::vector<std::vector<CartesianMatrixElement> >::const_iterator it_q2;
+    std::vector<ADAT::Handle<LLSQLatticeMultiData> >  ret; 
+
+    // this is looping over all of the Q2 values
+    for(it_q2 = sorted_by_q2.begin(); it_q2 != sorted_by_q2.end(); ++it_q2)
+      ret.push_back(get_lattice_multi_data(*it_q2)); 
+
+    return ret;
+  }
+
+
 }
 
+
+#undef BUILD_CORRS_USE_OMP_PARALLEL
+#undef DEBUG_CORRELATOR_NORMALIZATION 
+#undef SERIOUSLY_DEBUG_CORRELATOR_NORMALIZATION  
+#undef DEBUG_AT_MAKE_MOM_INV_TAGS 
 
 
 

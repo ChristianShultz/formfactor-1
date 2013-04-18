@@ -49,6 +49,8 @@ template<class T>
 struct ompPerThreadMap
 {
 
+    typedef typename std::map<int,T>::const_iterator const_iterator; 
+
     T &operator()(void)
     {
         // scoped lock
@@ -66,53 +68,72 @@ struct ompPerThreadMap
         return threadMap.insert(typename std::map<int, T>::value_type(omp_get_thread_num(), T())).first->second;
     }
 
-    void emptyThisThread(void)
+
+    T &operator()(const int id)
     {
-        omp_set_lock(&lock_);
-        typename std::map<int, T>::iterator it = threadMap.find(omp_get_thread_num());
+      typename std::map<int, T>::iterator it = threadMap.find(id);
 
-        if(it != threadMap.end())
-            threadMap.erase(it);
+      // if it exist return it
+      if(it != threadMap.end())
+        return it->second;
 
-        omp_unset_lock(&lock_);
+      // insert it and then return the T
+      // stl definition -- pair<iterator,bool> insert ( const value_type& x );
+      return threadMap.insert(typename std::map<int, T>::value_type(id, T())).first->second;
+
     }
 
-private:
+    const_iterator begin(void) const {return threadMap.begin();}
+    const_iterator end(void) const {return threadMap.end();}
+        
+
+    void emptyThisThread(void)
+    {
+      omp_set_lock(&lock_);
+      typename std::map<int, T>::iterator it = threadMap.find(omp_get_thread_num());
+
+      if(it != threadMap.end())
+        threadMap.erase(it);
+
+      omp_unset_lock(&lock_);
+    }
+
+  private:
     std::map<int, T> threadMap;
     omp_lock_t lock_;
 };
 
 
 /*
-  test case
+   test case
 
-struct boobar
+   struct boobar
+   {
+
+   void doSomething(void)
+   {
+   threadLocalDouble() = omp_get_thread_num();
+   }
+
+   void doSomethingElse(void)
+   {
+   doSomething();
+
+#pragma omp critical
 {
-
-    void doSomething(void)
-    {
-        threadLocalDouble() = omp_get_thread_num();
-    }
-
-    void doSomethingElse(void)
-    {
-        doSomething();
-
-        #pragma omp critical
-        {
-            // std::cout << threadLocalDouble() << std::endl;
-            std::cout << omp_get_thread_num() << std::endl;
-        }
-    }
+// std::cout << threadLocalDouble() << std::endl;
+std::cout << omp_get_thread_num() << std::endl;
+}
+}
 
 private:
-    static ompPerThreadMap<double> threadLocalDouble;
+static ompPerThreadMap<double> threadLocalDouble;
 };
 
 
 ompPerThreadMap<double> boobar::threadLocalDouble;
 
-*/
+ */
 
 } //radmat
 

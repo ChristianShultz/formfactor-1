@@ -91,6 +91,10 @@ namespace radmat
         insertion_map.insert(std::map<std::string,op_insertion>::value_type(s,o));
       }
 
+      void set_create(const bool &b) {creationOp = b;}
+      bool create(void) const {return creationOp;}
+
+      bool creationOp; 
       std::map<std::string,op_insertion> insertion_map;  // keys are "t" , "p", "m", "0" .. not found == don't use
     };
 

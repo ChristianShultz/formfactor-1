@@ -59,7 +59,27 @@ namespace radmat
 
   // basically hold two momenta in the tensor form
   //                     p_f               p_i
-  typedef std::pair<Tensor<double,1>, Tensor<double,1> > PInv_t;
+
+  struct PInv_t
+  {
+    PInv_t(const  std::pair<Tensor<double,1>, Tensor<double,1> > &p)
+      : mom(p) {}
+
+    Tensor<double,1> p_f(void) const
+    {
+      return mom.first;
+    }
+
+    Tensor<double,1> p_i(void) const 
+    {
+      return mom.second; 
+    }
+
+
+    std::pair<Tensor<double,1>, Tensor<double,1> >  mom;
+  };
+
+ // typedef std::pair<Tensor<double,1>, Tensor<double,1> > PInv_t;
 
 
   Tensor<double,1> pPlus(const Tensor<double,1> &p_f, const Tensor<double,1> &p_i);   // p_f + p_i
@@ -120,7 +140,9 @@ namespace radmat
     struct ffBlockBase_t
     {
       virtual std::string ff(void) const {return std::string("unknown");}
-      virtual Tensor<T,1> operator()(const Tensor<double,1> &p_f, const Tensor<double,1> &p_i) const = 0;
+      virtual Tensor<T,1> operator()(const Tensor<double,1> &p_f, 
+          const Tensor<double,1> &p_i, 
+          const double mom_fac) const = 0;
       virtual ~ffBlockBase_t(void) {}
     };
 
@@ -183,12 +205,14 @@ namespace radmat
       // generate the linear system based on the available set of kinematic factors
       // eventually wanna pass this through some type of isZero() filter?  -- do it at the ensemble level 
       // -- sometimes things will obviously be zero eg eps(z)_0,3 == 0
-      virtual itpp::Mat<T> operator()(const Tensor<double,1> &p_f, const Tensor<double,1> &p_i) const
+      virtual itpp::Mat<T> operator()(const Tensor<double,1> &p_f, 
+          const Tensor<double,1> &p_i, 
+          const double mom_fac) const
       {
         itpp::Mat<T> ret;
         typename ff_list::const_iterator it;
         for (it = m_list.begin(); it != m_list.end(); it++)
-          ret.append_col(toItpp<T>((**it)(p_f,p_i)));
+          ret.append_col(toItpp<T>((**it)(p_f,p_i,mom_fac)));
 
         return ret;
       }
@@ -234,7 +258,12 @@ namespace radmat
       return SEMBLE::toScalar(ENSEM::mean(Q2())); 
     }
 
+    double mom_factor(void) const {return mom_fac;} 
+    void set_mom_factor(const double p_fac) {mom_fac = p_fac;}
+
+    private:
     PInv_t p;
+    double mom_fac; 
 
   };
 
@@ -243,7 +272,7 @@ namespace radmat
       const EnsemReal &E_i,
       const Array<int> &p_f,
       const Array<int> &p_i,
-      const double mom_factor);  // 1/xi * 2pi /L_s -- the "unit" size
+      const double mom_factor);  // ( 1/xi) * 2pi /L_s -- the "unit" size
 
   /**
     @brief generate the kinematic factor matrix for one measurement,
@@ -284,15 +313,7 @@ namespace radmat
         p_i.rescaleSembleDown();
 
         for(int bin = 0; bin < nbins; bin++)
-          KF[bin] = (*m_KFacGen)(toTensor<double>(p_f[bin]),toTensor<double>(p_i[bin]));
-
-        ////////////////////////////////////////////////////////////////////////////////
-        ////////////////////////////////////////////////////////////////////////////////
-        /*
-           TO DO -- put the isZero()? type check in here before the return statement
-         */
-        ////////////////////////////////////////////////////////////////////////////////
-        ////////////////////////////////////////////////////////////////////////////////
+          KF[bin] = (*m_KFacGen)(toTensor<double>(p_f[bin]),toTensor<double>(p_i[bin]),moms.mom_factor());
 
         // scale up
         KF.rescaleSembleUp();

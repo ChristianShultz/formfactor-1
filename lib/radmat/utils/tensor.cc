@@ -27,8 +27,25 @@ namespace radmat
     return gmunu;
   }
 
- Tensor<double,2> genRotationMatrix(const XMLArray::Array<int> &mom)
+  Tensor<double,2> I4(void)
   {
+    Tensor<double,2> I((TensorShape<2>())[4][4],0.);
+    for(int i =0; i < 4; ++i)
+      I[i][i] = 1.;
+    I.lower_index(1);
+    return I;
+  }
+
+  bool isRest(const XMLArray::Array<int> &mom)
+  {
+    return ((mom[0] == 0) && (mom[1] == 0) && (mom[2] == 0));
+  }
+
+  Tensor<double,2> genRotationMatrix(const XMLArray::Array<int> &mom)
+  {
+    if(isRest(mom))
+      return I4();
+
     Hadron::CubicCanonicalRotation_t eulerangles = Hadron::cubicCanonicalRotation(mom);
 
     Tensor<double,2> A((TensorShape<2>())[4][4],0.),B((TensorShape<2>())[4][4],0.),C((TensorShape<2>())[4][4],0.);

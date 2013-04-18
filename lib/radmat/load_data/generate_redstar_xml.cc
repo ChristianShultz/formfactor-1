@@ -6,7 +6,7 @@
 
  * Creation Date : 03-12-2012
 
- * Last Modified : Mon Feb 11 14:37:14 2013
+ * Last Modified : Thu Mar 21 17:12:53 2013
 
  * Created By : shultz
 
@@ -30,6 +30,7 @@
 #include "itpp/itbase.h"
 #include <iostream>
 #include <sstream>
+#include <string>
 
 #if 0
 
@@ -74,6 +75,42 @@ struct redstarCircularMatElem_t
   std::pair<bool,listSubducedInsertion> m_minus; 
 };
 #endif
+
+
+namespace
+{
+
+  std::string do_string( const  ADATXML::Array<int>  &p)
+  {
+    int pm = p.size();
+    std::stringstream o;
+    o << "<";
+    for(int i = 0; i < pm; ++i)
+      o << p[i] <<",";
+    o << ">";
+    return o.str();;
+  }
+
+
+  std::string do_string( const radmat::redstarCircularMatElem_t::subducedOp &sub)
+  {
+    std::stringstream o;
+    o << SEMBLE::toScalar(sub.m_coeff) << "x" << Hadron::ensemFileName(sub.m_obj.operatorKey.irrep);
+    return o.str();
+  }
+
+  std::string do_string(const radmat::redstarCircularMatElem_t::listSubducedOp &sub)
+  {
+    radmat::redstarCircularMatElem_t::listSubducedOp::const_iterator it;
+    std::stringstream o; 
+    for (it = sub.begin(); it != sub.end(); ++it)
+      o << do_string(*it) << std::endl;
+
+    return o.str(); 
+  }
+
+}
+
 
 
 // CIRCULAR BASIS STUFF
@@ -153,7 +190,8 @@ namespace radmat
     }
 
 
-    listSubducedOp getLatticeSubducedOp(const simpleWorld::ContinuumMatElem::State &state, const std::string &pid)
+    listSubducedOp getLatticeSubducedOp(const simpleWorld::ContinuumMatElem::State &state,
+        const std::string &pid)
     {
       return getLatticeSubducedOp(state.state,pid,state.t_slice);
     }
@@ -162,7 +200,10 @@ namespace radmat
     struct circLorentzInsertion
     {
       circLorentzInsertion(void)
-        : time(std::pair<bool,listSubducedInsertion>(false,listSubducedInsertion())) , plus(time), zero(time) , minus(time) {}
+        : time(std::pair<bool,listSubducedInsertion>(false,listSubducedInsertion())) ,
+        plus(time), 
+        zero(time) ,
+        minus(time) {}
 
       std::pair<bool,listSubducedInsertion> time;
       std::pair<bool,listSubducedInsertion> plus;
@@ -171,7 +212,8 @@ namespace radmat
     };
 
 
-    circLorentzInsertion getLatticeSubducedInsertion(const simpleWorld::ContinuumInsertion &ins, const std::string &pid)
+    circLorentzInsertion getLatticeSubducedInsertion(const simpleWorld::ContinuumInsertion &ins,
+        const std::string &pid)
     {
       circLorentzInsertion ret;
       listSubducedOp work;
@@ -439,6 +481,13 @@ namespace radmat
           const std::string &source_id, 
           const std::string &sink_id)
       {
+
+/*
+        std::cout << __func__ << ": debuging is on MARK 4 is set" << std::endl;
+        std::cout << "ContinuumMatElem looks like " << std::endl;
+        std::cout << a << std::endl;
+*/
+
         redstarCircularMatElem_t dum(a,source_id,sink_id);
         ensemble = a.ensemble; 
         m_source = dum.m_source;
@@ -472,18 +521,30 @@ namespace radmat
       }
 
       // move from a circular basis to the cartesian basis 
-      void makeCartesian(const redstarCircularMatElem_t &tmp, const bool create_t, const bool create_s);
+      void makeCartesian(const redstarCircularMatElem_t &tmp, 
+          const bool create_t,
+          const bool create_s);
 
-      ADATXML::Array<int> mom(void)
+      ADATXML::Array<int> mom(const bool create)
       {
         ADATXML::Array<int> pf,pi,q;
         pf = m_sink.begin()->m_obj.operatorKey.irrep.mom;
         pi = m_source.begin()->m_obj.operatorKey.irrep.mom;
 
+/*
+        std::cout << __func__ << ": debugging is on" << std::endl;
+        std::cout << "pf = " << do_string( pf ) << std::endl;
+        std::cout << "pi = " << do_string( pi ) << std::endl;
+*/
+
+
         q.resize(3);
         q[0] = pi[0] - pf[0];
         q[1] = pi[1] - pf[1];
         q[2] = pi[2] - pf[2];
+
+        if(create)
+          return -q;
 
         return q; 
       }
@@ -501,7 +562,9 @@ namespace radmat
 
 
 
-    void redstarCartesianMatElem_p::makeCartesian(const redstarCircularMatElem_t &tmp, const bool create_t, const bool create_s)
+    void redstarCartesianMatElem_p::makeCartesian(const redstarCircularMatElem_t &tmp, 
+        const bool create_t, 
+        const bool create_s)
     {
       itpp::Vec<listSubducedInsertion> j_lambda(3),j_i(3);
       itpp::Vec<bool> j_lambda_have(3),j_i_have(3);
@@ -515,7 +578,7 @@ namespace radmat
       j_lambda_have[2] = tmp.m_plus.first; 
 
 
-      itpp::Mat<std::complex<double> > tform = inver2Cart(mom(),create_s);
+      itpp::Mat<std::complex<double> > tform = inver2Cart(mom(create_s),create_s);
 
       j_i = tform * j_lambda;
       j_i_have = tform * j_lambda_have; 
@@ -541,11 +604,13 @@ namespace radmat
          std::cout << __func__ << " cart components " << std::endl;
          std::cout << "list_x " << std::endl;
          for(it = m_x.second.begin(); it != m_x.second.end(); ++it)
-         std::cout << SEMBLE::toScalar(it->m_coeff) << " X " << Hadron::ensemFileName(it->m_obj.irrep) << std::endl;
+         std::cout << SEMBLE::toScalar(it->m_coeff) << " X " 
+         << Hadron::ensemFileName(it->m_obj.irrep) << std::endl;
 
          std::cout << "list_y " << std::endl;
          for(it = m_y.second.begin(); it != m_y.second.end(); ++it)
-         std::cout << SEMBLE::toScalar(it->m_coeff) << " X " << Hadron::ensemFileName(it->m_obj.irrep) << std::endl;
+         std::cout << SEMBLE::toScalar(it->m_coeff) << " X " 
+         << Hadron::ensemFileName(it->m_obj.irrep) << std::endl;
        */
 
 
@@ -564,11 +629,18 @@ namespace radmat
     m_source = getLatticeSubducedOp(cont.source,m_source_id);
     m_sink = getLatticeSubducedOp(cont.sink,m_sink_id);
 
-    /*
-       std::cout << __func__ << std::endl;
-       std::cout << "source " << cont.source << std::endl;
-       std::cout << "sink   " << cont.sink << std::endl;
-     */
+/*
+    std::cout << __func__ << std::endl;
+    std::cout << "source " << cont.source << std::endl;
+    std::cout << "m_source " << std::endl;
+    std::cout << do_string(m_source) << std::endl;
+    std::cout << do_string(m_sink) << std::endl;
+
+
+    std::cout << "sink   " << cont.sink << std::endl;
+    std::cout << "m_sink " << std::endl;
+*/
+
 
     circLorentzInsertion foo = getLatticeSubducedInsertion(cont.insertion,std::string("foobar"));
     m_time = foo.time;
@@ -633,7 +705,9 @@ namespace radmat
       for(it_source = source.begin(); it_source != source.end(); ++it_source)
         for(it_ins = ins.second.begin(); it_ins != ins.second.end(); ++it_ins)
           for(it_sink = sink.begin(); it_sink != sink.end(); ++it_sink)
-            m_list.push_back(threePointXMLKey(it_source->m_coeff * it_ins->m_coeff * it_sink->m_coeff,
+            m_list.push_back(threePointXMLKey(it_source->m_coeff 
+                  * it_ins->m_coeff
+                  * it_sink->m_coeff,
                   genThreePointKey(*it_source,*it_ins,*it_sink,ensemble)
                   )
                 );
@@ -652,19 +726,31 @@ namespace radmat
 
     lorentz_components.insert(
         std::map<int,redstarCartMatElemLorentzComponent>::value_type(0,
-          redstarCartMatElemLorentzComponent(foobar.m_source,foobar.m_t,foobar.m_sink,foobar.ensemble))
+          redstarCartMatElemLorentzComponent(foobar.m_source,
+            foobar.m_t,
+            foobar.m_sink,
+            foobar.ensemble))
         );
     lorentz_components.insert(
         std::map<int,redstarCartMatElemLorentzComponent>::value_type(1,
-          redstarCartMatElemLorentzComponent(foobar.m_source,foobar.m_x,foobar.m_sink,foobar.ensemble))
+          redstarCartMatElemLorentzComponent(foobar.m_source,
+            foobar.m_x,
+            foobar.m_sink,
+            foobar.ensemble))
         );
     lorentz_components.insert(
         std::map<int,redstarCartMatElemLorentzComponent>::value_type(2,
-          redstarCartMatElemLorentzComponent(foobar.m_source,foobar.m_y,foobar.m_sink,foobar.ensemble))
+          redstarCartMatElemLorentzComponent(foobar.m_source,
+            foobar.m_y,
+            foobar.m_sink,
+            foobar.ensemble))
         );
     lorentz_components.insert(
         std::map<int,redstarCartMatElemLorentzComponent>::value_type(3,
-          redstarCartMatElemLorentzComponent(foobar.m_source,foobar.m_z,foobar.m_sink,foobar.ensemble))
+          redstarCartMatElemLorentzComponent(foobar.m_source,
+            foobar.m_z,
+            foobar.m_sink,
+            foobar.ensemble))
         );
 
     if(foobar.m_t.first)

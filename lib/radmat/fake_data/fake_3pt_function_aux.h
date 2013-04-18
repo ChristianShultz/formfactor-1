@@ -51,7 +51,7 @@ namespace radmat
 
   // assume all states are stable against decay and use a dispersion relation to 
   // determine the energies at non-zero momentum 
-  // aaEE = aamm + 1/(xi*xi) *(2pi/L_s)^2 * p*p   || a is the temporal spacing
+  // aaEE = aamm + xi*xi *(2pi/L_s)^2 * p*p   || a is the temporal spacing
   template<typename T>
     void applyDispersion(typename ADAT::Handle<FakeDataInputs_p<T> > &input, const pProp_t &mom);
 
@@ -63,6 +63,8 @@ namespace radmat
         const int hel_source,
         const int t_ins,
         const int lorentz);
+
+ double mom_factor(const double xi, const int L_s); 
 
 
   // SOME FUNCTOR CLASSES TO MAKE LIFE EASIER
@@ -295,7 +297,8 @@ namespace radmat
 
       // ini
       handle->ini = ini;
-      handle->mom_factor = 1./ini.dispersionProps.xi * 2. * acos(-1.)/ini.dispersionProps.L_s;
+      handle->mom_factor = mom_factor(ini.dispersionProps.xi,ini.dispersionProps.L_s);
+
 
       // ffgenerator
       itpp::Mat<std::vector<FakeMatrixElement::ffFunction> > ffmv(szSource,szSink);
@@ -414,10 +417,12 @@ namespace radmat
   template<typename T>
     void applyDispersion(typename ADAT::Handle<FakeDataInputs_p<T> > &input, const pProp_t &mom)
     {
+      // (1/ xi) * 2pi/L_s
+
       SEMBLE::PromoteScalar<double>::Type factor,sink,source;
-      factor = SEMBLE::toScalar(( 2. * acos(-1.))
-          /double(input->ini.dispersionProps.L_s)
-          /(input->ini.dispersionProps.xi));         // 1/xi * 2pi/L_s
+      factor = SEMBLE::toScalar( mom_factor( input->ini.dispersionProps.xi , input->ini.dispersionProps.L_s ) );
+
+
 
       double mom2source = ( mom.momSource[0] * mom.momSource[0]
           +mom.momSource[1] * mom.momSource[1]
@@ -472,7 +477,7 @@ namespace radmat
       // Fake3ptFactor facGen;
       ThreePtPropagationFactor<T> facGen;
       FakeMatrixElement matGen;
-     SEMBLE::SembleMatrix<T> ret(specsink->getB(),nsource,nsink);
+      SEMBLE::SembleMatrix<T> ret(specsink->getB(),nsource,nsink);
       ret.zeros();
 
 

@@ -50,8 +50,13 @@ namespace radmat
 
 	  
 	  itpp::Mat<std::complex<double> > bazMat = toItpp(baz);
-      
-	  bool isEqual = bazMat == foobar(foo,bar);
+     
+    Tensor<std::complex<double> , 1> aa, bb;
+    aa = convertTensorUnderlyingType<std::complex<double>, double, 1>(foo);
+    bb = convertTensorUnderlyingType<std::complex<double>, double, 1>(bar);
+
+
+	  bool isEqual = bazMat == foobar(foo,bar,1.);
 
 	  if(!!!isEqual) 
 	    std::cout << "you messed this up " << std::endl;

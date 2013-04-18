@@ -17,7 +17,9 @@ namespace radmat
       return std::string("F_1(Q^2)\\left(- p_+^{\\mu}\frac{Q^2}{m_{\\pi*}^2 -m_{\\pi}^2} + p_-\\right)");
     }
 
-    Tensor<std::complex<double> , 1> F1::operator()(const Tensor<double,1> &p_f, const Tensor<double,1> &p_i) const
+    Tensor<std::complex<double> , 1> F1::operator()(const Tensor<double,1> &p_f, 
+        const Tensor<double,1> &p_i,
+        const double mom_factor) const
     {
       Tensor<std::complex<double>,1> pp,pm;
       pp = convertTensorUnderlyingType<std::complex<double>,double,1>(pPlus(p_f,p_i));

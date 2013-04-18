@@ -29,7 +29,7 @@ q_{\mu}\langle M^{\mu} \rangle = 0 &\rightarrow F_+p_+^{\mu}p_{-\mu} - F_-Q^2 = 
     {
       std::string ff(void) const;
       Tensor<std::complex<double> , 1> operator()(const Tensor<double,1> &p_f, 
-          const Tensor<double,1> &p_i) const;
+          const Tensor<double,1> &p_i, const double mom_fac) const;
     };
 
 
