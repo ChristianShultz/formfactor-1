@@ -27,7 +27,7 @@ namespace radmat
       {
 
         // come up with the ingredient list
-        Tensor<std::complex<double>, 1> epsilon = this->conjugate((this->ptensor(p_i,mom_fac))); // nb final state conjugation 
+        Tensor<std::complex<double>, 1> epsilon = this->conjugate((this->ptensor(p_f,mom_fac))); // nb final state conjugation 
         Tensor<std::complex<double>, 1> pplus, pminus;
         pplus = convertTensorUnderlyingType<std::complex<double>,double,1>( pPlus(p_f,p_i) );
         pminus = convertTensorUnderlyingType<std::complex<double>,double,1>( pMinus(p_f,p_i) );
@@ -40,6 +40,11 @@ namespace radmat
         Tensor<std::complex<double>, 3> foo;
         Tensor<std::complex<double>, 2> bar;
         Tensor<std::complex<double>, 1> baz; 
+
+
+        // std::cout << "pplus = " << pplus << std::endl;
+        // std::cout << "pminus = " << pminus << std::endl;
+        // std::cout << "eps = " << epsilon << std::endl;
 
         // do contractions 
         foo = contract(levi,applyMetric(pminus,gdd,0),3,0);

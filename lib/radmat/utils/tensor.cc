@@ -51,7 +51,11 @@ namespace radmat
     Tensor<double,2> A((TensorShape<2>())[4][4],0.),B((TensorShape<2>())[4][4],0.),C((TensorShape<2>())[4][4],0.);
 
     for(idx_t i = 0; i < 4; ++i)
-      A[i][i] = B[i][i] = C[i][i] = 1.;
+      A[i][i] = 1.;
+
+    B = A;
+    C = A;
+
 
     A[1][1] = A[2][2] = cos(eulerangles.gamma);
     A[2][1] = sin(eulerangles.gamma);
@@ -70,6 +74,20 @@ namespace radmat
     C.lower_index(1);
 
     return C*B*A;
+  }
+
+
+  Tensor<double,2> genRotationMatrix3D(const XMLArray::Array<int> &mom)
+  {
+    Tensor<double,2> Four = genRotationMatrix(mom);
+    Tensor<double,2> Three((TensorShape<2>())[3][3],0.);
+    for(int i = 0; i < 3; ++i)
+      for(int j = 0; j < 3; ++j)
+        Three[i][j] = Four[i+1][j+1];
+
+    Three.lower_index(1); 
+    
+    return Three;
   }
 
 }

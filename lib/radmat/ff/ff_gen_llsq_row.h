@@ -79,7 +79,7 @@ namespace radmat
     std::pair<Tensor<double,1>, Tensor<double,1> >  mom;
   };
 
- // typedef std::pair<Tensor<double,1>, Tensor<double,1> > PInv_t;
+  // typedef std::pair<Tensor<double,1>, Tensor<double,1> > PInv_t;
 
 
   Tensor<double,1> pPlus(const Tensor<double,1> &p_f, const Tensor<double,1> &p_i);   // p_f + p_i
@@ -210,6 +210,10 @@ namespace radmat
           const double mom_fac) const
       {
         itpp::Mat<T> ret;
+
+        //  std::cout << __func__ << " p_f = " << p_f << std::endl;
+        //  std::cout << __func__ << " p_i = " << p_i << std::endl;
+
         typename ff_list::const_iterator it;
         for (it = m_list.begin(); it != m_list.end(); it++)
           ret.append_col(toItpp<T>((**it)(p_f,p_i,mom_fac)));

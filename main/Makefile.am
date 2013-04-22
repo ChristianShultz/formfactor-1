@@ -9,7 +9,7 @@ AM_LDFLAGS  = -L@top_builddir@/lib/ \
 
 LDADD = -lradmat @SEMBLE_LIBS@ @JACKFITTER_LIBS@ @ADAT_LIBS@ @ITPP_LIBS@ @LIBS@ 
 
-noinst_PROGRAMS = plot_fake_3pt fake_radmat mass_overlap_db_create mass_overlap_db_combine single_plot phases mass_overlap_db_util
+noinst_PROGRAMS = plot_fake_3pt fake_radmat mass_overlap_db_create mass_overlap_db_combine single_plot phases mass_overlap_db_util grab_ff grab_pol
 
 plot_fake_3pt_SOURCES = plot_fake_3pt.cc
 
@@ -24,6 +24,10 @@ mass_overlap_db_util_SOURCES = mass_overlap_db_util.cc
 single_plot_SOURCES = single_plot.cc
 
 phases_SOURCES = phases.cc
+
+grab_ff_SOURCES = grab_ff.cc
+
+grab_pol_SOURCES = grab_pol.cc
 
 bin_PROGRAMS =  radmat
 

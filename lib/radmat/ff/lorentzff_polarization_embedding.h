@@ -38,7 +38,7 @@ namespace radmat
       {
         mom_t mom = int_based_mom(p,mom_factor);
         genPolTens<J> foo(mom);
-        return foo.get(p[0],hel,mom_factor); 
+        return foo(p[0],hel,mom_factor); 
       }
     };
 

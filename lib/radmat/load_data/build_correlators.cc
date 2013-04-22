@@ -6,7 +6,7 @@
 
  * Creation Date : 04-12-2012
 
- * Last Modified : Thu Apr 18 12:20:12 2013
+ * Last Modified : Mon Apr 22 09:09:51 2013
 
  * Created By : shultz
 
@@ -39,12 +39,12 @@
 
 
 
-#define DEBUG_CORRELATOR_NORMALIZATION // do loads of printing at the normalization stage
-#define SERIOUSLY_DEBUG_CORRELATOR_NORMALIZATION  // turn on annoying printing
+// #define DEBUG_CORRELATOR_NORMALIZATION // do loads of printing at the normalization stage
+// #define SERIOUSLY_DEBUG_CORRELATOR_NORMALIZATION  // turn on annoying printing
 
 // #define BUILD_CORRS_USE_OMP_PARALLEL
 
-#define  DEBUG_AT_MAKE_MOM_INV_TAGS // are we making the tags right?
+// #define  DEBUG_AT_MAKE_MOM_INV_TAGS // are we making the tags right?
 
 
 namespace radmat
@@ -287,8 +287,8 @@ namespace radmat
 
           
 
-
-          for(int t_ins = t_source; t_ins < t_sink; ++t_ins)
+          // NB: the indexing here assumes [tsource,tsink] ie: inclusive range
+          for(int t_ins = t_source; t_ins <= t_sink; ++t_ins)
           {
 
             ENSEM::EnsemReal prop = propagation_factor(sink.E(),sink.Z(),t_sink,t_ins,

@@ -6,7 +6,7 @@
 
  * Creation Date : 03-12-2012
 
- * Last Modified : Thu Mar 21 17:12:53 2013
+ * Last Modified : Mon Apr 22 12:40:41 2013
 
  * Created By : shultz
 
@@ -18,6 +18,8 @@
 #include "radmat/load_data/simple_world.h"
 #include "radmat/utils/obj_expr_t.h"
 #include "radmat/utils/pow2assert.h"
+#include "radmat/utils/polarisation_tensors.h"
+#include "radmat/utils/tensor.h"
 #include "hadron/hadron_npart_npt_corr.h"
 #include "hadron/hadron_npart_irrep.h"
 #include "hadron/irrep_util.h"
@@ -281,9 +283,18 @@ namespace radmat
         }
       }
 
-
+      // first print the non-zero guys
+      ss << "NON-ZERO COEFFS" << std::endl;
       for(map_it = collapse_xml.begin(); map_it != collapse_xml.end(); ++map_it)
-        ss << SEMBLE::toScalar(map_it->second) << " * " << map_it->first << std::endl;
+        if(std::norm(SEMBLE::toScalar(map_it->second)) > 0.0001)
+         ss << SEMBLE::toScalar(map_it->second) << " * " << map_it->first << std::endl;
+
+      // now print the zero coeffs for sanity check
+      ss << "\n\n\nSUBDUCED IN WITH ZERO COEFF" << std::endl;
+      for(map_it = collapse_xml.begin(); map_it != collapse_xml.end(); ++map_it)
+        if(std::norm(SEMBLE::toScalar(map_it->second)) <= 0.0001)
+         ss << SEMBLE::toScalar(map_it->second) << " * " << map_it->first << std::endl;
+
 
       return ss.str();
     }
@@ -332,6 +343,8 @@ namespace radmat
         return ret; 
       }
 
+
+    // multiply a matrix against a vector of bools
     itpp::Vec<bool>
       operator*(const itpp::Mat<std::complex<double> > &m, const itpp::Vec<bool> &v)
       {
@@ -354,6 +367,37 @@ namespace radmat
 
         return ret; 
       }
+
+    // this is col(+,0,-) =  R * eps * col(x,y,z)
+    // rows are +,0,- and cols are x,y,z
+    itpp::Mat<std::complex<double> > eps3d(const ADATXML::Array<int> &mom , const bool create)
+    {
+      Tensor<std::complex<double>, 1 > tmp;
+      genPolTens3D<1> eps(mom);
+      itpp::Mat<std::complex<double> > eps3(3,3); 
+
+      for(int h = 1; h > -2; --h)
+      {
+        tmp = eps.get(h);
+
+        for(int i = 0; i < 3; ++i)
+          if(create)
+            eps3(1-h,i) = tmp[i];
+          else
+            eps3(1-h,i) = std::conj(tmp[i]); 
+
+      }
+
+      return eps3; 
+    }
+
+    itpp::Mat<std::complex<double> > inver2Cart(const ADATXML::Array<int> mom, const bool create)
+    { 
+      return itpp::inv(eps3d(mom,create));
+    }
+
+
+#if 0
 
     itpp::Vec<std::complex<double> > eps3_z(const std::string &qn, const bool create)
     {
@@ -380,6 +424,7 @@ namespace radmat
         exit(1);
       }
 
+      // deal with creation vs annih here
       if(create)
         return ret;
       else
@@ -430,6 +475,12 @@ namespace radmat
     }
 
 
+    itpp::Mat<std::complex<double> > R_ij(const ADATXML::Array<int> mom)
+    {
+
+
+    }
+
 
     // a bunch of hardwires since itpp and ensem don't get along..
     itpp::Mat<std::complex<double> > inver2Cart(const ADATXML::Array<int> mom, const bool create)
@@ -454,7 +505,7 @@ namespace radmat
     }
 
 
-
+#endif
 
 
     //////////////////////////
@@ -482,11 +533,11 @@ namespace radmat
           const std::string &sink_id)
       {
 
-/*
-        std::cout << __func__ << ": debuging is on MARK 4 is set" << std::endl;
-        std::cout << "ContinuumMatElem looks like " << std::endl;
-        std::cout << a << std::endl;
-*/
+        /*
+           std::cout << __func__ << ": debuging is on MARK 4 is set" << std::endl;
+           std::cout << "ContinuumMatElem looks like " << std::endl;
+           std::cout << a << std::endl;
+         */
 
         redstarCircularMatElem_t dum(a,source_id,sink_id);
         ensemble = a.ensemble; 
@@ -531,11 +582,11 @@ namespace radmat
         pf = m_sink.begin()->m_obj.operatorKey.irrep.mom;
         pi = m_source.begin()->m_obj.operatorKey.irrep.mom;
 
-/*
-        std::cout << __func__ << ": debugging is on" << std::endl;
-        std::cout << "pf = " << do_string( pf ) << std::endl;
-        std::cout << "pi = " << do_string( pi ) << std::endl;
-*/
+        /*
+           std::cout << __func__ << ": debugging is on" << std::endl;
+           std::cout << "pf = " << do_string( pf ) << std::endl;
+           std::cout << "pi = " << do_string( pi ) << std::endl;
+         */
 
 
         q.resize(3);
@@ -569,13 +620,13 @@ namespace radmat
       itpp::Vec<listSubducedInsertion> j_lambda(3),j_i(3);
       itpp::Vec<bool> j_lambda_have(3),j_i_have(3);
 
-      j_lambda[0] = tmp.m_minus.second;
+      j_lambda[0] = tmp.m_plus.second;
       j_lambda[1] = tmp.m_zero.second; 
-      j_lambda[2] = tmp.m_plus.second; 
+      j_lambda[2] = tmp.m_minus.second; 
 
-      j_lambda_have[0] = tmp.m_minus.first;
+      j_lambda_have[0] = tmp.m_plus.first;
       j_lambda_have[1] = tmp.m_zero.first; 
-      j_lambda_have[2] = tmp.m_plus.first; 
+      j_lambda_have[2] = tmp.m_minus.first; 
 
 
       itpp::Mat<std::complex<double> > tform = inver2Cart(mom(create_s),create_s);
@@ -629,17 +680,17 @@ namespace radmat
     m_source = getLatticeSubducedOp(cont.source,m_source_id);
     m_sink = getLatticeSubducedOp(cont.sink,m_sink_id);
 
-/*
-    std::cout << __func__ << std::endl;
-    std::cout << "source " << cont.source << std::endl;
-    std::cout << "m_source " << std::endl;
-    std::cout << do_string(m_source) << std::endl;
-    std::cout << do_string(m_sink) << std::endl;
+    /*
+       std::cout << __func__ << std::endl;
+       std::cout << "source " << cont.source << std::endl;
+       std::cout << "m_source " << std::endl;
+       std::cout << do_string(m_source) << std::endl;
+       std::cout << do_string(m_sink) << std::endl;
 
 
-    std::cout << "sink   " << cont.sink << std::endl;
-    std::cout << "m_sink " << std::endl;
-*/
+       std::cout << "sink   " << cont.sink << std::endl;
+       std::cout << "m_sink " << std::endl;
+     */
 
 
     circLorentzInsertion foo = getLatticeSubducedInsertion(cont.insertion,std::string("foobar"));
