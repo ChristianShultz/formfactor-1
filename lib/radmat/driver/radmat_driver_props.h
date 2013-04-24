@@ -11,8 +11,10 @@ namespace radmat
   struct RDriverProps_t
   {
     ThreePointComparatorProps_t threePointComparatorProps;
-    ThreePointCorrIni_t threePointIni;    
-  };
+    ThreePointCorrIni_t threePointIni;   
+    double poleMass;                      // does the analytic continuation exist?  this is the lightest vector state
+  };                                       //  or the branch point at the energy of two pions -- nb this is the mass not
+                                           //  the square of the mass
 
 
   std::string toString (const RDriverProps_t &);

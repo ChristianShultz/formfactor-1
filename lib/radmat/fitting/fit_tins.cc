@@ -6,7 +6,7 @@
 
  * Creation Date : 01-08-2012
 
- * Last Modified : Sun Jan 27 13:27:43 2013
+ * Last Modified : Tue Apr 23 17:57:32 2013
 
  * Created By : shultz
 
@@ -172,7 +172,7 @@ namespace radmat
 
 
     ADAT::Handle<FitComparator> fitComp = constructThreePointFitComparator(fitProps);
-    ADAT::Handle<FitThreePoint> fitCorr (new FitThreePoint(corrData,Lt,0,fitComp,5,fitProps.fit_type));
+    ADAT::Handle<FitThreePoint> fitCorr (new FitThreePoint(corrData,Lt,0,fitComp,fitProps.minTSlice,fitProps.fit_type));
 
     // send to files
     fitCorr->saveFitPlot(ax.str());

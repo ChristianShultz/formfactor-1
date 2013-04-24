@@ -33,7 +33,7 @@ namespace radmat
 
     void read_xmlini(const std::string &ini); 
     void build_correlators(void);
-    void solve_llsq(void); 
+    void solve_llsq(void);
     void fit_ffs(void); 
     void do_chisq_analysis(void);  
     void make_FF_of_Q2_plots(void);

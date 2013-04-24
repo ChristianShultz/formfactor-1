@@ -20,7 +20,7 @@ namespace radmat
     RadmatSingleQ2Driver& operator=(const RadmatSingleQ2Driver &o);
 
     bool load_llsq(const ADAT::Handle<LLSQLatticeMultiData> &lattice_data,
-        const std::string &soln_ID);
+        const std::string &soln_ID, const double pole_mass_squared);
     void fit_data(const ThreePointComparatorProps_t &fitProps);
     void chisq_analysis(void);
 

@@ -6,7 +6,7 @@
 
  * Creation Date : 04-12-2012
 
- * Last Modified : Mon Apr 22 09:09:51 2013
+ * Last Modified : Wed Apr 24 08:44:01 2013
 
  * Created By : shultz
 
@@ -35,12 +35,14 @@
 #include <string>
 #include <vector>
 #include <set>
+#include <math.h>
 #include <omp.h>
 
 
 
-// #define DEBUG_CORRELATOR_NORMALIZATION // do loads of printing at the normalization stage
-// #define SERIOUSLY_DEBUG_CORRELATOR_NORMALIZATION  // turn on annoying printing
+ #define PRINT_CORRELATOR_NORMALIZATION // do loads of printing at the normalization stage
+
+// #define SERIOUSLY_PRINT_CORRELATOR_NORMALIZATION  // turn on annoying printing
 
 // #define BUILD_CORRS_USE_OMP_PARALLEL
 
@@ -173,6 +175,36 @@ namespace radmat
             RadmatMassOverlapData_t> DatabaseInterface_t;
 
 
+    double Mink_qsq(const ADATXML::Array<int> &pf, const double mf, 
+        const ADATXML::Array<int> &pi, const double mi,
+        const double factor)
+    {
+        ADATXML::Array<double> p_f,p_i; 
+        p_f.resize(3);
+        p_i.resize(3); 
+
+
+        double p_i_sq(0.);
+        double p_f_sq(0.); 
+        double q_space_sq(0.);
+
+        for(int i = 0; i < 3; ++i)
+        {        
+          p_f[i] = factor*double(pf[i]);
+          p_i[i] = factor*double(pi[i]); 
+          p_f_sq += p_f[i]*p_f[i];
+          p_i_sq += p_i[i]*p_i[i];
+          q_space_sq += (p_i[i] - p_f[i])*(p_i[i] - p_f[i]);
+        }
+
+
+        double q_time =  sqrt(mi*mi + p_i_sq) - sqrt(mf*mf + p_f_sq);  
+
+        return -((q_time*q_time) - q_space_sq); 
+    }
+
+
+
     // hurray a continuum three point correlator..
     struct accumulator
     {
@@ -193,13 +225,23 @@ namespace radmat
 
       }
 
+
+      double compute_correlator_qsq(const ThreePointCorrIni_t &ini, const ADATXML::Array<int> &pf, const ADATXML::Array<int> &pi)
+      {
+        double E_f = ini.threePointCorrXMLIni.maSink;
+        double E_i = ini.threePointCorrXMLIni.maSource;
+        double factor = mom_factor(ini.xi , ini.L_s);
+        return Mink_qsq(pf,E_f,pi,E_i,factor);
+      }
+
+
       void eat(const data_t &data, const ThreePointCorrIni_t &ini)
       {
         // break early if not active
         active = data.is_active();
         if(!!!active)
         {
-#ifdef DEBUG_CORRELATOR_NORMALIZATION
+#ifdef PRINT_CORRELATOR_NORMALIZATION
           std::cout << __func__ << ": unsuccessful " << std::endl;
 #endif
           return;
@@ -254,12 +296,16 @@ namespace radmat
           RadmatMassOverlapData_t source = db.fetch(it->m_obj.source_normalization); 
           RadmatMassOverlapData_t sink = db.fetch(it->m_obj.sink_normalization); 
 
-#ifdef DEBUG_CORRELATOR_NORMALIZATION
+#ifdef PRINT_CORRELATOR_NORMALIZATION
           std::string outstem = Hadron::ensemFileName(it->m_obj.redstar_xml); 
           std::string pth = SEMBLE::SEMBLEIO::getPath();
           std::stringstream path;
-          path << pth << "debug_normalization";
+          path << pth << "correlator_normalization";
           SEMBLE::SEMBLEIO::makeDirectoryPath(path.str());
+
+          path << "/" << compute_correlator_qsq(m_ini,p_f,p_i);
+          SEMBLE::SEMBLEIO::makeDirectoryPath(path.str()); 
+
           path << "/" << outstem;
           ENSEM::write(path.str() + std::string("_corr_pre") , corr_tmp); 
           ENSEM::EnsemVectorComplex norm = corr_tmp * SEMBLE::toScalar(0.); 
@@ -275,7 +321,7 @@ namespace radmat
 
           POW2_ASSERT(t_source < t_sink); 
 
-#ifdef  SERIOUSLY_DEBUG_CORRELATOR_NORMALIZATION 
+#ifdef  SERIOUSLY_PRINT_CORRELATOR_NORMALIZATION 
           std::cout << __func__ << std::endl;
           std::cout << "Z_sink = " << SEMBLE::toScalar(ENSEM::mean(sink.Z())) << std::endl;
           std::cout << "Z_source = " << SEMBLE::toScalar(ENSEM::mean(source.Z())) << std::endl;
@@ -285,7 +331,7 @@ namespace radmat
 
 #endif 
 
-          
+
 
           // NB: the indexing here assumes [tsource,tsink] ie: inclusive range
           for(int t_ins = t_source; t_ins <= t_sink; ++t_ins)
@@ -296,25 +342,26 @@ namespace radmat
 
             ENSEM::pokeObs(corr_tmp,ENSEM::peekObs(corr_tmp,t_ins)/prop,t_ins);
 
-#ifdef SERIOUSLY_DEBUG_CORRELATOR_NORMALIZATION
+#ifdef SERIOUSLY_PRINT_CORRELATOR_NORMALIZATION
             if(t_ins == 0) 
               std::cout << "t_ins = " << t_ins << " norm = " << SEMBLE::toScalar(ENSEM::mean(prop)) << std::endl;
 #endif
 
 
 
-#ifdef DEBUG_CORRELATOR_NORMALIZATION
+#ifdef PRINT_CORRELATOR_NORMALIZATION
 
             ENSEM::pokeObs(norm,prop,t_ins); 
 #endif
           } // end loop over t_ins
 
-#ifdef DEBUG_CORRELATOR_NORMALIZATION
+#ifdef PRINT_CORRELATOR_NORMALIZATION
           ENSEM::write(path.str() + std::string("_corr_post"), corr_tmp);
           ENSEM::write(path.str() + std::string("_norm") , norm);
-  
-          std::cout << __func__ << std::endl; 
-          std::cout << SEMBLE::toScalar(it->m_coeff) << " X " << Hadron::ensemFileName(it->m_obj.redstar_xml) << std::endl;
+
+    //      std::cout << __func__ << std::endl; 
+    //      std::cout << SEMBLE::toScalar(it->m_coeff) << " X " 
+    //      << Hadron::ensemFileName(it->m_obj.redstar_xml) << std::endl;
 #endif      
 
 
@@ -622,6 +669,17 @@ namespace radmat
 
 
 
+    double Mink_qsq(const CartesianMatrixElement & elem, 
+        const double E_f , const double E_i, const double factor)
+    { 
+      ADATXML::Array<int> p_f,p_i; 
+      p_f = elem.p_f;
+      p_i = elem.p_i;
+
+      return Mink_qsq(p_f, E_f, p_i, E_i, factor); 
+    }
+
+
     // this is the main work horse..
     std::vector<CartesianMatrixElement> 
       getCartesianMatrixElements(const std::vector<simpleWorld::ContinuumMatElem> & elems, const ThreePointCorrIni_t &ini)
@@ -735,29 +793,6 @@ namespace radmat
     };
 
 
-    double Mink_qsq(const CartesianMatrixElement & elem, 
-        const double E_f , const double E_i, const double factor)
-    { 
-      ADATXML::Array<double> p_f,p_i; 
-      p_f.resize(3);
-      p_i.resize(3); 
-      double p_i_sq(0.);
-      double p_f_sq(0.); 
-      double q_space_sq(0.);
-
-      for(int i = 0; i < 3; ++i)
-      {
-        p_f[i] = factor * double(elem.p_f[i]); 
-        p_i[i] = factor * double(elem.p_i[i]);
-        p_f_sq += p_f[i]*p_f[i];
-        p_i_sq += p_i[i]*p_i[i];
-        q_space_sq += (p_i[i] - p_f[i])*(p_i[i] - p_f[i]);
-      }
-
-      double q_time =  sqrt(E_i*E_i + p_i_sq) - sqrt(E_f*E_f + p_f_sq);  
-
-      return -((q_time*q_time) - q_space_sq); 
-    }
 
 
     struct manageWork
@@ -869,13 +904,11 @@ namespace radmat
 
 
         //     std::cout << __func__ << ": unsorted.size() " << unsorted.size() << std::endl;
-
-
-        double E_f, E_i; // rest energies..       
+        double m_f, m_i; // rest mass..       
         std::vector<CartesianMatrixElement>::const_iterator it;
 
-        E_f = unsorted.begin()->am_f; 
-        E_i = unsorted.begin()->am_i;
+        m_f = unsorted.begin()->am_f; 
+        m_i = unsorted.begin()->am_i;
 
 
         for(it = unsorted.begin(); it != unsorted.end(); ++it)
@@ -903,7 +936,7 @@ namespace radmat
           }
           // ignore any type of level splittings across different irreps 
           // also ignore any statistical fluctuations associated w/ different mom directions
-          double q2 = Mink_qsq(*it, E_f, E_i, factor);           
+          double q2 = Mink_qsq(*it, m_f, m_i, factor);           
           mapit = m_map.find(q2); 
 
           if(mapit == m_map.end()) 
@@ -1092,7 +1125,8 @@ namespace radmat
       LatticeMultiDataTag out;
 
       std::stringstream ss;
-      ss << simpleWorld::stateFileName(c.m_elem.sink) << ".V_" << jmu << "." << simpleWorld::stateFileName(c.m_elem.source); 
+      ss << simpleWorld::stateFileName(c.m_elem.sink) <<
+        ".V_" << jmu << "." << simpleWorld::stateFileName(c.m_elem.source); 
       out.file_id = ss.str(); 
       out.jmu = jmu;
       out.mat_elem_id = c.m_mat_elem_id;
@@ -1101,7 +1135,7 @@ namespace radmat
       out.E_f = c.E_f;
       out.E_i = c.E_i;
       out.mom_fac = mom_factor(c.m_ini.xi, c.m_ini.L_s);
-
+      out.set_qsq_label(Mink_qsq(c,c.am_f,c.am_i,out.mom_fac)); 
 
 
 
@@ -1266,8 +1300,8 @@ namespace radmat
 
 
 #undef BUILD_CORRS_USE_OMP_PARALLEL
-#undef DEBUG_CORRELATOR_NORMALIZATION 
-#undef SERIOUSLY_DEBUG_CORRELATOR_NORMALIZATION  
+#undef PRINT_CORRELATOR_NORMALIZATION 
+#undef SERIOUSLY_PRINT_CORRELATOR_NORMALIZATION  
 #undef DEBUG_AT_MAKE_MOM_INV_TAGS 
 
 

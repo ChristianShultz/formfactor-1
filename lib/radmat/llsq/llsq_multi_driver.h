@@ -39,6 +39,7 @@ namespace radmat
     SEMBLE::SembleMatrix<T> peek_data(void) const {check_exit_lat(); return lattice_data->data();}
     std::vector<LatticeMultiDataTag> peek_tags(void) const {check_exit_lat(); return lattice_data->tags();}
     ENSEM::EnsemReal Q2(void) const {check_exit_lat(); return lattice_data->tags().begin()->Q2();}
+    double qsq_label(void) const {check_exit_lat(); return lattice_data->tags().begin()->get_qsq_label();}
 
     private:
 

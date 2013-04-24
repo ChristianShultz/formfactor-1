@@ -6,7 +6,7 @@
 
  * Creation Date : 25-02-2013
 
- * Last Modified : Thu Mar 21 18:32:07 2013
+ * Last Modified : Wed Apr 24 10:27:29 2013
 
  * Created By : shultz
 
@@ -153,7 +153,7 @@ namespace radmat
 
     // PARALLEL HERE
     for(idx =0; idx < sz; ++idx)
-      good_qs.push_back( linear_systems_of_Q2[idx].load_llsq(multi_lattice_data[idx],soln_ID) );
+      good_qs.push_back( linear_systems_of_Q2[idx].load_llsq(multi_lattice_data[idx],soln_ID,m_ini.poleMass) );
     // END PARALLEL
 
     my_stopwatch.stop();

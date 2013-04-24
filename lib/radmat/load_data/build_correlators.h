@@ -65,6 +65,7 @@ namespace radmat
 
     LatticeMultiDataTag(void)
     {
+      qsq_label = 1000.;
       E_f.resize(1); 
       E_f = SEMBLE::toScalar(double(0.));
       E_i = E_f; 
@@ -106,13 +107,17 @@ namespace radmat
       return ss.str(); 
     }
 
+    void set_qsq_label(const double &q2) {qsq_label = q2;}
+    double get_qsq_label(void) const {return qsq_label;}
+
 
     // tags
 
     std::string file_id; // some unique string telling us what this is
 
     // for llsq system
-    int jmu;
+    double qsq_label;        // nb this is the boosted q2 from using doubles as the mass and doesnt have to be the same 
+    int jmu;                 //       as the actual ensemble q2
     std::string mat_elem_id; 
     Array<int> p_f;
     Array<int> p_i;

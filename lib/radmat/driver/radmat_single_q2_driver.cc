@@ -6,7 +6,7 @@
 
  * Creation Date : 25-02-2013
 
- * Last Modified : Thu Mar  7 20:46:27 2013
+ * Last Modified : Wed Apr 24 11:06:14 2013
 
  * Created By : shultz
 
@@ -70,12 +70,21 @@ namespace radmat
   }
 
   bool RadmatSingleQ2Driver::load_llsq(const ADAT::Handle<LLSQLatticeMultiData> &d,
-      const std::string &soln_ID)
+      const std::string &soln_ID, const double pole_mass_squared)
   { 
     if(!!!linear_system.load_data(d))
       return false;
 
-    std::cout << "Solving Q2 = " << SEMBLE::toScalar(ENSEM::mean(linear_system.Q2())) 
+    if( (pole_mass_squared + SEMBLE::toScalar(ENSEM::mean(linear_system.Q2())) < 0.))
+    {
+      std::cout << "Killing Q2 = " << SEMBLE::toScalar(ENSEM::mean(linear_system.Q2())) 
+        << "  q2tag = " << linear_system.qsq_label() << "  beacause pole_mass^2 + Q^2 < 0 "
+        << "\nvalue is " << pole_mass_squared + SEMBLE::toScalar(ENSEM::mean(linear_system.Q2())) << std::endl;
+      return false; 
+    }
+
+
+    std::cout << "Solving Q2 = " << linear_system.qsq_label() 
       << "  " << linear_system.peek_tags().begin()->mom_string() << std::endl;
 
     linear_system.solve_llsq(soln_ID);
@@ -148,7 +157,7 @@ namespace radmat
     std::stringstream ss;
 
     for(it = tt.begin(); it != tt.end(); ++it)
-      ss << qq << " " << it->file_id << std::endl;
+      ss << qq << " (tag val = " <<  linear_system.qsq_label() << ") " << it->file_id << std::endl;
 
     return ss.str(); 
   }
@@ -194,7 +203,7 @@ namespace radmat
   {
 
     std::stringstream ss; 
-    ss << SEMBLE::SEMBLEIO::getPath() << "Q2_" << SEMBLE::toScalar(ENSEM::mean(Q2())) << "/";
+    ss << SEMBLE::SEMBLEIO::getPath() << "Q2_" << linear_system.qsq_label() << "/";
     SEMBLE::SEMBLEIO::makeDirectoryPath(ss.str());
     return ss.str(); 
   }
