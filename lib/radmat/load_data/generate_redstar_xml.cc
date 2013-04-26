@@ -6,7 +6,7 @@
 
  * Creation Date : 03-12-2012
 
- * Last Modified : Mon Apr 22 12:40:41 2013
+ * Last Modified : Thu Apr 25 12:25:13 2013
 
  * Created By : shultz
 
@@ -397,117 +397,6 @@ namespace radmat
     }
 
 
-#if 0
-
-    itpp::Vec<std::complex<double> > eps3_z(const std::string &qn, const bool create)
-    {
-      itpp::Vec<std::complex<double> > ret(3);
-      ret.zeros(); 
-
-      if(qn == "p")
-      {
-        ret[0] = -root2inv;
-        ret[1] = -cplx_i/root2; 
-      }
-      else if(qn == "m")
-      {
-        ret[0] = root2inv;
-        ret[1] = -cplx_i/root2;
-      }
-      else if(qn == "0")
-      {
-        ret[2] = 1;
-      }
-      else
-      {
-        std::cerr << "qn(" << qn << ") is ill defined, use p,m,0" << std::endl;
-        exit(1);
-      }
-
-      // deal with creation vs annih here
-      if(create)
-        return ret;
-      else
-        return itpp::conj(ret); 
-    }
-
-
-    // columns are indexed -m to m
-    // rows go -lambda to lambda
-
-    itpp::Mat<std::complex<double> > Wigner_D(const ADATXML::Array<int> mom, const int J, const bool create)
-    {
-
-      if((mom[0] == 0) &&(mom[1] == 0) && (mom[2] == 0))
-      {
-        itpp::Vec<std::complex<double> > one(3);
-        one.ones();
-        return itpp::diag(one);
-      }
-
-
-
-      Hadron::CubicCanonicalRotation_t rot = Hadron::cubicCanonicalRotation(mom);
-      itpp::Mat<std::complex<double> > ret(2*J + 1, 2*J+1); 
-      std::complex<double> tmp; 
-      std::complex<double> zero(0.,0.); 
-
-      const int tJ = 2*J;
-
-      for(int lambda = -J; lambda < J +1; ++lambda)
-        for(int m = -J; m < J +1; ++m)
-        {
-          tmp = SEMBLE::toScalar(Hadron::Wigner_D(tJ,2*m,2*lambda,rot.alpha,rot.beta,rot.gamma));
-
-          if( itpp::round_to_zero(tmp,0.00001) == zero )
-            ret(lambda+J,m+J) = zero;
-          else
-            ret(lambda+J,m+J) = tmp; 
-        }
-
-      // std::cout << __func__ << " Wigner_D (lambda,m)" << std::endl;
-      // std::cout << ret << std::endl; 
-
-      if(create)
-        return ret; 
-      else
-        return itpp::conj(ret);
-    }
-
-
-    itpp::Mat<std::complex<double> > R_ij(const ADATXML::Array<int> mom)
-    {
-
-
-    }
-
-
-    // a bunch of hardwires since itpp and ensem don't get along..
-    itpp::Mat<std::complex<double> > inver2Cart(const ADATXML::Array<int> mom, const bool create)
-    { 
-      itpp::Mat<std::complex<double> > epsz(3,3), D;
-      epsz.set_row(0,eps3_z("m",create));
-      epsz.set_row(1,eps3_z("0",create));
-      epsz.set_row(2,eps3_z("p",create));
-
-      D = Wigner_D(mom,1,create);
-
-      /*
-         std::cout << __func__ << "epsz (hel,x) " << std::endl;
-         std::cout << epsz << std::endl;
-
-         std::cout << __func__ << " D * epsz" << std::endl;
-         std::cout << D * epsz << std::endl;
-
-       */
-
-      return itpp::inv(D*epsz); 
-    }
-
-
-#endif
-
-
     //////////////////////////
     //////////////////////////
     //////////////////////////
@@ -639,32 +528,6 @@ namespace radmat
       m_y = std::pair<bool,listSubducedInsertion>(j_i_have[1],j_i[1]);  
       m_z = std::pair<bool,listSubducedInsertion>(j_i_have[2],j_i[2]);  
 
-      /*      
-              std::cout << "false = " << false << std::endl;
-              std::cout << "j_lambda_have 0 , 1 , 2 ---" << j_lambda_have[0] 
-              << "  " << j_lambda_have[1]
-              << "  " << j_lambda_have[2] << std::endl;
-              std::cout << "j_i_have 0 , 1 , 2 --- " << j_i_have[0]
-              << "  " << j_i_have[1] 
-              << "  " << j_i_have[2] << std::endl; 
-       */
-
-
-      /*
-         redstarCartesianMatElem_p::listSubducedInsertion::const_iterator it; 
-         std::cout << __func__ << " cart components " << std::endl;
-         std::cout << "list_x " << std::endl;
-         for(it = m_x.second.begin(); it != m_x.second.end(); ++it)
-         std::cout << SEMBLE::toScalar(it->m_coeff) << " X " 
-         << Hadron::ensemFileName(it->m_obj.irrep) << std::endl;
-
-         std::cout << "list_y " << std::endl;
-         for(it = m_y.second.begin(); it != m_y.second.end(); ++it)
-         std::cout << SEMBLE::toScalar(it->m_coeff) << " X " 
-         << Hadron::ensemFileName(it->m_obj.irrep) << std::endl;
-       */
-
-
     }
 
 
@@ -679,18 +542,6 @@ namespace radmat
   {
     m_source = getLatticeSubducedOp(cont.source,m_source_id);
     m_sink = getLatticeSubducedOp(cont.sink,m_sink_id);
-
-    /*
-       std::cout << __func__ << std::endl;
-       std::cout << "source " << cont.source << std::endl;
-       std::cout << "m_source " << std::endl;
-       std::cout << do_string(m_source) << std::endl;
-       std::cout << do_string(m_sink) << std::endl;
-
-
-       std::cout << "sink   " << cont.sink << std::endl;
-       std::cout << "m_sink " << std::endl;
-     */
 
 
     circLorentzInsertion foo = getLatticeSubducedInsertion(cont.insertion,std::string("foobar"));

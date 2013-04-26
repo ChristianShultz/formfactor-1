@@ -3,6 +3,7 @@
 
 
 #include "radmat/load_data/simple_world.h"
+#include "radmat/load_data/g_parity_world.h"
 #include "radmat/utils/obj_expr_t.h"
 #include "radmat/utils/pow2assert.h"
 #include "hadron/hadron_npart_npt_corr.h"

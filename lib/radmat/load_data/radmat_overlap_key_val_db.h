@@ -58,6 +58,11 @@ namespace radmat
   //! write a key to xml
   void write(ADATXML::XMLWriter &xml, const std::string &path, const RadmatExtendedKeyHadronNPartIrrep_t &param);
 
+  //! a uniqe key
+  std::string fileName(const RadmatExtendedKeyHadronNPartIrrep_t &param);
+
+
+
 
 
   //! a serializable data container holding the energy and overlap

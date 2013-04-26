@@ -57,7 +57,8 @@ namespace radmat
 
 
   template<typename TT, typename ST>
-    LLSQMultiData<TT,ST>::LLSQMultiData(const typename SEMBLE::SembleMatrix<ST> &s, const int n , const TT &tt)
+    LLSQMultiData<TT,ST>::LLSQMultiData(const typename SEMBLE::SembleMatrix<ST> &s,
+        const int n , const TT &tt)
     :  first_append(false), m_data(s) 
     {
       m_tags.resize(n,tt);

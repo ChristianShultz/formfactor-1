@@ -108,7 +108,10 @@ am_libradmat_a_OBJECTS = aux.$(OBJEXT) breit_frame.$(OBJEXT) \
 	fake_spectrum.$(OBJEXT) llsq_gen_system.$(OBJEXT) \
 	llsq_multi_driver.$(OBJEXT) llsq_q2_pack.$(OBJEXT) \
 	llsq_solvers.$(OBJEXT) llsq_chisq.$(OBJEXT) \
-	build_correlators.$(OBJEXT) generate_redstar_xml.$(OBJEXT) \
+	build_correlators.$(OBJEXT) build_correlators_xml.$(OBJEXT) \
+	g_parity_world.$(OBJEXT) \
+	g_parity_world_generate_redstar_xml.$(OBJEXT) \
+	g_parity_world_xml.$(OBJEXT) generate_redstar_xml.$(OBJEXT) \
 	invert_subduction.$(OBJEXT) \
 	radmat_database_interface.$(OBJEXT) \
 	radmat_overlap_key_val_db.$(OBJEXT) simple_world.$(OBJEXT) \
@@ -282,7 +285,11 @@ nobase_include_HEADERS = radmat/utils/aux.h radmat/utils/breit_frame.h \
 	radmat/llsq/llsq_q2_pack.h radmat/llsq/llsq_solver.h \
 	radmat/llsq/llsq_solvers.h radmat/llsq/llsq_zero_filter.h \
 	radmat/llsq/llsq_chisq.h radmat/load_data/build_correlators.h \
+	radmat/load_data/build_correlators_xml.h \
 	radmat/load_data/build_q2_packs.h \
+	radmat/load_data/g_parity_world.h \
+	radmat/load_data/g_parity_world_generate_redstar_xml.h \
+	radmat/load_data/g_parity_world_xml.h \
 	radmat/load_data/generate_redstar_xml.h \
 	radmat/load_data/invert_subduction.h \
 	radmat/load_data/load_fake_data.h \
@@ -308,7 +315,6 @@ lib_LIBRARIES = libradmat.a
 #llsq
 
 #load_data
-
 #fitting
 
 #driver
@@ -327,6 +333,10 @@ libradmat_a_SOURCES = radmat/utils/aux.cc radmat/utils/breit_frame.cc \
 	radmat/llsq/llsq_multi_driver.cc radmat/llsq/llsq_q2_pack.cc \
 	radmat/llsq/llsq_solvers.cc radmat/llsq/llsq_chisq.cc \
 	radmat/load_data/build_correlators.cc \
+	radmat/load_data/build_correlators_xml.cc \
+	radmat/load_data/g_parity_world.cc \
+	radmat/load_data/g_parity_world_generate_redstar_xml.cc \
+	radmat/load_data/g_parity_world_xml.cc \
 	radmat/load_data/generate_redstar_xml.cc \
 	radmat/load_data/invert_subduction.cc \
 	radmat/load_data/radmat_database_interface.cc \
@@ -416,6 +426,7 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/axis_plotter.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/breit_frame.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/build_correlators.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/build_correlators_xml.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/covarrying_vectors.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/euler_angles.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/fake_3pt_function_aux.Po@am__quote@
@@ -425,6 +436,9 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/ff_gen_llsq_row.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/fit_tins.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/formfactor_factory.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/g_parity_world.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/g_parity_world_generate_redstar_xml.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/g_parity_world_xml.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/generate_redstar_xml.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/harmonic.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/invert_subduction.Po@am__quote@
@@ -781,6 +795,62 @@ build_correlators.obj: radmat/load_data/build_correlators.cc
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='radmat/load_data/build_correlators.cc' object='build_correlators.obj' libtool=no @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCXX_FALSE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o build_correlators.obj `if test -f 'radmat/load_data/build_correlators.cc'; then $(CYGPATH_W) 'radmat/load_data/build_correlators.cc'; else $(CYGPATH_W) '$(srcdir)/radmat/load_data/build_correlators.cc'; fi`
+
+build_correlators_xml.o: radmat/load_data/build_correlators_xml.cc
+@am__fastdepCXX_TRUE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT build_correlators_xml.o -MD -MP -MF $(DEPDIR)/build_correlators_xml.Tpo -c -o build_correlators_xml.o `test -f 'radmat/load_data/build_correlators_xml.cc' || echo '$(srcdir)/'`radmat/load_data/build_correlators_xml.cc
+@am__fastdepCXX_TRUE@	$(am__mv) $(DEPDIR)/build_correlators_xml.Tpo $(DEPDIR)/build_correlators_xml.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='radmat/load_data/build_correlators_xml.cc' object='build_correlators_xml.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o build_correlators_xml.o `test -f 'radmat/load_data/build_correlators_xml.cc' || echo '$(srcdir)/'`radmat/load_data/build_correlators_xml.cc
+
+build_correlators_xml.obj: radmat/load_data/build_correlators_xml.cc
+@am__fastdepCXX_TRUE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT build_correlators_xml.obj -MD -MP -MF $(DEPDIR)/build_correlators_xml.Tpo -c -o build_correlators_xml.obj `if test -f 'radmat/load_data/build_correlators_xml.cc'; then $(CYGPATH_W) 'radmat/load_data/build_correlators_xml.cc'; else $(CYGPATH_W) '$(srcdir)/radmat/load_data/build_correlators_xml.cc'; fi`
+@am__fastdepCXX_TRUE@	$(am__mv) $(DEPDIR)/build_correlators_xml.Tpo $(DEPDIR)/build_correlators_xml.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='radmat/load_data/build_correlators_xml.cc' object='build_correlators_xml.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o build_correlators_xml.obj `if test -f 'radmat/load_data/build_correlators_xml.cc'; then $(CYGPATH_W) 'radmat/load_data/build_correlators_xml.cc'; else $(CYGPATH_W) '$(srcdir)/radmat/load_data/build_correlators_xml.cc'; fi`
+
+g_parity_world.o: radmat/load_data/g_parity_world.cc
+@am__fastdepCXX_TRUE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT g_parity_world.o -MD -MP -MF $(DEPDIR)/g_parity_world.Tpo -c -o g_parity_world.o `test -f 'radmat/load_data/g_parity_world.cc' || echo '$(srcdir)/'`radmat/load_data/g_parity_world.cc
+@am__fastdepCXX_TRUE@	$(am__mv) $(DEPDIR)/g_parity_world.Tpo $(DEPDIR)/g_parity_world.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='radmat/load_data/g_parity_world.cc' object='g_parity_world.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o g_parity_world.o `test -f 'radmat/load_data/g_parity_world.cc' || echo '$(srcdir)/'`radmat/load_data/g_parity_world.cc
+
+g_parity_world.obj: radmat/load_data/g_parity_world.cc
+@am__fastdepCXX_TRUE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT g_parity_world.obj -MD -MP -MF $(DEPDIR)/g_parity_world.Tpo -c -o g_parity_world.obj `if test -f 'radmat/load_data/g_parity_world.cc'; then $(CYGPATH_W) 'radmat/load_data/g_parity_world.cc'; else $(CYGPATH_W) '$(srcdir)/radmat/load_data/g_parity_world.cc'; fi`
+@am__fastdepCXX_TRUE@	$(am__mv) $(DEPDIR)/g_parity_world.Tpo $(DEPDIR)/g_parity_world.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='radmat/load_data/g_parity_world.cc' object='g_parity_world.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o g_parity_world.obj `if test -f 'radmat/load_data/g_parity_world.cc'; then $(CYGPATH_W) 'radmat/load_data/g_parity_world.cc'; else $(CYGPATH_W) '$(srcdir)/radmat/load_data/g_parity_world.cc'; fi`
+
+g_parity_world_generate_redstar_xml.o: radmat/load_data/g_parity_world_generate_redstar_xml.cc
+@am__fastdepCXX_TRUE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT g_parity_world_generate_redstar_xml.o -MD -MP -MF $(DEPDIR)/g_parity_world_generate_redstar_xml.Tpo -c -o g_parity_world_generate_redstar_xml.o `test -f 'radmat/load_data/g_parity_world_generate_redstar_xml.cc' || echo '$(srcdir)/'`radmat/load_data/g_parity_world_generate_redstar_xml.cc
+@am__fastdepCXX_TRUE@	$(am__mv) $(DEPDIR)/g_parity_world_generate_redstar_xml.Tpo $(DEPDIR)/g_parity_world_generate_redstar_xml.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='radmat/load_data/g_parity_world_generate_redstar_xml.cc' object='g_parity_world_generate_redstar_xml.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o g_parity_world_generate_redstar_xml.o `test -f 'radmat/load_data/g_parity_world_generate_redstar_xml.cc' || echo '$(srcdir)/'`radmat/load_data/g_parity_world_generate_redstar_xml.cc
+
+g_parity_world_generate_redstar_xml.obj: radmat/load_data/g_parity_world_generate_redstar_xml.cc
+@am__fastdepCXX_TRUE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT g_parity_world_generate_redstar_xml.obj -MD -MP -MF $(DEPDIR)/g_parity_world_generate_redstar_xml.Tpo -c -o g_parity_world_generate_redstar_xml.obj `if test -f 'radmat/load_data/g_parity_world_generate_redstar_xml.cc'; then $(CYGPATH_W) 'radmat/load_data/g_parity_world_generate_redstar_xml.cc'; else $(CYGPATH_W) '$(srcdir)/radmat/load_data/g_parity_world_generate_redstar_xml.cc'; fi`
+@am__fastdepCXX_TRUE@	$(am__mv) $(DEPDIR)/g_parity_world_generate_redstar_xml.Tpo $(DEPDIR)/g_parity_world_generate_redstar_xml.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='radmat/load_data/g_parity_world_generate_redstar_xml.cc' object='g_parity_world_generate_redstar_xml.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o g_parity_world_generate_redstar_xml.obj `if test -f 'radmat/load_data/g_parity_world_generate_redstar_xml.cc'; then $(CYGPATH_W) 'radmat/load_data/g_parity_world_generate_redstar_xml.cc'; else $(CYGPATH_W) '$(srcdir)/radmat/load_data/g_parity_world_generate_redstar_xml.cc'; fi`
+
+g_parity_world_xml.o: radmat/load_data/g_parity_world_xml.cc
+@am__fastdepCXX_TRUE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT g_parity_world_xml.o -MD -MP -MF $(DEPDIR)/g_parity_world_xml.Tpo -c -o g_parity_world_xml.o `test -f 'radmat/load_data/g_parity_world_xml.cc' || echo '$(srcdir)/'`radmat/load_data/g_parity_world_xml.cc
+@am__fastdepCXX_TRUE@	$(am__mv) $(DEPDIR)/g_parity_world_xml.Tpo $(DEPDIR)/g_parity_world_xml.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='radmat/load_data/g_parity_world_xml.cc' object='g_parity_world_xml.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o g_parity_world_xml.o `test -f 'radmat/load_data/g_parity_world_xml.cc' || echo '$(srcdir)/'`radmat/load_data/g_parity_world_xml.cc
+
+g_parity_world_xml.obj: radmat/load_data/g_parity_world_xml.cc
+@am__fastdepCXX_TRUE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT g_parity_world_xml.obj -MD -MP -MF $(DEPDIR)/g_parity_world_xml.Tpo -c -o g_parity_world_xml.obj `if test -f 'radmat/load_data/g_parity_world_xml.cc'; then $(CYGPATH_W) 'radmat/load_data/g_parity_world_xml.cc'; else $(CYGPATH_W) '$(srcdir)/radmat/load_data/g_parity_world_xml.cc'; fi`
+@am__fastdepCXX_TRUE@	$(am__mv) $(DEPDIR)/g_parity_world_xml.Tpo $(DEPDIR)/g_parity_world_xml.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='radmat/load_data/g_parity_world_xml.cc' object='g_parity_world_xml.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o g_parity_world_xml.obj `if test -f 'radmat/load_data/g_parity_world_xml.cc'; then $(CYGPATH_W) 'radmat/load_data/g_parity_world_xml.cc'; else $(CYGPATH_W) '$(srcdir)/radmat/load_data/g_parity_world_xml.cc'; fi`
 
 generate_redstar_xml.o: radmat/load_data/generate_redstar_xml.cc
 @am__fastdepCXX_TRUE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT generate_redstar_xml.o -MD -MP -MF $(DEPDIR)/generate_redstar_xml.Tpo -c -o generate_redstar_xml.o `test -f 'radmat/load_data/generate_redstar_xml.cc' || echo '$(srcdir)/'`radmat/load_data/generate_redstar_xml.cc

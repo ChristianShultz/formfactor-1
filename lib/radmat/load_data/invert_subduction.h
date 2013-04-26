@@ -16,7 +16,8 @@ namespace radmat
   //! a continuum expression for J^P , lambda and the lattice symmetry group we want to "undo"
   struct ContinuumBosonExprPrimitive
   {
-    ContinuumBosonExprPrimitive(const int _J, const bool _parity, const int _H, const std::string _group)
+    ContinuumBosonExprPrimitive(const int _J, const bool _parity, 
+const int _H, const std::string _group)
       : J(_J) , parity(_parity) , H(_H) , group(_group)
     {} 
 

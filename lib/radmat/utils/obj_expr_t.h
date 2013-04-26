@@ -61,12 +61,8 @@ namespace radmat
     std::ostream& operator<<(std::ostream &os , const ListObjExpr_t<C,O> &o)
     {
       typename ListObjExpr_t<C,O>::const_iterator it;
-      typename ListObjExpr_t<C,O>::const_iterator stop = --(o.m_expr.end());
-
-      for(it = o.m_expr.begin(); it != stop; ++it)
-        os << *it << "  +  ";
-
-      os << *stop; 
+      for(it = o.m_expr.begin(); it != o.m_expr.end(); ++it)
+        os << *it << "  ";
 
       return os;
     }
@@ -117,6 +113,23 @@ namespace radmat
 
       return dest;
     }
+
+  //! add a Obj_Expr_t to a ListObjExpr_t
+  template<typename C, typename O>
+  ListObjExpr_t<C,O> operator+(const ListObjExpr_t<C,O> &o1, const ObjExpr_t<C,O> &o2)
+  {
+    ListObjExpr_t<C,O> tmp(o2);
+    return o1 + tmp; 
+  }
+
+  //! add a ListObj_Expr_t to a ObjExpr_t
+  template<typename C, typename O>
+  ListObjExpr_t<C,O> operator+(const ObjExpr_t<C,O> &o1, const ListObjExpr_t<C,O> &o2)
+  {
+    ListObjExpr_t<C,O> tmp(o1);
+    return tmp + o2; 
+  }
+
 
 
   //-----------------------------------------------------------------------

@@ -6,7 +6,7 @@
 
  * Creation Date : 02-10-2012
 
- * Last Modified : Tue Jan  8 11:37:54 2013
+ * Last Modified : Fri Apr 26 18:05:08 2013
 
  * Created By : shultz
 
@@ -15,6 +15,9 @@
 
 #include "radmat_overlap_key_val_db.h"
 #include "ensem/ensem.h"
+#include "hadron/ensem_filenames.h"
+
+#include <sstream>
 
 //#define DEBUG_RADMAT_KEY_VAL_DB
 
@@ -109,6 +112,13 @@ namespace radmat
     ADATXML::pop(xml);
   }
 
+    //! a uniqe key
+  std::string fileName(const RadmatExtendedKeyHadronNPartIrrep_t &param)
+  {
+    std::stringstream ss; 
+    ss << param.m_particle_id << "." << Hadron::ensemFileName(param.m_basic_key);
+    return ss.str();
+  }
 
 
 

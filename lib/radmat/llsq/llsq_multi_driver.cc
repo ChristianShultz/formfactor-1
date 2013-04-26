@@ -6,7 +6,7 @@
 
  * Creation Date : 22-02-2013
 
- * Last Modified : Thu Mar 21 17:05:41 2013
+ * Last Modified : Fri Apr 26 17:42:42 2013
 
  * Created By : shultz
 
@@ -245,8 +245,12 @@ namespace radmat
     old_tags = lattice_data->tags(); 
 
     const unsigned int sz = old_tags.size(); 
+
+    std::cout << __func__ << "trying to call " << old_tags.begin()->mat_elem_id << std::endl;
+
     ffKinematicFactors_t<std::complex<double> >
       KJunk(FormFactorDecompositionFactoryEnv::callFactory(old_tags.begin()->mat_elem_id)); 
+
 
     const int nff = KJunk.nFacs();
 

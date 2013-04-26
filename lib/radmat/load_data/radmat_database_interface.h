@@ -156,10 +156,8 @@ namespace radmat
         {
           outlog << __func__ << ": MISSED DAGGER TOO!!!!" << std::endl;
           outlog << key.key() << std::endl;
+          return false; 
         }
-
-
-        return m_norm_db->exist(key);
       }
 
       return true; 
