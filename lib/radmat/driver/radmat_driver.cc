@@ -6,7 +6,7 @@
 
  * Creation Date : 25-02-2013
 
- * Last Modified : Wed Apr 24 10:27:29 2013
+ * Last Modified : Mon Apr 29 17:11:57 2013
 
  * Created By : shultz
 
@@ -45,6 +45,13 @@ using namespace radmat;
 using namespace ENSEM;
 using namespace ADAT;
 using namespace ADATIO;
+
+
+
+ #define LOAD_LLSQ_PARALLEL 
+ #define FIT_LLSQ_PARALLEL
+ #define CHISQ_ANALYSIS_PARALLEL
+
 
 namespace radmat
 {
@@ -134,7 +141,7 @@ namespace radmat
   {
     check_exit_corrs(); 
 
-    unsigned int idx, sz = multi_lattice_data.size(); 
+    int idx, sz = multi_lattice_data.size(); 
     std::string soln_ID = std::string ("SVDNonSquare");
 
     if(sz == 0)
@@ -151,10 +158,30 @@ namespace radmat
     my_stopwatch.start(); 
 
 
-    // PARALLEL HERE
+    good_qs.resize(sz,false); 
+
+    std::cout << __func__ << ": sz = " << sz << std::endl;
+
+
+#ifdef LOAD_LLSQ_PARALLEL 
+
+#pragma omp parallel for shared(idx)  schedule(dynamic,1)
+
+#endif    
+    // POSSIBLE PARALLEL HERE
     for(idx =0; idx < sz; ++idx)
-      good_qs.push_back( linear_systems_of_Q2[idx].load_llsq(multi_lattice_data[idx],soln_ID,m_ini.poleMass) );
+      good_qs[idx] =  linear_systems_of_Q2[idx].load_llsq(multi_lattice_data[idx],soln_ID,m_ini.poleMass);
     // END PARALLEL
+
+#pragma omp barrier
+
+    int ngood(0);
+    for(idx = 0; idx < sz; ++idx)
+      if(good_qs[idx])
+        ++ngood; 
+
+    std::cout << __func__ << ": " << ngood << " good Q^2 points out of " << sz << std::endl;
+
 
     my_stopwatch.stop();
     std::cout << "Solving LLSQ took "     
@@ -172,18 +199,25 @@ namespace radmat
   {
     check_exit_llsq(); 
 
-    unsigned int idx, sz = multi_lattice_data.size(); 
+    int idx, sz = multi_lattice_data.size(); 
 
     std::cout << "Fitting FF(t_ins) " << std::endl;
 
     Util::StopWatch my_stopwatch; 
     my_stopwatch.start(); 
 
-    // PARALLEL HERE
+
+#ifdef FIT_LLSQ_PARALLEL
+
+#pragma omp parallel for shared(idx)  schedule(dynamic,1)
+
+#endif 
+    // POSSIBLE PARALLEL HERE
     for(idx = 0; idx < sz; ++idx)
       if(good_qs[idx])
         linear_systems_of_Q2[idx].fit_data(m_ini.threePointComparatorProps);
 
+#pragma omp barrier
 
     my_stopwatch.stop();
     std::cout << "Fitting took " 
@@ -202,18 +236,25 @@ namespace radmat
   {
     check_exit_fit();
 
-    unsigned int idx, sz = multi_lattice_data.size(); 
+    int idx, sz = multi_lattice_data.size(); 
 
     std::cout << "chisq_analysis" << std::endl;
 
     Util::StopWatch my_stopwatch; 
     my_stopwatch.start(); 
 
-    // PARALLEL HERE
+#ifdef CHISQ_ANALYSIS_PARALLEL
+
+#pragma omp parallel for shared(sz) schedule(dynamic,1)
+
+#endif
+
+    // POSSIBLE PARALLEL HERE
     for(idx = 0; idx < sz; ++idx)
       if(good_qs[idx])
         linear_systems_of_Q2[idx].chisq_analysis();
 
+#pragma omp barrier
 
     my_stopwatch.stop();
     std::cout << "chisq_analysis took " 
@@ -303,4 +344,11 @@ namespace radmat
   }
 
 }
+
+
+#undef LOAD_LLSQ_PARALLEL 
+#undef FIT_LLSQ_PARALLEL
+#undef CHISQ_ANALYSIS_PARALLEL
+
+
 

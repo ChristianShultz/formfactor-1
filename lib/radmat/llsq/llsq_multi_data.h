@@ -44,10 +44,13 @@ namespace radmat
       typename SEMBLE::PromoteEnsemVec<ST>::Type get_col_ensem(const int col) const; 
       typename SEMBLE::PromoteEnsemVec<ST>::Type get_row_ensem(const int row) const;
 
+      int nrows(void) const {return m_data.getN();}
+      int ncols(void) const {return m_data.getN();}
+
       TT& get_tag(const int idx) const; 
       TT& get_tag(const int idx); 
       void set_tag(const int idx, const TT &); 
-
+      void splash_tags(void) const; 
 
       bool first_append; 
       SEMBLE::SembleMatrix<ST> m_data; 
@@ -75,6 +78,7 @@ namespace radmat
       {
         first_append = o.first_append; 
         m_data = o.m_data;
+        m_tags.clear();
         m_tags = o.m_tags; 
       }
       return *this;
@@ -212,6 +216,15 @@ namespace radmat
 
       m_tags[idx] = tt; 
     } 
+
+template<typename TT, typename ST>
+void LLSQMultiData<TT,ST>::splash_tags(void) const
+{
+  typename std::vector<TT>::const_iterator tt; 
+  for(tt = m_tags.begin(); tt != m_tags.end(); ++tt)
+    std::cout << tt->splash_tag();
+}
+
 
 
 

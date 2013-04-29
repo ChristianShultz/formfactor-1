@@ -6,7 +6,7 @@
 
  * Creation Date : 04-12-2012
 
- * Last Modified : Fri Apr 26 18:54:29 2013
+ * Last Modified : Mon Apr 29 17:24:25 2013
 
  * Created By : shultz
 
@@ -39,7 +39,7 @@
 #include <omp.h>
 
 
-// #define BUILD_CORRELATORS_PARALLEL
+#define BUILD_CORRELATORS_PARALLEL
 
 
 namespace radmat
@@ -55,6 +55,21 @@ namespace radmat
     E_i = E_f; 
   }
 
+  LatticeMultiDataTag& LatticeMultiDataTag::operator=(const LatticeMultiDataTag &o)
+  {
+    if(this != &o)
+    {
+      qsq_label = o.qsq_label; 
+      jmu = o.jmu;
+      mat_elem_id = o.mat_elem_id;
+      p_f = o.p_f;
+      p_i = o.p_i;
+      E_f = o.E_f;
+      E_i = o.E_i;
+      mom_fac = o.mom_fac; 
+    }
+    return *this;
+  }
 
   ENSEM::EnsemReal LatticeMultiDataTag::Q2(void) const
   {
@@ -72,9 +87,25 @@ namespace radmat
     std::cout << file_id << " " << jmu << " " << mat_elem_id << std::endl;  
   }
 
+  std::string LatticeMultiDataTag::splash_tag(void) const
+  {
+    print_me();
+    std::stringstream ss; 
+    ss << SEMBLE::toScalar(ENSEM::mean(Q2())) << " " ;
+    ss << mom_string() << std::endl;
+    return ss.str();
+  }
+
 
   std::string LatticeMultiDataTag::mom_string(void) const
   {
+
+    if(p_f.size() != 3 || p_i.size() != 3)
+    {
+      std::cerr <<__func__ << ": error, momenta don't have correct size" << std::endl;
+      exit(1);
+    }
+
     std::stringstream ss;
     ss << "pf = " << p_f[0] << "," << p_f[1] << ","
       << p_f[2] << "  pi = "  << p_i[0] << "," 
@@ -161,6 +192,14 @@ namespace radmat
       ret.mat_elem_id = mat_elem_id.str(); 
       ret.p_f = e.sink.state.mom; 
       ret.p_i = e.source.state.mom;
+
+      // a sanity check, we will always assum a size of 3 
+      if(ret.p_f.size() != 3 || ret.p_i.size() != 3)
+      {
+        std::cerr << __func__ << ": sanity check failed here" << std::endl;
+        exit(1); 
+      }
+
       ret.mom_fac = mom_factor(ini.xi,ini.L_s); 
       ret.set_qsq_label(Mink_qsq(ret.p_f,ini.threePointCorrXMLIni.maSink,
             ret.p_i, ini.threePointCorrXMLIni.maSource,ret.mom_fac)); 
@@ -182,7 +221,7 @@ namespace radmat
           const ThreePointCorrIni_t &ini)
         : have_active_data(d.first) , my_npoint(d.second) , my_helicity_elem(e)
       {
-        my_tag = get_lattice_tag(lorentz_index,ini,e); 
+        my_tag = get_lattice_tag(lorentz_index,ini,e);
       }
 
       double qsq_tag(void) const {return my_tag.get_qsq_label();}
@@ -484,13 +523,11 @@ namespace radmat
           std::string outstem = Hadron::ensemFileName(it->m_obj.npt); 
           std::string pth = SEMBLE::SEMBLEIO::getPath();
           std::stringstream path;
-          path << pth << "correlator_normalization";
-          SEMBLE::SEMBLEIO::makeDirectoryPath(path.str());
 
-          path << "Q2" << ret.tag.get_qsq_label(); 
+          path << pth << "Q2_" << ret.tag.get_qsq_label(); 
           SEMBLE::SEMBLEIO::makeDirectoryPath(path.str()); 
 
-          path << pth << "/correlator_normalization";
+          path << "/correlator_normalization";
           SEMBLE::SEMBLEIO::makeDirectoryPath(path.str());
 
           path << "/" << outstem;
@@ -541,6 +578,11 @@ namespace radmat
         ret.tag.E_f = E_f;
         ret.tag.E_i = E_i;
 
+
+
+        //  std::cout << __func__ << ": " << ret.tag.splash_tag() << std::endl;
+
+
         return ret;
       };
 
@@ -548,7 +590,8 @@ namespace radmat
 
 
     std::pair<bool, ADAT::Handle<LLSQLatticeMultiData> >
-      build_llsq_data(const std::vector<cartesianMatrixElementXML> &e, ThreePointCorrIni_t &ini)
+      build_llsq_data(const std::vector<cartesianMatrixElementXML> &e,
+          const ThreePointCorrIni_t &ini)
       {
         ADAT::Handle<LLSQLatticeMultiData> ret(new LLSQLatticeMultiData()); 
         std::vector<cartesianMatrixElementXML>::const_iterator it;
@@ -579,17 +622,60 @@ namespace radmat
             any_data = true; 
         }
 
-        std::cout << __func__ << ": inserting " << m_bad_corrs.size() 
-          << " bad corrs" << std::endl;
-        std::cout << __func__ << ": inserting " << m_bad_norms.size() 
-          << " bad norms" << std::endl;
-
-
-        bad_data_repository.insert(0,m_bad_corrs); // single thread so use 0 as tid
-        bad_data_repository.insert(0,m_bad_norms); // single thread so use 0 as tid
+        bad_data_repository.insert(omp_get_thread_num(),m_bad_corrs); 
+        bad_data_repository.insert(omp_get_thread_num(),m_bad_norms); 
 
         return std::pair<bool,ADAT::Handle<LLSQLatticeMultiData> >(any_data,ret); 
       }
+
+
+    std::vector<ADAT::Handle<LLSQLatticeMultiData> >
+      build_llsq_data_parallel(const std::map<double, std::vector<cartesianMatrixElementXML> > &m,
+          const ThreePointCorrIni_t &ini)
+      {
+        std::vector<bool> use_data(m.size(),false); 
+        std::vector<ADAT::Handle<LLSQLatticeMultiData> > tmp,ret; 
+        tmp.resize(m.size()); 
+        std::vector<std::pair<double,std::vector<cartesianMatrixElementXML> > > elems;
+        std::map<double,std::vector<cartesianMatrixElementXML> >::const_iterator it; 
+
+        // populate a vector for parallel
+        for(it = m.begin(); it != m.end(); ++it)
+          elems.push_back(
+              std::pair<double,std::vector<cartesianMatrixElementXML> >(it->first,it->second)); 
+
+        unsigned int elem;
+#pragma omp parallel for shared(elem)  schedule(dynamic,1)
+
+        for(elem = 0; elem < elems.size(); ++elem)
+        {
+          //         std::cout << "Working on Q2 = " << elems[elem].first << std::endl; 
+          std::pair<bool,ADAT::Handle<LLSQLatticeMultiData> > val; 
+          val = build_llsq_data(elems[elem].second,ini);
+
+          use_data[elem] = val.first;
+          tmp[elem] = val.second;
+        }
+
+#pragma omp barrier 
+
+        for(elem = 0; elem < elems.size(); ++elem)
+        {
+          if(use_data[elem])
+          {
+            ret.push_back(tmp[elem]); 
+          }
+          else
+          {
+            std::cout << "removing Q2 = " << elems[elem].first 
+              << " from llsq (no data)" << std::endl;
+          }
+        }
+        return ret; 
+      }
+
+
+
 
 
 
@@ -607,7 +693,9 @@ namespace radmat
 
     // transform the xml into the internal helicity representation
     std::vector<gParityWorld::GParityHelicityMatrixElement> internal
-      = gParityWorld::getGParityHelicityMatrixElementFromXML(m_ini.threePointCorrXMLIni.continuumMatElemXML); 
+      = gParityWorld::getGParityHelicityMatrixElementFromXML(
+          m_ini.threePointCorrXMLIni.continuumMatElemXML); 
+
     std::vector<gParityWorld::GParityHelicityMatrixElement>::const_iterator internal_it;
     std::vector<cartesianMatrixElementXML> unsorted_elements; 
     std::vector<cartesianMatrixElementXML>::const_iterator unsorted_iterator; 
@@ -632,27 +720,28 @@ namespace radmat
       if(tmp.t.first)
         unsorted_elements.push_back(cartesianMatrixElementXML(0,tmp.t,*internal_it,m_ini));
       if(tmp.x.first)
-        unsorted_elements.push_back(cartesianMatrixElementXML(0,tmp.x,*internal_it,m_ini));
+        unsorted_elements.push_back(cartesianMatrixElementXML(1,tmp.x,*internal_it,m_ini));
       if(tmp.y.first)
-        unsorted_elements.push_back(cartesianMatrixElementXML(0,tmp.y,*internal_it,m_ini));
+        unsorted_elements.push_back(cartesianMatrixElementXML(2,tmp.y,*internal_it,m_ini));
       if(tmp.z.first)
-        unsorted_elements.push_back(cartesianMatrixElementXML(0,tmp.z,*internal_it,m_ini));
+        unsorted_elements.push_back(cartesianMatrixElementXML(3,tmp.z,*internal_it,m_ini));
     }
 
     // sort them by qsq
     sorted_elements = sortByQ2(unsorted_elements);
+
+
+#ifdef BUILD_CORRELATORS_PARALLEL
+    ret = build_llsq_data_parallel(sorted_elements,m_ini);
+#else  
+
 
     // loop and get the actual numbers to load into the llsq
     for(sorted_it = sorted_elements.begin(); sorted_it != sorted_elements.end(); ++sorted_it)
     {
       std::cout << "Working on Q2 = " << sorted_it->first << std::endl; 
       std::pair<bool,ADAT::Handle<LLSQLatticeMultiData> > val; 
-
-#ifdef BUILD_CORRELATORS_PARALLEL
-      val = build_llsq_data_parallel(*sorted_it,m_ini);
-#else  
       val = build_llsq_data(sorted_it->second,m_ini);
-#endif
 
       if(val.first)
         ret.push_back(val.second);
@@ -660,8 +749,12 @@ namespace radmat
         std::cout << "removing Q2 = " << sorted_it->first  << " from llsq (no data) " << std::endl;
     }
 
+#endif
+
     // dump the bad/missing xml lists
     dump_baddies(); 
+    //    std::cout << __func__ << ": have " << ret.size() << " different values of Q^2" << std::endl;
+
 
     return ret; 
   }

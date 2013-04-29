@@ -6,7 +6,7 @@
 
  * Creation Date : 25-02-2013
 
- * Last Modified : Wed Apr 24 11:06:14 2013
+ * Last Modified : Sun Apr 28 08:49:26 2013
 
  * Created By : shultz
 
@@ -74,6 +74,12 @@ namespace radmat
   { 
     if(!!!linear_system.load_data(d))
       return false;
+
+    if(linear_system.peek_tags().empty())
+    {
+      std::cerr << __func__ << ": warning, no tags" << std::endl; 
+      return false;
+    }
 
     if( (pole_mass_squared + SEMBLE::toScalar(ENSEM::mean(linear_system.Q2())) < 0.))
     {

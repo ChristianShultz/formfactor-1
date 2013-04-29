@@ -6,7 +6,7 @@
 
  * Creation Date : 22-02-2013
 
- * Last Modified : Fri Apr 26 17:42:42 2013
+ * Last Modified : Mon Apr 29 17:53:25 2013
 
  * Created By : shultz
 
@@ -234,10 +234,20 @@ namespace radmat
     return run_zero_filter(); 
   }
 
+  
+  void LLSQMultiDriver_t::splash_tags(void) const
+  {
+    lattice_data->splash_tags(); 
+  }
+
+
 
   bool LLSQMultiDriver_t::run_zero_filter(void)
   {
     check_exit_lat(); 
+
+   // splash_tags();
+
     ADAT::Handle<LLSQLatticeMultiData> non_zero_data(new LLSQLatticeMultiData);
     std::vector<LatticeMultiDataTag> old_tags;
     SEMBLE::SembleMatrix<std::complex<double> > Junk; 
@@ -246,13 +256,10 @@ namespace radmat
 
     const unsigned int sz = old_tags.size(); 
 
-    std::cout << __func__ << "trying to call " << old_tags.begin()->mat_elem_id << std::endl;
+   // std::cout << __func__ << "trying to call " << old_tags.begin()->mat_elem_id << std::endl;
 
     ffKinematicFactors_t<std::complex<double> >
       KJunk(FormFactorDecompositionFactoryEnv::callFactory(old_tags.begin()->mat_elem_id)); 
-
-
-    const int nff = KJunk.nFacs();
 
     Junk = KJunk.genFactors(makeMomInvariants(*old_tags.begin())); 
     Zero = Junk.getRow(0);
@@ -286,7 +293,16 @@ namespace radmat
     lattice_data = non_zero_data;
 
 
-    return (nff <= sz - zeroed_elems.size());
+    // warn that we are killing this data point 
+    if(non_zero_data->ncols() > non_zero_data->nrows())
+    {
+      std::cout << __func__ << ": not enough data points to solve the llsq" << std::endl;
+      std::cout << "passed in " << sz << " elements of which " << zeroed_elems.size() 
+        << " failed the zero test, needed " << non_zero_data->ncols() << " elems, had " 
+        << non_zero_data->nrows() << "elements " << std::endl;
+    }
+
+    return ( non_zero_data->ncols() <= non_zero_data->nrows() ); 
   }
 
 
