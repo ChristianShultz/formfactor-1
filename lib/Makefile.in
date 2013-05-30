@@ -101,15 +101,15 @@ libradmat_a_LIBADD =
 am_libradmat_a_OBJECTS = aux.$(OBJEXT) breit_frame.$(OBJEXT) \
 	euler_angles.$(OBJEXT) harmonic.$(OBJEXT) pow2assert.$(OBJEXT) \
 	splash.$(OBJEXT) tensor.$(OBJEXT) wigner.$(OBJEXT) \
-	ff_gen_llsq_row.$(OBJEXT) formfactor_factory.$(OBJEXT) \
-	lorentzff_PiPi.$(OBJEXT) lorentzff_PiPiStar.$(OBJEXT) \
-	covarrying_vectors.$(OBJEXT) fake_3pt_function_aux.$(OBJEXT) \
-	fake_data_ini.$(OBJEXT) fake_overlaps.$(OBJEXT) \
-	fake_spectrum.$(OBJEXT) llsq_gen_system.$(OBJEXT) \
-	llsq_multi_driver.$(OBJEXT) llsq_q2_pack.$(OBJEXT) \
-	llsq_solvers.$(OBJEXT) llsq_chisq.$(OBJEXT) \
-	build_correlators.$(OBJEXT) build_correlators_xml.$(OBJEXT) \
-	g_parity_world.$(OBJEXT) \
+	polarisation_tensors.$(OBJEXT) ff_gen_llsq_row.$(OBJEXT) \
+	formfactor_factory.$(OBJEXT) lorentzff_PiPi.$(OBJEXT) \
+	lorentzff_PiPiStar.$(OBJEXT) covarrying_vectors.$(OBJEXT) \
+	fake_3pt_function_aux.$(OBJEXT) fake_data_ini.$(OBJEXT) \
+	fake_overlaps.$(OBJEXT) fake_spectrum.$(OBJEXT) \
+	llsq_gen_system.$(OBJEXT) llsq_multi_driver.$(OBJEXT) \
+	llsq_q2_pack.$(OBJEXT) llsq_solvers.$(OBJEXT) \
+	llsq_chisq.$(OBJEXT) build_correlators.$(OBJEXT) \
+	build_correlators_xml.$(OBJEXT) g_parity_world.$(OBJEXT) \
 	g_parity_world_generate_redstar_xml.$(OBJEXT) \
 	g_parity_world_xml.$(OBJEXT) generate_redstar_xml.$(OBJEXT) \
 	invert_subduction.$(OBJEXT) \
@@ -322,6 +322,7 @@ libradmat_a_SOURCES = radmat/utils/aux.cc radmat/utils/breit_frame.cc \
 	radmat/utils/euler_angles.cc radmat/utils/harmonic.cc \
 	radmat/utils/pow2assert.cc radmat/utils/splash.cc \
 	radmat/utils/tensor.cc radmat/utils/wigner.cc \
+	radmat/utils/polarisation_tensors.cc \
 	radmat/ff/ff_gen_llsq_row.cc radmat/ff/formfactor_factory.cc \
 	radmat/ff/lorentzff_PiPi.cc radmat/ff/lorentzff_PiPiStar.cc \
 	radmat/fake_data/covarrying_vectors.cc \
@@ -449,6 +450,7 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/llsq_solvers.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/lorentzff_PiPi.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/lorentzff_PiPiStar.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/polarisation_tensors.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/pow2assert.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/radmat_database_interface.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/radmat_driver.Po@am__quote@
@@ -585,6 +587,20 @@ wigner.obj: radmat/utils/wigner.cc
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='radmat/utils/wigner.cc' object='wigner.obj' libtool=no @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCXX_FALSE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o wigner.obj `if test -f 'radmat/utils/wigner.cc'; then $(CYGPATH_W) 'radmat/utils/wigner.cc'; else $(CYGPATH_W) '$(srcdir)/radmat/utils/wigner.cc'; fi`
+
+polarisation_tensors.o: radmat/utils/polarisation_tensors.cc
+@am__fastdepCXX_TRUE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT polarisation_tensors.o -MD -MP -MF $(DEPDIR)/polarisation_tensors.Tpo -c -o polarisation_tensors.o `test -f 'radmat/utils/polarisation_tensors.cc' || echo '$(srcdir)/'`radmat/utils/polarisation_tensors.cc
+@am__fastdepCXX_TRUE@	$(am__mv) $(DEPDIR)/polarisation_tensors.Tpo $(DEPDIR)/polarisation_tensors.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='radmat/utils/polarisation_tensors.cc' object='polarisation_tensors.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o polarisation_tensors.o `test -f 'radmat/utils/polarisation_tensors.cc' || echo '$(srcdir)/'`radmat/utils/polarisation_tensors.cc
+
+polarisation_tensors.obj: radmat/utils/polarisation_tensors.cc
+@am__fastdepCXX_TRUE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT polarisation_tensors.obj -MD -MP -MF $(DEPDIR)/polarisation_tensors.Tpo -c -o polarisation_tensors.obj `if test -f 'radmat/utils/polarisation_tensors.cc'; then $(CYGPATH_W) 'radmat/utils/polarisation_tensors.cc'; else $(CYGPATH_W) '$(srcdir)/radmat/utils/polarisation_tensors.cc'; fi`
+@am__fastdepCXX_TRUE@	$(am__mv) $(DEPDIR)/polarisation_tensors.Tpo $(DEPDIR)/polarisation_tensors.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='radmat/utils/polarisation_tensors.cc' object='polarisation_tensors.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o polarisation_tensors.obj `if test -f 'radmat/utils/polarisation_tensors.cc'; then $(CYGPATH_W) 'radmat/utils/polarisation_tensors.cc'; else $(CYGPATH_W) '$(srcdir)/radmat/utils/polarisation_tensors.cc'; fi`
 
 ff_gen_llsq_row.o: radmat/ff/ff_gen_llsq_row.cc
 @am__fastdepCXX_TRUE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT ff_gen_llsq_row.o -MD -MP -MF $(DEPDIR)/ff_gen_llsq_row.Tpo -c -o ff_gen_llsq_row.o `test -f 'radmat/ff/ff_gen_llsq_row.cc' || echo '$(srcdir)/'`radmat/ff/ff_gen_llsq_row.cc

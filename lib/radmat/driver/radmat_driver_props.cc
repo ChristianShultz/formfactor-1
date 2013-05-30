@@ -6,7 +6,7 @@
 
 * Creation Date : 29-11-2012
 
-* Last Modified : Wed Apr 24 10:14:16 2013
+* Last Modified : Thu May  2 12:16:23 2013
 
 * Created By : shultz
 
@@ -45,7 +45,8 @@ namespace radmat
   {
     std::stringstream ss;
       ss << "threePointComparatorProps = " << prop.threePointComparatorProps;
-      ss << " \nthreePointIni = " << prop.threePointIni;
+      ss << "\nthreePointIni = " << prop.threePointIni;
+      ss << "\nmaxThread = " << prop.maxThread; 
       ss << "\npoleMass^2 = " <<  prop.poleMass; 
       return ss.str(); 
   }
@@ -60,6 +61,7 @@ namespace radmat
     ADATXML::XMLReader ptop(xml,path);
     doXMLRead(ptop,"threePointComparatorProps",prop.threePointComparatorProps,__PRETTY_FUNCTION__);
     doXMLRead(ptop,"threePointIni",prop.threePointIni,__PRETTY_FUNCTION__);
+    doXMLRead(ptop,"maxThread",prop.maxThread,__PRETTY_FUNCTION__);
     
     // NB: we square the mass here!
     double pole_mass; 

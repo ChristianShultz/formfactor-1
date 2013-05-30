@@ -6,7 +6,7 @@
 
  * Creation Date : 12-10-2012
 
- * Last Modified : Thu Mar  7 19:48:19 2013
+ * Last Modified : Mon May  6 16:33:04 2013
 
  * Created By : shultz
 
@@ -16,6 +16,7 @@
 
 
 #include "radmat/load_data/invert_subduction.h"
+#include "radmat/utils/polarisation_tensors.h"
 #include "radmat/utils/pow2assert.h"
 
 #include "hadron/subduce_tables_factory.h"
@@ -163,8 +164,8 @@ namespace  // a bunch of local stuff to make my life easier
       std::cerr << __func__ << ": error: out of bounds" << std::endl;
       exit(1);
     }
-
-    return J - H + 1;
+                
+    return ::radmat::remapHelicity_1based(H,J); 
   }
 
   struct irrepKey
@@ -242,13 +243,16 @@ namespace  // a bunch of local stuff to make my life easier
       for(int irrep_row = 1; irrep_row <= rep_bound; ++irrep_row)
       {
 
-        /*
+#if 0        
            std::cout <<"group: " << expr.group << "\n" 
            << "irrep: " << it->irrep << "\n"
            << "rep_bound: " << rep_bound << "\n"
            << "Hbase1: " << Hbase1 << "\n"
-           << "irrep_row: " << irrep_row << std::endl;
-         */
+           << "irrep_row: " << irrep_row << "\n"
+           << "subduce = " << (*subduce)(irrep_row,Hbase1) << "\n"
+           << std::endl;
+#endif
+          
 
         if(ENSEM::toBool(ENSEM::localNorm2( (*subduce)(irrep_row,Hbase1))  > ENSEM::Real(0.0)))
           lattice_expr.push_back(
@@ -371,8 +375,6 @@ namespace radmat
   }
 
 
-
-
   //! write this into a string for the factory
   std::string toString(const ContinuumBosonExprPrimitive &expr)
   {
@@ -421,5 +423,21 @@ namespace radmat
       return invertSubduction_rest(expr);
   }
 
+
+  LatticeIrrepExpr_t conj(const LatticeIrrepExpr_t &expr)
+  {
+    return LatticeIrrepExpr_t(ENSEM::conj(expr.m_coeff) , expr.m_obj);
+  }
+
+
+  ListLatticeIrrepExpr_t conj(const ListLatticeIrrepExpr_t &expr)
+  {
+    ListLatticeIrrepExpr_t dest; 
+    ListLatticeIrrepExpr_t::const_iterator it; 
+    for(it = expr.begin(); it != expr.end(); ++it)
+      dest = dest + conj(*it); 
+
+    return dest; 
+  }
 
 } // namespace radmat

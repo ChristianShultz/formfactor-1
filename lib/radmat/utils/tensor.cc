@@ -41,6 +41,8 @@ namespace radmat
     return ((mom[0] == 0) && (mom[1] == 0) && (mom[2] == 0));
   }
 
+
+  // active z-y-z rotations
   Tensor<double,2> genRotationMatrix(const XMLArray::Array<int> &mom)
   {
     if(isRest(mom))
@@ -49,6 +51,45 @@ namespace radmat
     Hadron::CubicCanonicalRotation_t eulerangles = Hadron::cubicCanonicalRotation(mom);
 
     Tensor<double,2> A((TensorShape<2>())[4][4],0.),B((TensorShape<2>())[4][4],0.),C((TensorShape<2>())[4][4],0.);
+
+
+    double a,b,g;
+    a = eulerangles.alpha;
+    b = eulerangles.beta;
+    g = eulerangles.gamma;
+
+
+    A[0][0] = 1.;
+    B[0][0] = 1.;
+    C[0][0] = 1.;
+
+
+    A[1][1] = cos(a)   ;    A[1][2] = -sin(a)    ;    A[1][3] =  0.      ; 
+    A[2][1] = sin(a)  ;    A[2][2] = cos(a)    ;    A[2][3] =  0.      ; 
+    A[3][1] = 0.       ;    A[3][2] = 0.        ;    A[3][3] =  1.      ; 
+
+
+#if 0
+    // B_x
+    B[1][1] = 1.       ;    B[1][2] = 0.        ;    B[1][3] =  0.      ; 
+    B[2][1] = 0.       ;    B[2][2] = cos(b)    ;    B[2][3] = sin(b)   ; 
+    B[3][1] = 0.       ;    B[3][2] = -sin(b)   ;    B[3][3] = cos(b)   ; 
+#endif 
+
+    // B_y 
+    B[1][1] = cos(b)   ;    B[1][2] = 0.        ;    B[1][3] = sin(b)   ; 
+    B[2][1] = 0.       ;    B[2][2] = 1.        ;    B[2][3] =  0.      ; 
+    B[3][1] = -sin(b)  ;    B[3][2] = 0.        ;    B[3][3] = cos(b)   ; 
+
+
+
+    C[1][1] = cos(g)   ;    C[1][2] = -sin(g)    ;    C[1][3] =  0.      ; 
+    C[2][1] = sin(g)  ;    C[2][2] = cos(g)    ;    C[2][3] =  0.      ; 
+    C[3][1] = 0.       ;    C[3][2] = 0.        ;    C[3][3] =  1.      ; 
+
+
+
+#if 0
 
     for(idx_t i = 0; i < 4; ++i)
       A[i][i] = 1.;
@@ -62,18 +103,20 @@ namespace radmat
     A[1][2] = -A[2][1];
 
     B[1][1] = B[3][3] = cos(eulerangles.beta);
-    B[1][3] = sin(eulerangles.beta);
-    B[3][1] = -B[1][3];
+    B[3][1] = sin(eulerangles.beta);
+    B[1][3] = -B[3][1];
 
     C[1][1] = C[2][2] = cos(eulerangles.alpha);
     C[2][1] = sin(eulerangles.alpha);
     C[1][2] = -C[2][1];
+#endif 
 
     A.lower_index(1);
     B.lower_index(1);
     C.lower_index(1);
 
-    return C*B*A;
+    // return C * B * A;
+    return A*B*C;
   }
 
 
@@ -86,7 +129,7 @@ namespace radmat
         Three[i][j] = Four[i+1][j+1];
 
     Three.lower_index(1); 
-    
+
     return Three;
   }
 

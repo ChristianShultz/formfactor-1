@@ -6,7 +6,7 @@
 
  * Creation Date : 25-02-2013
 
- * Last Modified : Sun Apr 28 08:49:26 2013
+ * Last Modified : Thu May  2 12:15:21 2013
 
  * Created By : shultz
 
@@ -69,9 +69,9 @@ namespace radmat
     return *this; 
   }
 
-  bool RadmatSingleQ2Driver::load_llsq(const ADAT::Handle<LLSQLatticeMultiData> &d,
-      const std::string &soln_ID, const double pole_mass_squared)
-  { 
+  bool RadmatSingleQ2Driver::load_llsq(const ADAT::Handle<LLSQLatticeMultiData> &d, const double pole_mass_squared)
+  {
+
     if(!!!linear_system.load_data(d))
       return false;
 
@@ -89,19 +89,30 @@ namespace radmat
       return false; 
     }
 
+    init_linear_system = true; 
 
+    SEMBLE::SEMBLEIO::makeDirectoryPath(base_path() + std::string("llsq"));
+    linear_system.dump_llsq_lattice(base_path() + std::string("llsq/"));
+
+    return true;
+  }
+
+
+  void RadmatSingleQ2Driver::solve_llsq(const std::string &soln_ID)
+  {
+    check_exit_linear_system();
     std::cout << "Solving Q2 = " << linear_system.qsq_label() 
       << "  " << linear_system.peek_tags().begin()->mom_string() << std::endl;
 
     linear_system.solve_llsq(soln_ID);
-    init_linear_system = true; 
-    return true;
+    init_solved_llsq = true; 
   }
 
 
   void RadmatSingleQ2Driver::fit_data(const ThreePointComparatorProps_t &fit_props)
   {
-    check_exit_linear_system(); 
+    check_exit_linear_system();
+    check_exit_solved_llsq(); 
     SEMBLE::SembleMatrix<std::complex<double> > FF_of_t = linear_system.peek_FF(); 
     LLSQRet_ff_Q2Pack<std::complex<double> > tmp;
 

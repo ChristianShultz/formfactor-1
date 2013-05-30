@@ -104,7 +104,15 @@ namespace radmat
 
     typedef redstarSubducedHelicityInsertion::map_t map_t; 
 
-    typedef std::pair<bool,listNPointKey> data_t; 
+    typedef std::pair<bool,listNPointKey> data_t;
+
+    generateCircularRedstarXML() 
+    {
+      time = data_t(false,listNPointKey());
+      plus = data_t(false,listNPointKey());
+      zero = data_t(false,listNPointKey());
+      minus = data_t(false,listNPointKey());
+    } 
 
     void fill(const std::string &id, const map_t& , data_t &, 
         const listIrrepOperator &sink, const listIrrepOperator &source, 

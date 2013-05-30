@@ -2084,6 +2084,10 @@ namespace radmat
     Tensor<typename Promote<T,U>::Type_t , N>
     applyMetric(const Tensor<T, N> &tensor, const Tensor<U, 2> &metric, const idx_t idx)
     {
+
+  //    std::cout << __func__ << " T in \n" << tensor << std::endl;
+  //    std::cout << __func__ << " metric \n" << metric << std::endl;
+
       POW2_ASSERT((tensor.Dimensions[idx] == metric.Dimensions[0])
           && (metric.Dimensions[0] == metric.Dimensions[1])
           && (idx < N));
@@ -2147,6 +2151,8 @@ namespace radmat
         ret.lower_index(idx);
       else
         ret.raise_index(idx);
+
+   //   std::cout << "T out \n" << ret << std::endl;
 
       return ret;
     }

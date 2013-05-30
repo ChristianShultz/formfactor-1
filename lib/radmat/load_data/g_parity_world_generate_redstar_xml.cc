@@ -6,7 +6,7 @@
 
  * Creation Date : 25-04-2013
 
- * Last Modified : Fri Apr 26 18:55:16 2013
+ * Last Modified : Thu May  9 16:23:42 2013
 
  * Created By : shultz
 
@@ -21,6 +21,8 @@
 #include "adat/map_obj.h"
 #include "ensem/ensem.h"
 #include "hadron/ensem_filenames.h"
+#include "hadron/irrep_util.h"
+#include "hadron/clebsch.h"
 #include "formfac/formfac_qsq.h"
 
 #include "radmat/utils/polarisation_tensors.h"
@@ -47,7 +49,29 @@ namespace radmat
   {
 
 
-    typedef generateCircularRedstarXML::listNPointKey listNPointKey; 
+    typedef generateCircularRedstarXML::listNPointKey listNPointKey;
+
+
+    // a debugging method
+    void screen_dump (const listNPointKey &k)
+    {
+
+#if 0
+      std::cout << __func__ << ": nele = " << k.m_expr.size() << std::endl;
+
+      //     for(int i = 0; i < k.m_expr.size(); ++i)
+      //       std::cout << ensemFileName( k.m_expr[i].m_obj ) << std::endl;
+
+      listNPointKey::const_iterator it;
+      for(it = k.begin(); it != k.end(); ++it)
+      {
+        std::cout << it->m_obj << std::endl;
+        std::cout << ensemFileName(it->m_obj) << std::endl;
+      }
+
+#endif
+    } 
+
 
     listNPointKey operator*(const std::complex<double> &c, const listNPointKey &l)
     {
@@ -62,7 +86,16 @@ namespace radmat
 
       for(int row = 0; row < m.rows(); ++row)
         for(int col = 0; col < m.cols(); ++col)
-          ret[row] = ret[row] + m(row,col)*v(col);
+        {
+          if(std::norm(m(row,col)) > 0.0001)
+          {
+            // init 
+            if(ret[row].m_expr.size() == 0)
+              ret[row] =  m(row,col)*v(col);
+            else
+              ret[row] = ret[row] + m(row,col)*v(col);
+          }
+        }
 
       return ret; 
     }
@@ -83,7 +116,7 @@ namespace radmat
           for(int col = 0; col < v.size(); ++col)
           {
             // phases may not cancel exactly but in this context 0.000001 is zero
-            if(itpp::round_to_zero(m(row,col), 0.00001) == std::complex<double>(0.,0.))
+            if(std::norm(m(row,col)) > 0.0001)
               continue; 
 
             ret(row) &= v(col);
@@ -117,9 +150,11 @@ namespace radmat
       return eps3; 
     }
 
+
+    // invert the matrix eps
     itpp::Mat<std::complex<double> > invert2Cart(const ADATXML::Array<int> mom, const bool create)
     { 
-      return itpp::inv(eps3d(mom,create));
+      return itpp::round_to_zero(itpp::inv(eps3d(mom,create)),0.00001);
     }
 
     std::string stringy_mom(const ADATXML::Array<int> mom)
@@ -140,7 +175,14 @@ namespace radmat
   {
     orig = e; 
     ContinuumBosonExprPrimitive meson(e.J,e.parity,e.H,Hadron::generateLittleGroup(e.mom)); 
-    ListLatticeIrrepExpr_t lattice_meson = invertSubduction(meson); 
+
+    ListLatticeIrrepExpr_t lattice_meson;
+
+    if(e.creation_op)
+      lattice_meson = invertSubduction(meson); 
+    else
+      lattice_meson = conj(invertSubduction(meson)); 
+
     ListLatticeIrrepExpr_t::const_iterator it; 
     for(it = lattice_meson.begin(); it != lattice_meson.end(); ++it)
     {
@@ -188,7 +230,7 @@ namespace radmat
       const gParityWorld::GParityInsertion::photon &p, const int t_slice)
   {
     gParityWorld::GParityInsertion::photon::const_iterator it; 
-    int ct = 0;
+
     for(it = p.begin(); it != p.end(); ++it)
     {
       redstarSubducedOperator work;
@@ -285,7 +327,10 @@ namespace radmat
       d = data_t(true,work.subduced); 
     }
     else
+    {
+      //     std::cout << __func__ << ": missed id = " << id << std::endl;
       d = data_t(false,work.subduced); // empty list
+    }
   }
 
 
@@ -303,7 +348,7 @@ namespace radmat
     fill("t", insertion.insertion_map,time,sink.subduced,source.subduced,e.ensemble); 
     fill("p", insertion.insertion_map,plus,sink.subduced,source.subduced,e.ensemble); 
     fill("0", insertion.insertion_map,zero,sink.subduced,source.subduced,e.ensemble); 
-    fill("m", insertion.insertion_map,minus,sink.subduced,source.subduced,e.ensemble); 
+    fill("m", insertion.insertion_map,minus,sink.subduced,source.subduced,e.ensemble);
 
     orig = e; 
   }
@@ -327,7 +372,8 @@ namespace radmat
 
       for(it = d.second.begin(); it != d.second.end(); ++it)
       {
-        ENSEM::Complex coeff = it->m_coeff; 
+        ENSEM::Complex coeff = it->m_coeff;
+
         std::string key = ensemFileName(it->m_obj); 
 
         if(coeff_map.find(key) != coeff_map.end())
@@ -370,10 +416,27 @@ namespace radmat
     itpp::Vec<listNPointKey> circl(3), cartl;
     circl[0] = tmp.plus.second;
     circl[1] = tmp.zero.second;
-    circl[2] = tmp.minus.second; 
+    circl[2] = tmp.minus.second;
 
     cartb = M * circb; 
     cartl = M * circl; 
+
+#if 0
+    std::cout << __func__ << std::endl;
+
+    std::cout << M << std::endl;
+
+    //  std::cout << e << std::endl;
+
+    std::cout << " pos " << tmp.plus.first << std::endl;
+    screen_dump( circl[0] );
+
+    std::cout << " zero " << tmp.zero.first << std::endl;
+    screen_dump( circl[1] );
+
+    std::cout << " neg " << tmp.minus.first << std::endl;
+    screen_dump( circl[2] );
+#endif
 
     x = combine_duplicates(data_t(cartb[0],cartl[0]));
     y = combine_duplicates(data_t(cartb[1],cartl[1]));

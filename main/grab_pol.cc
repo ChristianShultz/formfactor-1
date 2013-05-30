@@ -6,7 +6,7 @@
 
  * Creation Date : 22-04-2013
 
- * Last Modified : Mon Apr 22 16:29:44 2013
+ * Last Modified : Tue May  7 09:52:00 2013
 
  * Created By : shultz
 
@@ -33,19 +33,19 @@ void printTensor(const Tensor<double,1> &p, const int J, const int hel, const do
       }
     case 2:
       {
-      HelicityPolarizationTensor<1> foo;
+      HelicityPolarizationTensor<2> foo;
       std::cout << foo(p,hel,pfac);
       break;
       }
     case 3:
       {
-      HelicityPolarizationTensor<2> foo;
+      HelicityPolarizationTensor<3> foo;
       std::cout << foo(p,hel,pfac);
       break;
       }
     case 4:
       {
-      HelicityPolarizationTensor<3> foo;
+      HelicityPolarizationTensor<4> foo;
       std::cout << foo(p,hel,pfac);
       break;
       }
@@ -70,7 +70,7 @@ inp usage(int argc, char *argv[])
 {
   if(argc != 8)
   {
-    std::cerr << "usage: grab_pol <J> <H> <E> <nx ny nz> <2pi/xi/ns>" << std::endl;
+    std::cerr << "usage: grab_pol <J> <H> <m> <nx ny nz> <2pi/xi/ns>" << std::endl;
     exit(1);
   }
 
@@ -91,9 +91,14 @@ inp usage(int argc, char *argv[])
      
     foo.p = fred; }
 
+    double pp(0.); 
     for(int i = 1; i < 4; ++i)
+    {
       foo.p[i] *= foo.pfac;
+      pp += foo.p[i]*foo.p[i]; 
+    }
 
+    foo.p[0] = sqrt(foo.p[0]*foo.p[0] + pp);
     return foo;
 }
 

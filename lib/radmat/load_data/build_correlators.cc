@@ -6,7 +6,7 @@
 
  * Creation Date : 04-12-2012
 
- * Last Modified : Mon Apr 29 17:24:25 2013
+ * Last Modified : Wed May  8 14:34:32 2013
 
  * Created By : shultz
 
@@ -66,7 +66,8 @@ namespace radmat
       p_i = o.p_i;
       E_f = o.E_f;
       E_i = o.E_i;
-      mom_fac = o.mom_fac; 
+      mom_fac = o.mom_fac;
+      file_id = o.file_id;  
     }
     return *this;
   }
@@ -91,8 +92,8 @@ namespace radmat
   {
     print_me();
     std::stringstream ss; 
-    ss << SEMBLE::toScalar(ENSEM::mean(Q2())) << " " ;
-    ss << mom_string() << std::endl;
+    ss << SEMBLE::toScalar(ENSEM::mean(Q2())) << " "; 
+    ss << mom_string() << " " << E_string() <<  std::endl;
     return ss.str();
   }
 
@@ -249,6 +250,7 @@ namespace radmat
         // loop everything and toss it into a vector if it matches else make a new vector
         for(it = unsorted.begin(); it != unsorted.end(); ++it)
         {
+
           if(ret.find(it->qsq_tag()) != ret.end())
             ret.find(it->qsq_tag())->second.push_back(*it);
           else
@@ -457,7 +459,6 @@ namespace radmat
         build_correlator_return_value ret; 
         ret.tag = d.my_tag;
 
-
         std::vector<Hadron::KeyHadronNPartNPtCorr_t > m_bad_corrs;
         std::vector<RadmatExtendedKeyHadronNPartIrrep_t> m_bad_norms; 
         listCoeffKey data = 
@@ -485,19 +486,29 @@ namespace radmat
         ret.success = success;
 
 
+
+        // attempt a graceful exit
+        if(!!!success)
+        {
+          // set up a zero valued three point correlator
+          ENSEM::EnsemVectorComplex corr; 
+          corr.resize(1);
+          corr.resizeObs(1);
+          corr = SEMBLE::toScalar(0.); 
+
+
+          bad_corrs.insert(bad_corrs.end(),m_bad_corrs.begin(),m_bad_corrs.end());
+          bad_norms.insert(bad_norms.end(),m_bad_norms.begin(),m_bad_norms.end());
+          ret.data = corr; 
+          return ret;
+        }
+
         // set up a zero valued three point correlator
         ENSEM::EnsemVectorComplex corr; 
         it = data.begin();
         corr = db.fetch(it->m_obj.npt);
         corr = SEMBLE::toScalar(0.); 
 
-        if(!!!success)
-        {
-          bad_corrs.insert(bad_corrs.end(),m_bad_corrs.begin(),m_bad_corrs.end());
-          bad_norms.insert(bad_norms.end(),m_bad_norms.begin(),m_bad_norms.end());
-          ret.data = corr; 
-          return ret;
-        }
 
 
         // initialize some variables        
@@ -606,7 +617,7 @@ namespace radmat
         bool any_data = false; 
 
         for(it = e.begin(); it != e.end(); ++it)
-        { 
+        {
           build_correlator_return_value tmp;
           tmp = build_a_correlator(m_bad_corrs,
               m_bad_norms,
@@ -644,7 +655,7 @@ namespace radmat
           elems.push_back(
               std::pair<double,std::vector<cartesianMatrixElementXML> >(it->first,it->second)); 
 
-        unsigned int elem;
+        int elem;
 #pragma omp parallel for shared(elem)  schedule(dynamic,1)
 
         for(elem = 0; elem < elems.size(); ++elem)

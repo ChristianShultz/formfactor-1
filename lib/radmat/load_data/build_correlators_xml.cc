@@ -6,7 +6,7 @@
 
 * Creation Date : 25-04-2013
 
-* Last Modified : Fri Apr 26 17:30:55 2013
+* Last Modified : Tue May  7 09:31:07 2013
 
 * Created By : shultz
 
@@ -62,6 +62,8 @@ namespace radmat
     doXMLRead(ptop,"sink_id",prop.sink_id,__PRETTY_FUNCTION__);
     doXMLRead(ptop,"maSource",prop.maSource,__PRETTY_FUNCTION__);
     doXMLRead(ptop,"maSink",prop.maSink,__PRETTY_FUNCTION__); 
+    doXMLRead(ptop,"gParitySymmetry",prop.gParitySymmetry,__PRETTY_FUNCTION__); 
+    doXMLRead(ptop,"cubicSymmetry",prop.cubicSymmetry,__PRETTY_FUNCTION__);
   }
 
   //! xml writer

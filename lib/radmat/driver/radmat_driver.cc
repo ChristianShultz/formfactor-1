@@ -6,7 +6,7 @@
 
  * Creation Date : 25-02-2013
 
- * Last Modified : Mon Apr 29 17:11:57 2013
+ * Last Modified : Sat May  4 14:33:13 2013
 
  * Created By : shultz
 
@@ -40,6 +40,7 @@
 #include <iostream>
 #include <sstream>
 #include <exception>
+#include <omp.h>
 
 using namespace radmat;
 using namespace ENSEM;
@@ -48,9 +49,9 @@ using namespace ADATIO;
 
 
 
- #define LOAD_LLSQ_PARALLEL 
- #define FIT_LLSQ_PARALLEL
- #define CHISQ_ANALYSIS_PARALLEL
+#define LOAD_LLSQ_PARALLEL 
+#define FIT_LLSQ_PARALLEL
+#define CHISQ_ANALYSIS_PARALLEL
 
 
 namespace radmat
@@ -61,18 +62,20 @@ namespace radmat
   {
     init_false(); 
     read_xmlini(inifile);
+    if(m_ini.maxThread > 1)
+      omp_set_num_threads(m_ini.maxThread);
     build_correlators();
     solve_llsq();
     fit_ffs();
     do_chisq_analysis();
     make_FF_of_Q2_plots();
-    print_Q2_list(); 
   }
 
   void RadmatDriver::init_false(void)
   {
     read_ini = false;
     built_correlators = false;
+    init_llsq = false; 
     solved_llsq = false;
     fit_formfacs = false;
     chisq_analysis = false; 
@@ -170,7 +173,7 @@ namespace radmat
 #endif    
     // POSSIBLE PARALLEL HERE
     for(idx =0; idx < sz; ++idx)
-      good_qs[idx] =  linear_systems_of_Q2[idx].load_llsq(multi_lattice_data[idx],soln_ID,m_ini.poleMass);
+      good_qs[idx] =  linear_systems_of_Q2[idx].load_llsq(multi_lattice_data[idx],m_ini.poleMass);
     // END PARALLEL
 
 #pragma omp barrier
@@ -180,8 +183,23 @@ namespace radmat
       if(good_qs[idx])
         ++ngood; 
 
+    init_llsq = true;
+
     std::cout << __func__ << ": " << ngood << " good Q^2 points out of " << sz << std::endl;
 
+    // print the list here in case the solver flakes we can easily determine where it went wrong
+    print_Q2_list(); 
+
+#ifdef LOAD_LLSQ_PARALLEL 
+
+#pragma omp parallel for shared(idx)  schedule(dynamic,1)
+
+#endif    
+    for(idx = 0; idx < sz; ++idx)
+      if(good_qs[idx])
+        linear_systems_of_Q2[idx].solve_llsq(soln_ID); 
+
+#pragma omp barrier
 
     my_stopwatch.stop();
     std::cout << "Solving LLSQ took "     
@@ -331,7 +349,7 @@ namespace radmat
 
   void RadmatDriver::print_Q2_list(void) 
   {
-    check_exit_llsq(); 
+    check_exit_init_llsq(); 
     std::stringstream ss;
     std::vector<RadmatSingleQ2Driver>::const_iterator it; 
     std::string pth = SEMBLE::SEMBLEIO::getPath() + std::string("Q2_to_mat_elems.txt"); 
@@ -342,6 +360,16 @@ namespace radmat
         out << it->tags_at_this_Q2() << delim; 
     out.close();
   }
+
+
+
+
+
+
+
+
+
+
 
 }
 

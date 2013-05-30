@@ -6,7 +6,7 @@
 
  * Creation Date : 22-02-2013
 
- * Last Modified : Mon Apr 29 17:53:25 2013
+ * Last Modified : Fri May 10 13:21:33 2013
 
  * Created By : shultz
 
@@ -65,6 +65,14 @@ namespace radmat
           t.p_f,
           t.p_i,
           t.mom_fac);
+    }
+
+
+    std::string sort_string(const LatticeMultiDataTag &t)
+    {
+      std::stringstream ss; 
+      ss << t.p_f[0] <<  t.p_f[1] <<  t.p_f[2] <<  t.p_i[0] <<  t.p_i[1] <<  t.p_i[2] << t.jmu; 
+      return ss.str(); 
     }
 
     template<typename T>
@@ -231,7 +239,10 @@ namespace radmat
     lattice_data = d;
     POW2_ASSERT(&*d);
     init_lat = true; 
-    return run_zero_filter(); 
+
+    sort_data(); 
+    bool success = run_zero_filter();
+    return success; 
   }
 
   
@@ -240,13 +251,47 @@ namespace radmat
     lattice_data->splash_tags(); 
   }
 
+  
+  void LLSQMultiDriver_t::sort_data(void)
+  {
+    ADAT::Handle<LLSQLatticeMultiData> sorted_data(new LLSQLatticeMultiData); 
+    std::vector<LatticeMultiDataTag> tags = lattice_data->tags(); 
+    std::map<std::string,std::vector<int> > elems;
+    std::map<std::string,std::vector<int> >::iterator it; 
+
+    unsigned int sz = tags.size(); 
+    for(unsigned int elem = 0; elem < sz; ++elem)
+    {
+      std::string tt = sort_string(tags[elem]);
+      it = elems.find(tt);
+      if(it == elems.end())
+      {
+        elems[tt] = std::vector<int>(1,elem); 
+      }
+      else
+      {
+        it->second.push_back(elem); 
+      }
+    }
+
+
+    for(it = elems.begin(); it != elems.end(); ++it)
+    {
+      std::vector<int>::const_iterator sorted; 
+      for(sorted = it->second.begin(); sorted != it->second.end(); ++sorted)
+        sorted_data->append_row_semble(lattice_data->get_row_semble(*sorted),tags[*sorted]);
+    }
+
+    lattice_data = sorted_data; 
+  }
+
 
 
   bool LLSQMultiDriver_t::run_zero_filter(void)
   {
     check_exit_lat(); 
 
-   // splash_tags();
+    // splash_tags();
 
     ADAT::Handle<LLSQLatticeMultiData> non_zero_data(new LLSQLatticeMultiData);
     std::vector<LatticeMultiDataTag> old_tags;
@@ -256,7 +301,7 @@ namespace radmat
 
     const unsigned int sz = old_tags.size(); 
 
-   // std::cout << __func__ << "trying to call " << old_tags.begin()->mat_elem_id << std::endl;
+    // std::cout << __func__ << "trying to call " << old_tags.begin()->mat_elem_id << std::endl;
 
     ffKinematicFactors_t<std::complex<double> >
       KJunk(FormFactorDecompositionFactoryEnv::callFactory(old_tags.begin()->mat_elem_id)); 
@@ -273,12 +318,16 @@ namespace radmat
       SEMBLE::SembleVector<std::complex<double> > workV;
 
       workM = KK.genFactors(makeMomInvariants(old_tags[elem]));
-      workV = SEMBLE::round_to_zero(workM.getRow(old_tags[elem].jmu), 1e-14);
+      workV = SEMBLE::round_to_zero(workM.getRow(old_tags[elem].jmu), 1e-10);
 
       if(workV == Zero)
-        zeroed_elems.push_back(old_tags[elem]);
+      {
+        zeroed_data.append_row_semble(lattice_data->get_row_semble(elem),old_tags[elem]);    
+      }  
       else
+      {
         non_zero_data->append_row_semble(lattice_data->get_row_semble(elem),old_tags[elem]);
+      }
     }
 
     /*
@@ -297,7 +346,7 @@ namespace radmat
     if(non_zero_data->ncols() > non_zero_data->nrows())
     {
       std::cout << __func__ << ": not enough data points to solve the llsq" << std::endl;
-      std::cout << "passed in " << sz << " elements of which " << zeroed_elems.size() 
+      std::cout << "passed in " << sz << " elements of which " << zeroed_data.nrows() 
         << " failed the zero test, needed " << non_zero_data->ncols() << " elems, had " 
         << non_zero_data->nrows() << "elements " << std::endl;
     }
@@ -310,6 +359,8 @@ namespace radmat
 
   void LLSQMultiDriver_t::solve_llsq(const std::string &soln_ID)
   {
+    check_exit_lat();
+
     ADAT::Handle<LLSQBaseSolver_t<std::complex<double> > >
       foo = LLSQSolverFactoryEnv::callFactory(soln_ID);
 
@@ -366,30 +417,48 @@ namespace radmat
     my_writer(sys.str(),chisq_of_sys); 
   }
 
-  void LLSQMultiDriver_t::dump_llsq(const std::string &path)
+
+  void LLSQMultiDriver_t::dump_llsq_lattice(const std::string &path)
   {
     check_exit_lat();
+    std::stringstream b,cont,zero;
+    cont << path << "row_index_to_continuum_elem.txt";
+    zero << path << "zeroed_matrix_elems";
+    b << path << "lattice_mat_elem_";
+
+    my_writer_rows(b.str(), lattice_data->data());
+    my_writer_cont_expr(cont.str(), lattice_data->tags());
+
+    SEMBLE::SEMBLEIO::makeDirectoryPath(zero.str()); 
+    zero << "/zeroed_mat_elem_"; 
+    my_writer_rows(zero.str(),zeroed_data.data()); 
+    zero.str(std::string()); 
+    zero << path << "zeroed_matrix_elems/row_index_to_continuum_elem.txt"; 
+    my_writer_cont_expr(zero.str(),zeroed_data.tags()); 
+  }
+
+
+
+  void LLSQMultiDriver_t::dump_llsq(const std::string &path)
+  {
     check_exit_K();
     check_exit_Kinv();
     check_exit_FF(); 
 
 
-    std::stringstream ss, A,Ainv, x, b, cont, zero; 
+    std::stringstream ss, A,Ainv, x; 
     ss << path;
     A << ss.str() << "K.mean";
     Ainv << ss.str() << "Kinv.mean"; 
-    b << ss.str() << "lattice_mat_elem_";
-    x << ss.str() << "ff_"; 
-    cont << ss.str() << "row_index_to_continuum_elem.txt";
-    zero << ss.str() << "zeroed_matrix_elems"; 
+    x << ss.str() << "ff_";
+
     my_writer_mean(A.str(),K);
     my_writer_mean(Ainv.str(),Kinv);
-    my_writer_rows(b.str(), lattice_data->data());
     my_writer_rows(x.str(), FF_t); 
-    my_writer_cont_expr(cont.str(), lattice_data->tags());
-    if(!!!zeroed_elems.empty())
-      my_writer_cont_expr(zero.str(), zeroed_elems);
   }
+
+
+
 
 
 

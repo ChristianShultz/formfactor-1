@@ -53,7 +53,9 @@ noinst_PROGRAMS = plot_fake_3pt$(EXEEXT) fake_radmat$(EXEEXT) \
 	mass_overlap_db_create$(EXEEXT) \
 	mass_overlap_db_combine$(EXEEXT) single_plot$(EXEEXT) \
 	phases$(EXEEXT) mass_overlap_db_util$(EXEEXT) grab_ff$(EXEEXT) \
-	grab_pol$(EXEEXT)
+	grab_pol$(EXEEXT) grab_vector_mean_cmp$(EXEEXT) \
+	invert_subduced$(EXEEXT) phases2$(EXEEXT) \
+	check_rotations$(EXEEXT) corr_norm$(EXEEXT)
 bin_PROGRAMS = radmat$(EXEEXT)
 subdir = main
 DIST_COMMON = $(srcdir)/Makefile.am $(srcdir)/Makefile.in
@@ -67,6 +69,14 @@ CONFIG_CLEAN_FILES =
 CONFIG_CLEAN_VPATH_FILES =
 am__installdirs = "$(DESTDIR)$(bindir)"
 PROGRAMS = $(bin_PROGRAMS) $(noinst_PROGRAMS)
+am_check_rotations_OBJECTS = check_rotations.$(OBJEXT)
+check_rotations_OBJECTS = $(am_check_rotations_OBJECTS)
+check_rotations_LDADD = $(LDADD)
+check_rotations_DEPENDENCIES =
+am_corr_norm_OBJECTS = corr_norm.$(OBJEXT)
+corr_norm_OBJECTS = $(am_corr_norm_OBJECTS)
+corr_norm_LDADD = $(LDADD)
+corr_norm_DEPENDENCIES =
 am_fake_radmat_OBJECTS = fake_radmat.$(OBJEXT)
 fake_radmat_OBJECTS = $(am_fake_radmat_OBJECTS)
 fake_radmat_LDADD = $(LDADD)
@@ -79,6 +89,14 @@ am_grab_pol_OBJECTS = grab_pol.$(OBJEXT)
 grab_pol_OBJECTS = $(am_grab_pol_OBJECTS)
 grab_pol_LDADD = $(LDADD)
 grab_pol_DEPENDENCIES =
+am_grab_vector_mean_cmp_OBJECTS = grab_vector_mean_cmp.$(OBJEXT)
+grab_vector_mean_cmp_OBJECTS = $(am_grab_vector_mean_cmp_OBJECTS)
+grab_vector_mean_cmp_LDADD = $(LDADD)
+grab_vector_mean_cmp_DEPENDENCIES =
+am_invert_subduced_OBJECTS = invert_subduced.$(OBJEXT)
+invert_subduced_OBJECTS = $(am_invert_subduced_OBJECTS)
+invert_subduced_LDADD = $(LDADD)
+invert_subduced_DEPENDENCIES =
 am_mass_overlap_db_combine_OBJECTS =  \
 	mass_overlap_db_combine.$(OBJEXT)
 mass_overlap_db_combine_OBJECTS =  \
@@ -97,6 +115,10 @@ am_phases_OBJECTS = phases.$(OBJEXT)
 phases_OBJECTS = $(am_phases_OBJECTS)
 phases_LDADD = $(LDADD)
 phases_DEPENDENCIES =
+am_phases2_OBJECTS = phases2.$(OBJEXT)
+phases2_OBJECTS = $(am_phases2_OBJECTS)
+phases2_LDADD = $(LDADD)
+phases2_DEPENDENCIES =
 am_plot_fake_3pt_OBJECTS = plot_fake_3pt.$(OBJEXT)
 plot_fake_3pt_OBJECTS = $(am_plot_fake_3pt_OBJECTS)
 plot_fake_3pt_LDADD = $(LDADD)
@@ -118,17 +140,21 @@ CXXCOMPILE = $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) \
 CXXLD = $(CXX)
 CXXLINK = $(CXXLD) $(AM_CXXFLAGS) $(CXXFLAGS) $(AM_LDFLAGS) $(LDFLAGS) \
 	-o $@
-SOURCES = $(fake_radmat_SOURCES) $(grab_ff_SOURCES) \
-	$(grab_pol_SOURCES) $(mass_overlap_db_combine_SOURCES) \
+SOURCES = $(check_rotations_SOURCES) $(corr_norm_SOURCES) \
+	$(fake_radmat_SOURCES) $(grab_ff_SOURCES) $(grab_pol_SOURCES) \
+	$(grab_vector_mean_cmp_SOURCES) $(invert_subduced_SOURCES) \
+	$(mass_overlap_db_combine_SOURCES) \
 	$(mass_overlap_db_create_SOURCES) \
 	$(mass_overlap_db_util_SOURCES) $(phases_SOURCES) \
-	$(plot_fake_3pt_SOURCES) $(radmat_SOURCES) \
+	$(phases2_SOURCES) $(plot_fake_3pt_SOURCES) $(radmat_SOURCES) \
 	$(single_plot_SOURCES)
-DIST_SOURCES = $(fake_radmat_SOURCES) $(grab_ff_SOURCES) \
-	$(grab_pol_SOURCES) $(mass_overlap_db_combine_SOURCES) \
+DIST_SOURCES = $(check_rotations_SOURCES) $(corr_norm_SOURCES) \
+	$(fake_radmat_SOURCES) $(grab_ff_SOURCES) $(grab_pol_SOURCES) \
+	$(grab_vector_mean_cmp_SOURCES) $(invert_subduced_SOURCES) \
+	$(mass_overlap_db_combine_SOURCES) \
 	$(mass_overlap_db_create_SOURCES) \
 	$(mass_overlap_db_util_SOURCES) $(phases_SOURCES) \
-	$(plot_fake_3pt_SOURCES) $(radmat_SOURCES) \
+	$(phases2_SOURCES) $(plot_fake_3pt_SOURCES) $(radmat_SOURCES) \
 	$(single_plot_SOURCES)
 am__can_run_installinfo = \
   case $$AM_UPDATE_INFO_DIR in \
@@ -259,8 +285,13 @@ mass_overlap_db_combine_SOURCES = mass_overlap_db_combine.cc
 mass_overlap_db_util_SOURCES = mass_overlap_db_util.cc
 single_plot_SOURCES = single_plot.cc
 phases_SOURCES = phases.cc
+phases2_SOURCES = phases2.cc
 grab_ff_SOURCES = grab_ff.cc
 grab_pol_SOURCES = grab_pol.cc
+grab_vector_mean_cmp_SOURCES = grab_vector_mean_cmp.cc
+invert_subduced_SOURCES = invert_subduced.cc
+check_rotations_SOURCES = check_rotations.cc
+corr_norm_SOURCES = corr_norm.cc
 radmat_SOURCES = radmat.cc
 
 # no idea how/why this works, cut paste job
@@ -346,6 +377,12 @@ clean-binPROGRAMS:
 
 clean-noinstPROGRAMS:
 	-test -z "$(noinst_PROGRAMS)" || rm -f $(noinst_PROGRAMS)
+check_rotations$(EXEEXT): $(check_rotations_OBJECTS) $(check_rotations_DEPENDENCIES) $(EXTRA_check_rotations_DEPENDENCIES) 
+	@rm -f check_rotations$(EXEEXT)
+	$(CXXLINK) $(check_rotations_OBJECTS) $(check_rotations_LDADD) $(LIBS)
+corr_norm$(EXEEXT): $(corr_norm_OBJECTS) $(corr_norm_DEPENDENCIES) $(EXTRA_corr_norm_DEPENDENCIES) 
+	@rm -f corr_norm$(EXEEXT)
+	$(CXXLINK) $(corr_norm_OBJECTS) $(corr_norm_LDADD) $(LIBS)
 fake_radmat$(EXEEXT): $(fake_radmat_OBJECTS) $(fake_radmat_DEPENDENCIES) $(EXTRA_fake_radmat_DEPENDENCIES) 
 	@rm -f fake_radmat$(EXEEXT)
 	$(CXXLINK) $(fake_radmat_OBJECTS) $(fake_radmat_LDADD) $(LIBS)
@@ -355,6 +392,12 @@ grab_ff$(EXEEXT): $(grab_ff_OBJECTS) $(grab_ff_DEPENDENCIES) $(EXTRA_grab_ff_DEP
 grab_pol$(EXEEXT): $(grab_pol_OBJECTS) $(grab_pol_DEPENDENCIES) $(EXTRA_grab_pol_DEPENDENCIES) 
 	@rm -f grab_pol$(EXEEXT)
 	$(CXXLINK) $(grab_pol_OBJECTS) $(grab_pol_LDADD) $(LIBS)
+grab_vector_mean_cmp$(EXEEXT): $(grab_vector_mean_cmp_OBJECTS) $(grab_vector_mean_cmp_DEPENDENCIES) $(EXTRA_grab_vector_mean_cmp_DEPENDENCIES) 
+	@rm -f grab_vector_mean_cmp$(EXEEXT)
+	$(CXXLINK) $(grab_vector_mean_cmp_OBJECTS) $(grab_vector_mean_cmp_LDADD) $(LIBS)
+invert_subduced$(EXEEXT): $(invert_subduced_OBJECTS) $(invert_subduced_DEPENDENCIES) $(EXTRA_invert_subduced_DEPENDENCIES) 
+	@rm -f invert_subduced$(EXEEXT)
+	$(CXXLINK) $(invert_subduced_OBJECTS) $(invert_subduced_LDADD) $(LIBS)
 mass_overlap_db_combine$(EXEEXT): $(mass_overlap_db_combine_OBJECTS) $(mass_overlap_db_combine_DEPENDENCIES) $(EXTRA_mass_overlap_db_combine_DEPENDENCIES) 
 	@rm -f mass_overlap_db_combine$(EXEEXT)
 	$(CXXLINK) $(mass_overlap_db_combine_OBJECTS) $(mass_overlap_db_combine_LDADD) $(LIBS)
@@ -367,6 +410,9 @@ mass_overlap_db_util$(EXEEXT): $(mass_overlap_db_util_OBJECTS) $(mass_overlap_db
 phases$(EXEEXT): $(phases_OBJECTS) $(phases_DEPENDENCIES) $(EXTRA_phases_DEPENDENCIES) 
 	@rm -f phases$(EXEEXT)
 	$(CXXLINK) $(phases_OBJECTS) $(phases_LDADD) $(LIBS)
+phases2$(EXEEXT): $(phases2_OBJECTS) $(phases2_DEPENDENCIES) $(EXTRA_phases2_DEPENDENCIES) 
+	@rm -f phases2$(EXEEXT)
+	$(CXXLINK) $(phases2_OBJECTS) $(phases2_LDADD) $(LIBS)
 plot_fake_3pt$(EXEEXT): $(plot_fake_3pt_OBJECTS) $(plot_fake_3pt_DEPENDENCIES) $(EXTRA_plot_fake_3pt_DEPENDENCIES) 
 	@rm -f plot_fake_3pt$(EXEEXT)
 	$(CXXLINK) $(plot_fake_3pt_OBJECTS) $(plot_fake_3pt_LDADD) $(LIBS)
@@ -383,13 +429,18 @@ mostlyclean-compile:
 distclean-compile:
 	-rm -f *.tab.c
 
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/check_rotations.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/corr_norm.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/fake_radmat.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/grab_ff.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/grab_pol.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/grab_vector_mean_cmp.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/invert_subduced.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/mass_overlap_db_combine.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/mass_overlap_db_create.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/mass_overlap_db_util.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/phases.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/phases2.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/plot_fake_3pt.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/radmat.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/single_plot.Po@am__quote@

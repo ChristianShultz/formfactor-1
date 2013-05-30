@@ -33,7 +33,7 @@ nobase_include_HEADERS += radmat/driver/radmat_driver.h radmat/driver/radmat_dri
 lib_LIBRARIES = libradmat.a
 
 #utils
-libradmat_a_SOURCES = radmat/utils/aux.cc radmat/utils/breit_frame.cc radmat/utils/euler_angles.cc radmat/utils/harmonic.cc radmat/utils/pow2assert.cc radmat/utils/splash.cc radmat/utils/tensor.cc radmat/utils/wigner.cc
+libradmat_a_SOURCES = radmat/utils/aux.cc radmat/utils/breit_frame.cc radmat/utils/euler_angles.cc radmat/utils/harmonic.cc radmat/utils/pow2assert.cc radmat/utils/splash.cc radmat/utils/tensor.cc radmat/utils/wigner.cc radmat/utils/polarisation_tensors.cc
 
 #ff
 libradmat_a_SOURCES += radmat/ff/ff_gen_llsq_row.cc radmat/ff/formfactor_factory.cc radmat/ff/lorentzff_PiPi.cc radmat/ff/lorentzff_PiPiStar.cc

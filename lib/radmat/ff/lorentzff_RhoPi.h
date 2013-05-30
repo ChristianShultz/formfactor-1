@@ -28,6 +28,7 @@ namespace radmat
 
         // come up with the ingredient list
         Tensor<std::complex<double>, 1> epsilon = this->conjugate((this->ptensor(p_f,mom_fac))); // nb final state conjugation 
+        //   Tensor<std::complex<double>, 1 > epsilon = this->ptensor(p_f,mom_fac); 
         Tensor<std::complex<double>, 1> pplus, pminus;
         pplus = convertTensorUnderlyingType<std::complex<double>,double,1>( pPlus(p_f,p_i) );
         pminus = convertTensorUnderlyingType<std::complex<double>,double,1>( pMinus(p_f,p_i) );
@@ -41,15 +42,37 @@ namespace radmat
         Tensor<std::complex<double>, 2> bar;
         Tensor<std::complex<double>, 1> baz; 
 
+        pminus = applyMetric(pminus,gdd,0); 
+        pplus = applyMetric(pplus,gdd,0); 
+        epsilon = applyMetric(epsilon,gdd,0); 
 
-        // std::cout << "pplus = " << pplus << std::endl;
-        // std::cout << "pminus = " << pminus << std::endl;
-        // std::cout << "eps = " << epsilon << std::endl;
+#if 0
+        std::cout << "pplus_mu = " << pplus << std::endl;
+        std::cout << "pminus_mu = " << pminus << std::endl;
+        std::cout << "eps_mu = " << epsilon << std::endl;
+
+
+        std::cout << "levi non-zero " << std::endl;
+        Tensor<std::complex<double>, 1> tt((TensorShape<1>())[4],0.); 
+
+
+        for(int i = 0; i < 4; ++i)
+          for(int j = 0; j < 4; ++j)
+            for(int k = 0; k < 4; ++k)
+              for(int l = 0; l < 4; ++l)
+                if(levi[i][j][k][l] != 0.)
+                {
+                  tt[i] += levi[i][j][k][l]*epsilon[j]*pplus[k]*pminus[l];
+                 // std::cout << i << " " << j << " " << k << " " << l << "   " << levi[i][j][k][l] << std::endl;
+                }
+        std::cout << __func__ << " the answer should be " << std::endl;
+        std::cout << tt << std::endl; 
+#endif 
 
         // do contractions 
-        foo = contract(levi,applyMetric(pminus,gdd,0),3,0);
-        bar = contract(foo,applyMetric(pplus,gdd,0),2,0);
-        baz = contract(bar,applyMetric(epsilon,gdd,0),1,0);
+        foo = contract(levi,pminus,3,0);
+        bar = contract(foo,pplus,2,0);
+        baz = contract(bar,epsilon,1,0);
 
         // the kinematic factor carries one lorentz index
         return baz;

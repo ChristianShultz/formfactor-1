@@ -6,7 +6,7 @@
 
  * Creation Date : 24-04-2013
 
- * Last Modified : Fri Apr 26 17:29:57 2013
+ * Last Modified : Wed May  8 09:50:51 2013
 
  * Created By : shultz
 
@@ -276,6 +276,7 @@ namespace radmat
     {
       ADATXML::XMLReader ptop(xml,path);
       doXMLRead(ptop,"pmax",e.pmax,__PRETTY_FUNCTION__);
+      doXMLRead(ptop,"pmin",e.pmin,__PRETTY_FUNCTION__); 
       doXMLRead(ptop,"t_slice",e.t_slice,__PRETTY_FUNCTION__); 
       doXMLRead(ptop,"time",e.time,__PRETTY_FUNCTION__);
       doXMLRead(ptop,"space",e.space,__PRETTY_FUNCTION__); 
@@ -285,6 +286,7 @@ namespace radmat
     {
       ADATXML::push(xml,path);
       write(xml,"pmax",e.pmax);
+      write(xml,"pmin",e.pmin);
       write(xml,"t_slice",e.t_slice);
       write(xml,"time",e.time);
       write(xml,"space",e.space); 

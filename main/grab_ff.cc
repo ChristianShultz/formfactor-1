@@ -6,7 +6,7 @@
 
 * Creation Date : 22-04-2013
 
-* Last Modified : Mon Apr 22 14:04:01 2013
+* Last Modified : Thu May  2 16:09:59 2013
 
 * Created By : shultz
 
@@ -28,14 +28,23 @@ struct inp
   string matElemID; 
   Tensor<double,1> pf,pi;
   double pfac;
+  bool jmu;
+  int mu; 
 };
+
+
+// assuming that the momentum factor is already in the space bits here -- on shell
+void do_boost(Tensor<double,1> &p)
+{
+  p[0] = sqrt(p[0]*p[0] + p[1]*p[1] + p[2]*p[2] + p[3]*p[3]);
+}
 
 
 inp usage(int argc, char *argv[])
 {
-  if(argc != 11) 
+  if( (argc != 11) && (argc != 12) ) 
   {
-    std::cerr << "usage: grab ff <matElemID> <Ef0> <nx ny nz>  <Ei0> <nx ny, nz> <2pi/xi/nspace>" << std::endl;
+    std::cerr << "usage: grab ff <matElemID> <m_f> <nx ny nz>  <m_i> <nx ny, nz> <2pi/xi/nspace>  <optional jmu>" << std::endl;
     exit(1); 
   }
 
@@ -69,6 +78,15 @@ inp usage(int argc, char *argv[])
       foo.pf[i] *= foo.pfac;
       foo.pi[i] *= foo.pfac;
     }
+    
+    do_boost(foo.pf);
+    do_boost(foo.pi); 
+
+    if(argc == 12)
+    {
+      foo.jmu = true;
+      std::stringstream ss(argv[11]); ss >> foo.mu; 
+    }
 
     return foo; 
 }
@@ -78,16 +96,35 @@ int main(int argc, char *argv[])
 {
 
   inp fred = usage(argc, argv); 
-  
+
   FormFactorDecompositionFactoryEnv::registerAll(); 
 
   ADAT::Handle<ffBase_t<std::complex<double> > > foo = FormFactorDecompositionFactoryEnv::callFactory(fred.matElemID); 
 
-  std::cout << " The list of ffs is : \n" << foo->ff() << std::endl;
+  if(fred.jmu)
+  {
 
-  std::cout << "by value (row index is lorentz, col is FF num) \n" << (*foo)(fred.pf,fred.pi,fred.pfac);
+    itpp::Mat<std::complex<double> > baz = (*foo)(fred.pf,fred.pi,fred.pfac); 
+    itpp::Vec<std::complex<double> > bar = baz.get_row(fred.mu); 
 
-  std::cout << "\n\n" << std::endl;
+    for(int elem = 0; elem < bar.size() -1; ++elem)
+    {
+      std::complex<double> my_cmp = bar[elem];
+      std::cout << my_cmp.real() << " " << my_cmp.imag() << "   ,   "; 
+    }
+
+    std::complex<double> my_cmp = bar[bar.size() -1];
+    std::cout << my_cmp.real() << " " << my_cmp.imag() << std::endl;
+
+  }
+  else
+  {
+    std::cout << " The list of ffs is : \n" << foo->ff() << std::endl;
+
+    std::cout << "by value (row index is lorentz, col is FF num) \n" << (*foo)(fred.pf,fred.pi,fred.pfac);
+
+    std::cout << "\n\n" << std::endl;
+  }
 
   return 0;
 }

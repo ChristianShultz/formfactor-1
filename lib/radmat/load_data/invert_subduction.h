@@ -17,7 +17,7 @@ namespace radmat
   struct ContinuumBosonExprPrimitive
   {
     ContinuumBosonExprPrimitive(const int _J, const bool _parity, 
-const int _H, const std::string _group)
+        const int _H, const std::string _group)
       : J(_J) , parity(_parity) , H(_H) , group(_group)
     {} 
 
@@ -66,8 +66,13 @@ const int _H, const std::string _group)
   //! determine the coefficients for inverting subduction
   ListLatticeIrrepExpr_t invertSubduction(const ContinuumBosonExprPrimitive &);
 
-  void registerSubductionTables(void);
+  //! conjugate an obj
+  LatticeIrrepExpr_t conj(const LatticeIrrepExpr_t &); 
 
+  //! conjugate the coefficients 
+  ListLatticeIrrepExpr_t conj(const ListLatticeIrrepExpr_t &); 
+
+  void registerSubductionTables(void);
 
 } // namespace radmat
 

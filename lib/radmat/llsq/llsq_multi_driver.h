@@ -32,7 +32,8 @@ namespace radmat
         const int tlow,
         const int thigh,
         double tol=1e-6); 
-    void dump_llsq(const std::string &path); 
+    void dump_llsq(const std::string &path);
+    void dump_llsq_lattice(const std::string &path);  
 
     SEMBLE::SembleMatrix<T> peek_K(void) const {check_exit_K();return K;}
     SEMBLE::SembleMatrix<T> peek_Kinv(void) const {check_exit_Kinv();return Kinv;}
@@ -43,9 +44,10 @@ namespace radmat
     double qsq_label(void) const {check_exit_lat(); return lattice_data->tags().begin()->get_qsq_label();}
 
     private:
+    void sort_data(void); 
 
-    bool solve_slow(const std::string &soln_ID); 
-    bool solve_fast(const std::string &soln_ID); 
+    bool solve_slow(const std::string &soln_ID); // invert lots of times.. not implemented right now
+    bool solve_fast(const std::string &soln_ID); // invert once 
 
     void generate_kinematic_factors(void); 
 
@@ -59,7 +61,7 @@ namespace radmat
     bool init_lat,init_K,init_Kinv,init_FF; 
     ADAT::Handle<LLSQLatticeMultiData> lattice_data;
     SEMBLE::SembleMatrix<T> K,Kinv,FF_t;
-    std::vector<LatticeMultiDataTag> zeroed_elems; 
+    LLSQLatticeMultiData zeroed_data; 
   };
 
 

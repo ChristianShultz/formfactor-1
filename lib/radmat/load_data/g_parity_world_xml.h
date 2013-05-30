@@ -71,6 +71,10 @@ namespace radmat
 
       // we may be missing elementals 
       int pmax;
+  
+      // may only want to look at one thing
+      int pmin;
+
       int t_slice; 
 
       //  one for spatial currents, one for temporal

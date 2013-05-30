@@ -6,7 +6,7 @@
 
  * Creation Date : 25-04-2013
 
- * Last Modified : Fri Apr 26 17:40:39 2013
+ * Last Modified : Wed May  8 13:33:00 2013
 
  * Created By : shultz
 
@@ -14,26 +14,33 @@
 
 #include "g_parity_world.h"
 #include "radmat/utils/pow2assert.h"
+#include "hadron/irrep_util.h"
 
 namespace radmat
 {
   namespace gParityWorld
   {
 
-    std::string string_mom(const ADATXML::Array<int> &b)
-    {   
-      std::stringstream ss; 
-      for(int i = 0; i < b.size(); ++i)
-        ss << b[i] << " ";
-      return ss.str(); 
-    }
-
-    std::string string_mom_no_space(const ADATXML::Array<int> &b)
+    namespace
     {
-      std::stringstream ss; 
-      for(int i = 0; i < b.size(); ++i)
-        ss << b[i];
-      return ss.str(); 
+
+      std::string string_mom(const ADATXML::Array<int> &b)
+      {   
+        std::stringstream ss; 
+        for(int i = 0; i < b.size(); ++i)
+          ss << b[i] << " ";
+        return ss.str(); 
+      }
+
+      std::string string_mom_no_space(const ADATXML::Array<int> &b)
+      {
+        std::stringstream ss; 
+        for(int i = 0; i < b.size(); ++i)
+          ss << b[i];
+        return ss.str(); 
+      }
+
+
     }
 
 
@@ -69,7 +76,7 @@ namespace radmat
     {
       std::stringstream ss; 
       GParityInsertion::map_t::const_iterator it;
-     for(it = e.begin(); it != e.end(); ++it)
+      for(it = e.begin(); it != e.end(); ++it)
         ss << it->first << " " << it->second << "\n";
       ss << "t_slice = " << e.t_slice << " create = " << e.create();
       return ss.str(); 
@@ -220,12 +227,29 @@ namespace radmat
 
 
       // do the cut
-      bool cutMomentum(const ADATXML::Array<int> &mom, const int maxmom)
+      bool cutMomentum(const ADATXML::Array<int> &mom, const int minmom , const int maxmom)
       {
         int sq(0);
         for(int i = 0; i < 3; ++i)
           sq += mom[i]*mom[i];
-        return (sq > maxmom);
+        return   !!! ( (sq >= minmom) && (sq <= maxmom) ) ;  // false if its too big or too small 
+      }
+
+
+      bool acceptable_mom(const ADATXML::Array<int> &mom)
+      {
+        std::string lg = Hadron::generateLittleGroup(mom); 
+        if(lg == "Oh")
+          return true;
+        if(lg == "D4")
+          return true; 
+        if(lg == "D2")
+          return true; 
+        if(lg == "D3")
+          return true; 
+
+        std::cout << __func__ << ": not supporting LG " << lg << std::endl;
+        return false;
       }
 
 
@@ -237,15 +261,18 @@ namespace radmat
         GParityInsertion ret; 
         bool creation_op = getCreationOp(xml); 
         ADATXML::Array<int> mom = momentumTransfer(sink,source,creation_op);
-      
+
 
         ret.set_create(creation_op); 
         ret.t_slice = xml.t_slice; 
         ret.mom = mom;
 
         // break early if we can't make it
-        if(cutMomentum(mom,xml.pmax))
-          return std::pair<bool,GParityInsertion>(false,ret); 
+        if(cutMomentum(mom,xml.pmin,xml.pmax))
+          return std::pair<bool,GParityInsertion>(false,ret);
+
+        if(!!!acceptable_mom(mom)) 
+          return std::pair<bool,GParityInsertion>(false,ret);
 
         // do the temporal insertion
         if(xml.time.active) 
@@ -324,7 +351,6 @@ namespace radmat
             ins = makeInsertion(sink->state, xml.insertion, source->state);
             if(ins.first)
               ret.push_back(makeMatrixElement(*sink,ins.second,*source,xml.ensemble)); 
-
           }
 
         if(ret.empty())

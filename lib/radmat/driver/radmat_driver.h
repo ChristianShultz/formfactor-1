@@ -20,17 +20,19 @@ namespace radmat
 
     private:
 
-    bool read_ini, built_correlators, solved_llsq, fit_formfacs;
+    bool read_ini, built_correlators, init_llsq, solved_llsq, fit_formfacs;
     bool chisq_analysis; 
 
     void init_false(void); 
     void check_exit_ini(void) const {check_exit(read_ini,__func__);}
     void check_exit_corrs(void) const {check_exit(built_correlators,__func__);}
+    void check_exit_init_llsq(void) const {check_exit(init_llsq,__func__);}
     void check_exit_llsq(void) const {check_exit(solved_llsq,__func__);}
     void check_exit_fit(void) const {check_exit(fit_formfacs,__func__);}
     void check_exit_chisq(void) const {check_exit(chisq_analysis,__func__);}
     void check_exit(const bool &, const char *) const;
 
+// for running the full analysis 
     void read_xmlini(const std::string &ini); 
     void build_correlators(void);
     void solve_llsq(void);
@@ -38,6 +40,8 @@ namespace radmat
     void do_chisq_analysis(void);  
     void make_FF_of_Q2_plots(void);
     void print_Q2_list(void);  
+
+
 
     RDriverProps_t m_ini;  
     BuildCorrelators m_correlators; 

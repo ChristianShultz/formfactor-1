@@ -105,7 +105,7 @@ namespace radmat
     Tensor<T,1> toTensor(const itpp::Vec<T> &v)
     {
       idx_t dim = v.size();
-      Tensor<T,1> foo(TensorShape<1>()[dim],0.);
+      Tensor<T,1> foo((TensorShape<1>())[dim],0.);
       for(idx_t i = 0; i < dim; i++)
         foo[i] = v[i];
 
@@ -218,6 +218,7 @@ namespace radmat
         for (it = m_list.begin(); it != m_list.end(); it++)
           ret.append_col(toItpp<T>((**it)(p_f,p_i,mom_fac)));
 
+          
         return ret;
       }
 
@@ -315,6 +316,7 @@ namespace radmat
         // scale down
         p_f.rescaleSembleDown();
         p_i.rescaleSembleDown();
+
 
         for(int bin = 0; bin < nbins; bin++)
           KF[bin] = (*m_KFacGen)(toTensor<double>(p_f[bin]),toTensor<double>(p_i[bin]),moms.mom_factor());
