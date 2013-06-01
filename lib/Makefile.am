@@ -3,7 +3,7 @@
 #
 
 AM_CXXFLAGS = 	-I@top_srcdir@/lib		\
-		@CXXFLAGS@ @SEMBLE_CXXFLAGS@ @ADAT_CXXFLAGS@ @ITPP_CXXFLAGS@
+		@CXXFLAGS@ @SEMBLE_CXXFLAGS@ @ADAT_CXXFLAGS@ @ITPP_CXXFLAGS@ @JACKFITTER_CXXFLAGS@
 
 #utils
 nobase_include_HEADERS = radmat/utils/aux.h radmat/utils/breit_frame.h radmat/utils/euler_angles.h radmat/utils/harmonic.h radmat/utils/lorentz.h radmat/utils/obj_expr_t.h radmat/utils/perThreadStorage.h radmat/utils/polarisation_tensors.h radmat/utils/pow2assert.h radmat/utils/splash.h radmat/utils/stringify.h radmat/utils/tensor.h radmat/utils/type_computations.h radmat/utils/wigner.h radmat/utils/levi_civita.h
