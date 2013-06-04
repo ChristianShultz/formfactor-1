@@ -296,7 +296,7 @@ namespace radmat
       const int lambda)
   {
     int lambda_row = remapHelicity_1based(lambda,1); 
-    Tensor<std::complex<double> , 1> dest(TensorShape<1>()[3],0.); 
+    Tensor<std::complex<double> , 1> dest((TensorShape<1>())[3],0.); 
     itpp::Vec<std::complex<double> > eps(eps_lambda(mom,lambda_row));
 
     dest[0] = eps[0];
