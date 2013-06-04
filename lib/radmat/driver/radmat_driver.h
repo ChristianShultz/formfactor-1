@@ -15,8 +15,19 @@ namespace radmat
   struct RadmatDriver
   {
     RadmatDriver(void) {}
-    
+
+    //! do a three point analysis and extract form factors    
     void run_program(const std::string &inifile);
+
+    //! just run up to the point of building xml 
+    void build_xml(const std::string &inifile); 
+
+    //! just figure out what disconnected graphs we have to nuke for redstar
+    void nuke_graph(const std::string &inifile ,
+                    const std::string &graph_db,
+                    const std::string &nuke_xml_out);   
+
+
 
     private:
 

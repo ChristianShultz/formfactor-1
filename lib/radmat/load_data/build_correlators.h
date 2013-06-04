@@ -80,7 +80,8 @@ namespace radmat
     }
 
 
-    std::vector<ADAT::Handle<LLSQLatticeMultiData> > build_multi_correlators(const ThreePointCorrIni_t &ini)
+    std::vector<ADAT::Handle<LLSQLatticeMultiData> >
+     build_multi_correlators(const ThreePointCorrIni_t &ini)
     {
       load(ini); 
       return build_multi_correlators(); 
@@ -89,7 +90,15 @@ namespace radmat
     std::vector<ADAT::Handle<LLSQLatticeMultiData> > build_multi_correlators(void);
 
 
+    std::vector<Hadron::KeyHadronNPartNPtCorr_t> 
+      build_correlator_xml(const ThreePointCorrIni_t &ini)
+    {
+      load(ini);
+      return build_correlator_xml(); 
+    }
 
+    std::vector<Hadron::KeyHadronNPartNPtCorr_t>  build_correlator_xml(void);
+  
     bool have_ini;
     ThreePointCorrIni_t m_ini;
   };

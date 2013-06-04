@@ -6,7 +6,7 @@
 
  * Creation Date : 04-12-2012
 
- * Last Modified : Wed May  8 14:34:32 2013
+ * Last Modified : Mon Jun  3 13:56:28 2013
 
  * Created By : shultz
 
@@ -695,7 +695,8 @@ namespace radmat
 
 
 
-  std::vector<ADAT::Handle<LLSQLatticeMultiData> > BuildCorrelators::build_multi_correlators(void)
+  std::vector<ADAT::Handle<LLSQLatticeMultiData> >
+    BuildCorrelators::build_multi_correlators(void)
   {
     POW2_ASSERT(have_ini); 
 
@@ -770,6 +771,75 @@ namespace radmat
     return ret; 
   }
 
+
+
+
+
+
+  std::vector<Hadron::KeyHadronNPartNPtCorr_t>
+    BuildCorrelators::build_correlator_xml(void)
+  {
+    POW2_ASSERT(have_ini); 
+
+    // need thes
+    registerSubductionTables(); 
+
+    // transform the xml into the internal helicity representation
+    std::vector<gParityWorld::GParityHelicityMatrixElement> internal
+      = gParityWorld::getGParityHelicityMatrixElementFromXML(
+          m_ini.threePointCorrXMLIni.continuumMatElemXML); 
+
+    std::vector<gParityWorld::GParityHelicityMatrixElement>::const_iterator internal_it;
+    std::vector<cartesianMatrixElementXML> unsorted_elements; 
+    std::vector<cartesianMatrixElementXML>::const_iterator unsorted_iterator; 
+
+    // now loop over all the elements and separate them by lorentz component 
+    for(internal_it = internal.begin(); internal_it != internal.end(); ++internal_it)
+    {
+
+      // generate the subduced guy with a cartesian index
+      generateCartesianRedstarXML tmp(*internal_it); 
+
+      // run any symmetry operations that we might want
+      if(m_ini.threePointCorrXMLIni.gParitySymmetry)
+        tmp.run_g_parity_symmetry();
+      if(m_ini.threePointCorrXMLIni.cubicSymmetry)
+        tmp.run_cubic_symmetry();
+
+      // only keep active data
+      if(tmp.t.first)
+        unsorted_elements.push_back(cartesianMatrixElementXML(0,tmp.t,*internal_it,m_ini));
+      if(tmp.x.first)
+        unsorted_elements.push_back(cartesianMatrixElementXML(1,tmp.x,*internal_it,m_ini));
+      if(tmp.y.first)
+        unsorted_elements.push_back(cartesianMatrixElementXML(2,tmp.y,*internal_it,m_ini));
+      if(tmp.z.first)
+        unsorted_elements.push_back(cartesianMatrixElementXML(3,tmp.z,*internal_it,m_ini));
+    }
+
+
+    // build a map of unique correlators
+
+    std::map<std::string , Hadron::KeyHadronNPartNPtCorr_t > npoint_map; 
+    std::map<std::string , Hadron::KeyHadronNPartNPtCorr_t >::const_iterator npoint_it; 
+    cartesianMatrixElementXML::listNPointKey::const_iterator cart_it; 
+
+    for(unsorted_iterator = unsorted_elements.begin(); 
+        unsorted_iterator != unsorted_elements.end(); 
+        ++unsorted_iterator)
+      for(cart_it = unsorted_iterator->my_npoint.begin(); 
+          cart_it != unsorted_iterator->my_npoint.end(); 
+          ++cart_it)
+        if (npoint_map.find(Hadron::ensemFileName(cart_it->m_obj)) == npoint_map.end())
+          npoint_map[Hadron::ensemFileName(cart_it->m_obj)] = cart_it->m_obj; 
+
+    std::vector<Hadron::KeyHadronNPartNPtCorr_t> ret; 
+
+    for(npoint_it = npoint_map.begin(); npoint_it != npoint_map.end(); ++npoint_it)
+      ret.push_back(npoint_it->second); 
+
+    return ret;
+  }
 
 
 

@@ -115,8 +115,9 @@ am_libradmat_a_OBJECTS = aux.$(OBJEXT) breit_frame.$(OBJEXT) \
 	invert_subduction.$(OBJEXT) \
 	radmat_database_interface.$(OBJEXT) \
 	radmat_overlap_key_val_db.$(OBJEXT) simple_world.$(OBJEXT) \
-	axis_plotter.$(OBJEXT) fit_tins.$(OBJEXT) \
-	radmat_driver.$(OBJEXT) radmat_driver_props.$(OBJEXT) \
+	disconnected_graph_nuker.$(OBJEXT) axis_plotter.$(OBJEXT) \
+	fit_tins.$(OBJEXT) radmat_driver.$(OBJEXT) \
+	radmat_driver_props.$(OBJEXT) \
 	radmat_single_q2_driver.$(OBJEXT)
 libradmat_a_OBJECTS = $(am_libradmat_a_OBJECTS)
 DEFAULT_INCLUDES = -I.@am__isrc@
@@ -296,6 +297,7 @@ nobase_include_HEADERS = radmat/utils/aux.h radmat/utils/breit_frame.h \
 	radmat/load_data/radmat_database_interface.h \
 	radmat/load_data/radmat_overlap_key_val_db.h \
 	radmat/load_data/simple_world.h radmat/load_data/three_point.h \
+	radmat/load_data/disconnected_graph_nuker.h \
 	radmat/fitting/axis_plotter.h radmat/fitting/fit_tins.h \
 	radmat/driver/radmat_driver.h \
 	radmat/driver/radmat_driver_props.h \
@@ -315,6 +317,7 @@ lib_LIBRARIES = libradmat.a
 #llsq
 
 #load_data
+
 #fitting
 
 #driver
@@ -343,6 +346,7 @@ libradmat_a_SOURCES = radmat/utils/aux.cc radmat/utils/breit_frame.cc \
 	radmat/load_data/radmat_database_interface.cc \
 	radmat/load_data/radmat_overlap_key_val_db.cc \
 	radmat/load_data/simple_world.cc \
+	radmat/load_data/disconnected_graph_nuker.cc \
 	radmat/fitting/axis_plotter.cc radmat/fitting/fit_tins.cc \
 	radmat/driver/radmat_driver.cc \
 	radmat/driver/radmat_driver_props.cc \
@@ -429,6 +433,7 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/build_correlators.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/build_correlators_xml.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/covarrying_vectors.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/disconnected_graph_nuker.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/euler_angles.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/fake_3pt_function_aux.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/fake_data_ini.Po@am__quote@
@@ -937,6 +942,20 @@ simple_world.obj: radmat/load_data/simple_world.cc
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='radmat/load_data/simple_world.cc' object='simple_world.obj' libtool=no @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCXX_FALSE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o simple_world.obj `if test -f 'radmat/load_data/simple_world.cc'; then $(CYGPATH_W) 'radmat/load_data/simple_world.cc'; else $(CYGPATH_W) '$(srcdir)/radmat/load_data/simple_world.cc'; fi`
+
+disconnected_graph_nuker.o: radmat/load_data/disconnected_graph_nuker.cc
+@am__fastdepCXX_TRUE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT disconnected_graph_nuker.o -MD -MP -MF $(DEPDIR)/disconnected_graph_nuker.Tpo -c -o disconnected_graph_nuker.o `test -f 'radmat/load_data/disconnected_graph_nuker.cc' || echo '$(srcdir)/'`radmat/load_data/disconnected_graph_nuker.cc
+@am__fastdepCXX_TRUE@	$(am__mv) $(DEPDIR)/disconnected_graph_nuker.Tpo $(DEPDIR)/disconnected_graph_nuker.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='radmat/load_data/disconnected_graph_nuker.cc' object='disconnected_graph_nuker.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o disconnected_graph_nuker.o `test -f 'radmat/load_data/disconnected_graph_nuker.cc' || echo '$(srcdir)/'`radmat/load_data/disconnected_graph_nuker.cc
+
+disconnected_graph_nuker.obj: radmat/load_data/disconnected_graph_nuker.cc
+@am__fastdepCXX_TRUE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT disconnected_graph_nuker.obj -MD -MP -MF $(DEPDIR)/disconnected_graph_nuker.Tpo -c -o disconnected_graph_nuker.obj `if test -f 'radmat/load_data/disconnected_graph_nuker.cc'; then $(CYGPATH_W) 'radmat/load_data/disconnected_graph_nuker.cc'; else $(CYGPATH_W) '$(srcdir)/radmat/load_data/disconnected_graph_nuker.cc'; fi`
+@am__fastdepCXX_TRUE@	$(am__mv) $(DEPDIR)/disconnected_graph_nuker.Tpo $(DEPDIR)/disconnected_graph_nuker.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='radmat/load_data/disconnected_graph_nuker.cc' object='disconnected_graph_nuker.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o disconnected_graph_nuker.obj `if test -f 'radmat/load_data/disconnected_graph_nuker.cc'; then $(CYGPATH_W) 'radmat/load_data/disconnected_graph_nuker.cc'; else $(CYGPATH_W) '$(srcdir)/radmat/load_data/disconnected_graph_nuker.cc'; fi`
 
 axis_plotter.o: radmat/fitting/axis_plotter.cc
 @am__fastdepCXX_TRUE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT axis_plotter.o -MD -MP -MF $(DEPDIR)/axis_plotter.Tpo -c -o axis_plotter.o `test -f 'radmat/fitting/axis_plotter.cc' || echo '$(srcdir)/'`radmat/fitting/axis_plotter.cc
