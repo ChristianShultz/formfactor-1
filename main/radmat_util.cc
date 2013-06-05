@@ -82,6 +82,7 @@ std::map<std::string , fptr> options;
 void init_options(void)
 {
   options.insert(std::pair<std::string,fptr>("gen_xml",&gen_xml)); 
+  options.insert(std::pair<std::string,fptr>("nuke_graphs",&nuke_graphs)); 
 }
 
 // pick appropriate function and pass on command line inputs 
@@ -95,6 +96,7 @@ void do_work(std::string &op, int argc,char *argv[])
     std::map<std::string , fptr>::const_iterator it; 
     for(it = options.begin(); it != options.end(); ++it)
       std::cerr << it->first << std::endl; 
+    exit(1); 
   }
 
   fptr foo = options[op];
