@@ -6,7 +6,7 @@
 
  * Creation Date : 24-04-2013
 
- * Last Modified : Wed May  8 09:50:51 2013
+ * Last Modified : Wed Jun  5 13:48:31 2013
 
  * Created By : shultz
 
@@ -174,7 +174,7 @@ namespace radmat
     std::string toString(const GParityInsertionXML::GParityListElement &e)
     {
       std::stringstream ss;
-      ss << e.charge_coefficient << " X " << e.op_stem ;
+      ss << e.charge_coefficient << " X " << e.op_stem << "_twoI" << e.twoI_z;
       return ss.str(); 
     }
 
@@ -190,6 +190,7 @@ namespace radmat
       ADATXML::XMLReader ptop(xml,path); 
       doXMLRead(ptop,"op_stem",e.op_stem,__PRETTY_FUNCTION__);
       doXMLRead(ptop,"charge_coefficient",e.charge_coefficient,__PRETTY_FUNCTION__);
+      doXMLRead(ptop,"twoI_z",e.twoI_z,__PRETTY_FUNCTION__); 
     }
 
     void write(ADATXML::XMLWriter &xml, const std::string &path, const GParityInsertionXML::GParityListElement &e)
@@ -197,6 +198,7 @@ namespace radmat
       ADATXML::push(xml,path);
       write(xml,"op_stem",e.op_stem);
       write(xml,"charge_coefficient",e.charge_coefficient);
+      write(xml,"twoI_z",e.twoI_z); 
       ADATXML::pop(xml);
     }
 
@@ -207,7 +209,7 @@ namespace radmat
       ss << "active = " << op.active << " J = " << op.J << " H = {";
       for(int i = 0; i < op.H.size(); ++i)
         ss << op.H[i] << " ";
-      ss << "} parity = " << op.parity << " twoI_z = " << op.twoI_z
+      ss << "} parity = " << op.parity 
         << " create = " << op.creation_op
         << " smeared = " << op.smearedP << "\nphotons";
         for(int i = 0; i < op.photons.size(); ++i)
@@ -228,7 +230,6 @@ namespace radmat
       doXMLRead(ptop,"J",op.J,__PRETTY_FUNCTION__);
       doXMLRead(ptop,"H",op.H,__PRETTY_FUNCTION__);
       doXMLRead(ptop,"parity",op.parity,__PRETTY_FUNCTION__);      
-      doXMLRead(ptop,"twoI_z",op.twoI_z,__PRETTY_FUNCTION__);
       doXMLRead(ptop,"creation_op",op.creation_op,__PRETTY_FUNCTION__);
       doXMLRead(ptop,"smearedP",op.smearedP,__PRETTY_FUNCTION__);
       doXMLRead(ptop,"photons",op.photons,__PRETTY_FUNCTION__); 
@@ -250,7 +251,6 @@ namespace radmat
       write(xml,"J",op.J);
       write(xml,"H",op.H);
       write(xml,"parity",op.parity);
-      write(xml,"twoI_z",op.twoI_z);
       write(xml,"creation_op",op.creation_op);
       write(xml,"smearedP",op.smearedP);
       write(xml,"photons",op.photons);

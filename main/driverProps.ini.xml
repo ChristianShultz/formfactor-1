@@ -56,11 +56,11 @@
             <J>0</J>
             <H></H>
             <parity>true</parity>
-            <twoI_z>0</twoI_z>
             <photons>
               <elem> 
                 <charge_coefficient>1.</charge_coefficient>  <!-- a prefactor for this op -->
                 <op_stem>hl_b0xD0_J0__J0</op_stem>
+                <twoI_z>0</twoI_z>
               </elem>            
             </photons>
             <creation_op>true</creation_op>
@@ -71,11 +71,11 @@
             <J>1</J>
             <H></H>
             <parity>false</parity>
-            <twoI_z>0</twoI_z>
             <photons>
               <elem>
                 <charge_coefficient>1.</charge_coefficient>
                 <op_stem>omegal_rhoxD0_J0__J1</op_stem>
+                <twoI_z>0</twoI_z>
               </elem>
             </photons>
             <creation_op>true</creation_op>

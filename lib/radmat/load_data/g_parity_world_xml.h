@@ -54,6 +54,7 @@ namespace radmat
       {
         std::string op_stem;
         double charge_coefficient;
+        int twoI_z;
       };
 
       struct Insertion
@@ -62,7 +63,6 @@ namespace radmat
         int J;
         ADATXML::Array<int> H; // take note of circular basis!!!        
         bool parity;
-        int twoI_z;
         bool creation_op;
         bool smearedP; 
 

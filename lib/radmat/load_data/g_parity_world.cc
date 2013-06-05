@@ -6,7 +6,7 @@
 
  * Creation Date : 25-04-2013
 
- * Last Modified : Wed May  8 13:33:00 2013
+ * Last Modified : Wed Jun  5 13:46:41 2013
 
  * Created By : shultz
 
@@ -178,7 +178,7 @@ namespace radmat
 
         for(int i = 0; i < ins.photons.size(); ++i)
           ret = ret + GParityInsertion::photon_frag(ins.photons[i].charge_coefficient,
-              makeGParityState(ins.J,H,ins.parity,mom,ins.twoI_z,ins.photons[i].op_stem,
+              makeGParityState(ins.J,H,ins.parity,mom,ins.photons[i].twoI_z,ins.photons[i].op_stem,
                 ins.creation_op,ins.smearedP,false) // insertions are not projected operators 
               );
 
