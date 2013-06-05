@@ -11,6 +11,7 @@
     </extraProps>                                       
     <tlow>0</tlow>                                    <!-- fit range, should be less than or equal to correlator length --> 
     <thigh>28</thigh>
+    <minTSlice>7</minTSlice>
   </threePointComparatorProps>
 
 
@@ -27,18 +28,19 @@
             <J>1</J>
             <H></H>
             <parity>false</parity>
-            <fill_star>true</fill_star>
+            <fill_star>true</fill_star>    <!-- do we want to consider all the rotations of the provided momentum -->
             <mom>
               <elem>0 0 0</elem>
-              <elem>1 0 0</elem> 
-              <elem>1 1 0</elem> 
+              <elem>1 0 0</elem>
+              <elem>1 1 0</elem>
               <elem>1 1 1</elem>
-              <elem>2 0 0</elem>          
+              <elem>2 0 0</elem>
             </mom>
             <twoI_z>2</twoI_z>
             <op_stem>rho_proj0</op_stem>
             <creation_op>false</creation_op>
             <smearedP>true</smearedP>
+            <isProjected>true</isProjected>
           </state>
           <t_slice>28</t_slice>
         </sink>
@@ -46,15 +48,21 @@
 
 
         <insertion>
+          <pmin>0</pmin>
           <pmax>4</pmax> <!-- don't consider matrix elements w/ q^2_space > pmax-->
           <t_slice>-3</t_slice>
           <time>
-            <active>false</active>
+            <active>false</active>               <!-- on or off -->
             <J>0</J>
             <H></H>
             <parity>true</parity>
             <twoI_z>0</twoI_z>
-            <op_stem>hl_b0xD0_J0__J0</op_stem>
+            <photons>
+              <elem> 
+                <charge_coefficient>1.</charge_coefficient>  <!-- a prefactor for this op -->
+                <op_stem>hl_b0xD0_J0__J0</op_stem>
+              </elem>            
+            </photons>
             <creation_op>true</creation_op>
             <smearedP>true</smearedP>
           </time>
@@ -64,7 +72,12 @@
             <H></H>
             <parity>false</parity>
             <twoI_z>0</twoI_z>
-            <op_stem>omegal_rhoxD0_J0__J1</op_stem>
+            <photons>
+              <elem>
+                <charge_coefficient>1.</charge_coefficient>
+                <op_stem>omegal_rhoxD0_J0__J1</op_stem>
+              </elem>
+            </photons>
             <creation_op>true</creation_op>
             <smearedP>true</smearedP>
           </space>
@@ -78,33 +91,22 @@
             <fill_star>true</fill_star>
             <mom>
               <elem>0 0 0</elem>
-              <elem>1 0 0</elem> 
-              <elem>1 1 0</elem> 
+              <elem>1 0 0</elem>
+              <elem>1 1 0</elem>
               <elem>1 1 1</elem>
-              <elem>2 0 0</elem>   
+              <elem>2 0 0</elem>
             </mom>
             <twoI_z>2</twoI_z>
             <op_stem>pion_proj0</op_stem>
             <creation_op>true</creation_op>
             <smearedP>true</smearedP>
+            <isProjected>true</isProjected>
           </state>
           <t_slice>0</t_slice>
         </source>
 
         <ensemble>szscl3_16_128_b1p50_t_x4p300_um0p0743_n1p265_per</ensemble>
       </continuumMatElemXML>
-
-
-      <!-- identical particles on both sides ? --> 
-
-      <isDiagonal>false</isDiagonal>
-
-      <!-- projected particles are generally given names like pid_proj#_p###_Irrep,
-          we need to construct the redstar xml to reflect this vs the single operator 
-          naming conventions, this flag controls the naming scheme --> 
-  
-      <isProjected>true</isProjected>
-
 
       <!-- for constructing a mean Q^2 on the fly via a simple boost --> 
       <sink_id>rho</sink_id>
@@ -113,6 +115,8 @@
       <source_id>pion</source_id>
       <maSource>0.148382</maSource>
 
+      <cubicSymmetry>false</cubicSymmetry>
+      <gParitySymmetry>false</gParitySymmetry>
 
 
     </threePointCorrXMLIni>
@@ -122,7 +126,7 @@
 
     <radmatDBProp>
       <threePointDatabase>
-        <dbname>/Users/shultz/jlab/database/szscl3_16_128_b1p50_t_x4p300_um0p0743_n1p265_per/three_point_smeared/n64/pi_rho/data/szscl3_16_128_b1p50_t_x4p300_um0p0743_n1p265_per.n64.pion_proj0.rho_proj0.all.sdb</dbname>
+        <dbname>/Users/shultz/jlab/database/szscl3_16_128_b1p50_t_x4p300_um0p0743_n1p265_per/three_point_smeared/n64/rho_pi_omega_ins/data/db/szscl3_16_128_b1p50_t_x4p300_um0p0743_n1p265_per.n64.rho_pi.tins0_31.omegalInsertion.3pt</dbname>
         <badlist>bad_corrs.xml</badlist>
       </threePointDatabase>
       <normalizationDatabase>
@@ -151,5 +155,9 @@
     <L_s>16</L_s>
   </threePointIni>
 
+  <maxThread>2</maxThread>
+
+  <!-- energy of lightest vector or branch cut from two pions -->
+  <poleMass>0.216166</poleMass>
 
 </DriverProps>
