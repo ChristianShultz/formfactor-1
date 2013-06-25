@@ -24,7 +24,7 @@ nobase_include_HEADERS += radmat/load_data/build_correlators.h radmat/load_data/
 nobase_include_HEADERS += radmat/fitting/axis_plotter.h radmat/fitting/fit_tins.h
 
 #driver
-nobase_include_HEADERS += radmat/driver/radmat_driver.h radmat/driver/radmat_driver_props.h radmat/driver/radmat_single_q2_driver.h
+nobase_include_HEADERS += radmat/driver/radmat_driver.h radmat/driver/radmat_driver_props.h radmat/driver/radmat_single_q2_driver.h radmat/driver/radmat_driver_aux.h
 
 #
 # Library
@@ -51,5 +51,5 @@ libradmat_a_SOURCES += radmat/load_data/build_correlators.cc radmat/load_data/bu
 libradmat_a_SOURCES += radmat/fitting/axis_plotter.cc radmat/fitting/fit_tins.cc
 
 #driver
-libradmat_a_SOURCES += radmat/driver/radmat_driver.cc radmat/driver/radmat_driver_props.cc radmat/driver/radmat_single_q2_driver.cc
+libradmat_a_SOURCES += radmat/driver/radmat_driver.cc radmat/driver/radmat_driver_props.cc radmat/driver/radmat_single_q2_driver.cc radmat/driver/radmat_driver_aux.cc
 

@@ -6,13 +6,14 @@
 
  * Creation Date : 25-02-2013
 
- * Last Modified : Tue Jun  4 11:02:41 2013
+ * Last Modified : Tue Jun 25 17:01:40 2013
 
  * Created By : shultz
 
  _._._._._._._._._._._._._._._._._._._._._.*/
 
 #include "radmat/driver/radmat_driver.h"
+#include "radmat/driver/radmat_driver_aux.h"
 
 #include "radmat/utils/splash.h"
 #include "radmat/load_data/load_fake_data.h"
@@ -126,6 +127,39 @@ namespace radmat
   }
 
 
+  void RadmatDriver::build_stub_xml(const std::string &inifile)
+  {
+    read_xmlini(inifile);
+    if(m_ini.maxThread > 1)
+      omp_set_num_threads(m_ini.maxThread);
+
+    std::vector<Hadron::KeyHadronNPartNPtCorr_t> keys;
+    keys = m_correlators.build_correlator_xml(m_ini.threePointIni); 
+
+
+    stubify(keys);
+
+    ADATXML::XMLBufferWriter corrs;
+    ADATXML::Array<Hadron::KeyHadronNPartNPtCorr_t> bc;
+
+    bc.resize(keys.size()); 
+    for(unsigned int i = 0; i < keys.size(); ++i)
+      bc[i] = keys[i];
+
+    write(corrs,"NPointList",bc);
+
+    std::ofstream out("npt.list.xml");
+    corrs.print(out);
+    out.close();
+
+    std::vector<Hadron::KeyHadronNPartNPtCorr_t>::const_iterator it; 
+
+    out.open("npt.ensemFileNames.list"); 
+    for(it = keys.begin(); it != keys.end(); ++it)
+      out << Hadron::ensemFileName(*it) << "\n";
+    out.close(); 
+ 
+  }
 
 
 

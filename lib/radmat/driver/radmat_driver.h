@@ -27,7 +27,8 @@ namespace radmat
                     const std::string &graph_db,
                     const std::string &nuke_xml_out);   
 
-
+    //! stick in stubs for gen_prop generation
+    void build_stub_xml(const std::string &inifile); 
 
     private:
 

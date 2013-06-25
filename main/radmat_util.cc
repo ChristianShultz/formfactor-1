@@ -6,7 +6,7 @@
 
  * Creation Date : 25-02-2013
 
- * Last Modified : Tue Jun  4 10:50:49 2013
+ * Last Modified : Tue Jun 25 17:04:07 2013
 
  * Created By : shultz
 
@@ -69,6 +69,22 @@ void nuke_graphs(int argc , char *argv[] )
 
 }
 
+void stub_xml(int argc , char *argv[] )
+{
+  if(argc != 3)
+  {
+    std::cerr << "error: usage: radmat_util: stub_xml <xmlinifile> " << std::endl;
+    exit(1); 
+  }
+
+  std::istringstream val(argv[2]); 
+  std::string ini; 
+  val >> ini; 
+
+  radmat::RadmatDriver d; 
+  d.build_stub_xml(ini); 
+
+}
 
 
 
@@ -82,7 +98,8 @@ std::map<std::string , fptr> options;
 void init_options(void)
 {
   options.insert(std::pair<std::string,fptr>("gen_xml",&gen_xml)); 
-  options.insert(std::pair<std::string,fptr>("nuke_graphs",&nuke_graphs)); 
+  options.insert(std::pair<std::string,fptr>("nuke_graphs",&nuke_graphs));
+  options.insert(std::pair<std::string,fptr>("stub_xml",&stub_xml));  
 }
 
 // pick appropriate function and pass on command line inputs 
