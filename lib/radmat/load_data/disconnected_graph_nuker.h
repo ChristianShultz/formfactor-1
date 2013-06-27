@@ -30,7 +30,7 @@ namespace radmat
   {
 
     void find_nukes(std::vector<Hadron::KeyHadronNPartNPtCorr_t> &keys,
-        const std::string &graph_db );
+        const std::string &hadron_node_xml );
 
 
     void dump_nukes(const std::string &filename);
