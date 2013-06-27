@@ -6,7 +6,7 @@
 
  * Creation Date : 25-06-2013
 
- * Last Modified : Tue Jun 25 17:07:44 2013
+ * Last Modified : Thu Jun 27 08:13:27 2013
 
  * Created By : shultz
 
@@ -26,9 +26,12 @@ namespace radmat
     void stubify(Hadron::KeyHadronNPartIrrep_t &rep)
     {
       rep.row = 1;
+
+      /* -- redstar will fail if we mess with momentum
       rep.mom[0] = 0;
       rep.mom[1] = 0; 
       rep.mom[2] = 0; 
+      */
     }
 
     void stubify(Hadron::KeyHadronNPartNPtCorr_t::NPoint_t &npt)
