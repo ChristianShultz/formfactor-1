@@ -162,7 +162,7 @@ EOF
 
 sub print_single_op
 {
-  my ($pid, $rep , $rep_stem , $mom , $ncfg , $ensemble , $recon_dir ) = @_;  
+  my ($pid, $rep , $rep_stem , $mom , $twoI_z, $ncfg , $ensemble , $recon_dir ) = @_;  
   my $p = "\$${pid}_${mom}_${rep_stem}";
 
 
@@ -172,7 +172,8 @@ sub print_single_op
   $p->pid(\"$pid\");
   $p->irrep(\"$rep\");
   $p->irrep_stem(\"$rep_stem\");
-  $p->mom(\"$mom\");  
+  $p->mom(\"$mom\"); 
+  $p->twoI_z($twoI_z); 
   $p->ncfg($ncfg);
   $p->ensemble(\"$ensemble\"); 
   $p->recon_dir(\"$recon_dir\");
@@ -189,7 +190,7 @@ EOF
 sub print_ops
 {
 
-  my ($pid, $ncfg , $ensemble , $recon_dir , $hashr ) = @_;  
+  my ($pid, $twoI_z, $ncfg , $ensemble , $recon_dir , $hashr ) = @_;  
 
 
   my %hash = %{ $hashr };
@@ -212,7 +213,7 @@ sub print_ops
 
     foreach my $rk (@repkys)
     {
-      push @all_ops , &print_single_op($pid , $rk , $rephash{$rk}.$rk , $k , $ncfg , $ensemble , $recon_dir ); 
+      push @all_ops , &print_single_op($pid , $rk , $rephash{$rk}.$rk , $k, $twoI_z , $ncfg , $ensemble , $recon_dir ); 
     }
   } 
 
@@ -251,10 +252,54 @@ sub print_trailer_perl
 
   my \$listfile = &convert_proj_to_xml(\\\@extracts,\"$pid\"); 
 
-  &make_proj_plots(\$listfile); 
+  &make_proj_plots(\$listfile);
+
+  &write_radmat_xml(\\\@all_operators); 
 EOF
 
 
+}
+
+
+sub write_radmat_xml
+{
+  my $ref = shift; 
+  my @all_ops = @{$ref};
+  my %hash = (); 
+  my $dir = `pwd`;
+  chomp $dir;  
+  my $rdir = $dir . "/radmat";
+  mkdir $rdir unless -d $rdir;
+
+  #move down
+  chdir $rdir; 
+  
+  foreach my $op (@all_ops)
+  {
+    my %h = %{ $op->write_mass_overlap_xml() };
+
+    # hash slicing -- keys are op names which are unique
+    # so this is a safe but cryptic operation 
+    @hash{ keys %h } = values %h ; 
+  }
+
+  # make some lists so we can do that radmat thing later 
+  open OUT , ">" , "mass_overlap_xml_files.list";
+  foreach my $k (keys %hash)
+  {
+    print OUT $k . "\n";
+  }
+  close OUT; 
+
+  open OUT , ">" , "mass_overlap_sdbs.list"; 
+  foreach my $v (values %hash) 
+  {
+    print OUT $v . "\n";
+  }
+  close OUT; 
+
+  #move back out
+  chdir $dir; 
 }
 
 
