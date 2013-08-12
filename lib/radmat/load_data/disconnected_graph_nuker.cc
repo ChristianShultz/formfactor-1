@@ -148,7 +148,7 @@ namespace radmat
 
       std::vector<Hadron::KeyHadronNPartIrrep_t>::const_iterator it; 
       for(it = irreps.begin(); it != irreps.end(); ++it)
-        names.push_back(it->ops[1].name); // note stupid one particle op hardwire
+        names.push_back(it->op.ops[1].name); // note stupid one particle op hardwire
       names.sort(); 
       names.unique(); 
       return names; 

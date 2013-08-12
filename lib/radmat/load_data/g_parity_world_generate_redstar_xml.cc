@@ -193,9 +193,19 @@ namespace radmat
       name << it->m_obj.irrep; 
 
       Hadron::KeyHadronNPartIrrep_t base; 
-      base.ops.resize(1); 
-      base.ops[1].name = name.str(); 
-      base.ops[1].mom_type = FF::canonicalOrder(e.mom); 
+
+      //
+      //    THIS IS THE OLD CONSTRUCTION
+      //      base.ops.resize(1); 
+      //      base.ops[1].name = name.str(); 
+      //      base.ops[1].mom_type = FF::canonicalOrder(e.mom); 
+      //
+
+      //    IN WITH THAT NEW STUFF
+      base.op.ops.resize(1); 
+      base.op.ops[1].name = name.str(); 
+      base.op.ops[1].mom_type = FF::canonicalOrder(e.mom); 
+
       base.row = it->m_obj.row;
       base.twoI_z = e.twoI_z;
       base.mom = e.mom;

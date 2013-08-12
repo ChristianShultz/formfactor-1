@@ -89,7 +89,7 @@ void read(ADATXML::XMLReader &xml, const std::string &path, XML_input_t &prop)
   doXMLRead(ptop,"redstar",prop.redstar,__PRETTY_FUNCTION__);
   doXMLRead(ptop,"LG",prop.LG,__PRETTY_FUNCTION__); 
 
-  prop.dbname = prop.redstar.ops[1].name + std::string(".sdb");
+  prop.dbname = prop.redstar.op.ops[1].name + std::string(".sdb");
 
 
   if(prop.phase_imag != 0.)
