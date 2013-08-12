@@ -6,7 +6,7 @@
 
  * Creation Date : 25-02-2013
 
- * Last Modified : Tue Jun 25 17:01:40 2013
+ * Last Modified : Mon Aug 12 11:40:38 2013
 
  * Created By : shultz
 
@@ -79,15 +79,25 @@ namespace radmat
 
   void RadmatDriver::xml_handler(const std::string &ini, const std::string &mode)
   {
-    std::map<std::string, (RadmatDriver::*)(const std::string &)> handler; 
-    std::map<std::string, (RadmatDriver::*)(const std::string &)>::const_iterator it; 
+    std::map<std::string, void (RadmatDriver::*)(const std::string &)> handler; 
+    std::map<std::string, void (RadmatDriver::*)(const std::string &)>::iterator it; 
     handler["all"] = &RadmatDriver::build_xml; 
     handler["split"] = &RadmatDriver::build_xml_split_p2;
-    
+
     it = handler.find(mode); 
 
     if (it != handler.end())
-      this->(*(it->second))(ini); // get second which is a pointer, deref it 
+    {
+      // easier to read -- call the member function on this instance
+      // void (RadmatDriver::*Fred)(const std::string &);
+      // Fred = it->second; 
+      // (this->*Fred)(ini); 
+      // or this way
+      // ((*this).*Fred)(ini); 
+
+      // way more fun way of doing the same bit of work
+      (this->*(it->second))(ini);
+    }
     else
     {
       std::cerr << __PRETTY_FUNCTION__ << ": error mode, " << mode
@@ -107,7 +117,7 @@ namespace radmat
     std::vector<Hadron::KeyHadronNPartNPtCorr_t> keys;
     keys = m_correlators.build_correlator_xml(m_ini.threePointIni); 
 
-    
+
 
     ADATXML::XMLBufferWriter corrs;
     ADATXML::Array<Hadron::KeyHadronNPartNPtCorr_t> bc;
@@ -130,6 +140,11 @@ namespace radmat
     out.close(); 
   }
 
+  void RadmatDriver::build_xml_split_p2(const std::string &inifile)
+  {
+    std::cerr << __PRETTY_FUNCTION__ << ": STUBBY!" << std::endl; 
+    exit(1); 
+  }
 
   void RadmatDriver::nuke_graph(const std::string &inifile, 
       const std::string &graph_db,
@@ -180,7 +195,7 @@ namespace radmat
     for(it = keys.begin(); it != keys.end(); ++it)
       out << Hadron::ensemFileName(*it) << "\n";
     out.close(); 
- 
+
   }
 
 
