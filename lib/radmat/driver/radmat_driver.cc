@@ -38,6 +38,7 @@
 #include "hadron/ensem_filenames.h"
 
 #include <complex>
+#include <map>
 #include <string>
 #include <sstream>
 #include <fstream>
@@ -73,6 +74,27 @@ namespace radmat
     fit_ffs();
     do_chisq_analysis();
     make_FF_of_Q2_plots();
+  }
+
+
+  void RadmatDriver::xml_handler(const std::string &ini, const std::string &mode)
+  {
+    std::map<std::string, (RadmatDriver::*)(const std::string &)> handler; 
+    std::map<std::string, (RadmatDriver::*)(const std::string &)>::const_iterator it; 
+    handler["all"] = &RadmatDriver::build_xml; 
+    handler["split"] = &RadmatDriver::build_xml_split_p2;
+    
+    it = handler.find(mode); 
+
+    if (it != handler.end())
+      this->(*(it->second))(ini); // get second which is a pointer, deref it 
+    else
+    {
+      std::cerr << __PRETTY_FUNCTION__ << ": error mode, " << mode
+        << " not recognized, try one of the following" << std::endl;
+      for (it = handler.begin(); it != handler.end(); ++it)
+        std::cout << it->first << std::endl; 
+    }
   }
 
 

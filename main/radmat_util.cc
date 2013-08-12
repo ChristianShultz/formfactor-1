@@ -26,9 +26,9 @@
 
 void gen_xml(int argc , char *argv[] )
 {
-  if(argc != 3)
+  if(argc != 4)
   {
-    std::cerr << "error: usage: radmat_util: gen_xml <xmlinifile> " << std::endl;
+    std::cerr << "error: usage: radmat_util: gen_xml <xmlinifile> <mode> " << std::endl;
     exit(1); 
   }
 
@@ -36,8 +36,12 @@ void gen_xml(int argc , char *argv[] )
   std::string ini; 
   val >> ini; 
 
+  std::istringstream val2(argv[2]); 
+  std::string mode; 
+  val2 >> mode; 
+
   radmat::RadmatDriver d; 
-  d.build_xml(ini); 
+  d.xml_handler(ini,mode); 
 }
 
 
