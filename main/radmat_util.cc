@@ -36,7 +36,7 @@ void gen_xml(int argc , char *argv[] )
   std::string ini; 
   val >> ini; 
 
-  std::istringstream val2(argv[2]); 
+  std::istringstream val2(argv[3]); 
   std::string mode; 
   val2 >> mode; 
 

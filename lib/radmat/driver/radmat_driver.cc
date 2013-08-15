@@ -37,6 +37,8 @@
 
 #include "hadron/ensem_filenames.h"
 
+#include "formfac/formfac_qsq.h"
+
 #include <complex>
 #include <map>
 #include <string>
@@ -82,7 +84,7 @@ namespace radmat
     std::map<std::string, void (RadmatDriver::*)(const std::string &)> handler; 
     std::map<std::string, void (RadmatDriver::*)(const std::string &)>::iterator it; 
     handler["all"] = &RadmatDriver::build_xml; 
-    handler["split"] = &RadmatDriver::build_xml_split_p2;
+    handler["split_mom"] = &RadmatDriver::build_xml_split_p2;
 
     it = handler.find(mode); 
 
@@ -140,10 +142,66 @@ namespace radmat
     out.close(); 
   }
 
+  namespace
+  {
+    std::string can_mom_str(const Hadron::KeyHadronNPartNPtCorr_t &k)
+    {
+      ADATXML::Array<int> p = FF::canonicalOrder(k.npoint[2].irrep.mom);
+      std::stringstream ss; 
+      ss << "p" << p[0] << p[1] << p[2]; 
+      return ss.str(); 
+    }
+
+  } // anonomyous
+
   void RadmatDriver::build_xml_split_p2(const std::string &inifile)
   {
-    std::cerr << __PRETTY_FUNCTION__ << ": STUBBY!" << std::endl; 
-    exit(1); 
+    read_xmlini(inifile);
+    if(m_ini.maxThread > 1)
+      omp_set_num_threads(m_ini.maxThread);
+
+    std::vector<Hadron::KeyHadronNPartNPtCorr_t> keys;
+    std::vector<Hadron::KeyHadronNPartNPtCorr_t>::const_iterator unsorted_it;
+    std::map<std::string,std::vector<Hadron::KeyHadronNPartNPtCorr_t> > sorted; 
+    std::map<std::string,std::vector<Hadron::KeyHadronNPartNPtCorr_t> >::iterator sorted_it; 
+
+    keys = m_correlators.build_correlator_xml(m_ini.threePointIni); 
+
+    // sort them based on momentum
+    for(unsorted_it = keys.begin(); unsorted_it != keys.end(); ++unsorted_it)
+    {
+      sorted_it = sorted.find(can_mom_str(*unsorted_it)); 
+      if (sorted_it != sorted.end())
+        sorted_it->second.push_back(*unsorted_it); 
+      else
+        sorted.insert(
+            std::pair<std::string,std::vector<Hadron::KeyHadronNPartNPtCorr_t> >(can_mom_str(*unsorted_it),
+              std::vector<Hadron::KeyHadronNPartNPtCorr_t>(1,*unsorted_it) 
+              )
+            );
+    }
+
+
+    // now run them with some unique ids 
+    for(sorted_it = sorted.begin(); sorted_it != sorted.end(); ++sorted_it)
+    {
+      ADATXML::XMLBufferWriter corrs;
+      ADATXML::Array<Hadron::KeyHadronNPartNPtCorr_t> bc;
+      keys = sorted_it->second; 
+
+      bc.resize(keys.size()); 
+      for(unsigned int i = 0; i < keys.size(); ++i)
+        bc[i] = keys[i];
+
+      write(corrs,"NPointList",bc);
+
+      std::stringstream ss; 
+      ss << "npt.list." << sorted_it->first << ".xml"; 
+
+      std::ofstream out(ss.str().c_str());
+      corrs.print(out);
+      out.close();
+    }
   }
 
   void RadmatDriver::nuke_graph(const std::string &inifile, 
