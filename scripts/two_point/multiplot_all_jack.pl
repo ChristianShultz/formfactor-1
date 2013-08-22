@@ -33,6 +33,8 @@ $num = $maxnum unless ($num < $maxnum);
 
 my @chunks = @{ chunk($num,@stems) };
 
+print "this is stupid $#chunks \n ";
+
 #print @qs; 
 
 mkdir ("tmp"); 
@@ -105,7 +107,7 @@ sub chunk
   my ($num,@stems) = @_; 
   my $n2 = $num*$num;
   my $nchunk = ceil($#stems/$n2); 
-  @chunks = ();
+  my @chunks = ();
 
   for my $i(0..$nchunk-1)
   {
@@ -113,12 +115,18 @@ sub chunk
 
     for my $idx(0..$n2-1)
     {
-      push @this_chunk , @stems[$i*$n2 + $idx] unless $i*$n2 + $idx > $#stems;
+      push @this_chunk , $stems[$i*$n2 + $idx] unless $i*$n2 + $idx > $#stems;
     }
 
+#    print join(", ",@this_chunk) . "\n";
+
     push @chunks , \@this_chunk;
-}
-return \@chunks; 
+  }
+
+
+  print join(",   ", @chunks);
+
+  return \@chunks; 
 }
 
 
