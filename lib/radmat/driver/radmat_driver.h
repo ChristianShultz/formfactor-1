@@ -28,6 +28,9 @@ namespace radmat
     //! split up xml on p^2
     void build_xml_split_p2(const std::string &inifile);  
 
+    //! two point xml hack
+    void build_xml_twopoint(const std::string &inifile);
+
     //! just figure out what disconnected graphs we have to nuke for redstar
     void nuke_graph(const std::string &inifile ,
                     const std::string &graph_db,

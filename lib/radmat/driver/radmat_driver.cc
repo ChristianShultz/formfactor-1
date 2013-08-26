@@ -85,6 +85,7 @@ namespace radmat
     std::map<std::string, void (RadmatDriver::*)(const std::string &)>::iterator it; 
     handler["all"] = &RadmatDriver::build_xml; 
     handler["split_mom"] = &RadmatDriver::build_xml_split_p2;
+    handler["two_point"] = &RadmatDriver::build_xml_twopoint;
 
     it = handler.find(mode); 
 
@@ -152,6 +153,42 @@ namespace radmat
       return ss.str(); 
     }
 
+    Hadron::KeyHadronNPartNPtCorr_t
+      twoPointCorr(const Hadron::KeyHadronNPartNPtCorr_t::NPoint_t &npt1,
+          const Hadron::KeyHadronNPartNPtCorr_t::NPoint_t &npt2,
+          const std::string &ensemble)
+      {
+        Hadron::KeyHadronNPartNPtCorr_t dest;
+        dest.ensemble = ensemble; 
+        dest.npoint.resize(2); 
+        dest.npoint[1].t_slice = -2; 
+        dest.npoint[2].t_slice = 0; 
+
+        dest.npoint[1].irrep = npt1.irrep; 
+        dest.npoint[2].irrep = npt2.irrep; 
+        
+        dest.npoint[1].irrep.creation_op = false; 
+        dest.npoint[2].irrep.creation_op = true; 
+
+        return dest; 
+      }
+
+
+    // make a twopoint list
+    std::vector<Hadron::KeyHadronNPartNPtCorr_t> 
+      twoPointList(const std::vector<Hadron::KeyHadronNPartNPtCorr_t::NPoint_t> &npts,
+          const std::string &ensemble)
+      {
+        std::vector<Hadron::KeyHadronNPartNPtCorr_t::NPoint_t>::const_iterator a,b; 
+        std::vector<Hadron::KeyHadronNPartNPtCorr_t> dest; 
+
+        for (a = npts.begin(); a != npts.end(); ++a)
+          for(b = npts.begin(); b != npts.end(); ++b)
+            dest.push_back( twoPointCorr(*a,*b,ensemble) );
+         
+        return dest; 
+      }
+
   } // anonomyous
 
   void RadmatDriver::build_xml_split_p2(const std::string &inifile)
@@ -202,6 +239,42 @@ namespace radmat
       corrs.print(out);
       out.close();
     }
+  }
+
+  void RadmatDriver::build_xml_twopoint(const std::string &inifile)
+  {
+    read_xmlini(inifile);
+    if(m_ini.maxThread > 1)
+      omp_set_num_threads(m_ini.maxThread);
+
+    std::vector<Hadron::KeyHadronNPartNPtCorr_t> keys;
+    std::vector<Hadron::KeyHadronNPartNPtCorr_t>::const_iterator kit;
+    keys = m_correlators.build_correlator_xml(m_ini.threePointIni); 
+   
+    if ( keys.size() <= 0 ) 
+      exit(12034); 
+
+    std::vector<Hadron::KeyHadronNPartNPtCorr_t::NPoint_t> npts;
+
+    for (kit = keys.begin(); kit != keys.end(); ++kit)
+      npts.push_back(kit->npoint[1]);
+      
+   
+    std::vector<Hadron::KeyHadronNPartNPtCorr_t> list = twoPointList( npts, keys[0].ensemble );
+
+    ADATXML::XMLBufferWriter corrs;
+    ADATXML::Array<Hadron::KeyHadronNPartNPtCorr_t> bc;
+
+    bc.resize(list.size()); 
+    for(unsigned int i = 0; i < keys.size(); ++i)
+      bc[i] = list[i];
+
+    write(corrs,"NPointList",bc);
+
+    std::ofstream out("npt.list.xml");
+    corrs.print(out);
+    out.close();
+
   }
 
   void RadmatDriver::nuke_graph(const std::string &inifile, 
