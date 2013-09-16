@@ -182,10 +182,16 @@ namespace radmat
         std::vector<Hadron::KeyHadronNPartNPtCorr_t::NPoint_t>::const_iterator a,b; 
         std::vector<Hadron::KeyHadronNPartNPtCorr_t> dest; 
 
-        for (a = npts.begin(); a != npts.end(); ++a)
-          for(b = npts.begin(); b != npts.end(); ++b)
-            dest.push_back( twoPointCorr(*a,*b,ensemble) );
-         
+        //  Square correlation matrix 
+        //        for (a = npts.begin(); a != npts.end(); ++a)
+        //          for(b = npts.begin(); b != npts.end(); ++b)
+        //            dest.push_back( twoPointCorr(*a,*b,ensemble) );
+        //
+
+        // Diagonal elements
+        for(a = npts.begin(); a != npts.end(); ++a)
+          dest.push_back( twoPointCorr(*a,*a,ensemble) );
+
         return dest; 
       }
 
@@ -250,7 +256,7 @@ namespace radmat
     std::vector<Hadron::KeyHadronNPartNPtCorr_t> keys;
     std::vector<Hadron::KeyHadronNPartNPtCorr_t>::const_iterator kit;
     keys = m_correlators.build_correlator_xml(m_ini.threePointIni); 
-   
+
     if ( keys.size() <= 0 ) 
       exit(12034); 
 
@@ -258,8 +264,8 @@ namespace radmat
 
     for (kit = keys.begin(); kit != keys.end(); ++kit)
       npts.push_back(kit->npoint[1]);
-      
-   
+
+
     std::vector<Hadron::KeyHadronNPartNPtCorr_t> list = twoPointList( npts, keys[0].ensemble );
 
     ADATXML::XMLBufferWriter corrs;
