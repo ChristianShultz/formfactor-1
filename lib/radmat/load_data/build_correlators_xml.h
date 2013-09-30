@@ -19,6 +19,13 @@ namespace radmat
 {
   struct ThreePointCorrXMLIni_t
   {
+    struct RenormalizationProp
+    {
+      double RGE_prop;  // flavor space wick contraction normalization 
+      double Z_t; 
+      double Z_s; 
+    };
+
     gParityWorld::GParityContinuumMatElemXML continuumMatElemXML;
     std::string source_id;
     std::string sink_id;
@@ -26,8 +33,25 @@ namespace radmat
     bool cubicSymmetry;
     double maSource;
     double maSink;  
+
+    RenormalizationProp renormalization; 
   };
 
+  //! write a renormalization prop to a string 
+  std::string toString(const ThreePointCorrXMLIni_t::RenormalizationProp &);
+
+  //! stream it
+  std::ostream& operator<<(std::ostream&, const ThreePointCorrXMLIni_t::RenormalizationProp &); 
+
+  //! read it
+  void read(ADATXML::XMLReader &xml, 
+      const std::string &path, 
+      ThreePointCorrXMLIni_t::RenormalizationProp &); 
+
+  //! write it
+  void write(ADATXML::XMLWriter &xml, 
+      const std::string &path, 
+      const ThreePointCorrXMLIni_t::RenormalizationProp &);
 
   //! write it to a string
   std::string toString(const ThreePointCorrXMLIni_t &);

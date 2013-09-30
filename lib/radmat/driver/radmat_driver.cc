@@ -6,7 +6,7 @@
 
  * Creation Date : 25-02-2013
 
- * Last Modified : Mon Aug 12 11:40:38 2013
+ * Last Modified : Mon 30 Sep 2013 04:22:04 PM EDT
 
  * Created By : shultz
 
@@ -70,7 +70,11 @@ namespace radmat
     init_false(); 
     read_xmlini(inifile);
     if(m_ini.maxThread > 1)
+    {
+      std::cout << "\n\n\n" << __PRETTY_FUNCTION__ << ": setting num threads to " 
+        << m_ini.maxThread << "\n\n\n" << std::endl;
       omp_set_num_threads(m_ini.maxThread);
+    }
     build_correlators();
     solve_llsq();
     fit_ffs();

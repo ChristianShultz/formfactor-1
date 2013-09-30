@@ -6,7 +6,7 @@
 
 * Creation Date : 25-04-2013
 
-* Last Modified : Tue May  7 09:31:07 2013
+* Last Modified : Mon 30 Sep 2013 02:42:59 PM EDT
 
 * Created By : shultz
 
@@ -28,7 +28,8 @@ namespace radmat
           read(ptop,path,place);
         else
         {
-          std::cerr << __PRETTY_FUNCTION__ << ": Error, called by " << f << " trying to read path, " << path
+          std::cerr << __PRETTY_FUNCTION__ << ": Error, called by " 
+            << f << " trying to read path, " << path
             << ", path was empty, exiting" << std::endl;
           exit(1);
         }
@@ -36,13 +37,54 @@ namespace radmat
 
   } // namespace anonomyous 
 
+  std::string toString(const ThreePointCorrXMLIni_t::RenormalizationProp &o)
+  {
+    std::stringstream ss; 
+    ss << "RGE_prop = " << o.RGE_prop 
+      << " Z_t = " << o.Z_t 
+      << " Z_s = " << o.Z_s;
+
+    return ss.str(); 
+  }
+
+  std::ostream & operator<<(std::ostream &os, 
+      const ThreePointCorrXMLIni_t::RenormalizationProp &p)
+  {
+    return ( os << toString(p) ); 
+  }
+
+  
+  //! xml reader
+  void read(ADATXML::XMLReader &xml, 
+      const std::string &path, 
+      ThreePointCorrXMLIni_t::RenormalizationProp &prop)
+  {
+    ADATXML::XMLReader ptop(xml,path);
+    doXMLRead(ptop,"RGE_prop",prop.RGE_prop,__PRETTY_FUNCTION__);
+    doXMLRead(ptop,"Z_t",prop.Z_t,__PRETTY_FUNCTION__);
+    doXMLRead(ptop,"Z_s",prop.Z_s,__PRETTY_FUNCTION__);
+  }
+
+  void write(ADATXML::XMLWriter &xml, 
+      const std::string &path, 
+      const ThreePointCorrXMLIni_t::RenormalizationProp &prop)
+  {
+    ADATXML::push(xml,path);
+    write(xml,"RGE_prop",prop.RGE_prop);
+    write(xml,"Z_t",prop.Z_t);
+    write(xml,"Z_s",prop.Z_s);
+    ADATXML::pop(xml);
+  }
+
+
   //! write it to a string
   std::string toString(const ThreePointCorrXMLIni_t &o)
   { 
     std::stringstream ss;
     ss << "continuumMatElemXML = " <<  o.continuumMatElemXML << "\nsource_id " 
-      << o.source_id << " sink_id " << o.sink_id  << " maSource = " << o.maSource
-      << " maSink = " << o.maSink; 
+      << o.source_id << " sink_id " << o.sink_id  << " maSource = " 
+      << o.maSource << " maSink = " << o.maSink
+      << "\nRenormalization = " << o.renormalization; 
     return ss.str();
   }
 
@@ -64,6 +106,7 @@ namespace radmat
     doXMLRead(ptop,"maSink",prop.maSink,__PRETTY_FUNCTION__); 
     doXMLRead(ptop,"gParitySymmetry",prop.gParitySymmetry,__PRETTY_FUNCTION__); 
     doXMLRead(ptop,"cubicSymmetry",prop.cubicSymmetry,__PRETTY_FUNCTION__);
+    doXMLRead(ptop,"renormalization",prop.renormalization,__PRETTY_FUNCTION__);
   }
 
   //! xml writer
@@ -75,6 +118,9 @@ namespace radmat
     write(xml,"sink_id",prop.sink_id);
     write(xml,"maSource",prop.maSource);
     write(xml,"maSink",prop.maSink); 
+    write(xml,"gParitySymmetry",prop.gParitySymmetry); 
+    write(xml,"cubicSymmetry",prop.cubicSymmetry); 
+    write(xml,"renormalization",prop.renormalization); 
     ADATXML::pop(xml);
   }
 

@@ -28,6 +28,9 @@ namespace radmat
 
     LatticeMultiDataTag& operator=(const LatticeMultiDataTag &o); 
 
+    //! the lorentz index
+    int mu(void) const {return jmu;}
+
     //! ensemble qsquared
     ENSEM::EnsemReal Q2(void) const;
 
@@ -46,6 +49,7 @@ namespace radmat
     //! the value of Q2 we use when sorting and labeling 
     double get_qsq_label(void) const {return qsq_label;}
 
+    //! splash it to the screen
     std::string splash_tag(void) const;
 
     // tags

@@ -6,7 +6,7 @@
 
 * Creation Date : 29-11-2012
 
-* Last Modified : Thu May  2 12:16:23 2013
+* Last Modified : Mon 30 Sep 2013 11:06:09 AM EDT
 
 * Created By : shultz
 
@@ -44,7 +44,8 @@ namespace radmat
   std::string toString (const RDriverProps_t &prop)
   {
     std::stringstream ss;
-      ss << "threePointComparatorProps = " << prop.threePointComparatorProps;
+      ss << "version = " << prop.version; 
+      ss << "\nthreePointComparatorProps = " << prop.threePointComparatorProps;
       ss << "\nthreePointIni = " << prop.threePointIni;
       ss << "\nmaxThread = " << prop.maxThread; 
       ss << "\npoleMass^2 = " <<  prop.poleMass; 
@@ -56,9 +57,30 @@ namespace radmat
     o << toString(p);
     return o; 
   }
+
+  
+  namespace
+  {
+    void check_version(const int v)
+    {
+      int my_version  = 1; 
+      if ( my_version != 1 ) 
+      {
+        std::cerr << "version " << v << "is not supported, must be at " 
+          << my_version << " try again later" << std::endl; 
+        exit(1); 
+      }
+    }
+  }
+
+
   void read(ADATXML::XMLReader &xml, const std::string &path, RDriverProps_t &prop)
   {
     ADATXML::XMLReader ptop(xml,path);
+    doXMLRead(ptop,"version",prop.version,__PRETTY_FUNCTION__); 
+
+    check_version(prop.version); 
+
     doXMLRead(ptop,"threePointComparatorProps",prop.threePointComparatorProps,__PRETTY_FUNCTION__);
     doXMLRead(ptop,"threePointIni",prop.threePointIni,__PRETTY_FUNCTION__);
     doXMLRead(ptop,"maxThread",prop.maxThread,__PRETTY_FUNCTION__);
