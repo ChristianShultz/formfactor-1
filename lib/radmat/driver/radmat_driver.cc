@@ -6,7 +6,7 @@
 
  * Creation Date : 25-02-2013
 
- * Last Modified : Mon 30 Sep 2013 05:09:08 PM EDT
+ * Last Modified : Tue 01 Oct 2013 02:50:25 PM EDT
 
  * Created By : shultz
 
@@ -407,9 +407,9 @@ namespace radmat
       << my_stopwatch.getTimeInSeconds() << " seconds " << std::endl;
 
     built_correlators = true; 
+
   }
-
-
+    
   void RadmatDriver::solve_llsq(void)
   {
     check_exit_corrs(); 

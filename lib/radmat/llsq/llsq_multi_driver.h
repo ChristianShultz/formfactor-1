@@ -35,6 +35,8 @@ namespace radmat
     void dump_llsq(const std::string &path);
     void dump_llsq_lattice(const std::string &path);  
 
+    void save_llsq_state(const std::string &path) const; 
+
     SEMBLE::SembleMatrix<T> peek_K(void) const {check_exit_K();return K;}
     SEMBLE::SembleMatrix<T> peek_Kinv(void) const {check_exit_Kinv();return Kinv;}
     SEMBLE::SembleMatrix<T> peek_FF(void) const {check_exit_FF(); return FF_t;}

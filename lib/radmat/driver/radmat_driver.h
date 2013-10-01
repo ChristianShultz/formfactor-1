@@ -63,7 +63,6 @@ namespace radmat
     void print_Q2_list(void);  
 
 
-
     RDriverProps_t m_ini;  
     BuildCorrelators m_correlators; 
     std::vector<bool> good_qs;

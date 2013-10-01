@@ -6,7 +6,7 @@
 
  * Creation Date : 22-02-2013
 
- * Last Modified : Fri May 10 13:21:33 2013
+ * Last Modified : Tue 01 Oct 2013 03:04:05 PM EDT
 
  * Created By : shultz
 
@@ -16,6 +16,7 @@
 #include "llsq_multi_driver.h"
 #include "llsq_solvers.h"
 #include "llsq_chisq.h"
+#include "llsq_multi_data_serialize.h"
 #include "radmat/utils/pow2assert.h"
 #include "radmat/load_data/build_correlators.h"
 #include "radmat/ff/ff_gen_llsq_row.h"
@@ -421,7 +422,7 @@ namespace radmat
   void LLSQMultiDriver_t::dump_llsq_lattice(const std::string &path)
   {
     check_exit_lat();
-    std::stringstream b,cont,zero;
+    std::stringstream b,cont,zero,db;
     cont << path << "row_index_to_continuum_elem.txt";
     zero << path << "zeroed_matrix_elems";
     b << path << "lattice_mat_elem_";
@@ -458,6 +459,17 @@ namespace radmat
   }
 
 
+
+  void LLSQMultiDriver_t::save_llsq_state(const std::string &path) const
+  {
+    std::cout << __func__ << ": entering" << std::endl; 
+    check_exit_lat();
+    std::stringstream ss; 
+    ss << path << "state_database.rad"; 
+    ADATIO::BinaryFileWriter bin(ss.str());
+    write(bin,*lattice_data); 
+    bin.close();
+  }
 
 
 

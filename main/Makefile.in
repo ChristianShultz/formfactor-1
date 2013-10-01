@@ -39,7 +39,7 @@ bin_PROGRAMS = plot_fake_3pt$(EXEEXT) fake_radmat$(EXEEXT) \
 	grab_pol$(EXEEXT) grab_vector_mean_cmp$(EXEEXT) \
 	invert_subduced$(EXEEXT) phases2$(EXEEXT) \
 	check_rotations$(EXEEXT) corr_norm$(EXEEXT) \
-	radmat_util$(EXEEXT) radmat$(EXEEXT)
+	radmat_util$(EXEEXT) radmat$(EXEEXT) radmat_single_q2$(EXEEXT)
 subdir = main
 DIST_COMMON = $(srcdir)/Makefile.am $(srcdir)/Makefile.in
 ACLOCAL_M4 = $(top_srcdir)/aclocal.m4
@@ -110,6 +110,10 @@ am_radmat_OBJECTS = radmat.$(OBJEXT)
 radmat_OBJECTS = $(am_radmat_OBJECTS)
 radmat_LDADD = $(LDADD)
 radmat_DEPENDENCIES =
+am_radmat_single_q2_OBJECTS = radmat_single_q2.$(OBJEXT)
+radmat_single_q2_OBJECTS = $(am_radmat_single_q2_OBJECTS)
+radmat_single_q2_LDADD = $(LDADD)
+radmat_single_q2_DEPENDENCIES =
 am_radmat_util_OBJECTS = radmat_util.$(OBJEXT)
 radmat_util_OBJECTS = $(am_radmat_util_OBJECTS)
 radmat_util_LDADD = $(LDADD)
@@ -134,7 +138,8 @@ SOURCES = $(check_rotations_SOURCES) $(corr_norm_SOURCES) \
 	$(mass_overlap_db_create_SOURCES) \
 	$(mass_overlap_db_util_SOURCES) $(phases_SOURCES) \
 	$(phases2_SOURCES) $(plot_fake_3pt_SOURCES) $(radmat_SOURCES) \
-	$(radmat_util_SOURCES) $(single_plot_SOURCES)
+	$(radmat_single_q2_SOURCES) $(radmat_util_SOURCES) \
+	$(single_plot_SOURCES)
 DIST_SOURCES = $(check_rotations_SOURCES) $(corr_norm_SOURCES) \
 	$(fake_radmat_SOURCES) $(grab_ff_SOURCES) $(grab_pol_SOURCES) \
 	$(grab_vector_mean_cmp_SOURCES) $(invert_subduced_SOURCES) \
@@ -142,7 +147,8 @@ DIST_SOURCES = $(check_rotations_SOURCES) $(corr_norm_SOURCES) \
 	$(mass_overlap_db_create_SOURCES) \
 	$(mass_overlap_db_util_SOURCES) $(phases_SOURCES) \
 	$(phases2_SOURCES) $(plot_fake_3pt_SOURCES) $(radmat_SOURCES) \
-	$(radmat_util_SOURCES) $(single_plot_SOURCES)
+	$(radmat_single_q2_SOURCES) $(radmat_util_SOURCES) \
+	$(single_plot_SOURCES)
 ETAGS = etags
 CTAGS = ctags
 DISTFILES = $(DIST_COMMON) $(DIST_SOURCES) $(TEXINFOS) $(EXTRA_DIST)
@@ -275,6 +281,7 @@ check_rotations_SOURCES = check_rotations.cc
 corr_norm_SOURCES = corr_norm.cc
 radmat_util_SOURCES = radmat_util.cc
 radmat_SOURCES = radmat.cc
+radmat_single_q2_SOURCES = radmat_single_q2.cc
 
 # no idea how/why this works, cut paste job
 #
@@ -395,6 +402,9 @@ plot_fake_3pt$(EXEEXT): $(plot_fake_3pt_OBJECTS) $(plot_fake_3pt_DEPENDENCIES)
 radmat$(EXEEXT): $(radmat_OBJECTS) $(radmat_DEPENDENCIES) 
 	@rm -f radmat$(EXEEXT)
 	$(CXXLINK) $(radmat_OBJECTS) $(radmat_LDADD) $(LIBS)
+radmat_single_q2$(EXEEXT): $(radmat_single_q2_OBJECTS) $(radmat_single_q2_DEPENDENCIES) 
+	@rm -f radmat_single_q2$(EXEEXT)
+	$(CXXLINK) $(radmat_single_q2_OBJECTS) $(radmat_single_q2_LDADD) $(LIBS)
 radmat_util$(EXEEXT): $(radmat_util_OBJECTS) $(radmat_util_DEPENDENCIES) 
 	@rm -f radmat_util$(EXEEXT)
 	$(CXXLINK) $(radmat_util_OBJECTS) $(radmat_util_LDADD) $(LIBS)
@@ -422,6 +432,7 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/phases2.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/plot_fake_3pt.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/radmat.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/radmat_single_q2.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/radmat_util.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/single_plot.Po@am__quote@
 

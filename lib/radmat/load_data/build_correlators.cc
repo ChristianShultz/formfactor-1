@@ -6,13 +6,15 @@
 
  * Creation Date : 04-12-2012
 
- * Last Modified : Mon 30 Sep 2013 03:48:14 PM EDT
+ * Last Modified : Tue 01 Oct 2013 10:55:48 AM EDT
 
  * Created By : shultz
 
  _._._._._._._._._._._._._._._._._._._._._.*/
 
 #include "build_correlators.h"
+#include "lattice_multi_data_tag.h"
+#include "lattice_multi_data_object.h"
 #include "invert_subduction.h"
 #include "g_parity_world.h"
 #include "g_parity_world_generate_redstar_xml.h"  
@@ -45,83 +47,6 @@
 namespace radmat
 {
 
-
-
-  LatticeMultiDataTag::LatticeMultiDataTag(void)
-  {
-    qsq_label = 1000.;
-    E_f.resize(1); 
-    E_f = SEMBLE::toScalar(double(0.));
-    E_i = E_f; 
-  }
-
-  LatticeMultiDataTag& LatticeMultiDataTag::operator=(const LatticeMultiDataTag &o)
-  {
-    if(this != &o)
-    {
-      qsq_label = o.qsq_label; 
-      jmu = o.jmu;
-      mat_elem_id = o.mat_elem_id;
-      p_f = o.p_f;
-      p_i = o.p_i;
-      E_f = o.E_f;
-      E_i = o.E_i;
-      mom_fac = o.mom_fac;
-      file_id = o.file_id;  
-    }
-    return *this;
-  }
-
-  ENSEM::EnsemReal LatticeMultiDataTag::Q2(void) const
-  {
-    double pp(0); 
-    pp = mom_fac*mom_fac*((p_f[0] - p_i[0])*(p_f[0] - p_i[0])
-        + (p_f[1] - p_i[1])*(p_f[1] - p_i[1])
-        + (p_f[2] - p_i[2])*(p_f[2] - p_i[2]));
-
-
-    return ( - (E_f-E_i)*(E_f-E_i) + SEMBLE::toScalar(pp));
-  }
-
-  void LatticeMultiDataTag::print_me(void) const
-  {
-    std::cout << file_id << " " << jmu << " " << mat_elem_id << std::endl;  
-  }
-
-  std::string LatticeMultiDataTag::splash_tag(void) const
-  {
-    print_me();
-    std::stringstream ss; 
-    ss << SEMBLE::toScalar(ENSEM::mean(Q2())) << " "; 
-    ss << mom_string() << " " << E_string() <<  std::endl;
-    return ss.str();
-  }
-
-
-  std::string LatticeMultiDataTag::mom_string(void) const
-  {
-
-    if(p_f.size() != 3 || p_i.size() != 3)
-    {
-      std::cerr <<__func__ << ": error, momenta don't have correct size" << std::endl;
-      exit(1);
-    }
-
-    std::stringstream ss;
-    ss << "pf = " << p_f[0] << "," << p_f[1] << ","
-      << p_f[2] << "  pi = "  << p_i[0] << "," 
-      << p_i[1] << "," << p_i[2] ;
-    return ss.str();
-  }
-
-
-  std::string LatticeMultiDataTag::E_string(void) const
-  {
-    std::stringstream ss;
-    ss << "E_f = " << std::setw(3) << SEMBLE::toScalar(ENSEM::mean(E_f)) 
-      << " E_i = " << std::setw(3) << SEMBLE::toScalar(ENSEM::mean(E_i));
-    return ss.str(); 
-  }
 
 
 

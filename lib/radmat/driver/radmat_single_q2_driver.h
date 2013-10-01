@@ -21,6 +21,10 @@ namespace radmat
 
     bool load_llsq(const ADAT::Handle<LLSQLatticeMultiData> &lattice_data,
         const double pole_mass_squared);
+
+    // single q2 backdoor
+    bool load_llsq(const ADAT::Handle<LLSQLatticeMultiData> &lattice_data);
+
     void solve_llsq(const std::string &soln_ID);
     void fit_data(const ThreePointComparatorProps_t &fitProps);
     void chisq_analysis(void);

@@ -6,7 +6,7 @@
 
  * Creation Date : 25-02-2013
 
- * Last Modified : Thu May  2 12:15:21 2013
+ * Last Modified : Tue 01 Oct 2013 04:22:06 PM EDT
 
  * Created By : shultz
 
@@ -15,6 +15,7 @@
 
 
 #include "radmat/driver/radmat_single_q2_driver.h"
+#include "radmat/llsq/llsq_multi_data_serialize.h"
 #include "semble/semble_semble.h"
 #include "ensem/ensem.h"
 #include <sstream>
@@ -93,10 +94,28 @@ namespace radmat
 
     SEMBLE::SEMBLEIO::makeDirectoryPath(base_path() + std::string("llsq"));
     linear_system.dump_llsq_lattice(base_path() + std::string("llsq/"));
-
+    linear_system.save_llsq_state( base_path() + std::string("llsq/") ); 
     return true;
   }
 
+  bool RadmatSingleQ2Driver::load_llsq(const ADAT::Handle<LLSQLatticeMultiData> &d)
+  {
+
+    if(!!!linear_system.load_data(d))
+      return false;
+
+    if(linear_system.peek_tags().empty())
+    {
+      std::cerr << __func__ << ": warning, no tags" << std::endl; 
+      return false;
+    }
+
+    init_linear_system = true; 
+
+    SEMBLE::SEMBLEIO::makeDirectoryPath(base_path() + std::string("llsq"));
+    linear_system.dump_llsq_lattice(base_path() + std::string("llsq/"));
+    return true;
+  }
 
   void RadmatSingleQ2Driver::solve_llsq(const std::string &soln_ID)
   {

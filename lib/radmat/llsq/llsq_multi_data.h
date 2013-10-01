@@ -47,7 +47,7 @@ namespace radmat
       int nrows(void) const {return m_data.getN();}
       int ncols(void) const {return m_data.getN();}
 
-      TT& get_tag(const int idx) const; 
+      const TT& get_tag(const int idx) const; 
       TT& get_tag(const int idx); 
       void set_tag(const int idx, const TT &); 
       void splash_tags(void) const; 
@@ -182,7 +182,7 @@ namespace radmat
       foo = this->get_row_semble(row); 
       typename SEMBLE::PromoteEnsemVec<ST>::Type ret; 
       ret.resize(foo.getB());
-      ret.rsizeObs(foo.getN());
+      ret.resizeObs(foo.getN());
       for(int nn = 0; nn < foo.getN(); ++nn)
         ENSEM::pokeObs(ret,foo.getEnsemElement(nn),nn);
 
@@ -192,7 +192,7 @@ namespace radmat
 
 
   template<typename TT, typename ST>
-    TT&  LLSQMultiData<TT,ST>::get_tag(const int idx) const
+    const TT&  LLSQMultiData<TT,ST>::get_tag(const int idx) const
     {
       return m_tags.at(idx); 
     }
