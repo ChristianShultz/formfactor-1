@@ -6,7 +6,7 @@
 
  * Creation Date : 01-08-2012
 
- * Last Modified : Tue Apr 23 17:57:32 2013
+ * Last Modified : Mon 30 Sep 2013 05:11:52 PM EDT
 
  * Created By : shultz
 
@@ -158,9 +158,9 @@ namespace radmat
   {
     std::stringstream ss,jack,ax,fit;
     ss << filenameBase;
-    fit << ss.str() << "_F_" << ffnum << "_fit.jack";
-    jack << ss.str() << "_F_" << ffnum << ".jack";
-    ax << ss.str() << "_F_" << ffnum << ".ax";
+    fit << ss.str() << "FF_" << ffnum << "_fit.jack";
+    jack << ss.str() << "FF_" << ffnum << ".jack";
+    ax << ss.str() << "FF_" << ffnum << ".ax";
 
     std::vector<double> time; 
     const int Lt = data.numElem();

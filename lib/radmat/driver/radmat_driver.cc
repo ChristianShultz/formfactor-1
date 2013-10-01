@@ -6,7 +6,7 @@
 
  * Creation Date : 25-02-2013
 
- * Last Modified : Mon 30 Sep 2013 04:22:04 PM EDT
+ * Last Modified : Mon 30 Sep 2013 05:09:08 PM EDT
 
  * Created By : shultz
 
@@ -574,6 +574,10 @@ namespace radmat
         nff = (linear_systems_of_Q2[allQ].fetchFF()).second.getN();
         nQs = linear_systems_of_Q2.size(); 
         ncfg =  linear_systems_of_Q2[allQ].Q2().size(); 
+
+        std::cout << "nff = " << nff << " nQs = "
+          << nQs << " ncfg = " << ncfg << std::endl;
+
         break; // only do this once but don't assume any ordering
       }
       if(allQ == linear_systems_of_Q2.size() -1)
@@ -589,8 +593,10 @@ namespace radmat
       if(good_qs[Q])
         q2s.push_back(SEMBLE::toScalar(ENSEM::mean(linear_systems_of_Q2[Q].Q2()))); 
 
-    for(int ff; ff < nff; ++ff)
+    for(int ff = 0; ff < nff; ++ff)
     {
+      std::cout << __func__ << ": working on FF_" << ff << std::endl;
+
       ENSEM::EnsemVectorReal FF;
       FF.resize(ncfg);
       FF.resizeObs(nQs);
