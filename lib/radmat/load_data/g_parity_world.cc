@@ -6,7 +6,7 @@
 
  * Creation Date : 25-04-2013
 
- * Last Modified : Wed Jun  5 13:46:41 2013
+ * Last Modified : Wed 02 Oct 2013 01:20:23 PM EDT
 
  * Created By : shultz
 
@@ -15,6 +15,7 @@
 #include "g_parity_world.h"
 #include "radmat/utils/pow2assert.h"
 #include "hadron/irrep_util.h"
+#include "formfac/formfac_qsq.h"
 
 namespace radmat
 {
@@ -65,7 +66,8 @@ namespace radmat
     std::string stateFileName(const GParityState &s)
     {
       std::stringstream ss; 
-      ss << s.name << ",J" << s.J << ",H" << s.H 
+      ss << s.name << "_p" << string_mom_no_space(FF::canonicalOrder(s.mom))
+        << ",J" << s.J << ",H" << s.H 
         << ",p" << string_mom_no_space(s.mom)
         << ",Iz" << s.twoI_z;
       return ss.str(); 

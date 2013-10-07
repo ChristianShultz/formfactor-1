@@ -63,10 +63,10 @@ sub rep_list_spin_0
   $D2{ "D2" . $rep } = "H0";
 
   my %D3 = (); 
-  $D3{ "D2" . $rep } = "H0";
+  $D3{ "D3" . $rep } = "H0";
 
   my %D4 = (); 
-  $D4{ "D2" . $rep } = "H0";
+  $D4{ "D4" . $rep } = "H0";
 
 
   $ret { "p000" } = \%rest; 
@@ -180,7 +180,7 @@ sub print_single_op
   $p->t0(-1);
   $p->state(-1); 
   $p->tz(-1);
-
+  $p->phaser(1.);
 EOF
 
   return $p; 
@@ -202,7 +202,7 @@ sub print_ops
 
   foreach my $k (@kys)
   {
-    print "working on $k \n";
+    #    print "working on $k \n";
 
     my $rephashr = $hash{$k};
     my %rephash = %{$rephashr};
@@ -213,6 +213,7 @@ sub print_ops
 
     foreach my $rk (@repkys)
     {
+      print "mom = $k rep = $rk \n"; 
       push @all_ops , &print_single_op($pid , $rk , $rephash{$rk}.$rk , $k, $twoI_z , $ncfg , $ensemble , $recon_dir ); 
     }
   } 
@@ -273,7 +274,8 @@ sub write_radmat_xml
 
   #move down
   chdir $rdir; 
-  
+
+  # a month later I am sorry for writing this..eww
   foreach my $op (@all_ops)
   {
     my %h = %{ $op->write_mass_overlap_xml() };
@@ -328,10 +330,10 @@ sub run_extract_all_v_coeffs_svd
   my $base = `pwd`;
   chomp $base;  
   my $destdir = $op->recon_dir(); 
-  
-  
-  my $exe = "extract_all_v_coeffs_svd.pl";
-  my $prog = $op->recon_dir() . "/" . $exe;
+
+
+  my $loc = "/u/home/shultz/optimized_operators/";
+  my $exe = $loc ."extract_all_v_coeffs_svd.pl";
   my $t0 = $op->t0(); 
   my $tz = $op->tz(); 
   my $state = $op->state(); 
@@ -340,9 +342,7 @@ sub run_extract_all_v_coeffs_svd
 
   my $outfile = $opname . ".list"; 
 
-  my $run = "./${exe} $t0 $tz $state $opslistfile $opname > $outfile";
-   
-  copy_file($exe , $prog );
+  my $run = "${exe} $t0 $tz $state $opslistfile $opname > $outfile";
 
   chdir $destdir || die ( $_ ); 
 
@@ -361,7 +361,7 @@ sub run_extract_all_v_coeffs_svd
 
   chdir $base || die ( $_ );
 
-  
+
   copy_file($destdir."/".$outfile , $outfile);
 
   return $outfile; 
@@ -391,11 +391,16 @@ sub convert_proj_to_xml
 
   close OUT; 
 
-  my $exe = "convert_proj_list_to_xml.pl"; 
-  die ( "$exe not present" ) unless -f $exe; 
+## THIS IS OLD
+#  my $exe = "convert_proj_list_to_xml.pl"; 
+#  die ( "$exe not present" ) unless -f $exe; 
+#  
+#  system (" ./${exe} $listf $xmlf " ) == 0 || die ($_) ;
 
-  system (" ./${exe} $listf $xmlf " ) == 0 || die ($_) ;
-
+  my $loc = "/u/home/shultz/optimized_operators/";
+  my $exe = $loc . "convert_proj_list_to_irrep_op_xml.pl";
+  die ("$exe not present") unless -f $exe;
+  system (" cat $listf | ${exe} > $xmlf ") == 0 || die($_); 
 
   return $listf;  
 }
@@ -403,13 +408,13 @@ sub convert_proj_to_xml
 sub make_proj_plots
 {
   my $file = shift; 
-
-  my $exe = "plot_proj_op_coeffs.pl"; 
+  my $loc = "/u/home/shultz/optimized_operators/";
+  my $exe = $loc . "plot_proj_op_coeffs.pl"; 
 
   die ( "$exe not present" ) unless -f $exe; 
   die ( "input not present : $file " ) unless -f $file; 
 
-  system ( " ./${exe} $file " ) == 0 || die ($_); 
+  system ( " ${exe} $file " ) == 0 || die ($_); 
 }
 
 1;  # for require 

@@ -25,6 +25,7 @@ sub new
     NCFG => undef,
     ENSEMBLE => undef,  
     RECONDIR => undef,
+    PHASER => undef, 
     @_,
   }; ## self 
 
@@ -103,6 +104,11 @@ sub recon_dir {
   return $self->{RECONDIR};
 }
 
+sub phaser {
+  my $self = shift; 
+  if (@_) {$self->{PHASER} = shift;}
+  return $self->{PHASER};
+}
 
 #
 #
@@ -143,7 +149,8 @@ sub write_mass_overlap_xml
   my $mom = split_mom($self->mom()); 
   my $t0 = $self->t0(); 
   my $ncfg = $self->ncfg(); 
-
+  my $pid = $self->pid();
+  my $phaser = $self->phaser(); 
 
   my $massf = $self->recon_dir() . "/t0" . $t0; 
   $massf .= "/MassJackFiles/mass_t0_" . $t0 . "_reorder_"; 
@@ -166,11 +173,11 @@ sub write_mass_overlap_xml
   <ncfg>$ncfg</ncfg>
   <resize>false</resize>
   <isProjected>true</isProjected>
-  <phase_real>1.</phase_real>
+  <phase_real>$phaser</phase_real>
   <phase_imag>0.</phase_imag>
   <Z_type>2E</Z_type>
   <dbname>$db</dbname>
-  <pid>$op</pid>
+  <pid>$pid</pid>
   <LG>true</LG>
   <t0_extract>$t0</t0_extract>
   <redstar>
