@@ -26,6 +26,11 @@ nobase_include_HEADERS += radmat/fitting/axis_plotter.h radmat/fitting/fit_tins.
 #driver
 nobase_include_HEADERS += radmat/driver/radmat_driver.h radmat/driver/radmat_driver_props.h radmat/driver/radmat_single_q2_driver.h radmat/driver/radmat_driver_aux.h
 
+
+#jfit
+
+nobase_include_HEADERS += radmat/jfit/abstract_function_exit.h radmat/jfit/abstract_function_parameter_names.h
+
 #
 # Library
 #
