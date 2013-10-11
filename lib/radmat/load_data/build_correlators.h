@@ -1,6 +1,12 @@
 #ifndef BUILD_CORRELATORS_H
 #define BUILD_CORRELATORS_H
 
+/*
+ * This class is responsible for taking the ini and generating either
+ * the redstar xml we need to generate or for combining lattice data 
+ * in order to produce correlation functions corresponding to matrix
+ * elements in a cartesian basis.
+ */
 
 #include "g_parity_world_xml.h"
 #include "g_parity_world.h"

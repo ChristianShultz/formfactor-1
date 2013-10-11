@@ -18,6 +18,8 @@
 #include "semble/semble_meta.h" 
 #endif
 
+// #define DEBUGGING_ADATIO_KEYS
+
 namespace radmat
 {
 
@@ -167,12 +169,28 @@ namespace radmat
     CORRDATA  radmatAllConfDatabaseInterface<CORRKEY,CORRDATA,NORMKEY,NORMDATA>::fetch(const CORRKEY &k) const
     {
       CORRDATA eval;
+
+
+#ifdef DEBUGGING_ADATIO_KEYS
+      std::cout << __func__ << ": trying to extract key " << k 
+        << "\n" << __func__ 
+        << ": trying to allocacte a key of type ADATIO::SerialDBKey<CORRKEY> " 
+        << std::endl; 
+#endif
+
+      S_C_KEY key;
+
+#ifdef DEBUGGING_ADATIO_KEYS
+      std::cout << __func__ << ": trying to apply the equality operator " 
+                << std::endl; 
+#endif
+
+      key.key() = k;
+      std::vector<S_C_DATA> vals;
+      int ret(0);
+
       try
       {
-        S_C_KEY key;
-        key.key() = k;
-        std::vector<S_C_DATA> vals;
-        int ret(0);
         if ((ret = m_corr_db->get(key, vals)) != 0)
         {
           outlog << __func__ << ": key not found\n" << k;
@@ -200,6 +218,8 @@ namespace radmat
       {
         outlog << __func__ << ": Caught standard library exception: " << e.what() << std::endl;
         std::cerr << __func__ << ": Caught standard library exception: " << e.what() << std::endl;
+        std::cerr << __func__ << ": key -- " << key.key() << "\n vals.size = " << vals.size() 
+                  << "\n ret = " << ret << " eval.size = " << eval.size() << std::endl;
         exit(1);
       }
 

@@ -6,7 +6,7 @@
 
  * Creation Date : 25-04-2013
 
- * Last Modified : Thu May  9 16:23:42 2013
+ * Last Modified : Fri 11 Oct 2013 04:27:44 PM EDT
 
  * Created By : shultz
 
@@ -334,7 +334,10 @@ namespace radmat
     if(m.find(id) != m.end())
     {
       work.merge_subduction_lists(sink,m.find(id)->second,source,ensemble);
-      d = data_t(true,work.subduced); 
+      if ( work.subduced.size() != 0 ) 
+        d = data_t(true,work.subduced);
+      else
+        d = data_t(false,work.subduced); 
     }
     else
     {
@@ -362,6 +365,37 @@ namespace radmat
 
     orig = e; 
   }
+
+  // --
+
+  // Suppose the list is empty, we better turn it off
+
+  namespace
+  {
+    double local_zero_threshold = 0.0001; 
+
+    // look for a single non-zero coefficient
+    bool non_z(const generateCartesianRedstarXML::data_t &d) 
+    {
+      if ( !!! d.first)
+        return false; 
+
+      bool success = false; 
+
+      mergeSubducedOperators3pt::listNPointKey::const_iterator it; 
+      for(it = d.second.begin(); it != d.second.end(); ++it)
+        if ( ENSEM::toDouble(ENSEM::localNorm2(it->m_coeff)) > local_zero_threshold)
+          success = true;
+
+      return success; 
+    }
+
+    generateCartesianRedstarXML::data_t 
+     parse_zero_data(const generateCartesianRedstarXML::data_t &d)
+     {
+       return generateCartesianRedstarXML::data_t(non_z(d),d.second); 
+     } 
+  } // anonomyous 
 
   // --
 
@@ -401,7 +435,8 @@ namespace radmat
         ret.second = ret.second 
           + generateCartesianRedstarXML::objNPointKey(map_it->second.first,map_it->second.second);
 
-      return ret; 
+      // remove zeros
+      return parse_zero_data(ret); 
     } 
 
   void generateCartesianRedstarXML::generate_subduction_list(
@@ -412,47 +447,50 @@ namespace radmat
     tmp.generate_subduction_list(e); 
 
     // time is simple
-    t = tmp.time;
+    t = combine_duplicates(data_t(tmp.time.first,tmp.time.second));
 
-    // space is not hard  
-    ADATXML::Array<int> q = e.insertion.mom;
-    itpp::Mat<std::complex<double> > M = invert2Cart(q,e.insertion.create()); 
+        // space is not hard  
+        ADATXML::Array<int> q = e.insertion.mom;
+        itpp::Mat<std::complex<double> > M = invert2Cart(q,e.insertion.create()); 
 
-    itpp::Vec<bool> circb(3), cartb;
-    circb[0] = tmp.plus.first;
-    circb[1] = tmp.zero.first;
-    circb[2] = tmp.minus.first;
+        itpp::Vec<bool> circb(3), cartb;
+        circb[0] = tmp.plus.first;
+        circb[1] = tmp.zero.first;
+        circb[2] = tmp.minus.first;
 
-    itpp::Vec<listNPointKey> circl(3), cartl;
-    circl[0] = tmp.plus.second;
-    circl[1] = tmp.zero.second;
-    circl[2] = tmp.minus.second;
+        itpp::Vec<listNPointKey> circl(3), cartl;
+        circl[0] = tmp.plus.second;
+        circl[1] = tmp.zero.second;
+        circl[2] = tmp.minus.second;
 
-    cartb = M * circb; 
-    cartl = M * circl; 
+        cartb = M * circb; 
+        cartl = M * circl; 
 
 #if 0
-    std::cout << __func__ << std::endl;
+        std::cout << __func__ << std::endl;
 
-    std::cout << M << std::endl;
+        std::cout << M << std::endl;
 
-    //  std::cout << e << std::endl;
+        //  std::cout << e << std::endl;
 
-    std::cout << " pos " << tmp.plus.first << std::endl;
-    screen_dump( circl[0] );
+        std::cout << " pos " << tmp.plus.first << std::endl;
+        screen_dump( circl[0] );
 
-    std::cout << " zero " << tmp.zero.first << std::endl;
-    screen_dump( circl[1] );
+        std::cout << " zero " << tmp.zero.first << std::endl;
+        screen_dump( circl[1] );
 
-    std::cout << " neg " << tmp.minus.first << std::endl;
-    screen_dump( circl[2] );
+        std::cout << " neg " << tmp.minus.first << std::endl;
+        screen_dump( circl[2] );
 #endif
 
-    x = combine_duplicates(data_t(cartb[0],cartl[0]));
-    y = combine_duplicates(data_t(cartb[1],cartl[1]));
-    z = combine_duplicates(data_t(cartb[2],cartl[2])); 
+        x = combine_duplicates(data_t(cartb[0],cartl[0]));
+        y = combine_duplicates(data_t(cartb[1],cartl[1]));
+        z = combine_duplicates(data_t(cartb[2],cartl[2])); 
 
-    orig = e; 
+        // check that we got rid of any zero coeffs and any empty lists
+
+
+        orig = e; 
   }
 
 

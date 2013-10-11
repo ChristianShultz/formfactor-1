@@ -6,7 +6,7 @@
 
  * Creation Date : 22-02-2013
 
- * Last Modified : Tue 01 Oct 2013 03:04:05 PM EDT
+ * Last Modified : Fri 11 Oct 2013 04:38:53 PM EDT
 
  * Created By : shultz
 
@@ -246,13 +246,13 @@ namespace radmat
     return success; 
   }
 
-  
+
   void LLSQMultiDriver_t::splash_tags(void) const
   {
     lattice_data->splash_tags(); 
   }
 
-  
+
   void LLSQMultiDriver_t::sort_data(void)
   {
     ADAT::Handle<LLSQLatticeMultiData> sorted_data(new LLSQLatticeMultiData); 
@@ -338,7 +338,7 @@ namespace radmat
        std::cout << SEMBLE::mean(non_zero_data->data()) << std::endl;
        std::cout << "old_tags.size() = " << sz 
        << " zeroed_elems.size() = " << zeroed_elems.size() << std::endl;
-     */
+       */
 
     lattice_data = non_zero_data;
 
@@ -462,7 +462,7 @@ namespace radmat
 
   void LLSQMultiDriver_t::save_llsq_state(const std::string &path) const
   {
-    std::cout << __func__ << ": entering" << std::endl; 
+    //    std::cout << __func__ << ": entering" << std::endl; 
     check_exit_lat();
     std::stringstream ss; 
     ss << path << "state_database.rad"; 
@@ -500,7 +500,7 @@ namespace radmat
        std::cout << "Kinv = \n" << Kinv.mean() << std::endl;
        std::cout << "lat = \n" << SEMBLE::mean(lattice_data->data()) << std::endl;
        std::cout << "FF = \n" << FF_t.mean() << std::endl;
-     */
+       */
 
     return success; 
   }

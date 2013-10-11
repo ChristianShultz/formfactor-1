@@ -6,7 +6,7 @@
 
  * Creation Date : 04-12-2012
 
- * Last Modified : Tue 01 Oct 2013 10:55:48 AM EDT
+ * Last Modified : Fri 11 Oct 2013 04:31:50 PM EDT
 
  * Created By : shultz
 
@@ -41,8 +41,9 @@
 #include <omp.h>
 
 
-#define BUILD_CORRELATORS_PARALLEL
+ #define BUILD_CORRELATORS_PARALLEL
 
+// #define DEBUG_BUILD_LLSQ_DATA
 
 namespace radmat
 {
@@ -391,6 +392,10 @@ namespace radmat
         listCoeffKey::const_iterator it;
         bool success = true; 
 
+#ifdef DEBUG_BUILD_LLSQ_DATA
+        int counter = 1; 
+#endif 
+
         for(it = data.begin(); it != data.end(); ++it)
         {
           if(!!!db.exists(it->m_obj.npt))
@@ -399,6 +404,12 @@ namespace radmat
             m_bad_norms.push_back(it->m_obj.source);
           if(!!!db.exists(it->m_obj.sink))
             m_bad_norms.push_back(it->m_obj.sink);
+
+#ifdef DEBUG_BUILD_LLSQ_DATA 
+          std::cout << __func__ << " check # " << counter << " of " 
+            << data.size() << " checked for " << it->m_obj.npt << std::endl; 
+          ++counter;
+#endif
         }
 
         // break early if not successful 
@@ -407,6 +418,15 @@ namespace radmat
 
         if(!!!m_bad_norms.empty())
           success = false; 
+
+        // this shouldn't happen but would 
+        // probably cause some nasty if it did
+        if(data.begin() == data.end())
+        {
+          std::cerr << __func__ << ": somehow you pumped in an empty guy" 
+            << " I will try to continue" << std::endl;
+          success = false; 
+        }
 
         ret.success = success;
 
@@ -447,6 +467,9 @@ namespace radmat
 
         for(it = data.begin(); it != data.end(); ++it)
         {
+#ifdef DEBUG_BUILD_LLSQ_DATA 
+          std::cout << "\n\n" << __func__ << ": BUILDING " << it->m_obj.npt << std::endl; 
+#endif
           ENSEM::EnsemVectorComplex corr_tmp = db.fetch(it->m_obj.npt);
           RadmatMassOverlapData_t source = db.fetch(it->m_obj.source); 
           RadmatMassOverlapData_t sink = db.fetch(it->m_obj.sink); 
@@ -468,11 +491,10 @@ namespace radmat
           // the hadron key uses 1 based arrays
 
           // NB: assumption that npt is organized like <sink, ins , source>
-
           const int t_source(it->m_obj.npt.npoint[3].t_slice);
           const int t_sink(it->m_obj.npt.npoint[1].t_slice); 
 
-
+          // sanity
           POW2_ASSERT(t_source < t_sink); 
 
 
@@ -527,13 +549,14 @@ namespace radmat
           ret.data = corr / Z_t;
         else
           ret.data = corr / Z_s;  
+
         ret.tag.E_f = E_f;
         ret.tag.E_i = E_i;
 
 
-
-        //  std::cout << __func__ << ": " << ret.tag.splash_tag() << std::endl;
-
+#ifdef DEBUG_BUILD_LLSQ_DATA 
+        std::cout << __func__ << ": " << ret.tag.splash_tag() << std::endl;
+#endif
 
         return ret;
       };
@@ -559,6 +582,8 @@ namespace radmat
 
         for(it = e.begin(); it != e.end(); ++it)
         {
+          if(!!!it->have_active_data) 
+            continue; 
           build_correlator_return_value tmp;
           tmp = build_a_correlator(m_bad_corrs,
               m_bad_norms,
@@ -687,7 +712,6 @@ namespace radmat
 #ifdef BUILD_CORRELATORS_PARALLEL
       ret = build_llsq_data_parallel(sorted_elements,m_ini);
 #else  
-
 
       // loop and get the actual numbers to load into the llsq
       for(sorted_it = sorted_elements.begin(); sorted_it != sorted_elements.end(); ++sorted_it)

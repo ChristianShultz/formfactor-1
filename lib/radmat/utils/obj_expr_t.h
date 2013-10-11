@@ -41,6 +41,7 @@ namespace radmat
       void clear(void) {m_expr.clear();}
       const_iterator begin(void) const {return m_expr.begin();}
       const_iterator end(void) const {return m_expr.end();}
+      int size(void) {return m_expr.size();}
 
       List_t m_expr;
     };

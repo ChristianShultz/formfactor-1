@@ -13,16 +13,16 @@
     <baseProp>CompareFitsByChisqPerNDoF</baseProp>
 
     <!-- add some bias function to the comparator as 
-         a function of fit range (try to bias toward middle?) -->
+    a function of fit range (try to bias toward middle?) -->
     <biasProp>none</biasProp>     
 
     <!-- multiply extra bits on the comparator 
-         ie smaller errors on the constant etc -->
+    ie smaller errors on the constant etc -->
     <extraProps>         
     </extraProps>                                       
 
     <!-- fit range, should be less than 
-         or equal to correlator length --> 
+    or equal to correlator length --> 
     <tlow>0</tlow>       
     <thigh>32</thigh>
 
@@ -77,12 +77,34 @@
             <H></H>
             <parity>true</parity>
             <photons>
+
+              <!--  NB:
+
+              Isospin 1, Iz = 0 mesons have a factor of 1/2 from redstar            
+              the photon current is represented as:
+              0.5(q_u - q_d) * Isospin1 + 0.5(q_u + q_d)*Isospin0
+
+              Isospin 1, Iz = 0 mesons have a factor of 1/2 from redstar    
+              which means that their charge coefficient should be 1 
+
+              Isospin 0 mesons have a factor of 1/root(2) from redstar
+              which means that their charge factor should be 1/(3*root(2))         
+
+              -->
+
               <elem> 
                 <charge_coefficient>1.</charge_coefficient>  <!-- a prefactor for this op -->
                 <op_stem>b_b0xD0_J0__J0</op_stem>
                 <twoI_z>0</twoI_z>
               </elem>            
             </photons>
+
+            <elem> 
+              <charge_coefficient>0.23570226</charge_coefficient>  <!-- a prefactor for this op -->
+              <op_stem>hl_b0xD0_J0__J0</op_stem>
+              <twoI_z>0</twoI_z>
+            </elem>            
+
             <creation_op>true</creation_op>
             <smearedP>false</smearedP>
           </time>
@@ -95,6 +117,11 @@
               <elem>
                 <charge_coefficient>1.</charge_coefficient>
                 <op_stem>rho_rhoxD0_J0__J1</op_stem>
+                <twoI_z>0</twoI_z>
+              </elem>
+              <elem>
+                <charge_coefficient>0.23570226</charge_coefficient>
+                <op_stem>omegal_rhoxD0_J0__J1</op_stem>
                 <twoI_z>0</twoI_z>
               </elem>
             </photons>
@@ -140,11 +167,11 @@
       <gParitySymmetry>false</gParitySymmetry>
 
       <!-- there is a flavor space factor from the wick contraction
-           as well as the standard vector current renormalization -->
+      as well as the standard vector current renormalization -->
       <renormalization>
-        <RGE_prop>4.</RGE_prop>
-        <Z_t>1.</Z_t>
-        <Z_s>1.</Z_s>
+        <RGE_prop>4.</RGE_prop>  <!-- be wary of this stupid ass factor -->
+        <Z_t>1.039</Z_t>
+        <Z_s>1.184</Z_s>
       </renormalization>
 
     </threePointCorrXMLIni>

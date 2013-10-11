@@ -23,7 +23,7 @@ foreach (@dat)
 
 @stems = sort{do_split_last($a) <=> do_split_last($b)}  @stems;
 
-#print @stems;
+# print @stems;
 
 my %Q2 = ();
 
@@ -108,7 +108,7 @@ sub chunk
   my ($num,@stems) = @_; 
   my $n2 = $num*$num;
   my $nchunk = ceil($#stems/$n2); 
-  @chunks = ();
+  my @chunks = ();
 
   for my $i(0..$nchunk-1)
   {
@@ -116,12 +116,12 @@ sub chunk
 
     for my $idx(0..$n2-1)
     {
-      push @this_chunk , @stems[$i*$n2 + $idx] unless $i*$n2 + $idx > $#stems;
+      push @this_chunk , $stems[$i*$n2 + $idx] unless $i*$n2 + $idx > $#stems;
     }
 
     push @chunks , \@this_chunk;
-}
-return \@chunks; 
+  }
+  return \@chunks; 
 }
 
 

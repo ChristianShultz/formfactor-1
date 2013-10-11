@@ -1,6 +1,18 @@
 #ifndef G_PARITY_WORLD_GENERATE_REDSTAR_XML_H
 #define G_PARITY_WORLD_GENERATE_REDSTAR_XML_H
 
+/*
+ * The set of related classes in this file essential form the dictionary 
+ * that tells us how to move from our interal representation of a matrix
+ * element to the redstar definition, ie helicity as a sum over different
+ * projections of the cubic irrep. 
+ *
+ * We then transform the vector current from the helicity basis to a
+ * cartesian basis in order to line up with the decompositions we write 
+ * down in the cartesian basi.s
+ *
+ */
+
 
 #include "g_parity_world.h"
 #include "radmat/utils/obj_expr_t.h"
