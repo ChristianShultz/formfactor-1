@@ -6,7 +6,7 @@
 
  * Creation Date : 04-12-2012
 
- * Last Modified : Fri 11 Oct 2013 04:31:50 PM EDT
+ * Last Modified : Mon 14 Oct 2013 11:08:08 AM EDT
 
  * Created By : shultz
 
@@ -598,6 +598,8 @@ namespace radmat
           if(tmp.success)
             any_data = true; 
         }
+
+        any_data &= !!!ret->empty(); 
 
         bad_data_repository.insert(omp_get_thread_num(),m_bad_corrs); 
         bad_data_repository.insert(omp_get_thread_num(),m_bad_norms); 

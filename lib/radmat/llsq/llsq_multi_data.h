@@ -45,7 +45,8 @@ namespace radmat
       typename SEMBLE::PromoteEnsemVec<ST>::Type get_row_ensem(const int row) const;
 
       int nrows(void) const {return m_data.getN();}
-      int ncols(void) const {return m_data.getN();}
+      int ncols(void) const {return m_data.getM();}
+      bool empty(void) const {return ( m_data.getN() == 0 );}
 
       const TT& get_tag(const int idx) const; 
       TT& get_tag(const int idx); 

@@ -1,7 +1,7 @@
 #!/usr/bin/perl -w
 
 BEGIN{
-  push (@INC, "/Users/shultz/jlab/scripts");
+  push (@INC, "/u/home/shultz/git/radmat/scripts/three_point/check");
 }
 
 

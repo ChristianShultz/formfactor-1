@@ -6,7 +6,7 @@
 
  * Creation Date : 22-02-2013
 
- * Last Modified : Fri 11 Oct 2013 04:38:53 PM EDT
+ * Last Modified : Mon 14 Oct 2013 10:59:25 AM EDT
 
  * Created By : shultz
 
@@ -301,6 +301,13 @@ namespace radmat
     old_tags = lattice_data->tags(); 
 
     const unsigned int sz = old_tags.size(); 
+
+    if ( sz == 0 ) 
+      {
+        std::cerr << __func__ << "no tags?? " << std::endl; 
+        return false; 
+      }
+
 
     // std::cout << __func__ << "trying to call " << old_tags.begin()->mat_elem_id << std::endl;
 
