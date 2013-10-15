@@ -27,7 +27,7 @@ namespace radmat
 
     void solve_llsq(const std::string &soln_ID);
     void fit_data(const ThreePointComparatorProps_t &fitProps);
-    void chisq_analysis(void);
+    void chisq_analysis(const int tlow, const int thigh);
 
     ENSEM::EnsemReal Q2(void) const; 
     std::pair<ENSEM::EnsemReal, SEMBLE::SembleVector<double> > fetchFF(void) const;

@@ -29,6 +29,7 @@
     <minTSlice>7</minTSlice>
   </threePointComparatorProps>
 
+  <chisq>none</chisq>
   <dbfile>state_database.rad</dbfile>
   <solnID>SVDNonSquare</solnID>
   <lat_elems>0 1 2 3 4</lat_elems>

@@ -34,7 +34,7 @@ namespace jFit
         const int line, 
         const char *msg) const
     {
-      if ( ! bin ) 
+      if ( bin ) 
         exit_message(prettyFunction,file,line,msg); 
     }
 
@@ -44,7 +44,7 @@ namespace jFit
         const int line, 
         const std::string &msg) const
     {
-      if ( ! bin )
+      if ( bin )
         exit_message(prettyFunction,file,line,msg); 
     }
 

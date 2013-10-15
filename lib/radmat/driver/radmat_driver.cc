@@ -6,7 +6,7 @@
 
  * Creation Date : 25-02-2013
 
- * Last Modified : Tue 01 Oct 2013 02:50:25 PM EDT
+ * Last Modified : Mon 14 Oct 2013 06:55:14 PM EDT
 
  * Created By : shultz
 
@@ -522,11 +522,19 @@ namespace radmat
 
   void RadmatDriver::do_chisq_analysis(void)
   {
+    if ( m_ini.chisq == "none") 
+      return ;
+
     check_exit_fit();
 
     int idx, sz = multi_lattice_data.size(); 
 
     std::cout << "chisq_analysis" << std::endl;
+
+    int low, high ; 
+    low = m_ini.threePointComparatorProps.tlow; 
+    high = m_ini.threePointComparatorProps.thigh;
+
 
     Util::StopWatch my_stopwatch; 
     my_stopwatch.start(); 
@@ -540,7 +548,7 @@ namespace radmat
     // POSSIBLE PARALLEL HERE
     for(idx = 0; idx < sz; ++idx)
       if(good_qs[idx])
-        linear_systems_of_Q2[idx].chisq_analysis();
+        linear_systems_of_Q2[idx].chisq_analysis(low,high);
 
 #pragma omp barrier
 

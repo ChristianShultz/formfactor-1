@@ -6,7 +6,7 @@
 
  * Creation Date : 25-02-2013
 
- * Last Modified : Tue 01 Oct 2013 04:48:30 PM EDT
+ * Last Modified : Tue 15 Oct 2013 01:46:44 PM EDT
 
  * Created By : shultz
 
@@ -46,6 +46,7 @@ namespace
   struct SingleQ2Prop_t
   {
     ThreePointComparatorProps_t threePointComparatorProps;
+    std::string chisq;
     std::string dbfile; 
     std::string solnID; 
     ADATXML::Array<int> lat_elems; 
@@ -54,6 +55,7 @@ namespace
   void read(ADATXML::XMLReader &xml, const std::string &pth, SingleQ2Prop_t &p) 
   {
     doXMLRead(xml,"threePointComparatorProps",p.threePointComparatorProps,__PRETTY_FUNCTION__); 
+    doXMLRead(xml,"chisq",p.chisq,__PRETTY_FUNCTION__); 
     doXMLRead(xml,"dbfile",p.dbfile,__PRETTY_FUNCTION__); 
     doXMLRead(xml,"solnID",p.solnID,__PRETTY_FUNCTION__); 
     doXMLRead(xml,"lat_elems",p.lat_elems,__PRETTY_FUNCTION__); 
@@ -129,8 +131,10 @@ int main(int argc, char *argv[])
 
   my_driver.fit_data(ini.threePointComparatorProps);
 
-  my_driver.chisq_analysis(); 
-  
+  if ( ini.chisq != std::string("none") ) 
+    my_driver.chisq_analysis(ini.threePointComparatorProps.tlow,
+        ini.threePointComparatorProps.thigh); 
+
 
   return 0;
 }

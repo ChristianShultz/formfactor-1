@@ -6,68 +6,101 @@
 #include <vector>
 #include <sstream>
 #include "abstract_function_exit.h"
-
+#include "abstract_function_parameter_container.h"
 
 namespace jFit
 {
 
+
+  // a hacky way to avoid ambiguous base classes
   template<unsigned short NP>
-    struct AbstractFitFunctionNames  : public AbstractFitFunctionExit
+    struct AbstractFitFunctionNames_prim  : public AbstractFitFunctionParameterContainer<std::string,NP>
   {
-    AbstractFitFunctionNames(void)
+
+    typedef AbstractFitFunctionParameterContainer<std::string,NP> AbsBase;
+
+    AbstractFitFunctionNames_prim(void)
+      :AbsBase()
+    { }
+
+    AbstractFitFunctionNames_prim(const std::string &s)
+      :AbsBase(s)
+    { }
+
+    ~AbstractFitFunctionNames_prim(void) {}
+
+    virtual void setParNames_prim(const std::vector<std::string> &names)
     {
-      parNames.resize(NP,"default"); 
+      AbsBase::set(names); 
     }
 
-    ~AbstractFitFunctionNames(void) {}
-
-    virtual void setParNames(const std::vector<std::string> &names)
+    virtual void setParName_prim(const int parNum , const std::string &name)
     {
-      parNames = names; 
+      AbsBase::set(parNum,name); 
     }
 
-    virtual void setParName(const int parNum , const std::string &name)
-    {
-      boolean_exit_message( parNum > NP ,
-          __PRETTY_FUNCTION__, 
-          __FILE__ , 
-          __LINE__ , 
-          "parNum was larger than nPar");
+    virtual std::vector<std::string> getParNames_prim(void) const {return AbsBase::get();}
 
-      parNames[parNum] = name;  
+    virtual std::string getParName_prim(const int parNum) const
+    {
+      return AbsBase::get(parNum); 
     }
 
-    virtual std::vector<std::string> getParNames(void) const {return parNames;}
-
-    virtual std::string getParName(const int parNum) const
+    virtual int getParNum_prim(const std::string &name) const 
     {
-      boolean_exit_message( parNum > NP ,
-          __PRETTY_FUNCTION__, 
-          __FILE__ , 
-          __LINE__ , 
-          "parNum was larger than nPar");
-
-      return parNames[parNum]; 
+      return AbsBase::match(name); 
     }
 
-    virtual int getParNum(const std::string &name) const 
-    {
-      for (int i = 0; i < NP; ++i)
-        if ( parNames[i] == name ) 
-          return i;
-
-      std::stringstream ss; 
-        ss << "unable to match " << name << std::endl ; 
-
-      exit_message(__PRETTY_FUNCTION__, 
-          __FILE__ , 
-          __LINE__ , 
-          ss.str() );
-
-    }
-
-    std::vector<std::string> parNames; 
   };
+
+
+  // relabel names from above
+
+
+  template<unsigned short NP>
+    struct AbstractFitFunctionNames 
+    : public AbstractFitFunctionNames_prim<NP>
+    {
+
+      typedef AbstractFitFunctionNames_prim<NP> AbsBase;
+
+
+      AbstractFitFunctionNames(void)
+        :AbsBase()
+      { }
+
+      AbstractFitFunctionNames(const std::string &s)
+        :AbsBase(s)
+      { }
+
+      ~AbstractFitFunctionNames(void) {}
+
+      virtual void setParNames(const std::vector<std::string> &names)
+      {
+        AbsBase::setParNames_prim(names); 
+      }
+
+      virtual void setParName(const int parNum , const std::string &name)
+      {
+        AbsBase::setParName_prim(parNum,name); 
+      }
+
+      virtual std::vector<std::string> getParNames(void) const 
+      {
+        return AbsBase::getParNames_prim();
+      }
+
+      virtual std::string getParName(const int parNum) const
+      {
+        return AbsBase::getParName_prim(parNum); 
+      }
+
+      virtual int getParNum(const std::string &name) const 
+      {
+        return AbsBase::getParNum_prim(name); 
+      }
+
+    };
 
 
 } // jFit

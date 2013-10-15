@@ -29,8 +29,7 @@ nobase_include_HEADERS += radmat/driver/radmat_driver.h radmat/driver/radmat_dri
 
 #jfit
 
-nobase_include_HEADERS += radmat/jfit/abstract_function_exit.h radmat/jfit/abstract_function_parameter_names.h
-
+# nobase_include_HEADERS += radmat/jfit/abstract_function_default_errors.h radmat/jfit/abstract_function_default_values.h radmat/jfit/abstract_function_exit.h radmat/jfit/abstract_function.h radmat/jfit/abstract_function_named_parameter_container.h radmat/jfit/abstract_function_parameter_container.h radmat/jfit/abstract_function_parameter_fixing.h radmat/jfit/abstract_function_parameter_limits.h radmat/jfit/abstract_function_parameter_names.h
 #
 # Library
 #

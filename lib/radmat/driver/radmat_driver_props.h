@@ -12,6 +12,8 @@ namespace radmat
   {
     ThreePointComparatorProps_t threePointComparatorProps;
     ThreePointCorrIni_t threePointIni;  
+    
+    std::string chisq;
     int version; 
     int maxThread;                        // # < 1 does nothing , #>= 1 sets nthread to # 
     double poleMass;                      // does the analytic continuation exist?  this is the lightest vector state

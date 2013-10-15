@@ -6,7 +6,7 @@
 
  * Creation Date : 25-02-2013
 
- * Last Modified : Tue 01 Oct 2013 04:22:06 PM EDT
+ * Last Modified : Mon 14 Oct 2013 06:53:15 PM EDT
 
  * Created By : shultz
 
@@ -147,21 +147,25 @@ namespace radmat
   }
 
 
-  void RadmatSingleQ2Driver::chisq_analysis(void)
+  void RadmatSingleQ2Driver::chisq_analysis(const int tlows, const int thighs)
   {
     check_exit_fits();
-    std::cerr << __func__ 
-      << ": warning, there is a stupid hardwire here that needs to be updated" << std::endl;
 
-    int tlow = 10;
-    int thigh = 24; 
+    int tlow = tlows; 
+    int thigh = thighs; 
 
     for(int fn = 0; fn < fit_across_time.nFF(); ++fn)
     {
       ADAT::Handle<FitThreePoint> some_fit = fit_across_time.getFit(fn); 
-      std::string fit_name = some_fit->getFitName();
-      std::cout << __func__ << " fit name " << fit_name << std::endl;
+        if ( some_fit->tlow() > tlow) 
+          tlow = some_fit->tlow(); 
+
+        if ( some_fit->thigh() < thigh)
+          thigh = some_fit->thigh();
+
     }
+
+    std::cout << __func__ << ": using range [" << tlow << "," << thigh << "]" << std::endl; 
 
     SEMBLE::SEMBLEIO::makeDirectoryPath(base_path() + std::string("chisq/"));
     linear_system.chisq_analysis( fit_across_time.fetchFF().second,

@@ -6,7 +6,7 @@
 
 * Creation Date : 29-11-2012
 
-* Last Modified : Mon 30 Sep 2013 11:06:09 AM EDT
+* Last Modified : Mon 14 Oct 2013 06:12:21 PM EDT
 
 * Created By : shultz
 
@@ -47,6 +47,7 @@ namespace radmat
       ss << "version = " << prop.version; 
       ss << "\nthreePointComparatorProps = " << prop.threePointComparatorProps;
       ss << "\nthreePointIni = " << prop.threePointIni;
+      ss << "\nchisq = " << prop.chisq; 
       ss << "\nmaxThread = " << prop.maxThread; 
       ss << "\npoleMass^2 = " <<  prop.poleMass; 
       return ss.str(); 
@@ -82,6 +83,7 @@ namespace radmat
     check_version(prop.version); 
 
     doXMLRead(ptop,"threePointComparatorProps",prop.threePointComparatorProps,__PRETTY_FUNCTION__);
+    doXMLRead(ptop,"chisq",prop.chisq,__PRETTY_FUNCTION__);
     doXMLRead(ptop,"threePointIni",prop.threePointIni,__PRETTY_FUNCTION__);
     doXMLRead(ptop,"maxThread",prop.maxThread,__PRETTY_FUNCTION__);
     
