@@ -6,7 +6,7 @@
 
 * Creation Date : 22-04-2013
 
-* Last Modified : Thu May  2 16:09:59 2013
+* Last Modified : Tue 15 Oct 2013 07:48:41 PM EDT
 
 * Created By : shultz
 
@@ -44,7 +44,7 @@ inp usage(int argc, char *argv[])
 {
   if( (argc != 11) && (argc != 12) ) 
   {
-    std::cerr << "usage: grab ff <matElemID> <m_f> <nx ny nz>  <m_i> <nx ny, nz> <2pi/xi/nspace>  <optional jmu>" << std::endl;
+    std::cerr << "usage: <grab_ff> <matElemID> <m_f> <nx ny nz>  <m_i> <nx ny, nz> <2pi/xi/nspace>  <optional jmu>" << std::endl;
     exit(1); 
   }
 
@@ -81,6 +81,8 @@ inp usage(int argc, char *argv[])
     
     do_boost(foo.pf);
     do_boost(foo.pi); 
+
+    foo.jmu = false; 
 
     if(argc == 12)
     {
