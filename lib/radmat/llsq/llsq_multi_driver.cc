@@ -6,7 +6,7 @@
 
  * Creation Date : 22-02-2013
 
- * Last Modified : Mon 14 Oct 2013 10:59:25 AM EDT
+ * Last Modified : Tue 15 Oct 2013 02:05:10 PM EDT
 
  * Created By : shultz
 
@@ -303,10 +303,10 @@ namespace radmat
     const unsigned int sz = old_tags.size(); 
 
     if ( sz == 0 ) 
-      {
-        std::cerr << __func__ << "no tags?? " << std::endl; 
-        return false; 
-      }
+    {
+      std::cerr << __func__ << "no tags?? " << std::endl; 
+      return false; 
+    }
 
 
     // std::cout << __func__ << "trying to call " << old_tags.begin()->mat_elem_id << std::endl;
@@ -349,9 +349,8 @@ namespace radmat
 
     lattice_data = non_zero_data;
 
-
     // warn that we are killing this data point 
-    if(non_zero_data->ncols() > non_zero_data->nrows())
+    if(non_zero_data->nrows() >= KJunk.nFacs())
     {
       std::cout << __func__ << ": not enough data points to solve the llsq" << std::endl;
       std::cout << "passed in " << sz << " elements of which " << zeroed_data.nrows() 
@@ -359,7 +358,7 @@ namespace radmat
         << non_zero_data->nrows() << "elements " << std::endl;
     }
 
-    return ( non_zero_data->ncols() <= non_zero_data->nrows() ); 
+    return (non_zero_data->nrows() >= KJunk.nFacs());
   }
 
 
