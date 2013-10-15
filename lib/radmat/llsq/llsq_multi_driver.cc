@@ -6,7 +6,7 @@
 
  * Creation Date : 22-02-2013
 
- * Last Modified : Tue 15 Oct 2013 02:05:10 PM EDT
+ * Last Modified : Tue 15 Oct 2013 02:22:51 PM EDT
 
  * Created By : shultz
 
@@ -350,11 +350,11 @@ namespace radmat
     lattice_data = non_zero_data;
 
     // warn that we are killing this data point 
-    if(non_zero_data->nrows() >= KJunk.nFacs())
+    if(non_zero_data->nrows() < KJunk.nFacs())
     {
       std::cout << __func__ << ": not enough data points to solve the llsq" << std::endl;
       std::cout << "passed in " << sz << " elements of which " << zeroed_data.nrows() 
-        << " failed the zero test, needed " << non_zero_data->ncols() << " elems, had " 
+        << " failed the zero test, needed " << KJunk.nFacs() << " elems, had " 
         << non_zero_data->nrows() << "elements " << std::endl;
     }
 

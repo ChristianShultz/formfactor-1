@@ -6,7 +6,7 @@
 
  * Creation Date : 25-02-2013
 
- * Last Modified : Tue 15 Oct 2013 01:46:44 PM EDT
+ * Last Modified : Tue 15 Oct 2013 02:29:35 PM EDT
 
  * Created By : shultz
 
@@ -121,16 +121,28 @@ int main(int argc, char *argv[])
     exit(1);
   }
 
+ // driver
   radmat::RadmatSingleQ2Driver my_driver;
 
+  // get the lattice elems as a function of insertion time from 
+  // the database that was saved in the orig run 
   pull_elems(foo,ini); 
 
+  // check that we can load the thing
   POW2_ASSERT( my_driver.load_llsq(foo) ); 
 
+  // solve the linear system 
   my_driver.solve_llsq(ini.solnID); 
 
+  // fit out the insertion time dependence
   my_driver.fit_data(ini.threePointComparatorProps);
 
+  // do the component plots 
+  my_driver.dump_fits(); 
+
+  // skip doing chisq -- or do it if you have a bunch of free time
+  // but if you have that much free time you should do someting 
+  // more productive with it
   if ( ini.chisq != std::string("none") ) 
     my_driver.chisq_analysis(ini.threePointComparatorProps.tlow,
         ini.threePointComparatorProps.thigh); 
