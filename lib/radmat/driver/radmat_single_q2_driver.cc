@@ -6,7 +6,7 @@
 
  * Creation Date : 25-02-2013
 
- * Last Modified : Mon 14 Oct 2013 06:53:15 PM EDT
+ * Last Modified : Thu 17 Oct 2013 12:59:26 PM EDT
 
  * Created By : shultz
 
@@ -128,7 +128,9 @@ namespace radmat
   }
 
 
-  void RadmatSingleQ2Driver::fit_data(const ThreePointComparatorProps_t &fit_props)
+  void RadmatSingleQ2Driver::fit_data(const ThreePointComparatorProps_t &fit_props, 
+      const int tsrc,
+      const int tsnk)
   {
     check_exit_linear_system();
     check_exit_solved_llsq(); 
@@ -142,7 +144,9 @@ namespace radmat
     SEMBLE::SEMBLEIO::makeDirectoryPath(base_path() + std::string("t_ins_fits/"));
     fit_across_time.fit<std::complex<double> >(base_path() + std::string("t_ins_fits/"),
         tmp,
-        fit_props);
+        fit_props,
+        tsrc,
+        tsnk);
     init_fits = true; 
   }
 
@@ -197,7 +201,7 @@ namespace radmat
     std::stringstream ss;
 
     for(it = tt.begin(); it != tt.end(); ++it)
-      ss << qq << " (tag val = " <<  linear_system.qsq_label() << ") " << it->file_id << std::endl;
+      ss << qq << " (tag val = " <<  linear_system.qsq_sort() << ") " << it->file_id << std::endl;
 
     return ss.str(); 
   }
@@ -243,7 +247,7 @@ namespace radmat
   {
 
     std::stringstream ss; 
-    ss << SEMBLE::SEMBLEIO::getPath() << "Q2_" << linear_system.qsq_label() << "/";
+    ss << SEMBLE::SEMBLEIO::getPath() << "Q2_" << linear_system.qsq_sort() << "/";
     SEMBLE::SEMBLEIO::makeDirectoryPath(ss.str());
     return ss.str(); 
   }

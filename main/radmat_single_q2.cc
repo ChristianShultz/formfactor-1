@@ -6,7 +6,7 @@
 
  * Creation Date : 25-02-2013
 
- * Last Modified : Tue 15 Oct 2013 02:29:35 PM EDT
+ * Last Modified : Wed 16 Oct 2013 02:05:45 PM EDT
 
  * Created By : shultz
 
@@ -46,6 +46,8 @@ namespace
   struct SingleQ2Prop_t
   {
     ThreePointComparatorProps_t threePointComparatorProps;
+    int tsrc;
+    int tsnk; 
     std::string chisq;
     std::string dbfile; 
     std::string solnID; 
@@ -55,6 +57,8 @@ namespace
   void read(ADATXML::XMLReader &xml, const std::string &pth, SingleQ2Prop_t &p) 
   {
     doXMLRead(xml,"threePointComparatorProps",p.threePointComparatorProps,__PRETTY_FUNCTION__); 
+    doXMLRead(xml,"tsrc",p.tsrc,__PRETTY_FUNCTION__); 
+    doXMLRead(xml,"tsnk",p.tsnk,__PRETTY_FUNCTION__); 
     doXMLRead(xml,"chisq",p.chisq,__PRETTY_FUNCTION__); 
     doXMLRead(xml,"dbfile",p.dbfile,__PRETTY_FUNCTION__); 
     doXMLRead(xml,"solnID",p.solnID,__PRETTY_FUNCTION__); 
@@ -135,7 +139,7 @@ int main(int argc, char *argv[])
   my_driver.solve_llsq(ini.solnID); 
 
   // fit out the insertion time dependence
-  my_driver.fit_data(ini.threePointComparatorProps);
+  my_driver.fit_data(ini.threePointComparatorProps,ini.tsrc,ini.tsnk);
 
   // do the component plots 
   my_driver.dump_fits(); 

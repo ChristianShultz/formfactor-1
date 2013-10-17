@@ -6,7 +6,7 @@
 
  * Creation Date : 01-08-2012
 
- * Last Modified : Mon 30 Sep 2013 05:11:52 PM EDT
+ * Last Modified : Thu 17 Oct 2013 10:41:02 AM EDT
 
  * Created By : shultz
 
@@ -115,7 +115,9 @@ namespace radmat
   template<>
     void TinsFitter::fit<double>(const std::string &fname, 
         const LLSQRet_ff_Q2Pack<double> &pack,
-        const ThreePointComparatorProps_t &fitProps)
+        const ThreePointComparatorProps_t &fitProps,
+        const int tsrc, 
+        const int tsnk)
     {
       const unsigned int sz = pack.size();
       const int nbins = pack.Q2().size();
@@ -125,7 +127,7 @@ namespace radmat
       LLSQRet_ff_Q2Pack<double>::const_iterator it;
 
       for(it = pack.begin(); it != pack.end(); ++it)
-        doFit(fname,it->second,it->first,fitProps);
+        doFit(fname,it->second,it->first,fitProps,tsrc,tsnk);
 
       didFit = true;
     }
@@ -135,7 +137,9 @@ namespace radmat
   template<>
     void TinsFitter::fit<std::complex<double> >(const std::string &fname , 
         const LLSQRet_ff_Q2Pack<std::complex<double> > &pack,
-        const ThreePointComparatorProps_t &fitProps)
+        const ThreePointComparatorProps_t &fitProps,
+        const int tsrc,
+        const int tsnk)
     {
       const unsigned int sz = pack.size();
       const int nbins = pack.Q2().size();
@@ -145,7 +149,7 @@ namespace radmat
       LLSQRet_ff_Q2Pack<std::complex<double> >::const_iterator it;
 
       for(it = pack.begin(); it != pack.end(); ++it)
-        doFit(fname,convertToReal(*this,it->second,fitProps.tlow,fitProps.thigh),it->first,fitProps);
+        doFit(fname,convertToReal(*this,it->second,tsrc,tsnk),it->first,fitProps,tsrc,tsnk);
 
       didFit = true;
     }
@@ -154,7 +158,9 @@ namespace radmat
   void TinsFitter::doFit(const std::string &filenameBase, 
       const ENSEM::EnsemVectorReal &data, 
       const int ffnum,
-      const ThreePointComparatorProps_t &fitProps)
+      const ThreePointComparatorProps_t &fitProps,
+      const int tsrc,
+      const int tsnk)
   {
     std::stringstream ss,jack,ax,fit;
     ss << filenameBase;
@@ -172,7 +178,9 @@ namespace radmat
 
 
     ADAT::Handle<FitComparator> fitComp = constructThreePointFitComparator(fitProps);
-    ADAT::Handle<FitThreePoint> fitCorr (new FitThreePoint(corrData,Lt,0,fitComp,fitProps.minTSlice,fitProps.fit_type));
+    // NB: I Have assumed that no chopping has gone on in the data
+    ADAT::Handle<FitThreePoint> fitCorr (new FitThreePoint(corrData,tsnk,tsrc,
+          fitProps.thigh,fitProps.tlow,fitComp,fitProps.minTSlice,fitProps.fit_type));
 
     // send to files
     fitCorr->saveFitPlot(ax.str());
@@ -191,7 +199,7 @@ namespace radmat
     for(it = fitters.begin(); it != fitters.end(); ++it)
     {
       std::stringstream ss;
-      ss << path << "_F_" << it->first << "_fit_log.log";
+      ss << path << "F_" << it->first << ".fitlog";
       std::ofstream out(ss.str().c_str());
       out << it->second->getFitSummary();
       out.close();
@@ -205,7 +213,7 @@ namespace radmat
     for(it = fitters.begin(); it != fitters.end(); ++it)
     {
       std::stringstream ss; 
-      ss << path <<  "_F_" << it->first << "_component_fit.ax";
+      ss << path <<  "FF_" << it->first << ".ax";
       std::ofstream out(ss.str().c_str());
       out << it->second->getFitPlotStringWithComponents(); 
       out.close();

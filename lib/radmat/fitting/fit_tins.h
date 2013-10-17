@@ -31,7 +31,9 @@ namespace radmat
     template<typename T>
       void fit(const std::string &filenameBase, 
           const LLSQRet_ff_Q2Pack<T> &data,
-          const ThreePointComparatorProps_t &fitProps);
+          const ThreePointComparatorProps_t &fitProps, 
+          const int tsrc,
+          const int tsnk);
 
     // get the form factors at this q2
     std::pair<ENSEM::EnsemReal, SEMBLE::SembleVector<double> > fetchFF(void) const;
@@ -60,7 +62,9 @@ namespace radmat
     void doFit(const std::string &filenameBase, 
         const ENSEM::EnsemVectorReal &data, 
         const int ffnum,
-        const ThreePointComparatorProps_t &fitProps);
+        const ThreePointComparatorProps_t &fitProps,
+        const int tsrc, 
+        const int tsnk);
 
     // data store
     bool didFit;
@@ -75,12 +79,16 @@ namespace radmat
   template<>
     void TinsFitter::fit<double>(const std::string &, 
         const LLSQRet_ff_Q2Pack<double> &,
-        const ThreePointComparatorProps_t &);
+        const ThreePointComparatorProps_t &,
+        const int tsrc,
+        const int tsnk);
 
   template<>
     void TinsFitter::fit<std::complex<double> >(const std::string &,
         const LLSQRet_ff_Q2Pack<std::complex<double> > &,
-        const ThreePointComparatorProps_t &fitProps);
+        const ThreePointComparatorProps_t &fitProps,
+        const int tsrc,
+        const int tsnk);
 
 
 

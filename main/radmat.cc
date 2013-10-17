@@ -6,7 +6,7 @@
 
 * Creation Date : 25-02-2013
 
-* Last Modified : Tue Feb 26 15:28:43 2013
+* Last Modified : Wed 16 Oct 2013 06:53:00 PM EDT
 
 * Created By : shultz
 
@@ -32,6 +32,9 @@ int main(int argc, char *argv[])
 
   radmat::RadmatDriver my_driver;
   my_driver.run_program(xmlini);
+
+// grep on this to test completion
+  std::cout << "ran successfully" << std::endl; 
 
   return 0;
 }

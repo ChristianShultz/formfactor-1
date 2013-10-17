@@ -26,7 +26,9 @@ namespace radmat
     bool load_llsq(const ADAT::Handle<LLSQLatticeMultiData> &lattice_data);
 
     void solve_llsq(const std::string &soln_ID);
-    void fit_data(const ThreePointComparatorProps_t &fitProps);
+    void fit_data(const ThreePointComparatorProps_t &fitProps, 
+        const int tsrc,
+        const int tsnk);
     void chisq_analysis(const int tlow, const int thigh);
 
     ENSEM::EnsemReal Q2(void) const; 

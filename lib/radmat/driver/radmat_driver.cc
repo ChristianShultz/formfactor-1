@@ -6,7 +6,7 @@
 
  * Creation Date : 25-02-2013
 
- * Last Modified : Mon 14 Oct 2013 06:55:14 PM EDT
+ * Last Modified : Thu 17 Oct 2013 12:33:19 PM EDT
 
  * Created By : shultz
 
@@ -170,7 +170,7 @@ namespace radmat
 
         dest.npoint[1].irrep = npt1.irrep; 
         dest.npoint[2].irrep = npt2.irrep; 
-        
+
         dest.npoint[1].irrep.creation_op = false; 
         dest.npoint[2].irrep.creation_op = true; 
 
@@ -409,7 +409,7 @@ namespace radmat
     built_correlators = true; 
 
   }
-    
+
   void RadmatDriver::solve_llsq(void)
   {
     check_exit_corrs(); 
@@ -494,16 +494,19 @@ namespace radmat
     Util::StopWatch my_stopwatch; 
     my_stopwatch.start(); 
 
+    int tsrc,tsnk;
+    tsrc = m_ini.threePointIni.threePointCorrXMLIni.continuumMatElemXML.source.t_slice; 
+    tsnk = m_ini.threePointIni.threePointCorrXMLIni.continuumMatElemXML.sink.t_slice; 
 
 #ifdef FIT_LLSQ_PARALLEL
 
-#pragma omp parallel for shared(idx)  schedule(dynamic,1)
+#pragma omp parallel for shared(idx,tsrc,tsnk)  schedule(dynamic,1)
 
 #endif 
     // POSSIBLE PARALLEL HERE
     for(idx = 0; idx < sz; ++idx)
       if(good_qs[idx])
-        linear_systems_of_Q2[idx].fit_data(m_ini.threePointComparatorProps);
+        linear_systems_of_Q2[idx].fit_data(m_ini.threePointComparatorProps,tsrc,tsnk);
 
 #pragma omp barrier
 
@@ -596,10 +599,16 @@ namespace radmat
     }
 
     std::vector<double> q2s;
+    std::vector<double> q2s_err;
 
     for(int Q = 0; Q < nQs; ++Q)
       if(good_qs[Q])
-        q2s.push_back(SEMBLE::toScalar(ENSEM::mean(linear_systems_of_Q2[Q].Q2()))); 
+      {
+        q2s.push_back(SEMBLE::toScalar(
+              ENSEM::mean( linear_systems_of_Q2[Q].Q2() ) ) ); 
+        q2s_err.push_back( SEMBLE::toScalar( 
+              ENSEM::sqrt ( ENSEM::variance( linear_systems_of_Q2[Q].Q2() ) ) ) ); 
+      }
 
     for(int ff = 0; ff < nff; ++ff)
     {
@@ -626,6 +635,19 @@ namespace radmat
       std::stringstream ss; 
       ss << path.str() << "FF_" << ff << ".ax"; 
       plt.sendToFile(ss.str()); 
+
+
+      // write out a data file with numbers in it
+      std::stringstream s2; 
+      s2 << path.str() << "FF_" << ff << ".dat";
+      std::ofstream out2( s2.str().c_str() ) ; 
+      for (unsigned int idx = 0; idx < q2s.size(); ++idx ) 
+        out2 << q2s[idx] << " " << q2s_err[idx] 
+          << " " <<  ENSEM::toDouble( 
+              ENSEM::mean( ENSEM::peekObs( FF , idx ) ) ) 
+          << " " << ENSEM::toDouble( 
+              ENSEM::sqrt ( ENSEM::variance( ENSEM::peekObs( FF , idx ) ) ) ) << std::endl;  
+      out2.close(); 
     }
 
   }
