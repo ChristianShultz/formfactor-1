@@ -6,7 +6,7 @@
 
  * Creation Date : 25-02-2013
 
- * Last Modified : Thu 17 Oct 2013 12:59:26 PM EDT
+ * Last Modified : Thu 17 Oct 2013 03:31:32 PM EDT
 
  * Created By : shultz
 
@@ -41,6 +41,20 @@ namespace radmat
 
         return out;
       }
+  
+    void write_jackfile_fit_report ( const TinsFitter &fits, const std::string &bpth)
+    {
+      for (int ff = 0; ff < fits.nFF(); ++ff)
+      {
+        std::stringstream ss;
+        ss << bpth << "FF_" << ff << ".jack";
+        ENSEM::write(ss.str(),fits.getFF(ff));  
+      }
+
+      std::stringstream ss; 
+      ss << bpth << "Q2.jack";
+      ENSEM::write(ss.str(),fits.getQ2()); 
+    }
 
   } // anonomyous 
 
@@ -161,11 +175,11 @@ namespace radmat
     for(int fn = 0; fn < fit_across_time.nFF(); ++fn)
     {
       ADAT::Handle<FitThreePoint> some_fit = fit_across_time.getFit(fn); 
-        if ( some_fit->tlow() > tlow) 
-          tlow = some_fit->tlow(); 
+      if ( some_fit->tlow() > tlow) 
+        tlow = some_fit->tlow(); 
 
-        if ( some_fit->thigh() < thigh)
-          thigh = some_fit->thigh();
+      if ( some_fit->thigh() < thigh)
+        thigh = some_fit->thigh();
 
     }
 
@@ -214,7 +228,11 @@ namespace radmat
     fit_across_time.writeFitLogs(base_path() + std::string("fit_logs/"));
     SEMBLE::SEMBLEIO::makeDirectoryPath(base_path() + std::string("component_fits/")); 
     fit_across_time.writeFitPlotsWithComponents(base_path() + std::string("component_fits/"));
+    SEMBLE::SEMBLEIO::makeDirectoryPath(base_path() + std::string("jack_files/")); 
+    write_jackfile_fit_report ( fit_across_time, base_path() + std::string("jack_files/"));
   }
+
+
 
 
   void RadmatSingleQ2Driver::dump_llsq(void)
