@@ -23,9 +23,11 @@ namespace radmat
 
     LLSQMultiDriver_t(void);
 
-    bool load_data(const ADAT::Handle<LLSQLatticeMultiData> &dat); 
+    
+    bool load_data(const ADAT::Handle<LLSQLatticeMultiData> &dat, 
+        const double tolerance); 
     void splash_tags(void) const; 
-    bool run_zero_filter(void); 
+    bool run_zero_filter(const double tolerance);  
     void solve_llsq(const std::string &soln_ID);
     void chisq_analysis(const SEMBLE::SembleVector<double> &ff, 
         const std::string &path,

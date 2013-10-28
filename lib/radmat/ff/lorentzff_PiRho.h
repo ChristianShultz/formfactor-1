@@ -13,8 +13,11 @@ namespace radmat
   namespace PiRho
   {
     template<short lambda>
-      struct F1 : public ffBlockBase_t<std::complex<double> > , public embedHelicityPolarizationTensor<1,lambda>
+      struct F1 
+      : public ffBlockBase_t<std::complex<double> > , 
+      public embedHelicityPolarizationTensor<1,lambda>
     {
+
       std::string ff(void) const
       {
         return std::string("F_1(Q^2) \\epsilon^{\\mu,\\nu,\\rho,\\sigma}\\epsilon_{\\nu}(p,\\lambda)p_{\\rho}^{+}p_{\\sigma}^{-}");
@@ -43,6 +46,17 @@ namespace radmat
         foo = contract(levi,applyMetric(pminus,gdd,0),3,0);
         bar = contract(foo,applyMetric(pplus,gdd,0),2,0);
         baz = contract(bar,applyMetric(epsilon,gdd,0),1,0);
+
+#if 1
+        // sanity
+        Tensor<std::complex<double>, 0> inner_prod; 
+        inner_prod = contract(epsilon,applyMetric(p_i,gdd,0),0,0); 
+        std::stringstream ss; 
+        ss << "momentum dotted into polarization was " << inner_prod.value() << std::endl ;
+        if(std::norm(inner_prod.value()) > 0.000001 ) 
+         std::cout << ss.str() << std::endl;  
+
+#endif
 
         // the kinematic factor carries one lorentz index
         return baz;

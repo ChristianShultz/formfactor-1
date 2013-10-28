@@ -20,10 +20,12 @@ namespace radmat
     RadmatSingleQ2Driver& operator=(const RadmatSingleQ2Driver &o);
 
     bool load_llsq(const ADAT::Handle<LLSQLatticeMultiData> &lattice_data,
-        const double pole_mass_squared);
+        const double pole_mass_squared, 
+        const double tolerance);
 
     // single q2 backdoor
-    bool load_llsq(const ADAT::Handle<LLSQLatticeMultiData> &lattice_data);
+    bool load_llsq(const ADAT::Handle<LLSQLatticeMultiData> &lattice_data,
+        const double tolerance);
 
     void solve_llsq(const std::string &soln_ID);
     void fit_data(const ThreePointComparatorProps_t &fitProps, 

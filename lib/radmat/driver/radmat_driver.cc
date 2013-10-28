@@ -6,7 +6,7 @@
 
  * Creation Date : 25-02-2013
 
- * Last Modified : Thu 17 Oct 2013 12:33:19 PM EDT
+ * Last Modified : Tue 22 Oct 2013 09:44:34 AM EDT
 
  * Created By : shultz
 
@@ -443,7 +443,9 @@ namespace radmat
 #endif    
     // POSSIBLE PARALLEL HERE
     for(idx =0; idx < sz; ++idx)
-      good_qs[idx] =  linear_systems_of_Q2[idx].load_llsq(multi_lattice_data[idx],m_ini.poleMass);
+      good_qs[idx] =  linear_systems_of_Q2[idx].load_llsq(multi_lattice_data[idx],
+          m_ini.poleMass,
+          m_ini.tolerance);
     // END PARALLEL
 
 #pragma omp barrier

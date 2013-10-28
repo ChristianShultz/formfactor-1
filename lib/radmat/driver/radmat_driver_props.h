@@ -17,6 +17,7 @@ namespace radmat
     int version; 
     int maxThread;                        // # < 1 does nothing , #>= 1 sets nthread to # 
     double poleMass;                      // does the analytic continuation exist?  this is the lightest vector state
+    double tolerance; 
   };                                       //  or the branch point at the energy of two pions -- nb this is the mass not
                                            //  the square of the mass
 

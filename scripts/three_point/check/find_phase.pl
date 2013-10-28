@@ -1,7 +1,7 @@
 #!/usr/bin/perl -w
 
 BEGIN{
-  push (@INC, "/Users/shultz/jlab/scripts");
+  push (@INC, "/u/home/shultz/git/radmat/scripts/three_point/check");
 }
 
 
@@ -24,13 +24,14 @@ use findPhase;
 # print arg($z) . "\n";
 # die("unholy death");
 
-die("usage: $0 <MatrixElement_> <tlow> <thigh>") unless $#ARGV == 2; 
+die("usage: $0 <MatrixElement_> <tlow> <thigh> <tol_deg>") unless $#ARGV == 3; 
 
 my $matrix_elememt_stem = $ARGV[0];
 
 #
 # what is numerically zero ?
-my $toldeg = 15.; 
+# my $toldeg = 15.; 
+my $toldeg = $ARGV[3];
 my $tol = $toldeg*3.1415/180.; 
 
 
@@ -132,11 +133,12 @@ foreach my $elem (@elems)
   {
     if( abs ( $elem->phase_diff() ) > $tol )
     {
+        
       # kill 2pi
       if( abs ( abs ( $elem->phase_diff() ) - 2. * 3.1415)  > $tol )
       {
         #    by elem 
-        print "*" . $elem->elem_out_str() . "\n";  
+        print "*" . $elem->elem_out_str() .  " -- $tol " . "\n";  
 
         push @superbad , $elem; 
         #    by tag 
@@ -144,7 +146,7 @@ foreach my $elem (@elems)
       }
       else
       {
-        print " " . $elem->elem_out_str() . "\n";  
+        print "*" . $elem->elem_out_str() . " -- $tol " .  "\n";  
       }
 
     }

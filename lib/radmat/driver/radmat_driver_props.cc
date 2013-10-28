@@ -6,7 +6,7 @@
 
 * Creation Date : 29-11-2012
 
-* Last Modified : Mon 14 Oct 2013 06:12:21 PM EDT
+* Last Modified : Tue 22 Oct 2013 10:53:59 AM EDT
 
 * Created By : shultz
 
@@ -50,6 +50,7 @@ namespace radmat
       ss << "\nchisq = " << prop.chisq; 
       ss << "\nmaxThread = " << prop.maxThread; 
       ss << "\npoleMass^2 = " <<  prop.poleMass; 
+      ss << "\ntolerance = " << prop.tolerance; 
       return ss.str(); 
   }
 
@@ -64,11 +65,22 @@ namespace radmat
   {
     void check_version(const int v)
     {
-      int my_version  = 1; 
-      if ( my_version != 1 ) 
+      std::vector<int> version_list; 
+      std::vector<int>::const_iterator it; 
+      bool found = false; 
+      version_list.push_back(1);
+      version_list.push_back(2); 
+
+      for( it = version_list.begin(); it != version_list.end(); ++it)
+        if ( *it == v ) 
+          found = true; 
+
+      if ( !!! found ) 
       {
-        std::cerr << "version " << v << "is not supported, must be at " 
-          << my_version << " try again later" << std::endl; 
+        std::cerr << "version " << v << "is not supported, must be at ";
+        for( it = version_list.begin(); it != version_list.end(); ++it)
+          std::cerr << *it << " ";
+        std::cerr <<"try again later" << std::endl; 
         exit(1); 
       }
     }
@@ -86,7 +98,11 @@ namespace radmat
     doXMLRead(ptop,"chisq",prop.chisq,__PRETTY_FUNCTION__);
     doXMLRead(ptop,"threePointIni",prop.threePointIni,__PRETTY_FUNCTION__);
     doXMLRead(ptop,"maxThread",prop.maxThread,__PRETTY_FUNCTION__);
-    
+    if ( prop.version >= 2 ) 
+      doXMLRead(ptop,"tolerance",prop.tolerance,__PRETTY_FUNCTION__); 
+    else
+      prop.tolerance = 1e-7; 
+
     // NB: we square the mass here!
     double pole_mass; 
     doXMLRead(ptop,"poleMass",pole_mass,__PRETTY_FUNCTION__); 

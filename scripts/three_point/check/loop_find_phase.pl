@@ -8,38 +8,39 @@ BEGIN{
 
 use strict;
 use Math::Complex;
-use Math::Complex ':pi';
+use Math::Complex qw(pi);
 use findPhase; 
+use POSIX qw(floor);
 use threads;
 use threads::shared;
+use makeHisto; 
 
 
 
-
-die("usage: $0 <MatrixElement_> <KinematicZeroCut>") unless $#ARGV == 1; 
+die("usage: $0 <MatrixElement_> <KinematicZeroCut> <tolerance> <tlow> <thigh>") unless $#ARGV == 4; 
 
 my $matrix_elememt_stem = $ARGV[0];
 my $kcut = $ARGV[1]; 
 
 #
 # what is numerically zero ?
-my $tol_deg = 15;
-my $tol = $tol_deg * 3.1415 / 180.; 
-my $tol_per_pi = $tol / 3.1415;
+my $tol_deg = $ARGV[2];
+my $tol = $tol_deg * pi / 180.; 
+my $tol_per_pi = $tol / pi;
 
 
 print " using tolerance $tol = $tol_deg (deg) = $tol_per_pi * pi\n"; 
 
 #
 # where do we want to look for the phase
-my $tlow = 8;
-my $thigh = 12; 
+my $tlow = $ARGV[3];
+my $thigh = $ARGV[4]; 
 
 
 # assumption that you are running in the llsq directory
 my $llsq_file = "row_index_to_continuum_elem.txt";
 
-my $foo = `ls -al | grep ^d  | grep Q2 | grep -v FF | awk \'{print \$9} \' | xargs `;
+my $foo = `ls -al | grep ^d  | grep Q2 |grep -v refit | grep -v FF | awk \'{print \$9} \' | xargs `;
 
 my @QS = split /\s+/ , $foo ; 
 
@@ -48,15 +49,18 @@ foreach my $q (@QS)
   $q = $q . "/llsq";
 }
 
-my @bad_elems;  
+my @bad_elems = ();  
+my %bad_qs_rep = (); 
 
 my $dir = `pwd`;
 chomp $dir;
 
+my $histogram = makeHisto->new(); 
+
 foreach my $i (0..$#QS)
 {
   chdir $dir || die("couldn't move back up");
-  my $ref = find_phase($QS[$i]);
+  my $ref = find_phase($QS[$i],$histogram);
   my @a = @{ $ref };
 
   if(@a)
@@ -65,6 +69,8 @@ foreach my $i (0..$#QS)
 
     push @bad_elems , @a; 
 
+    $bad_qs_rep{$QS[$i]} = $a[0]->elem_out_str();
+    
     print " bad phases \n" ;
 
     foreach my $elem (@a)
@@ -75,17 +81,25 @@ foreach my $i (0..$#QS)
   }  
 }
 
+  chdir $dir || die("couldn't move back up");
 
 if (@bad_elems)
 {
   print " had $#bad_elems bad phases \n" ;
+
+  print " bad eles = \n";
+  foreach my $f ( keys %bad_qs_rep ) 
+  { 
+    print $f . "\n" . $bad_qs_rep{$f} . "\n";
+  } 
 }
 else
 {
   print " all phases passed \n";
 }
 
-
+$histogram->bin( ($histogram->max() - $histogram->min() )/ 100. ) ; 
+$histogram->histo(); 
 ###########################################################
 
 
@@ -93,6 +107,7 @@ sub find_phase
 {
 
   my $dir = shift; 
+  my $histogram = shift; 
 
   chdir $dir; 
 
@@ -172,6 +187,9 @@ sub find_phase
     $elem->philat($philat);
     $elem->phirad($phirad); 
 
+    my $foo = wrap_mpi_pi( $elem->philat() - $elem->phirad() ) ; 
+
+    $histogram->add_data( $foo *180 / pi ); 
   }
 
 
@@ -179,17 +197,22 @@ sub find_phase
 
   foreach my $elem (@elems)
   {
-    if( abs ( $elem->phase_diff() ) > $tol )
+    if ( wrap_mpi_pi( abs ( $elem->phase_diff() ) ) > $tol ) 
     {
-      # kill 2pi
-      if( abs(abs ( $elem->phase_diff() ) - 2. * 3.1415) > $tol)
-      {
-        push @baddies, $elem; 
-      }
+      push @baddies, $elem; 
     }
   }
 
   return \@baddies; 
+}
+
+sub wrap_mpi_pi
+{
+  my $foo = shift; 
+  my $twoPi = 2. * pi; 
+  $foo = $foo - floor( $foo / $twoPi ) * $twoPi;
+  $foo = $foo - $twoPi if $foo - pi > 0.;
+  return $foo; 
 }
 
 
@@ -202,9 +225,12 @@ sub run_kinematic_cut
   foreach my $elem (@eles)
   {
 
+#    print "lat " . $elem->lat_real() . " " . $elem->lat_imag() . "\n";
+#    print "rad " . $elem->rad_real() . " " . $elem->rad_imag() . "\n";
+
     my $zlat = Math::Complex->make($elem->lat_real(),$elem->lat_imag()); 
     my $zrad = Math::Complex->make($elem->rad_real(),$elem->rad_imag());
-    
+
     my $rlat = abs($zlat); 
     my $rrad = abs($zrad); 
 

@@ -6,7 +6,7 @@
 
  * Creation Date : 25-02-2013
 
- * Last Modified : Thu 17 Oct 2013 03:31:32 PM EDT
+ * Last Modified : Tue 22 Oct 2013 09:43:47 AM EDT
 
  * Created By : shultz
 
@@ -84,10 +84,12 @@ namespace radmat
     return *this; 
   }
 
-  bool RadmatSingleQ2Driver::load_llsq(const ADAT::Handle<LLSQLatticeMultiData> &d, const double pole_mass_squared)
+  bool RadmatSingleQ2Driver::load_llsq(const ADAT::Handle<LLSQLatticeMultiData> &d, 
+      const double pole_mass_squared,
+      const double tolerance)
   {
 
-    if(!!!linear_system.load_data(d))
+    if(!!!linear_system.load_data(d,tolerance))
       return false;
 
     if(linear_system.peek_tags().empty())
@@ -112,10 +114,11 @@ namespace radmat
     return true;
   }
 
-  bool RadmatSingleQ2Driver::load_llsq(const ADAT::Handle<LLSQLatticeMultiData> &d)
+  bool RadmatSingleQ2Driver::load_llsq(const ADAT::Handle<LLSQLatticeMultiData> &d, 
+      const double tolerance)
   {
 
-    if(!!!linear_system.load_data(d))
+    if(!!!linear_system.load_data(d,tolerance))
       return false;
 
     if(linear_system.peek_tags().empty())

@@ -6,7 +6,7 @@
 
  * Creation Date : 25-02-2013
 
- * Last Modified : Wed 16 Oct 2013 02:05:45 PM EDT
+ * Last Modified : Tue 22 Oct 2013 10:57:41 AM EDT
 
  * Created By : shultz
 
@@ -43,6 +43,21 @@ namespace
       }
     }
 
+  template<typename T>
+    void doXMLRead(ADATXML::XMLReader &ptop, const std::string &path, T &place, const char * f, const T &val)
+    {
+      if(ptop.count(path) > 0)
+        read(ptop,path,place);
+      else
+      {
+        std::cerr << __PRETTY_FUNCTION__ << ": Error, called by " 
+          << f << " trying to read path, " << path
+          << ", path was empty, reverting to default value " 
+          << val << std::endl;
+        place = val;
+      }
+    }
+
   struct SingleQ2Prop_t
   {
     ThreePointComparatorProps_t threePointComparatorProps;
@@ -51,6 +66,7 @@ namespace
     std::string chisq;
     std::string dbfile; 
     std::string solnID; 
+    double tolerance;
     ADATXML::Array<int> lat_elems; 
   };
 
@@ -62,6 +78,7 @@ namespace
     doXMLRead(xml,"chisq",p.chisq,__PRETTY_FUNCTION__); 
     doXMLRead(xml,"dbfile",p.dbfile,__PRETTY_FUNCTION__); 
     doXMLRead(xml,"solnID",p.solnID,__PRETTY_FUNCTION__); 
+    doXMLRead(xml,"tolerance",p.tolerance,__PRETTY_FUNCTION__,1e-6); 
     doXMLRead(xml,"lat_elems",p.lat_elems,__PRETTY_FUNCTION__); 
   }
 
@@ -133,7 +150,7 @@ int main(int argc, char *argv[])
   pull_elems(foo,ini); 
 
   // check that we can load the thing
-  POW2_ASSERT( my_driver.load_llsq(foo) ); 
+  POW2_ASSERT( my_driver.load_llsq(foo,ini.tolerance) ); 
 
   // solve the linear system 
   my_driver.solve_llsq(ini.solnID); 

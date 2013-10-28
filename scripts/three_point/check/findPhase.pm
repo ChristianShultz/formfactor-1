@@ -2,6 +2,8 @@
 
 
 package findPhase;
+use Math::Complex qw(pi);
+use POSIX qw(floor);
 use strict; 
 
 sub new
@@ -172,7 +174,7 @@ sub rad_str
 {
   my $self = shift;
 
-  my $id = $self->matrix_element_stem . $self->hsnk() . "_" . $self->hsrc();
+  my $id = $self->matrix_element_stem . "_" . $self->hsnk() . "_" . $self->hsrc();
 
   my $snk = " " . $self->mf() . " " . $self->psnk_str();
   my $src = " " . $self->mi() . " " . $self->psrc_str(); 
@@ -312,11 +314,13 @@ sub out_str
   my $str = $self->id() . "   " ;
   $str = $str . $self->philat() . " - " . $self->phirad() . " = ";
   
-  my $diff =  $self->philat() - $self->phirad();
+  my $diff =  $self->phase_diff();
   
-  my $diffbyPi = sprintf("%.3f", $diff / 3.14159 );
+#  my $diffbyPi = sprintf("%.3f", $diff / 3.14159 );
+  my $diffInDeg = sprintf("%.3f", 180 * $diff / 3.14159  );
 
-  $str = $str . $diff . "  divide by pi " . $diffbyPi;
+#  $str = $str . $diff . "  divide by pi " . $diffbyPi;
+  $str .= $diff . " deg $diffInDeg " ; 
   return $str; 
 }
 
@@ -327,11 +331,12 @@ sub elem_out_str
   my $str = $self->stem() . $self->elem() .  "   " . $self->id() . "   ";
   $str = $str . $self->philat() . " - " . $self->phirad() . " = ";
   
-  my $diff =  $self->philat() - $self->phirad();
+  my $diff =  $self->phase_diff();
   
-  my $diffbyPi = sprintf("%.3f", $diff / 3.14159 );
-
-  $str = $str . $diff . "  divide by pi " . $diffbyPi;
+#  my $diffbyPi = sprintf("%.3f", $diff / 3.14159 );
+  my $diffInDeg = sprintf("%.3f", 180 * $diff / 3.14159  );
+#  $str = $str . $diff . "  divide by pi " . $diffbyPi;
+  $str .= $diff . " deg $diffInDeg " ; 
   return $str; 
 
 }
@@ -340,7 +345,11 @@ sub elem_out_str
 sub phase_diff 
 {
   my $self = shift; 
-  return ( $self->philat() - $self->phirad() );
+  my $foo =  $self->philat() - $self->phirad();
+  my $twoPi = 2. * pi; 
+  $foo = $foo - floor($foo/$twoPi) * $twoPi; 
+  $foo = $foo - $twoPi if $foo - pi > 0.;
+  return $foo; 
 }
 
 1;  

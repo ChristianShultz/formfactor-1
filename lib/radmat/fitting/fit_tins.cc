@@ -6,7 +6,7 @@
 
  * Creation Date : 01-08-2012
 
- * Last Modified : Thu 17 Oct 2013 10:41:02 AM EDT
+ * Last Modified : Tue 22 Oct 2013 12:50:51 PM EDT
 
  * Created By : shultz
 
@@ -65,22 +65,18 @@ namespace radmat
         double phase = std::arg(std::complex<double>(rl,im)); 
         
         
-        // std::cout << __func__ << " t = " << i << " phase = " << phase << " (" << phase*180./3.14159 <<" deg)"<< std::endl;
+       //  std::cout << __func__ << " t = " << i << " phase = " << phase << " (" << phase*180./3.14159 <<" deg)"<< std::endl;
 
       
         if(phase < -3.*3.14159/4.)
           phase = - phase; 
     
-
-        //  std::cout << __func__ << " t = " << i << " phase = " << phase << " (" << phase*180./3.14159 <<" deg)"<< std::endl;
+        // std::cout << __func__ << " t = " << i << " phase = " << phase << " (" << phase*180./3.14159 <<" deg)"<< std::endl;
 
         mean_phase += phase; 
       }
 
-
       double phase = mean_phase/double(thigh - tlow); 
-
-
 
       if( (phase < 0.174528) && (phase > -0.174708) ) // +/- 10 degree about 0 in rad
         return real;
@@ -94,6 +90,7 @@ namespace radmat
       {
         std::cout << "The calculated phase was " << phase*180./3.14159 << " (deg)" << std::endl;
         std::cout << "for Q2 = " << SEMBLE::toScalar(ENSEM::mean(fitter.getQ2())) << std::endl;  
+        std::cout << "used tlow = " << tlow << " thigh = " << thigh << std::endl; 
         SPLASH("check bad_corr.jack, bad_corr.ax for the correlator"); 
 
         AxisPlot plot; 

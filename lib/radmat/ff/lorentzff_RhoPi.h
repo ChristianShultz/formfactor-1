@@ -46,27 +46,31 @@ namespace radmat
         pplus = applyMetric(pplus,gdd,0); 
         epsilon = applyMetric(epsilon,gdd,0); 
 
-#if 0
-        std::cout << "pplus_mu = " << pplus << std::endl;
-        std::cout << "pminus_mu = " << pminus << std::endl;
-        std::cout << "eps_mu = " << epsilon << std::endl;
-
-
-        std::cout << "levi non-zero " << std::endl;
-        Tensor<std::complex<double>, 1> tt((TensorShape<1>())[4],0.); 
-
-
-        for(int i = 0; i < 4; ++i)
-          for(int j = 0; j < 4; ++j)
-            for(int k = 0; k < 4; ++k)
-              for(int l = 0; l < 4; ++l)
-                if(levi[i][j][k][l] != 0.)
-                {
-                  tt[i] += levi[i][j][k][l]*epsilon[j]*pplus[k]*pminus[l];
-                 // std::cout << i << " " << j << " " << k << " " << l << "   " << levi[i][j][k][l] << std::endl;
-                }
-        std::cout << __func__ << " the answer should be " << std::endl;
-        std::cout << tt << std::endl; 
+#if 1
+//       std::cout << "pplus_mu = " << pplus << std::endl;
+//       std::cout << "pminus_mu = " << pminus << std::endl;
+//        std::cout << "eps_mu = " << epsilon << std::endl;
+//
+//
+//        std::cout << "levi non-zero " << std::endl;
+//        Tensor<std::complex<double>, 1> tt((TensorShape<1>())[4],0.); 
+//
+//
+//        for(int i = 0; i < 4; ++i)
+//          for(int j = 0; j < 4; ++j)
+//            for(int k = 0; k < 4; ++k)
+//              for(int l = 0; l < 4; ++l)
+//                if(levi[i][j][k][l] != 0.)
+//                {
+//                  tt[i] += levi[i][j][k][l]*epsilon[j]*pplus[k]*pminus[l];
+//                 // std::cout << i << " " << j << " " << k << " " << l << "   " << levi[i][j][k][l] << std::endl;
+//                }
+//        std::cout << __func__ << " the answer should be " << std::endl;
+//        std::cout << tt << std::endl; 
+//
+        Tensor<std::complex<double> , 0> inner_prod = contract( epsilon, p_f , 0 , 0 ) ; 
+        if ( std::norm ( inner_prod.value() ) >  0.000001 ) 
+          std::cout << "mom dotted into polarization was " << inner_prod.value() << std::endl; 
 #endif 
 
         // do contractions 

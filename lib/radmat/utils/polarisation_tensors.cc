@@ -6,7 +6,7 @@
 
  * Creation Date : 04-05-2013
 
- * Last Modified : Fri May 10 10:35:46 2013
+ * Last Modified : Mon 21 Oct 2013 10:51:50 AM EDT
 
  * Created By : shultz
 
@@ -214,7 +214,9 @@ namespace radmat
         rot = Hadron::cubicCanonicalRotation(mom); 
       }
 
+#if 1
 
+#warning "using R^u_v eps^v(p,lam) = eps^u(Rp,lam)"
 
       Tensor<std::complex<double>, 2> RotMat;
       RotMat = convertTensorUnderlyingType<std::complex<double> , double , 2 > (genRotationMatrix(mom));
@@ -239,7 +241,8 @@ namespace radmat
       std::cout << __func__ << " R*epsz " << eps << std::endl;
       */
 
-#if 0
+#else 
+#warning "using eps^u(Rp,lam) = D_m,lam * R * eps(pz,m)"
 
       for(int i = 1; i <= 3; ++i)
       {
@@ -250,9 +253,10 @@ namespace radmat
         if(std::norm(SEMBLE::toScalar(D)) > 0.00001) 
           eps = eps + phase*SEMBLE::toScalar(D) * R * epsz(i,p,E); 
       }
+      
+       return itpp::conj(eps);
 #endif 
 
-      // return itpp::conj(eps);
       return eps;
     }
 

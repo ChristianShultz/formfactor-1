@@ -6,7 +6,7 @@
 
  * Creation Date : 22-02-2013
 
- * Last Modified : Tue 15 Oct 2013 02:22:51 PM EDT
+ * Last Modified : Tue 22 Oct 2013 09:42:03 AM EDT
 
  * Created By : shultz
 
@@ -234,7 +234,8 @@ namespace radmat
   }
 
 
-  bool LLSQMultiDriver_t::load_data(const ADAT::Handle<LLSQLatticeMultiData> &d)
+  bool LLSQMultiDriver_t::load_data(const ADAT::Handle<LLSQLatticeMultiData> &d,
+      const double tolerance)
   {
     init_false();
     lattice_data = d;
@@ -242,7 +243,7 @@ namespace radmat
     init_lat = true; 
 
     sort_data(); 
-    bool success = run_zero_filter();
+    bool success = run_zero_filter(tolerance);
     return success; 
   }
 
@@ -288,7 +289,7 @@ namespace radmat
 
 
 
-  bool LLSQMultiDriver_t::run_zero_filter(void)
+  bool LLSQMultiDriver_t::run_zero_filter(const double tolerance)
   {
     check_exit_lat(); 
 
@@ -326,7 +327,7 @@ namespace radmat
       SEMBLE::SembleVector<std::complex<double> > workV;
 
       workM = KK.genFactors(makeMomInvariants(old_tags[elem]));
-      workV = SEMBLE::round_to_zero(workM.getRow(old_tags[elem].jmu), 1e-10);
+      workV = SEMBLE::round_to_zero(workM.getRow(old_tags[elem].jmu), tolerance);
 
       if(workV == Zero)
       {
