@@ -6,13 +6,14 @@
 
  * Creation Date : 04-12-2012
 
- * Last Modified : Mon 14 Oct 2013 11:08:08 AM EDT
+ * Last Modified : Fri 01 Nov 2013 04:07:49 PM EDT
 
  * Created By : shultz
 
  _._._._._._._._._._._._._._._._._._._._._.*/
 
 #include "build_correlators.h"
+#include "build_correlators_bad_data_repository.h"
 #include "lattice_multi_data_tag.h"
 #include "lattice_multi_data_object.h"
 #include "invert_subduction.h"
@@ -22,6 +23,7 @@
 #include "radmat/fake_data/fake_3pt_function_aux.h"
 #include "radmat/utils/pow2assert.h"
 #include "radmat/utils/perThreadStorage.h"
+#include "radmat/utils/mink_qsq.h"
 #include "radmat/llsq/llsq_gen_system.h"
 #include "semble/semble_semble.h"
 #include "radmat_overlap_key_val_db.h"
@@ -69,34 +71,6 @@ namespace radmat
   // utility
   namespace
   {
-
-    double Mink_qsq(const ADATXML::Array<int> &pf, const double mf, 
-        const ADATXML::Array<int> &pi, const double mi,
-        const double factor)
-    {
-      ADATXML::Array<double> p_f,p_i; 
-      p_f.resize(3);
-      p_i.resize(3); 
-
-
-      double p_i_sq(0.);
-      double p_f_sq(0.); 
-      double q_space_sq(0.);
-
-      for(int i = 0; i < 3; ++i)
-      {        
-        p_f[i] = factor*double(pf[i]);
-        p_i[i] = factor*double(pi[i]); 
-        p_f_sq += p_f[i]*p_f[i];
-        p_i_sq += p_i[i]*p_i[i];
-        q_space_sq += (p_i[i] - p_f[i])*(p_i[i] - p_f[i]);
-      }
-
-
-      double q_time =  sqrt(mi*mi + p_i_sq) - sqrt(mf*mf + p_f_sq);  
-
-      return -((q_time*q_time) - q_space_sq); 
-    }
 
 
     LatticeMultiDataTag get_lattice_tag(const int jmu, 
@@ -193,141 +167,12 @@ namespace radmat
       }
 
 
+/*
+ *  A LOCAL bad data repository that exists only here
+ *
+ */
 
-    struct local_bad_data_repository
-    {
-
-      void insert(const int tid, const std::vector<RadmatExtendedKeyHadronNPartIrrep_t> &v)
-      {
-#pragma omp critical
-        {
-          if(norms.find(tid) != norms.end())
-            norms.find(tid)->second.insert(norms.find(tid)->second.begin(),v.begin(),v.end());
-          else
-            norms.insert(
-                std::map<int,std::vector<RadmatExtendedKeyHadronNPartIrrep_t> >::value_type(tid,v));
-        }
-      }
-
-      void insert(const int tid,const std::vector<Hadron::KeyHadronNPartNPtCorr_t> &v)
-      {
-#pragma omp critical
-        {
-          if(norms.find(tid) != norms.end())
-            tpc.find(tid)->second.insert(tpc.find(tid)->second.begin(),v.begin(),v.end());
-          else
-            tpc.insert(
-                std::map<int,std::vector<Hadron::KeyHadronNPartNPtCorr_t> >::value_type(tid,v));
-        }        
-      }
-
-      // the integer shall be the thread number to avoid collisions 
-      std::map<int,std::vector<RadmatExtendedKeyHadronNPartIrrep_t> > norms;
-      std::map<int,std::vector<Hadron::KeyHadronNPartNPtCorr_t> > tpc; 
-    };
-
-
-    local_bad_data_repository bad_data_repository;
-
-    std::vector<Hadron::KeyHadronNPartNPtCorr_t> merge_bad_data_npt(void)
-    {
-      typedef std::map<std::string,Hadron::KeyHadronNPartNPtCorr_t>::value_type value_type; 
-      std::map<std::string,Hadron::KeyHadronNPartNPtCorr_t> uniq; 
-      std::map<std::string,Hadron::KeyHadronNPartNPtCorr_t>::const_iterator it; 
-      std::map<int,std::vector<Hadron::KeyHadronNPartNPtCorr_t > >::const_iterator it1; 
-      std::vector<Hadron::KeyHadronNPartNPtCorr_t>::const_iterator it2; 
-      std::vector<Hadron::KeyHadronNPartNPtCorr_t> ret; 
-
-      for(it1 = bad_data_repository.tpc.begin(); it1 != bad_data_repository.tpc.end(); ++it1)
-        for(it2 = it1->second.begin(); it2 != it1->second.end(); ++it2)
-          uniq.insert(value_type(Hadron::ensemFileName(*it2),*it2));
-
-      for(it = uniq.begin(); it != uniq.end(); ++it)
-        ret.push_back(it->second); 
-
-      return ret; 
-    }
-
-    std::vector<RadmatExtendedKeyHadronNPartIrrep_t> 
-      merge_bad_data_norm(void)
-      {
-        typedef std::map<std::string,RadmatExtendedKeyHadronNPartIrrep_t>::value_type value_type; 
-        std::map<std::string,RadmatExtendedKeyHadronNPartIrrep_t> uniq; 
-        std::map<std::string,RadmatExtendedKeyHadronNPartIrrep_t>::const_iterator it; 
-        std::map<int,std::vector<RadmatExtendedKeyHadronNPartIrrep_t > >::const_iterator it1; 
-        std::vector<RadmatExtendedKeyHadronNPartIrrep_t>::const_iterator it2; 
-        std::vector<RadmatExtendedKeyHadronNPartIrrep_t> ret; 
-
-        for(it1 = bad_data_repository.norms.begin(); it1 != bad_data_repository.norms.end(); ++it1)
-          for(it2 = it1->second.begin(); it2 != it1->second.end(); ++it2)
-            uniq.insert(value_type(fileName(*it2),*it2));
-
-        for(it = uniq.begin(); it != uniq.end(); ++it)
-          ret.push_back(it->second); 
-
-        return ret; 
-
-      }
-
-
-    void dump_baddies(void)
-    {
-      std::cout << __func__ << ": printing missing xml " << std::endl;
-
-      std::vector<Hadron::KeyHadronNPartNPtCorr_t> bcv = merge_bad_data_npt();
-      std::vector<RadmatExtendedKeyHadronNPartIrrep_t> bnv =  merge_bad_data_norm();
-
-      if(!!!bcv.empty())
-      {
-        ADATXML::XMLBufferWriter corrs;
-        ADATXML::Array<Hadron::KeyHadronNPartNPtCorr_t> bc;
-
-        bc.resize(bcv.size()); 
-        for(unsigned int i = 0; i < bcv.size(); ++i)
-          bc[i] = bcv[i];
-
-        write(corrs,"NPointList",bc);
-
-        std::string pth = SEMBLE::SEMBLEIO::getPath();
-        SEMBLE::SEMBLEIO::makeDirectoryPath(pth + std::string("missing")); 
-
-        std::ofstream out("missing/npt.list.xml");
-        corrs.print(out);
-        out.close();
-
-        std::vector<Hadron::KeyHadronNPartNPtCorr_t>::const_iterator it; 
-
-        out.open("missing/npt.ensemFileNames.list"); 
-        for(it = bcv.begin(); it != bcv.end(); ++it)
-          out << Hadron::ensemFileName(*it) << "\n";
-        out.close(); 
-
-      }
-
-      if(!!!bnv.empty())
-      {
-        ADATXML::XMLBufferWriter norms;
-        ADATXML::Array<RadmatExtendedKeyHadronNPartIrrep_t> bn;
-
-        std::vector<RadmatExtendedKeyHadronNPartIrrep_t>::const_iterator it;
-
-
-        bn.resize(bnv.size());
-        for(unsigned int i = 0; i < bnv.size(); ++i)
-          bn[i] = bnv[i];
-
-        write(norms,"BadNorms",bn);
-
-        std::string pth = SEMBLE::SEMBLEIO::getPath();
-        SEMBLE::SEMBLEIO::makeDirectoryPath(pth + std::string("missing")); 
-
-        std::ofstream out("missing/normalizations.list.xml");
-        norms.print(out);
-        out.close(); 
-      }
-
-    }
-
+    BuildCorrsLocalBadDataRepo_t bad_data_repository;
 
     // NB hardwire in here
     struct dbKeyObject
@@ -731,15 +576,12 @@ namespace radmat
 #endif
 
       // dump the bad/missing xml lists
-      dump_baddies(); 
+      bad_data_repository.dump_baddies(); 
       //    std::cout << __func__ << ": have " << ret.size() << " different values of Q^2" << std::endl;
 
 
       return ret; 
     }
-
-
-
 
 
 

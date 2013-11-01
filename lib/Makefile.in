@@ -78,23 +78,24 @@ libradmat_a_LIBADD =
 am_libradmat_a_OBJECTS = aux.$(OBJEXT) breit_frame.$(OBJEXT) \
 	euler_angles.$(OBJEXT) harmonic.$(OBJEXT) pow2assert.$(OBJEXT) \
 	splash.$(OBJEXT) tensor.$(OBJEXT) wigner.$(OBJEXT) \
-	polarisation_tensors.$(OBJEXT) ff_gen_llsq_row.$(OBJEXT) \
-	formfactor_factory.$(OBJEXT) lorentzff_PiPi.$(OBJEXT) \
-	lorentzff_PiPiStar.$(OBJEXT) covarrying_vectors.$(OBJEXT) \
-	fake_3pt_function_aux.$(OBJEXT) fake_data_ini.$(OBJEXT) \
-	fake_overlaps.$(OBJEXT) fake_spectrum.$(OBJEXT) \
-	llsq_gen_system.$(OBJEXT) llsq_multi_driver.$(OBJEXT) \
-	llsq_q2_pack.$(OBJEXT) llsq_solvers.$(OBJEXT) \
-	llsq_chisq.$(OBJEXT) lattice_multi_data_tag.$(OBJEXT) \
-	build_correlators.$(OBJEXT) build_correlators_xml.$(OBJEXT) \
-	g_parity_world.$(OBJEXT) \
+	polarisation_tensors.$(OBJEXT) mink_qsq.$(OBJEXT) \
+	ff_gen_llsq_row.$(OBJEXT) formfactor_factory.$(OBJEXT) \
+	lorentzff_PiPi.$(OBJEXT) lorentzff_PiPiStar.$(OBJEXT) \
+	covarrying_vectors.$(OBJEXT) fake_3pt_function_aux.$(OBJEXT) \
+	fake_data_ini.$(OBJEXT) fake_overlaps.$(OBJEXT) \
+	fake_spectrum.$(OBJEXT) llsq_gen_system.$(OBJEXT) \
+	llsq_multi_driver.$(OBJEXT) llsq_q2_pack.$(OBJEXT) \
+	llsq_solvers.$(OBJEXT) llsq_chisq.$(OBJEXT) \
+	lattice_multi_data_tag.$(OBJEXT) build_correlators.$(OBJEXT) \
+	build_correlators_xml.$(OBJEXT) g_parity_world.$(OBJEXT) \
 	g_parity_world_generate_redstar_xml.$(OBJEXT) \
 	g_parity_world_xml.$(OBJEXT) invert_subduction.$(OBJEXT) \
 	radmat_database_interface.$(OBJEXT) \
 	radmat_overlap_key_val_db.$(OBJEXT) \
-	disconnected_graph_nuker.$(OBJEXT) axis_plotter.$(OBJEXT) \
-	fit_tins.$(OBJEXT) radmat_driver.$(OBJEXT) \
-	radmat_driver_props.$(OBJEXT) \
+	disconnected_graph_nuker.$(OBJEXT) \
+	build_correlators_bad_data_repository.$(OBJEXT) \
+	axis_plotter.$(OBJEXT) fit_tins.$(OBJEXT) \
+	radmat_driver.$(OBJEXT) radmat_driver_props.$(OBJEXT) \
 	radmat_single_q2_driver.$(OBJEXT) radmat_driver_aux.$(OBJEXT)
 libradmat_a_OBJECTS = $(am_libradmat_a_OBJECTS)
 DEFAULT_INCLUDES = -I.@am__isrc@
@@ -239,8 +240,9 @@ nobase_include_HEADERS = radmat/utils/aux.h radmat/utils/breit_frame.h \
 	radmat/utils/splash.h radmat/utils/stringify.h \
 	radmat/utils/tensor.h radmat/utils/type_computations.h \
 	radmat/utils/wigner.h radmat/utils/levi_civita.h \
-	radmat/ff/ff_gen_llsq_row.h radmat/ff/formfactor_factory.h \
-	radmat/ff/lorentzff_PiPi.h radmat/ff/lorentzff_PiPiStar.h \
+	radmat/utils/mink_qsq.h radmat/ff/ff_gen_llsq_row.h \
+	radmat/ff/formfactor_factory.h radmat/ff/lorentzff_PiPi.h \
+	radmat/ff/lorentzff_PiPiStar.h \
 	radmat/ff/lorentzff_polarization_embedding.h \
 	radmat/ff/lorentzff_PiRho.h radmat/ff/lorentzff_RhoPi.h \
 	radmat/fake_data/covarrying_vectors.h \
@@ -272,6 +274,7 @@ nobase_include_HEADERS = radmat/utils/aux.h radmat/utils/breit_frame.h \
 	radmat/load_data/radmat_overlap_key_val_db.h \
 	radmat/load_data/three_point.h \
 	radmat/load_data/disconnected_graph_nuker.h \
+	radmat/load_data/build_correlators_bad_data_repository.h \
 	radmat/fitting/axis_plotter.h radmat/fitting/fit_tins.h \
 	radmat/driver/radmat_driver.h \
 	radmat/driver/radmat_driver_props.h \
@@ -303,7 +306,7 @@ libradmat_a_SOURCES = radmat/utils/aux.cc radmat/utils/breit_frame.cc \
 	radmat/utils/euler_angles.cc radmat/utils/harmonic.cc \
 	radmat/utils/pow2assert.cc radmat/utils/splash.cc \
 	radmat/utils/tensor.cc radmat/utils/wigner.cc \
-	radmat/utils/polarisation_tensors.cc \
+	radmat/utils/polarisation_tensors.cc radmat/utils/mink_qsq.cc \
 	radmat/ff/ff_gen_llsq_row.cc radmat/ff/formfactor_factory.cc \
 	radmat/ff/lorentzff_PiPi.cc radmat/ff/lorentzff_PiPiStar.cc \
 	radmat/fake_data/covarrying_vectors.cc \
@@ -324,6 +327,7 @@ libradmat_a_SOURCES = radmat/utils/aux.cc radmat/utils/breit_frame.cc \
 	radmat/load_data/radmat_database_interface.cc \
 	radmat/load_data/radmat_overlap_key_val_db.cc \
 	radmat/load_data/disconnected_graph_nuker.cc \
+	radmat/load_data/build_correlators_bad_data_repository.cc \
 	radmat/fitting/axis_plotter.cc radmat/fitting/fit_tins.cc \
 	radmat/driver/radmat_driver.cc \
 	radmat/driver/radmat_driver_props.cc \
@@ -410,6 +414,7 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/axis_plotter.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/breit_frame.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/build_correlators.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/build_correlators_bad_data_repository.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/build_correlators_xml.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/covarrying_vectors.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/disconnected_graph_nuker.Po@am__quote@
@@ -434,6 +439,7 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/llsq_solvers.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/lorentzff_PiPi.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/lorentzff_PiPiStar.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/mink_qsq.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/polarisation_tensors.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/pow2assert.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/radmat_database_interface.Po@am__quote@
@@ -585,6 +591,20 @@ polarisation_tensors.obj: radmat/utils/polarisation_tensors.cc
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='radmat/utils/polarisation_tensors.cc' object='polarisation_tensors.obj' libtool=no @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCXX_FALSE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o polarisation_tensors.obj `if test -f 'radmat/utils/polarisation_tensors.cc'; then $(CYGPATH_W) 'radmat/utils/polarisation_tensors.cc'; else $(CYGPATH_W) '$(srcdir)/radmat/utils/polarisation_tensors.cc'; fi`
+
+mink_qsq.o: radmat/utils/mink_qsq.cc
+@am__fastdepCXX_TRUE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT mink_qsq.o -MD -MP -MF $(DEPDIR)/mink_qsq.Tpo -c -o mink_qsq.o `test -f 'radmat/utils/mink_qsq.cc' || echo '$(srcdir)/'`radmat/utils/mink_qsq.cc
+@am__fastdepCXX_TRUE@	$(am__mv) $(DEPDIR)/mink_qsq.Tpo $(DEPDIR)/mink_qsq.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='radmat/utils/mink_qsq.cc' object='mink_qsq.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o mink_qsq.o `test -f 'radmat/utils/mink_qsq.cc' || echo '$(srcdir)/'`radmat/utils/mink_qsq.cc
+
+mink_qsq.obj: radmat/utils/mink_qsq.cc
+@am__fastdepCXX_TRUE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT mink_qsq.obj -MD -MP -MF $(DEPDIR)/mink_qsq.Tpo -c -o mink_qsq.obj `if test -f 'radmat/utils/mink_qsq.cc'; then $(CYGPATH_W) 'radmat/utils/mink_qsq.cc'; else $(CYGPATH_W) '$(srcdir)/radmat/utils/mink_qsq.cc'; fi`
+@am__fastdepCXX_TRUE@	$(am__mv) $(DEPDIR)/mink_qsq.Tpo $(DEPDIR)/mink_qsq.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='radmat/utils/mink_qsq.cc' object='mink_qsq.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o mink_qsq.obj `if test -f 'radmat/utils/mink_qsq.cc'; then $(CYGPATH_W) 'radmat/utils/mink_qsq.cc'; else $(CYGPATH_W) '$(srcdir)/radmat/utils/mink_qsq.cc'; fi`
 
 ff_gen_llsq_row.o: radmat/ff/ff_gen_llsq_row.cc
 @am__fastdepCXX_TRUE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT ff_gen_llsq_row.o -MD -MP -MF $(DEPDIR)/ff_gen_llsq_row.Tpo -c -o ff_gen_llsq_row.o `test -f 'radmat/ff/ff_gen_llsq_row.cc' || echo '$(srcdir)/'`radmat/ff/ff_gen_llsq_row.cc
@@ -921,6 +941,20 @@ disconnected_graph_nuker.obj: radmat/load_data/disconnected_graph_nuker.cc
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='radmat/load_data/disconnected_graph_nuker.cc' object='disconnected_graph_nuker.obj' libtool=no @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCXX_FALSE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o disconnected_graph_nuker.obj `if test -f 'radmat/load_data/disconnected_graph_nuker.cc'; then $(CYGPATH_W) 'radmat/load_data/disconnected_graph_nuker.cc'; else $(CYGPATH_W) '$(srcdir)/radmat/load_data/disconnected_graph_nuker.cc'; fi`
+
+build_correlators_bad_data_repository.o: radmat/load_data/build_correlators_bad_data_repository.cc
+@am__fastdepCXX_TRUE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT build_correlators_bad_data_repository.o -MD -MP -MF $(DEPDIR)/build_correlators_bad_data_repository.Tpo -c -o build_correlators_bad_data_repository.o `test -f 'radmat/load_data/build_correlators_bad_data_repository.cc' || echo '$(srcdir)/'`radmat/load_data/build_correlators_bad_data_repository.cc
+@am__fastdepCXX_TRUE@	$(am__mv) $(DEPDIR)/build_correlators_bad_data_repository.Tpo $(DEPDIR)/build_correlators_bad_data_repository.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='radmat/load_data/build_correlators_bad_data_repository.cc' object='build_correlators_bad_data_repository.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o build_correlators_bad_data_repository.o `test -f 'radmat/load_data/build_correlators_bad_data_repository.cc' || echo '$(srcdir)/'`radmat/load_data/build_correlators_bad_data_repository.cc
+
+build_correlators_bad_data_repository.obj: radmat/load_data/build_correlators_bad_data_repository.cc
+@am__fastdepCXX_TRUE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT build_correlators_bad_data_repository.obj -MD -MP -MF $(DEPDIR)/build_correlators_bad_data_repository.Tpo -c -o build_correlators_bad_data_repository.obj `if test -f 'radmat/load_data/build_correlators_bad_data_repository.cc'; then $(CYGPATH_W) 'radmat/load_data/build_correlators_bad_data_repository.cc'; else $(CYGPATH_W) '$(srcdir)/radmat/load_data/build_correlators_bad_data_repository.cc'; fi`
+@am__fastdepCXX_TRUE@	$(am__mv) $(DEPDIR)/build_correlators_bad_data_repository.Tpo $(DEPDIR)/build_correlators_bad_data_repository.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='radmat/load_data/build_correlators_bad_data_repository.cc' object='build_correlators_bad_data_repository.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o build_correlators_bad_data_repository.obj `if test -f 'radmat/load_data/build_correlators_bad_data_repository.cc'; then $(CYGPATH_W) 'radmat/load_data/build_correlators_bad_data_repository.cc'; else $(CYGPATH_W) '$(srcdir)/radmat/load_data/build_correlators_bad_data_repository.cc'; fi`
 
 axis_plotter.o: radmat/fitting/axis_plotter.cc
 @am__fastdepCXX_TRUE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT axis_plotter.o -MD -MP -MF $(DEPDIR)/axis_plotter.Tpo -c -o axis_plotter.o `test -f 'radmat/fitting/axis_plotter.cc' || echo '$(srcdir)/'`radmat/fitting/axis_plotter.cc
