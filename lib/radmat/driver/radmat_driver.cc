@@ -6,7 +6,7 @@
 
  * Creation Date : 25-02-2013
 
- * Last Modified : Tue 22 Oct 2013 09:44:34 AM EDT
+ * Last Modified : Mon 28 Oct 2013 02:32:18 PM EDT
 
  * Created By : shultz
 
@@ -95,6 +95,7 @@ namespace radmat
 
     if (it != handler.end())
     {
+      std::cout << __PRETTY_FUNCTION__ << ": FOUND " << mode << std::endl;
       // easier to read -- call the member function on this instance
       // void (RadmatDriver::*Fred)(const std::string &);
       // Fred = it->second; 
@@ -213,6 +214,9 @@ namespace radmat
     std::map<std::string,std::vector<Hadron::KeyHadronNPartNPtCorr_t> >::iterator sorted_it; 
 
     keys = m_correlators.build_correlator_xml(m_ini.threePointIni); 
+
+    std::cout << __PRETTY_FUNCTION__ << " writing xml for " 
+      << keys.size() << " correlators" << std::endl; 
 
     // sort them based on momentum
     for(unsorted_it = keys.begin(); unsorted_it != keys.end(); ++unsorted_it)

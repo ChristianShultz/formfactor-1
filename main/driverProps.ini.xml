@@ -1,7 +1,7 @@
 <?xml version="1.0"?>
 <DriverProps>
 
-  <version>1</version>
+  <version>2</version>
 
   <!-- control the fiting across t_ins -->
 
@@ -97,13 +97,14 @@
                 <op_stem>b_b0xD0_J0__J0</op_stem>
                 <twoI_z>0</twoI_z>
               </elem>            
+
+              <elem> 
+                <charge_coefficient>0.23570226</charge_coefficient>  <!-- a prefactor for this op -->
+                <op_stem>hl_b0xD0_J0__J0</op_stem>
+                <twoI_z>0</twoI_z>
+              </elem>            
             </photons>
 
-            <elem> 
-              <charge_coefficient>0.23570226</charge_coefficient>  <!-- a prefactor for this op -->
-              <op_stem>hl_b0xD0_J0__J0</op_stem>
-              <twoI_z>0</twoI_z>
-            </elem>            
 
             <creation_op>true</creation_op>
             <smearedP>false</smearedP>
@@ -214,5 +215,9 @@
 
   <!-- energy of lightest vector or branch cut from two pions -->
   <poleMass>0.216166</poleMass>
+
+  <chisq>none</chisq>
+
+  <tolerance>1e-6</tolerance>
 
 </DriverProps>

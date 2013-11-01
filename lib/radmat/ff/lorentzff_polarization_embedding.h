@@ -69,8 +69,32 @@ namespace radmat
 
         return foo;
       }
-
     };
+
+
+  template<idx_t J_left, int hel_left>
+    struct leftPTensor
+    {
+      virtual Tensor<std::complex<double> , J_left > 
+        left_p_tensor(const Tensor<double,1> &p, const double mom_factor ) const
+        {
+          embedHelicityPolarizationTensor<J_left,hel_left> foo; 
+          return foo.conjugate( foo.ptensor(p,mom_factor) ); 
+        }
+    };
+
+
+  template<idx_t J_right, int hel_right>
+    struct rightPTensor
+    {
+      virtual Tensor<std::complex<double> , J_right > 
+        right_p_tensor(const Tensor<double,1> &p, const double mom_factor ) const
+        {
+          embedHelicityPolarizationTensor<J_right,hel_right> foo; 
+          return foo.ptensor(p,mom_factor); 
+        }
+    };
+
 
 }
 
