@@ -6,7 +6,7 @@
 
  * Creation Date : 04-05-2013
 
- * Last Modified : Mon 21 Oct 2013 10:51:50 AM EDT
+ * Last Modified : Mon 04 Nov 2013 02:34:45 PM EST
 
  * Created By : shultz
 
@@ -118,10 +118,6 @@ namespace radmat
 
         int M2 = -2*(i - 1) +J2;
         double phase = 1.;
-
-        // attempted phase cooking
-        // int M2 = 2*(i -1) - J2; // m -> -m
-        // double phase = (i %2 == 0) ? 1. : -1.; 
 
         ENSEM::Complex D = Hadron::Wigner_D(J2,M2,lambda2,rot.alpha,rot.beta,rot.gamma); 
         if(std::norm(SEMBLE::toScalar(D)) > 0.00001) 

@@ -47,6 +47,14 @@ namespace radmat
     };
 
 
+  // a cast like function
+  template<typename Coefficient, typename Object>
+    ListObjExpr_t<Coefficient,Object> 
+      convert_to_list(const ObjExpr_t<Coefficient,Object> &o)
+      {
+        return ListObjExpr_t<Coefficient,Object>(o); 
+      }
+
   //-----------------------------------------------------------------------
 
   //! stream an ObjExpr_t

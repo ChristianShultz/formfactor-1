@@ -7,6 +7,7 @@
 #include "ensem/ensem.h"
 #include "adat/handle.h"
 #include "AllConfStoreDB.h"
+#include "AllConfStoreMultipleDB.h"
 #include "io/adat_io.h"
 #include "io/adat_xmlio.h"
 #include "io/key_val_db.h"
@@ -25,7 +26,7 @@ namespace radmat
 
   struct dbProp_t
   {
-    std::string dbname;
+    std::vector<std::string> dbname;
     std::string badlist;
   };
 
@@ -75,8 +76,8 @@ namespace radmat
       NORMDATA fetch_dagger(const NORMKEY &) const;  
 
       public:
-      ADAT::Handle<FILEDB::AllConfStoreDB<S_C_KEY,S_C_DATA> > m_corr_db;
-      ADAT::Handle<FILEDB::AllConfStoreDB<S_N_KEY,S_N_DATA> > m_norm_db;  
+      ADAT::Handle<FILEDB::AllConfStoreMultipleDB<S_C_KEY,S_C_DATA> > m_corr_db;
+      ADAT::Handle<FILEDB::AllConfStoreMultipleDB<S_N_KEY,S_N_DATA> > m_norm_db;  
       radmatDBProp_t db_props;
 
       mutable std::ofstream outlog; // this is naughty but i wanted to move all of the 
@@ -97,22 +98,38 @@ namespace radmat
     void radmatAllConfDatabaseInterface<CORRKEY,CORRDATA,NORMKEY,NORMDATA>::alloc(void)
     {
 
-      m_corr_db = ADAT::Handle<FILEDB::AllConfStoreDB<S_C_KEY,S_C_DATA> > (new FILEDB::AllConfStoreDB<S_C_KEY,S_C_DATA>() );
-      m_norm_db = ADAT::Handle<FILEDB::AllConfStoreDB<S_N_KEY,S_N_DATA> > (new FILEDB::AllConfStoreDB<S_N_KEY,S_N_DATA>() );
+      m_corr_db = ADAT::Handle<FILEDB::AllConfStoreMultipleDB<S_C_KEY,S_C_DATA> > (new FILEDB::AllConfStoreMultipleDB<S_C_KEY,S_C_DATA>() );
+      m_norm_db = ADAT::Handle<FILEDB::AllConfStoreMultipleDB<S_N_KEY,S_N_DATA> > (new FILEDB::AllConfStoreMultipleDB<S_N_KEY,S_N_DATA>() );
 
-      if(m_corr_db->open(db_props.threePointDatabase.dbname, O_RDONLY, 0400) != 0)
+      m_corr_db->setCacheSize(1*1024*1024*1024); 
+      m_norm_db->setCacheSize(1*1024*1024*1024); 
+
+      // if(m_corr_db->open(db_props.threePointDatabase.dbname, O_RDONLY, 0400) != 0)
+      if(m_corr_db->open(db_props.threePointDatabase.dbname) != 0)
       {
-
-        outlog << __func__ << ": error opening dbase= " << db_props.threePointDatabase.dbname << std::endl;
-        std::cout << __func__ << ": error opening dbase= " << db_props.threePointDatabase.dbname << std::endl;
+        std::vector<std::string>::const_iterator it; 
+        outlog << __func__ << ": error opening one of the following" << std::endl;
+        std::cerr << __func__ << ": error opening one of the following" << std::endl;
+        for (it = db_props.threePointDatabase.dbname.begin(); it != db_props.threePointDatabase.dbname.end(); ++it)
+        {
+          outlog << *it << std::endl;
+          std::cout << *it << std::endl;
+        }
         exit(1);
       }
 
 
-      if(m_norm_db->open(db_props.normalizationDatabase.dbname, O_RDONLY, 0400) != 0)
+      // if(m_norm_db->open(db_props.normalizationDatabase.dbname, O_RDONLY, 0400) != 0)
+      if(m_norm_db->open(db_props.normalizationDatabase.dbname) != 0)
       {
-        outlog << __func__ << ": error opening dbase= " << db_props.normalizationDatabase.dbname << std::endl;
-        std::cerr << __func__ << ": error opening dbase= " << db_props.normalizationDatabase.dbname << std::endl;
+        std::vector<std::string>::const_iterator it; 
+        outlog << __func__ << ": error opening one of the following" << std::endl;
+        std::cerr << __func__ << ": error opening one of the following" << std::endl;
+        for (it = db_props.normalizationDatabase.dbname.begin(); it != db_props.normalizationDatabase.dbname.end(); ++it)
+        {
+          outlog << *it << std::endl;
+          std::cout << *it << std::endl;
+        }
         exit(1);
       }
     }
@@ -182,7 +199,7 @@ namespace radmat
 
 #ifdef DEBUGGING_ADATIO_KEYS
       std::cout << __func__ << ": trying to apply the equality operator " 
-                << std::endl; 
+        << std::endl; 
 #endif
 
       key.key() = k;
@@ -219,7 +236,7 @@ namespace radmat
         outlog << __func__ << ": Caught standard library exception: " << e.what() << std::endl;
         std::cerr << __func__ << ": Caught standard library exception: " << e.what() << std::endl;
         std::cerr << __func__ << ": key -- " << key.key() << "\n vals.size = " << vals.size() 
-                  << "\n ret = " << ret << " eval.size = " << eval.size() << std::endl;
+          << "\n ret = " << ret << " eval.size = " << eval.size() << std::endl;
         exit(1);
       }
 

@@ -55,6 +55,7 @@ namespace radmat
         std::string op_stem;
         double charge_coefficient;
         int twoI_z;
+        std::string op_manip; // useful to split off improvement terms
       };
 
       struct Insertion

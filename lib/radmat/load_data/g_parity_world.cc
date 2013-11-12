@@ -6,7 +6,7 @@
 
  * Creation Date : 25-04-2013
 
- * Last Modified : Wed 02 Oct 2013 01:20:23 PM EDT
+ * Last Modified : Mon 11 Nov 2013 11:02:50 AM EST
 
  * Created By : shultz
 
@@ -16,6 +16,8 @@
 #include "radmat/utils/pow2assert.h"
 #include "hadron/irrep_util.h"
 #include "formfac/formfac_qsq.h"
+#include <omp.h>
+
 
 namespace radmat
 {
@@ -153,7 +155,7 @@ namespace radmat
         ret.H = H;
         ret.parity = parity;
         ret.mom = mom;
-        ret.twoI_z = twoI_z;
+       ret.twoI_z = twoI_z;
         ret.name = name;
         ret.creation_op = creation_op;
         ret.smearedP = smearedP; 
@@ -172,17 +174,102 @@ namespace radmat
         return ret; 
       }
 
+
+      namespace photonWorkEnv
+      {
+        typedef GParityInsertion::photon 
+          (*photonPtr)(const GParityInsertionXML::Insertion &, 
+            const int, 
+            const ADATXML::Array<int> &, 
+            const GParityInsertionXML::GParityListElement &,
+            const std::string &);
+
+        bool local_registration = false; 
+
+        std::map<std::string,photonPtr> work_handler; 
+
+
+        GParityInsertion::photon 
+          standard_photon(const GParityInsertionXML::Insertion &ins,
+              const int helicity, 
+              const ADATXML::Array<int> &mom, 
+              const GParityInsertionXML::GParityListElement &ele,
+              const std::string &s)
+          {
+            return convert_to_list(
+                GParityInsertion::photon_frag(
+                  ele.charge_coefficient,
+                  makeGParityState(ins.J,
+                    helicity,
+                    ins.parity,
+                    mom,
+                    ele.twoI_z,
+                    ele.op_stem,
+                    ins.creation_op,
+                    ins.smearedP,
+                    false)  
+                  )
+                );
+          }
+
+        void init_work_handler(void)
+        {
+#pragma omp critical
+          {
+            if ( !!! local_registration ) 
+            {
+              work_handler[std::string("standard")] = &standard_photon;  
+
+            }
+            local_registration = true; 
+          }
+        }
+
+        GParityInsertion::photon getPhoton(const GParityInsertionXML::Insertion &ins, 
+            const int H, 
+            const ADATXML::Array<int> &mom, 
+            const GParityInsertionXML::GParityListElement &el,
+            const std::string &s)
+        {
+          init_work_handler(); 
+          std::string op = el.op_manip; 
+          photonPtr foo; 
+          std::map<std::string,photonPtr>::const_iterator it; 
+          it = work_handler.find(op); 
+
+          if ( it == work_handler.end() )
+          {
+            std::cout << __PRETTY_FUNCTION__ << ": error, " << s 
+              << " is not a supported option, try one of the following:" << std::endl;
+
+            for (it = work_handler.begin(); it != work_handler.end(); ++it)
+              std::cout << it->first << std::endl;
+          }
+
+          foo = it->second; 
+
+          return (*foo)(ins,H,mom,el,s); 
+        }
+
+
+
+
+      } // photonWorkEnv
+
+
+
       // photon is a list of coeff times a GParityState -- generate one
       GParityInsertion::photon getPhoton(const GParityInsertionXML::Insertion &ins, 
-          const int H, const ADATXML::Array<int> &mom) 
+          const int H, const ADATXML::Array<int> &mom, const std::string &s) 
       {
         GParityInsertion::photon ret; 
 
         for(int i = 0; i < ins.photons.size(); ++i)
-          ret = ret + GParityInsertion::photon_frag(ins.photons[i].charge_coefficient,
-              makeGParityState(ins.J,H,ins.parity,mom,ins.photons[i].twoI_z,ins.photons[i].op_stem,
-                ins.creation_op,ins.smearedP,false) // insertions are not projected operators 
-              );
+          ret = ret + photonWorkEnv::getPhoton(ins,H,mom,ins.photons[i],s); 
+
+        //     GParityInsertion::photon_frag(ins.photons[i].charge_coefficient,
+        //       makeGParityState(ins.J,H,ins.parity,mom,ins.photons[i].twoI_z,ins.photons[i].op_stem,
+        //         ins.creation_op,ins.smearedP,false));
 
         return ret; 
       }
@@ -278,7 +365,7 @@ namespace radmat
 
         // do the temporal insertion
         if(xml.time.active) 
-          ret.insert("t",getPhoton(xml.time,0,mom)); 
+          ret.insert("t",getPhoton(xml.time,0,mom,"t")); 
 
         // do the spatial insertion
         if(xml.space.active)
@@ -293,7 +380,7 @@ namespace radmat
             if(foo.find(xml.space.H[h]) != foo.end())
             {
               std::string lab = foo[xml.space.H[h]];
-              ret.insert(lab,getPhoton(xml.space,xml.space.H[h],mom)); 
+              ret.insert(lab,getPhoton(xml.space,xml.space.H[h],mom,"s")); 
             }
             else
             {

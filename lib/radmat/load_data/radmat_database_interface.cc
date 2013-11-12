@@ -6,7 +6,7 @@
 
  * Creation Date : 04-12-2012
 
- * Last Modified : Wed Jan 16 14:43:17 2013
+ * Last Modified : Mon 11 Nov 2013 10:15:00 AM EST
 
  * Created By : shultz
 
@@ -36,6 +36,14 @@ namespace radmat
         }
       }
 
+    template<typename T>
+      std::ostream& operator<<(std::ostream &o, const std::vector<T> &tt)
+      {
+        typename std::vector<T>::const_iterator it; 
+        for (it = tt.begin(); it != tt.end(); ++it)
+          o << *it << " "; 
+        return o; 
+      }
   } // namespace anonomyous 
 
 

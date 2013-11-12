@@ -6,7 +6,7 @@
 
  * Creation Date : 24-04-2013
 
- * Last Modified : Wed Jun  5 13:48:31 2013
+ * Last Modified : Mon 04 Nov 2013 10:15:49 AM EST
 
  * Created By : shultz
 
@@ -191,6 +191,7 @@ namespace radmat
       doXMLRead(ptop,"op_stem",e.op_stem,__PRETTY_FUNCTION__);
       doXMLRead(ptop,"charge_coefficient",e.charge_coefficient,__PRETTY_FUNCTION__);
       doXMLRead(ptop,"twoI_z",e.twoI_z,__PRETTY_FUNCTION__); 
+      doXMLRead(ptop,"op_manip",e.op_manip,__PRETTY_FUNCTION__); 
     }
 
     void write(ADATXML::XMLWriter &xml, const std::string &path, const GParityInsertionXML::GParityListElement &e)
@@ -199,6 +200,7 @@ namespace radmat
       write(xml,"op_stem",e.op_stem);
       write(xml,"charge_coefficient",e.charge_coefficient);
       write(xml,"twoI_z",e.twoI_z); 
+      write(xml,"op_manip",e.op_manip);
       ADATXML::pop(xml);
     }
 

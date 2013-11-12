@@ -6,7 +6,7 @@
 
  * Creation Date : 04-12-2012
 
- * Last Modified : Fri 01 Nov 2013 04:07:49 PM EDT
+ * Last Modified : Fri 01 Nov 2013 04:30:35 PM EDT
 
  * Created By : shultz
 
@@ -219,7 +219,7 @@ namespace radmat
 
 
 
-
+// the real workhorse
     build_correlator_return_value
       build_a_correlator( std::vector<Hadron::KeyHadronNPartNPtCorr_t >  & bad_corrs,
           std::vector<RadmatExtendedKeyHadronNPartIrrep_t> & bad_norms,
@@ -336,12 +336,11 @@ namespace radmat
           // the hadron key uses 1 based arrays
 
           // NB: assumption that npt is organized like <sink, ins , source>
-          const int t_source(it->m_obj.npt.npoint[3].t_slice);
           const int t_sink(it->m_obj.npt.npoint[1].t_slice); 
+          const int t_source(it->m_obj.npt.npoint[3].t_slice);
 
           // sanity
           POW2_ASSERT(t_source < t_sink); 
-
 
           // NB: the indexing here assumes [tsource,tsink] ie: inclusive range
           for(int t_ins = t_source; t_ins <= t_sink; ++t_ins)

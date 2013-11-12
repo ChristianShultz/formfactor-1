@@ -30,6 +30,10 @@ nobase_include_HEADERS += radmat/driver/radmat_driver.h radmat/driver/radmat_dri
 #jfit
 
 # nobase_include_HEADERS += radmat/jfit/abstract_function_default_errors.h radmat/jfit/abstract_function_default_values.h radmat/jfit/abstract_function_exit.h radmat/jfit/abstract_function.h radmat/jfit/abstract_function_named_parameter_container.h radmat/jfit/abstract_function_parameter_container.h radmat/jfit/abstract_function_parameter_fixing.h radmat/jfit/abstract_function_parameter_limits.h radmat/jfit/abstract_function_parameter_names.h
+
+# redstar_interface 
+nobase_include_HEADERS += radmat/redstar_interface/redstar_abstract_block_base.h radmat/redstar_interface/redstar_abstract_block_factory.h radmat/redstar_interface/redstar_npoint_function.h radmat/redstar_interface/redstar_single_particle_meson_block.h radmat/redstar_interface/redstar_unimproved_vector_current.h
+
 #
 # Library
 #
@@ -57,3 +61,5 @@ libradmat_a_SOURCES += radmat/fitting/axis_plotter.cc radmat/fitting/fit_tins.cc
 #driver
 libradmat_a_SOURCES += radmat/driver/radmat_driver.cc radmat/driver/radmat_driver_props.cc radmat/driver/radmat_single_q2_driver.cc radmat/driver/radmat_driver_aux.cc
 
+#redstar_interface
+libradmat_a_SOURCES += radmat/redstar_interface/redstar_abstract_block_factory.cc radmat/redstar_interface/redstar_npoint_function.cc radmat/redstar_interface/redstar_single_particle_meson_block.cc radmat/redstar_interface/redstar_unimproved_vector_current.cc

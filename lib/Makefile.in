@@ -96,7 +96,11 @@ am_libradmat_a_OBJECTS = aux.$(OBJEXT) breit_frame.$(OBJEXT) \
 	build_correlators_bad_data_repository.$(OBJEXT) \
 	axis_plotter.$(OBJEXT) fit_tins.$(OBJEXT) \
 	radmat_driver.$(OBJEXT) radmat_driver_props.$(OBJEXT) \
-	radmat_single_q2_driver.$(OBJEXT) radmat_driver_aux.$(OBJEXT)
+	radmat_single_q2_driver.$(OBJEXT) radmat_driver_aux.$(OBJEXT) \
+	redstar_abstract_block_factory.$(OBJEXT) \
+	redstar_npoint_function.$(OBJEXT) \
+	redstar_single_particle_meson_block.$(OBJEXT) \
+	redstar_unimproved_vector_current.$(OBJEXT)
 libradmat_a_OBJECTS = $(am_libradmat_a_OBJECTS)
 DEFAULT_INCLUDES = -I.@am__isrc@
 depcomp = $(SHELL) $(top_srcdir)/config/depcomp
@@ -232,6 +236,12 @@ AM_CXXFLAGS = -I@top_srcdir@/lib		\
 #fitting
 
 #driver
+
+#jfit
+
+# nobase_include_HEADERS += radmat/jfit/abstract_function_default_errors.h radmat/jfit/abstract_function_default_values.h radmat/jfit/abstract_function_exit.h radmat/jfit/abstract_function.h radmat/jfit/abstract_function_named_parameter_container.h radmat/jfit/abstract_function_parameter_container.h radmat/jfit/abstract_function_parameter_fixing.h radmat/jfit/abstract_function_parameter_limits.h radmat/jfit/abstract_function_parameter_names.h
+
+# redstar_interface 
 nobase_include_HEADERS = radmat/utils/aux.h radmat/utils/breit_frame.h \
 	radmat/utils/euler_angles.h radmat/utils/harmonic.h \
 	radmat/utils/lorentz.h radmat/utils/obj_expr_t.h \
@@ -279,11 +289,13 @@ nobase_include_HEADERS = radmat/utils/aux.h radmat/utils/breit_frame.h \
 	radmat/driver/radmat_driver.h \
 	radmat/driver/radmat_driver_props.h \
 	radmat/driver/radmat_single_q2_driver.h \
-	radmat/driver/radmat_driver_aux.h
+	radmat/driver/radmat_driver_aux.h \
+	radmat/redstar_interface/redstar_abstract_block_base.h \
+	radmat/redstar_interface/redstar_abstract_block_factory.h \
+	radmat/redstar_interface/redstar_npoint_function.h \
+	radmat/redstar_interface/redstar_single_particle_meson_block.h \
+	radmat/redstar_interface/redstar_unimproved_vector_current.h
 
-#jfit
-
-# nobase_include_HEADERS += radmat/jfit/abstract_function_default_errors.h radmat/jfit/abstract_function_default_values.h radmat/jfit/abstract_function_exit.h radmat/jfit/abstract_function.h radmat/jfit/abstract_function_named_parameter_container.h radmat/jfit/abstract_function_parameter_container.h radmat/jfit/abstract_function_parameter_fixing.h radmat/jfit/abstract_function_parameter_limits.h radmat/jfit/abstract_function_parameter_names.h
 #
 # Library
 #
@@ -302,6 +314,8 @@ lib_LIBRARIES = libradmat.a
 #fitting
 
 #driver
+
+#redstar_interface
 libradmat_a_SOURCES = radmat/utils/aux.cc radmat/utils/breit_frame.cc \
 	radmat/utils/euler_angles.cc radmat/utils/harmonic.cc \
 	radmat/utils/pow2assert.cc radmat/utils/splash.cc \
@@ -332,7 +346,11 @@ libradmat_a_SOURCES = radmat/utils/aux.cc radmat/utils/breit_frame.cc \
 	radmat/driver/radmat_driver.cc \
 	radmat/driver/radmat_driver_props.cc \
 	radmat/driver/radmat_single_q2_driver.cc \
-	radmat/driver/radmat_driver_aux.cc
+	radmat/driver/radmat_driver_aux.cc \
+	radmat/redstar_interface/redstar_abstract_block_factory.cc \
+	radmat/redstar_interface/redstar_npoint_function.cc \
+	radmat/redstar_interface/redstar_single_particle_meson_block.cc \
+	radmat/redstar_interface/redstar_unimproved_vector_current.cc
 all: all-am
 
 .SUFFIXES:
@@ -448,6 +466,10 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/radmat_driver_props.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/radmat_overlap_key_val_db.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/radmat_single_q2_driver.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/redstar_abstract_block_factory.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/redstar_npoint_function.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/redstar_single_particle_meson_block.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/redstar_unimproved_vector_current.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/splash.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/tensor.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/wigner.Po@am__quote@
@@ -1039,6 +1061,62 @@ radmat_driver_aux.obj: radmat/driver/radmat_driver_aux.cc
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='radmat/driver/radmat_driver_aux.cc' object='radmat_driver_aux.obj' libtool=no @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCXX_FALSE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o radmat_driver_aux.obj `if test -f 'radmat/driver/radmat_driver_aux.cc'; then $(CYGPATH_W) 'radmat/driver/radmat_driver_aux.cc'; else $(CYGPATH_W) '$(srcdir)/radmat/driver/radmat_driver_aux.cc'; fi`
+
+redstar_abstract_block_factory.o: radmat/redstar_interface/redstar_abstract_block_factory.cc
+@am__fastdepCXX_TRUE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT redstar_abstract_block_factory.o -MD -MP -MF $(DEPDIR)/redstar_abstract_block_factory.Tpo -c -o redstar_abstract_block_factory.o `test -f 'radmat/redstar_interface/redstar_abstract_block_factory.cc' || echo '$(srcdir)/'`radmat/redstar_interface/redstar_abstract_block_factory.cc
+@am__fastdepCXX_TRUE@	$(am__mv) $(DEPDIR)/redstar_abstract_block_factory.Tpo $(DEPDIR)/redstar_abstract_block_factory.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='radmat/redstar_interface/redstar_abstract_block_factory.cc' object='redstar_abstract_block_factory.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o redstar_abstract_block_factory.o `test -f 'radmat/redstar_interface/redstar_abstract_block_factory.cc' || echo '$(srcdir)/'`radmat/redstar_interface/redstar_abstract_block_factory.cc
+
+redstar_abstract_block_factory.obj: radmat/redstar_interface/redstar_abstract_block_factory.cc
+@am__fastdepCXX_TRUE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT redstar_abstract_block_factory.obj -MD -MP -MF $(DEPDIR)/redstar_abstract_block_factory.Tpo -c -o redstar_abstract_block_factory.obj `if test -f 'radmat/redstar_interface/redstar_abstract_block_factory.cc'; then $(CYGPATH_W) 'radmat/redstar_interface/redstar_abstract_block_factory.cc'; else $(CYGPATH_W) '$(srcdir)/radmat/redstar_interface/redstar_abstract_block_factory.cc'; fi`
+@am__fastdepCXX_TRUE@	$(am__mv) $(DEPDIR)/redstar_abstract_block_factory.Tpo $(DEPDIR)/redstar_abstract_block_factory.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='radmat/redstar_interface/redstar_abstract_block_factory.cc' object='redstar_abstract_block_factory.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o redstar_abstract_block_factory.obj `if test -f 'radmat/redstar_interface/redstar_abstract_block_factory.cc'; then $(CYGPATH_W) 'radmat/redstar_interface/redstar_abstract_block_factory.cc'; else $(CYGPATH_W) '$(srcdir)/radmat/redstar_interface/redstar_abstract_block_factory.cc'; fi`
+
+redstar_npoint_function.o: radmat/redstar_interface/redstar_npoint_function.cc
+@am__fastdepCXX_TRUE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT redstar_npoint_function.o -MD -MP -MF $(DEPDIR)/redstar_npoint_function.Tpo -c -o redstar_npoint_function.o `test -f 'radmat/redstar_interface/redstar_npoint_function.cc' || echo '$(srcdir)/'`radmat/redstar_interface/redstar_npoint_function.cc
+@am__fastdepCXX_TRUE@	$(am__mv) $(DEPDIR)/redstar_npoint_function.Tpo $(DEPDIR)/redstar_npoint_function.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='radmat/redstar_interface/redstar_npoint_function.cc' object='redstar_npoint_function.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o redstar_npoint_function.o `test -f 'radmat/redstar_interface/redstar_npoint_function.cc' || echo '$(srcdir)/'`radmat/redstar_interface/redstar_npoint_function.cc
+
+redstar_npoint_function.obj: radmat/redstar_interface/redstar_npoint_function.cc
+@am__fastdepCXX_TRUE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT redstar_npoint_function.obj -MD -MP -MF $(DEPDIR)/redstar_npoint_function.Tpo -c -o redstar_npoint_function.obj `if test -f 'radmat/redstar_interface/redstar_npoint_function.cc'; then $(CYGPATH_W) 'radmat/redstar_interface/redstar_npoint_function.cc'; else $(CYGPATH_W) '$(srcdir)/radmat/redstar_interface/redstar_npoint_function.cc'; fi`
+@am__fastdepCXX_TRUE@	$(am__mv) $(DEPDIR)/redstar_npoint_function.Tpo $(DEPDIR)/redstar_npoint_function.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='radmat/redstar_interface/redstar_npoint_function.cc' object='redstar_npoint_function.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o redstar_npoint_function.obj `if test -f 'radmat/redstar_interface/redstar_npoint_function.cc'; then $(CYGPATH_W) 'radmat/redstar_interface/redstar_npoint_function.cc'; else $(CYGPATH_W) '$(srcdir)/radmat/redstar_interface/redstar_npoint_function.cc'; fi`
+
+redstar_single_particle_meson_block.o: radmat/redstar_interface/redstar_single_particle_meson_block.cc
+@am__fastdepCXX_TRUE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT redstar_single_particle_meson_block.o -MD -MP -MF $(DEPDIR)/redstar_single_particle_meson_block.Tpo -c -o redstar_single_particle_meson_block.o `test -f 'radmat/redstar_interface/redstar_single_particle_meson_block.cc' || echo '$(srcdir)/'`radmat/redstar_interface/redstar_single_particle_meson_block.cc
+@am__fastdepCXX_TRUE@	$(am__mv) $(DEPDIR)/redstar_single_particle_meson_block.Tpo $(DEPDIR)/redstar_single_particle_meson_block.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='radmat/redstar_interface/redstar_single_particle_meson_block.cc' object='redstar_single_particle_meson_block.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o redstar_single_particle_meson_block.o `test -f 'radmat/redstar_interface/redstar_single_particle_meson_block.cc' || echo '$(srcdir)/'`radmat/redstar_interface/redstar_single_particle_meson_block.cc
+
+redstar_single_particle_meson_block.obj: radmat/redstar_interface/redstar_single_particle_meson_block.cc
+@am__fastdepCXX_TRUE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT redstar_single_particle_meson_block.obj -MD -MP -MF $(DEPDIR)/redstar_single_particle_meson_block.Tpo -c -o redstar_single_particle_meson_block.obj `if test -f 'radmat/redstar_interface/redstar_single_particle_meson_block.cc'; then $(CYGPATH_W) 'radmat/redstar_interface/redstar_single_particle_meson_block.cc'; else $(CYGPATH_W) '$(srcdir)/radmat/redstar_interface/redstar_single_particle_meson_block.cc'; fi`
+@am__fastdepCXX_TRUE@	$(am__mv) $(DEPDIR)/redstar_single_particle_meson_block.Tpo $(DEPDIR)/redstar_single_particle_meson_block.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='radmat/redstar_interface/redstar_single_particle_meson_block.cc' object='redstar_single_particle_meson_block.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o redstar_single_particle_meson_block.obj `if test -f 'radmat/redstar_interface/redstar_single_particle_meson_block.cc'; then $(CYGPATH_W) 'radmat/redstar_interface/redstar_single_particle_meson_block.cc'; else $(CYGPATH_W) '$(srcdir)/radmat/redstar_interface/redstar_single_particle_meson_block.cc'; fi`
+
+redstar_unimproved_vector_current.o: radmat/redstar_interface/redstar_unimproved_vector_current.cc
+@am__fastdepCXX_TRUE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT redstar_unimproved_vector_current.o -MD -MP -MF $(DEPDIR)/redstar_unimproved_vector_current.Tpo -c -o redstar_unimproved_vector_current.o `test -f 'radmat/redstar_interface/redstar_unimproved_vector_current.cc' || echo '$(srcdir)/'`radmat/redstar_interface/redstar_unimproved_vector_current.cc
+@am__fastdepCXX_TRUE@	$(am__mv) $(DEPDIR)/redstar_unimproved_vector_current.Tpo $(DEPDIR)/redstar_unimproved_vector_current.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='radmat/redstar_interface/redstar_unimproved_vector_current.cc' object='redstar_unimproved_vector_current.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o redstar_unimproved_vector_current.o `test -f 'radmat/redstar_interface/redstar_unimproved_vector_current.cc' || echo '$(srcdir)/'`radmat/redstar_interface/redstar_unimproved_vector_current.cc
+
+redstar_unimproved_vector_current.obj: radmat/redstar_interface/redstar_unimproved_vector_current.cc
+@am__fastdepCXX_TRUE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT redstar_unimproved_vector_current.obj -MD -MP -MF $(DEPDIR)/redstar_unimproved_vector_current.Tpo -c -o redstar_unimproved_vector_current.obj `if test -f 'radmat/redstar_interface/redstar_unimproved_vector_current.cc'; then $(CYGPATH_W) 'radmat/redstar_interface/redstar_unimproved_vector_current.cc'; else $(CYGPATH_W) '$(srcdir)/radmat/redstar_interface/redstar_unimproved_vector_current.cc'; fi`
+@am__fastdepCXX_TRUE@	$(am__mv) $(DEPDIR)/redstar_unimproved_vector_current.Tpo $(DEPDIR)/redstar_unimproved_vector_current.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='radmat/redstar_interface/redstar_unimproved_vector_current.cc' object='redstar_unimproved_vector_current.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o redstar_unimproved_vector_current.obj `if test -f 'radmat/redstar_interface/redstar_unimproved_vector_current.cc'; then $(CYGPATH_W) 'radmat/redstar_interface/redstar_unimproved_vector_current.cc'; else $(CYGPATH_W) '$(srcdir)/radmat/redstar_interface/redstar_unimproved_vector_current.cc'; fi`
 install-nobase_includeHEADERS: $(nobase_include_HEADERS)
 	@$(NORMAL_INSTALL)
 	test -z "$(includedir)" || $(MKDIR_P) "$(DESTDIR)$(includedir)"
