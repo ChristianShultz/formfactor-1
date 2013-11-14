@@ -6,7 +6,7 @@
 
  * Creation Date : 25-02-2013
 
- * Last Modified : Tue 22 Oct 2013 10:57:41 AM EDT
+ * Last Modified : Wed 13 Nov 2013 08:47:26 PM EST
 
  * Created By : shultz
 
@@ -17,7 +17,7 @@
 #include <sstream>
 #include <iostream>
 #include "radmat/driver/radmat_driver.h"
-#include "radmat/load_data/lattice_multi_data_object.h"
+#include "radmat/construct_data/lattice_multi_data_object.h"
 #include "radmat/llsq/llsq_multi_data_serialize.h"
 #include "radmat/utils/pow2assert.h"
 #include "radmat/utils/splash.h"

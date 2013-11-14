@@ -20,18 +20,22 @@ namespace radmat
   //
   //
 
-  struct RedstarSingleParticleMesonInput_string {};
-  REGISTER_STRINGIFY_TYPE(RedstarSingleParticleMesonInput_string); 
+  struct RedstarSingleParticleMesonInput;
+  REGISTER_STRINGIFY_TYPE(RedstarSingleParticleMesonInput); 
 
   struct RedstarSingleParticleMesonInput
     : public AbsRedstarInput_t
   {
     virtual std::string type(void) const 
     {
-      return std::string(Stringify<RedstarSingleParticleMesonInput_string>()); 
+      return std::string(Stringify<RedstarSingleParticleMesonInput>()); 
     }
 
     virtual std::string write(void) const; 
+
+    virtual AbsRedstarInput_t * clone(void) const; 
+
+    std::string sname(void) const; 
 
     int J;                            // continuum spin
     int H;                            // helicity 
@@ -52,20 +56,22 @@ namespace radmat
   //
   //
 
-  struct RedstarSingleParticleMesonBlock_string {};
-  REGISTER_STRINGIFY_TYPE(RedstarSingleParticleMesonBlock_string); 
+  struct RedstarSingleParticleMesonBlock;
+  REGISTER_STRINGIFY_TYPE(RedstarSingleParticleMesonBlock); 
 
   struct RedstarSingleParticleMesonBlock
     : public AbsRedstarBlock_t
   {
     virtual std::string type(void) const 
     {
-      return std::string(Stringify<RedstarSingleParticleMesonBlock_string>()); 
+      return std::string(Stringify<RedstarSingleParticleMesonBlock>()); 
     }
 
     // arg is polymorphic dynamic cast to derived type RedstarSingleParticleMesonInput
     virtual EnsemRedstarBlock 
       operator()(const AbsRedstarInput_t * ptr2derived) const ; 
+
+    virtual AbsRedstarBlock_t* clone(void) const {return new RedstarSingleParticleMesonBlock;}
   };
 
 
@@ -79,8 +85,8 @@ namespace radmat
   //
 
 
-  struct RedstarSingleParticleMesonXML_string {}; 
-  REGISTER_STRINGIFY_TYPE(RedstarSingleParticleMesonXML_string); 
+  struct RedstarSingleParticleMesonXML; 
+  REGISTER_STRINGIFY_TYPE(RedstarSingleParticleMesonXML); 
 
 
   struct RedstarSingleParticleMesonXML
@@ -89,7 +95,7 @@ namespace radmat
 
     virtual std::string type(void) const 
     {
-      return std::string(Stringify<RedstarSingleParticleMesonXML_string>()); 
+      return std::string(Stringify<RedstarSingleParticleMesonXML>()); 
     }
 
     virtual void read(ADATXML::XMLReader &xml, 
@@ -97,7 +103,12 @@ namespace radmat
 
     virtual std::string write(void) const;  
     virtual void write(ADATXML::XMLWriter &xml, 
-        const std::string &path); 
+        const std::string &path) const; 
+
+    virtual AbsRedstarXMLInterface_t * 
+      clone(void) const {return new RedstarSingleParticleMesonXML(*this); }
+
+    virtual int timeslice(void) const {return t_slice;}
 
     int J;                                              // continuum spin
     ADATXML::Array<int> H;                              // helicity 

@@ -6,7 +6,7 @@
 
  * Creation Date : 12-10-2012
 
- * Last Modified : Mon May  6 16:33:04 2013
+ * Last Modified : Wed 13 Nov 2013 06:34:33 PM EST
 
  * Created By : shultz
 
@@ -15,7 +15,7 @@
 
 
 
-#include "radmat/load_data/invert_subduction.h"
+#include "radmat/construct_data/invert_subduction.h"
 #include "radmat/utils/polarisation_tensors.h"
 #include "radmat/utils/pow2assert.h"
 

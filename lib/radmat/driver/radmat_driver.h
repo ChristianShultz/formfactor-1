@@ -4,7 +4,7 @@
 
 #include <string>
 #include "adat/handle.h"
-#include "radmat/load_data/build_correlators.h"
+#include "radmat/construct_data/construct_correlators.h"
 #include "radmat/llsq/llsq_multi_data.h"
 #include "radmat_driver_props.h"
 #include "radmat_single_q2_driver.h"
@@ -31,13 +31,13 @@ namespace radmat
     //! two point xml hack
     void build_xml_twopoint(const std::string &inifile);
 
-    //! just figure out what disconnected graphs we have to nuke for redstar
-    void nuke_graph(const std::string &inifile ,
-                    const std::string &graph_db,
-                    const std::string &nuke_xml_out);   
-
-    //! stick in stubs for gen_prop generation
-    void build_stub_xml(const std::string &inifile); 
+//    //! just figure out what disconnected graphs we have to nuke for redstar
+//    void nuke_graph(const std::string &inifile ,
+//                    const std::string &graph_db,
+//                    const std::string &nuke_xml_out);   
+//
+//    //! stick in stubs for gen_prop generation
+//    void build_stub_xml(const std::string &inifile); 
 
     private:
 
@@ -64,7 +64,7 @@ namespace radmat
 
 
     RDriverProps_t m_ini;  
-    BuildCorrelators m_correlators; 
+    ConstructCorrelators m_correlators; 
     std::vector<bool> good_qs;
     std::vector<ADAT::Handle<LLSQLatticeMultiData> > multi_lattice_data; 
     std::vector<RadmatSingleQ2Driver> linear_systems_of_Q2; 

@@ -22,8 +22,8 @@ namespace radmat
   //
   //
 
-  struct RedstarUnimprovedVectorCurrentInput_string {};
-  REGISTER_STRINGIFY_TYPE(RedstarUnimprovedVectorCurrentInput_string);
+  struct RedstarUnimprovedVectorCurrentInput;
+  REGISTER_STRINGIFY_TYPE(RedstarUnimprovedVectorCurrentInput);
 
   struct RedstarUnimprovedVectorCurrentInput
     : public AbsRedstarInput_t 
@@ -34,10 +34,11 @@ namespace radmat
 
     virtual std::string type(void) const
     {
-      return std::string(Stringify<RedstarUnimprovedVectorCurrentInput_string>()); 
+      return std::string(Stringify<RedstarUnimprovedVectorCurrentInput>()); 
     }
 
     virtual std::string write(void) const; 
+    AbsRedstarInput_t* clone(void) const; 
 
     const_iterator begin(void) const {return photons.begin();}
     const_iterator end(void) const {return photons.end();}
@@ -58,20 +59,24 @@ namespace radmat
   //
   //
 
-  struct RedstarUnimprovedVectorCurrentBlock_string {};
-  REGISTER_STRINGIFY_TYPE(RedstarUnimprovedVectorCurrentBlock_string);
+  struct RedstarUnimprovedVectorCurrentBlock;
+  REGISTER_STRINGIFY_TYPE(RedstarUnimprovedVectorCurrentBlock);
 
   struct RedstarUnimprovedVectorCurrentBlock
     : public AbsRedstarBlock_t
   {
     virtual std::string type(void) const
     {
-      return std::string(Stringify<RedstarUnimprovedVectorCurrentBlock_string>()); 
+      return std::string(Stringify<RedstarUnimprovedVectorCurrentBlock>()); 
     }
 
     virtual EnsemRedstarBlock
       operator()(const AbsRedstarInput_t *ptr2derived) const ; 
 
+    virtual AbsRedstarBlock_t* clone(void) const 
+    {
+      return new RedstarUnimprovedVectorCurrentBlock;
+    }
   };
 
 
@@ -82,8 +87,8 @@ namespace radmat
   //
 
 
-  struct RedstarUnimprovedVectorCurrentXML_string {};
-  REGISTER_STRINGIFY_TYPE(RedstarUnimprovedVectorCurrentXML_string);
+  struct RedstarUnimprovedVectorCurrentXML;
+  REGISTER_STRINGIFY_TYPE(RedstarUnimprovedVectorCurrentXML);
 
 
   struct RedstarUnimprovedVectorCurrentXML 
@@ -96,12 +101,18 @@ namespace radmat
 
     virtual std::string type(void) const
     {
-      return std::string(Stringify<RedstarUnimprovedVectorCurrentXML_string>());
+      return std::string(Stringify<RedstarUnimprovedVectorCurrentXML>());
     }
 
     virtual std::string write(void) const; 
-    virtual void write(ADATXML::XMLWriter &xml, const std::string &path); 
+    virtual void write(ADATXML::XMLWriter &xml, const std::string &path) const; 
 
+    virtual AbsRedstarXMLInterface_t* clone(void) const 
+    {
+      return new RedstarUnimprovedVectorCurrentXML(*this); 
+    }
+
+    virtual int timeslice(void) const { return t_slice; }
 
     struct insertion
     {
@@ -123,10 +134,17 @@ namespace radmat
       const std::string &path,
       RedstarUnimprovedVectorCurrentPFrag &p);
 
+  void write(ADATXML::XMLWriter &xml, 
+      const std::string &path,
+      const RedstarUnimprovedVectorCurrentPFrag &p);
+
   void read(ADATXML::XMLReader &xml, 
       const std::string &path,
       RedstarUnimprovedVectorCurrentXML::insertion &i);
 
+  void write(ADATXML::XMLWriter &xml,
+      const std::string &path, 
+      const RedstarUnimprovedVectorCurrentXML::insertion &i);
 } // radmat
 
 

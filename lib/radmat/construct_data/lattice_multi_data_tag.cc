@@ -6,7 +6,7 @@
 
 * Creation Date : 01-10-2013
 
-* Last Modified : Tue 01 Oct 2013 04:53:00 PM EDT
+* Last Modified : Wed 13 Nov 2013 05:25:53 PM EST
 
 * Created By : shultz
 
@@ -15,8 +15,6 @@ _._._._._._._._._._._._._._._._._._._._._.*/
 
 #include "lattice_multi_data_tag.h"
 #include "invert_subduction.h"
-#include "g_parity_world.h"
-#include "g_parity_world_generate_redstar_xml.h"  
 #include "radmat_database_interface.h"
 #include "radmat/fake_data/fake_3pt_function_aux.h"
 #include "radmat/utils/pow2assert.h"

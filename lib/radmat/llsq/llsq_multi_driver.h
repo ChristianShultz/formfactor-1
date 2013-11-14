@@ -5,7 +5,7 @@
 #include "llsq_driver.h"
 #include "llsq_solvers.h"
 #include "llsq_gen_system.h"
-#include "radmat/load_data/build_correlators.h"
+#include "radmat/construct_data/lattice_multi_data_object.h"
 #include <complex>
 #include <string>
 

@@ -6,7 +6,7 @@
 
  * Creation Date : 11-11-2013
 
- * Last Modified : Tue 12 Nov 2013 09:06:44 AM EST
+ * Last Modified : Wed 13 Nov 2013 08:45:49 PM EST
 
  * Created By : shultz
 
@@ -14,7 +14,7 @@
 
 #include "redstar_unimproved_vector_current.h"
 #include "redstar_single_particle_meson_block.h"
-#include "radmat/load_data/invert_subduction.h"
+#include "radmat/construct_data/invert_subduction.h"
 
 #include "semble/semble_meta.h"
 
@@ -301,6 +301,22 @@ namespace radmat
     return ss.str(); 
   }
 
+  AbsRedstarInput_t * 
+    RedstarUnimprovedVectorCurrentInput::clone(void) const
+    {
+      RedstarUnimprovedVectorCurrentInput *p; 
+      p = new RedstarUnimprovedVectorCurrentInput; 
+
+      p->lorentz = lorentz; 
+      p->mom = mom; 
+      p->photons = photons; 
+      p->creation_op = creation_op;
+      p->smearedP = smearedP;
+      p->t_slice = t_slice;
+
+      return p;
+    } 
+
 
   EnsemRedstarBlock
     RedstarUnimprovedVectorCurrentBlock::operator()(const AbsRedstarInput_t *base) const
@@ -378,27 +394,65 @@ namespace radmat
 
     }
 
+    std::string toString(const RedstarUnimprovedVectorCurrentXML::insertion &i)
+    {
+      std::stringstream ss; 
+      ss << "active= " << i.active << " create= " << i.creation_op 
+        << " smear= " << i.smearedP << " photons: ";
+      for(int j = 0; j < i.photons.size(); ++j)
+        ss << i.photons[j].coeff << "x" << i.photons[j].name << "   ";
+      return ss.str(); 
+    }
+
+
+
   } // anonomyous  
 
-    void read(ADATXML::XMLReader &xml, 
-        const std::string &path,
-        RedstarUnimprovedVectorCurrentPFrag &p)  
-    {
-      ADATXML::XMLReader ptop(xml,path); 
-      doXMLRead(ptop,"coeff",p.coeff,__PRETTY_FUNCTION__); 
-      doXMLRead(ptop,"name",p.name,__PRETTY_FUNCTION__); 
-    }
 
-    void read(ADATXML::XMLReader &xml, 
-        const std::string &path,
-        RedstarUnimprovedVectorCurrentXML::insertion &i)  
-    {
-      ADATXML::XMLReader ptop(xml,path); 
-      doXMLRead(ptop,"active",i.active,__PRETTY_FUNCTION__); 
-      doXMLRead(ptop,"creation_op",i.creation_op,__PRETTY_FUNCTION__); 
-      doXMLRead(ptop,"smearedP",i.smearedP,__PRETTY_FUNCTION__); 
-      doXMLRead(ptop,"photons",i.photons,__PRETTY_FUNCTION__); 
-    }
+
+
+
+  void write(ADATXML::XMLWriter &xml, 
+      const std::string &path,
+      const RedstarUnimprovedVectorCurrentPFrag &p)
+  {
+    ADATXML::push(xml,path);
+    ADATXML::write(xml,"coeff",p.coeff);
+    ADATXML::write(xml,"name",p.name); 
+    ADATXML::pop(xml);
+  }
+
+  void write(ADATXML::XMLWriter &xml,
+      const std::string &path, 
+      const RedstarUnimprovedVectorCurrentXML::insertion &i)
+  {
+    ADATXML::push(xml,path);
+    ADATXML::write(xml,"active",i.active);
+    ADATXML::write(xml,"creation_op",i.creation_op);
+    ADATXML::write(xml,"smearedP",i.smearedP); 
+    write(xml,"photons",i.photons); 
+    ADATXML::pop(xml);
+  }
+
+  void read(ADATXML::XMLReader &xml, 
+      const std::string &path,
+      RedstarUnimprovedVectorCurrentPFrag &p)  
+  {
+    ADATXML::XMLReader ptop(xml,path); 
+    doXMLRead(ptop,"coeff",p.coeff,__PRETTY_FUNCTION__); 
+    doXMLRead(ptop,"name",p.name,__PRETTY_FUNCTION__); 
+  }
+
+  void read(ADATXML::XMLReader &xml, 
+      const std::string &path,
+      RedstarUnimprovedVectorCurrentXML::insertion &i)  
+  {
+    ADATXML::XMLReader ptop(xml,path); 
+    doXMLRead(ptop,"active",i.active,__PRETTY_FUNCTION__); 
+    doXMLRead(ptop,"creation_op",i.creation_op,__PRETTY_FUNCTION__); 
+    doXMLRead(ptop,"smearedP",i.smearedP,__PRETTY_FUNCTION__); 
+    doXMLRead(ptop,"photons",i.photons,__PRETTY_FUNCTION__); 
+  }
 
   void 
     RedstarUnimprovedVectorCurrentXML::read(ADATXML::XMLReader &xml, const std::string &path)
@@ -418,5 +472,28 @@ namespace radmat
       read_in_photons(inputList,space,t_slice,false);  
     }
 
+  std::string 
+    RedstarUnimprovedVectorCurrentXML::write(void) const
+    {
+      std::stringstream ss;
+      ss << "pmin= " << pmin << " pmax=" << pmax << " t_slice= " << t_slice; 
+      ss << "time= " << toString(time) << std::endl;
+      ss << "space= " << toString(space) << std::endl;
+      return ss.str(); 
+    }
+
+  void 
+    RedstarUnimprovedVectorCurrentXML::write(
+        ADATXML::XMLWriter &xml, 
+        const std::string &path) const
+    {
+      ADATXML::push(xml,path);
+      ADATXML::write(xml,"pmin",pmin);
+      ADATXML::write(xml,"pmax",pmax);
+      ADATXML::write(xml,"t_slice",t_slice);
+      ::radmat::write(xml,"time",time);
+      ::radmat::write(xml,"space",space); 
+      ADATXML::pop(xml); 
+    }
 
 } // radmat

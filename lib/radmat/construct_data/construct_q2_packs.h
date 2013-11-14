@@ -1,5 +1,5 @@
-#ifndef BUILD_Q2_PACKS_H_H_GUARD
-#define BUILD_Q2_PACKS_H_H_GUARD
+#ifndef CONSTRUCT_Q2_PACKS_H_H_GUARD
+#define CONSTRUCT_Q2_PACKS_H_H_GUARD
 
 
 #include "three_point.h"
@@ -31,6 +31,8 @@
 // the vectors already have their storage allocated, we will be 
 // writing one thread per elem so its safe
 
+
+#warning "\n\n\n THIS CODE IS MASSIVELY DEPRECIATED \n\n\n"
 
 namespace radmat
 {

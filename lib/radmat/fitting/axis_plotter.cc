@@ -6,7 +6,7 @@
 
  * Creation Date : 31-07-2012
 
- * Last Modified : Mon Nov 26 14:34:44 2012
+ * Last Modified : Wed 13 Nov 2013 06:10:39 PM EST
 
  * Created By : shultz
 
@@ -18,7 +18,6 @@
 #include "ensem/ensem.h"
 #include "jackFitter/plot.h"
 #include "semble/semble_file_management.h"
-#include "radmat/load_data/build_q2_packs.h"
 #include "radmat/utils/splash.h"
 #include <sstream>
 

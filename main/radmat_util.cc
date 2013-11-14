@@ -6,7 +6,7 @@
 
  * Creation Date : 25-02-2013
 
- * Last Modified : Tue Jun 25 17:04:07 2013
+ * Last Modified : Wed 13 Nov 2013 05:55:44 PM EST
 
  * Created By : shultz
 
@@ -48,14 +48,16 @@ void gen_xml(int argc , char *argv[] )
 void nuke_graphs(int argc , char *argv[] )
 {
 
-  if(argc != 5)
+  // if(argc != 5)
+  if(true)
   {
-    std::cerr << "error: usage: radmat_util: nuke_graphs" 
-      <<" <smeared_xmlinifile> <smeared_graph.sdb> <output.xml>" << std::endl; 
-
-    std::cerr << " this takes an xml ini with a smeared insertion and the graph db \n" 
-      << " that redstar_gen_graph spits out and comes up with an xml list of the \n" 
-      << " disconnected insertions that need to be nuked" << std::endl;
+    std::cerr << "this is no longer needed" << std::endl;
+//    std::cerr << "error: usage: radmat_util: nuke_graphs" 
+//      <<" <smeared_xmlinifile> <smeared_graph.sdb> <output.xml>" << std::endl; 
+//
+//    std::cerr << " this takes an xml ini with a smeared insertion and the graph db \n" 
+//      << " that redstar_gen_graph spits out and comes up with an xml list of the \n" 
+//      << " disconnected insertions that need to be nuked" << std::endl;
     exit(1); 
   }
 
@@ -68,16 +70,18 @@ void nuke_graphs(int argc , char *argv[] )
   val2 >> graph; 
   val3 >> xmlout; 
 
-  radmat::RadmatDriver d; 
-  d.nuke_graph(ini,graph,xmlout); 
+//  radmat::RadmatDriver d; 
+//  d.nuke_graph(ini,graph,xmlout); 
 
 }
 
 void stub_xml(int argc , char *argv[] )
 {
-  if(argc != 3)
+  // if(argc != 3)
+  if(true)
   {
-    std::cerr << "error: usage: radmat_util: stub_xml <xmlinifile> " << std::endl;
+    std::cerr << "this is no longer needed" << std::endl; 
+//    std::cerr << "error: usage: radmat_util: stub_xml <xmlinifile> " << std::endl;
     exit(1); 
   }
 
@@ -85,8 +89,8 @@ void stub_xml(int argc , char *argv[] )
   std::string ini; 
   val >> ini; 
 
-  radmat::RadmatDriver d; 
-  d.build_stub_xml(ini); 
+//  radmat::RadmatDriver d; 
+//  d.build_stub_xml(ini); 
 
 }
 

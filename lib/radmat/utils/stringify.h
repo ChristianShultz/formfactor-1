@@ -2,6 +2,7 @@
 #define STRINGIFY_H_H_GUARD
 
 #include <complex>
+#include <string>
 
 /**
   @file stringify.h
@@ -14,31 +15,60 @@
 namespace radmat
 {
 
-  template<typename T>
-    struct TypeName
-    {
-      static const char *name;
-    };
 
-  template<typename T>
-    const char *TypeName<T>::name = "unknown";
-
-  template<typename T>
-    const char *Stringify(void)
+    struct StringifyBase
     {
-      return TypeName<T>::name;
+      StringifyBase() {}
+      virtual std::string name() const = 0; 
+    }; 
+
+  template<class T>
+    struct StringifyTemp : public StringifyBase
+  { };
+
+
+#define REGISTER_STRINGIFY_TYPE(X)                \
+  template<>                                      \
+  struct StringifyTemp<X> : public StringifyBase  \
+  {                                               \
+    std::string name() const { return #X ;}       \
+  };                                              \
+
+  // only specializations may be instatiated
+  template<typename T>
+    std::string Stringify(void)
+    {
+      StringifyTemp<T> f;
+      return f.name(); 
     }
 
-  // macro template specialization expansion
-#define REGISTER_STRINGIFY_TYPE(X) template<>	\
-  const char *TypeName<X>::name = #X
 
-  // types must be registered before use otherwise it will default to
-  // the unknown type
-  REGISTER_STRINGIFY_TYPE(int);
-  REGISTER_STRINGIFY_TYPE(float);
-  REGISTER_STRINGIFY_TYPE(double);
-  REGISTER_STRINGIFY_TYPE(std::complex<double>);
+//  template<typename T>
+//    struct TypeName
+//    {
+//      static const char *name;
+//    };
+//
+//  template<typename T>
+//    const char *TypeName<T>::name = "unknown";
+//
+//  template<typename T>
+//   inline const char *Stringify(void)
+//    {
+//      return TypeName<T>::name;
+//    }
+//
+//  // macro template specialization expansion
+//#define REGISTER_STRINGIFY_TYPE(X) template<>	\
+//  const char *TypeName<X>::name = #X
+//
+//  // types must be registered before use otherwise it will default to
+//  // the unknown type
+//  REGISTER_STRINGIFY_TYPE(int);
+//  REGISTER_STRINGIFY_TYPE(float);
+//  REGISTER_STRINGIFY_TYPE(double);
+//  REGISTER_STRINGIFY_TYPE(double);
+//  REGISTER_STRINGIFY_TYPE(std::complex<double>);
 
 }
 #endif

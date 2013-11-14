@@ -17,8 +17,6 @@ nobase_include_HEADERS += radmat/fake_data/covarrying_vectors.h radmat/fake_data
 #llsq
 nobase_include_HEADERS += radmat/llsq/llsq_multi_data_serialize.h radmat/llsq/llsq_driver.h radmat/llsq/llsq_gen_system.h radmat/llsq/llsq_multi_data.h radmat/llsq/llsq_multi_driver.h radmat/llsq/llsq_q2_pack.h radmat/llsq/llsq_solver.h radmat/llsq/llsq_solvers.h radmat/llsq/llsq_zero_filter.h radmat/llsq/llsq_chisq.h
 
-#load_data
-nobase_include_HEADERS += radmat/load_data/lattice_multi_data_tag.h radmat/load_data/lattice_multi_data_object.h radmat/load_data/build_correlators.h radmat/load_data/build_correlators_xml.h radmat/load_data/build_q2_packs.h radmat/load_data/g_parity_world.h radmat/load_data/g_parity_world_generate_redstar_xml.h radmat/load_data/g_parity_world_xml.h radmat/load_data/invert_subduction.h radmat/load_data/load_fake_data.h radmat/load_data/radmat_database_interface.h radmat/load_data/radmat_overlap_key_val_db.h radmat/load_data/three_point.h radmat/load_data/disconnected_graph_nuker.h radmat/load_data/build_correlators_bad_data_repository.h
 
 #fitting
 nobase_include_HEADERS += radmat/fitting/axis_plotter.h radmat/fitting/fit_tins.h
@@ -32,7 +30,10 @@ nobase_include_HEADERS += radmat/driver/radmat_driver.h radmat/driver/radmat_dri
 # nobase_include_HEADERS += radmat/jfit/abstract_function_default_errors.h radmat/jfit/abstract_function_default_values.h radmat/jfit/abstract_function_exit.h radmat/jfit/abstract_function.h radmat/jfit/abstract_function_named_parameter_container.h radmat/jfit/abstract_function_parameter_container.h radmat/jfit/abstract_function_parameter_fixing.h radmat/jfit/abstract_function_parameter_limits.h radmat/jfit/abstract_function_parameter_names.h
 
 # redstar_interface 
-nobase_include_HEADERS += radmat/redstar_interface/redstar_abstract_block_base.h radmat/redstar_interface/redstar_abstract_block_factory.h radmat/redstar_interface/redstar_npoint_function.h radmat/redstar_interface/redstar_single_particle_meson_block.h radmat/redstar_interface/redstar_unimproved_vector_current.h
+nobase_include_HEADERS += radmat/redstar_interface/abstract_named_object.h radmat/redstar_interface/redstar_abstract_block_base.h radmat/redstar_interface/redstar_abstract_merge_npoint_factory.h radmat/redstar_interface/redstar_abstract_merge_npoint.h radmat/redstar_interface/redstar_abstract_xml_factory.h radmat/redstar_interface/redstar_interface.h radmat/redstar_interface/redstar_merge_function_xml.h radmat/redstar_interface/redstar_merge_vector_current_npoint.h radmat/redstar_interface/redstar_npoint_function_xml.h radmat/redstar_interface/redstar_single_particle_meson_block.h radmat/redstar_interface/redstar_unimproved_vector_current.h
+
+# construct_data
+nobase_include_HEADERS += radmat/construct_data/construct_correlators_bad_data_repository.h radmat/construct_data/construct_correlators.h radmat/construct_data/construct_correlators_utils.h radmat/construct_data/construct_correlators_xml.h radmat/construct_data/construct_q2_packs.h radmat/construct_data/invert_subduction.h radmat/construct_data/lattice_multi_data_object.h radmat/construct_data/lattice_multi_data_tag.h radmat/construct_data/lattice_multi_data_tag_redstar_interface.h radmat/construct_data/load_fake_data.h radmat/construct_data/radmat_database_interface.h radmat/construct_data/radmat_overlap_key_val_db.h radmat/construct_data/three_point.h
 
 #
 # Library
@@ -52,8 +53,6 @@ libradmat_a_SOURCES += radmat/fake_data/covarrying_vectors.cc radmat/fake_data/f
 #llsq
 libradmat_a_SOURCES += radmat/llsq/llsq_gen_system.cc radmat/llsq/llsq_multi_driver.cc radmat/llsq/llsq_q2_pack.cc radmat/llsq/llsq_solvers.cc radmat/llsq/llsq_chisq.cc
 
-#load_data
-libradmat_a_SOURCES += radmat/load_data/lattice_multi_data_tag.cc  radmat/load_data/build_correlators.cc radmat/load_data/build_correlators_xml.cc radmat/load_data/g_parity_world.cc radmat/load_data/g_parity_world_generate_redstar_xml.cc radmat/load_data/g_parity_world_xml.cc radmat/load_data/invert_subduction.cc radmat/load_data/radmat_database_interface.cc radmat/load_data/radmat_overlap_key_val_db.cc  radmat/load_data/disconnected_graph_nuker.cc radmat/load_data/build_correlators_bad_data_repository.cc
 
 #fitting
 libradmat_a_SOURCES += radmat/fitting/axis_plotter.cc radmat/fitting/fit_tins.cc
@@ -62,4 +61,8 @@ libradmat_a_SOURCES += radmat/fitting/axis_plotter.cc radmat/fitting/fit_tins.cc
 libradmat_a_SOURCES += radmat/driver/radmat_driver.cc radmat/driver/radmat_driver_props.cc radmat/driver/radmat_single_q2_driver.cc radmat/driver/radmat_driver_aux.cc
 
 #redstar_interface
-libradmat_a_SOURCES += radmat/redstar_interface/redstar_abstract_block_factory.cc radmat/redstar_interface/redstar_npoint_function.cc radmat/redstar_interface/redstar_single_particle_meson_block.cc radmat/redstar_interface/redstar_unimproved_vector_current.cc
+libradmat_a_SOURCES +=radmat/redstar_interface/redstar_abstract_merge_npoint_factory.cc radmat/redstar_interface/redstar_abstract_xml_factory.cc radmat/redstar_interface/redstar_merge_function_xml.cc radmat/redstar_interface/redstar_merge_vector_current_npoint.cc radmat/redstar_interface/redstar_npoint_function_xml.cc radmat/redstar_interface/redstar_single_particle_meson_block.cc radmat/redstar_interface/redstar_unimproved_vector_current.cc
+
+#construct_data
+libradmat_a_SOURCES += radmat/construct_data/construct_correlators_bad_data_repository.cc radmat/construct_data/construct_correlators.cc radmat/construct_data/construct_correlators_utils.cc radmat/construct_data/construct_correlators_xml.cc radmat/construct_data/invert_subduction.cc radmat/construct_data/lattice_multi_data_tag.cc radmat/construct_data/lattice_multi_data_tag_redstar_interface.cc radmat/construct_data/radmat_database_interface.cc radmat/construct_data/radmat_overlap_key_val_db.cc
+

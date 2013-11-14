@@ -23,9 +23,9 @@
 
 #include "jackFitter/plot.h"
 
-#include "radmat/load_data/load_fake_data.h"
-#include "radmat/load_data/build_q2_packs.h"
-#include "radmat/load_data/three_point.h"
+#include "radmat/construct_data/load_fake_data.h"
+#include "radmat/construct_data/construct_q2_packs.h"
+#include "radmat/construct_data/three_point.h"
 #include "radmat/fake_data/fake_data_ini.h"
 #include "radmat/llsq/llsq_driver.h"
 #include "radmat/llsq/llsq_q2_pack.h"

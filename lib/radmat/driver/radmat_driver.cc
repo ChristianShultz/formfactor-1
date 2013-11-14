@@ -6,7 +6,7 @@
 
  * Creation Date : 25-02-2013
 
- * Last Modified : Mon 28 Oct 2013 02:32:18 PM EDT
+ * Last Modified : Wed 13 Nov 2013 06:33:20 PM EST
 
  * Created By : shultz
 
@@ -16,11 +16,6 @@
 #include "radmat/driver/radmat_driver_aux.h"
 
 #include "radmat/utils/splash.h"
-#include "radmat/load_data/load_fake_data.h"
-#include "radmat/load_data/build_q2_packs.h"
-#include "radmat/load_data/three_point.h"
-#include "radmat/load_data/build_correlators.h"
-#include "radmat/load_data/disconnected_graph_nuker.h"
 #include "radmat/llsq/llsq_driver.h"
 #include "radmat/llsq/llsq_q2_pack.h"
 #include "radmat/driver/radmat_driver_props.h"
@@ -123,7 +118,7 @@ namespace radmat
       omp_set_num_threads(m_ini.maxThread);
 
     std::vector<Hadron::KeyHadronNPartNPtCorr_t> keys;
-    keys = m_correlators.build_correlator_xml(m_ini.threePointIni); 
+    keys = m_correlators.construct_correlator_xml(m_ini.threePointIni); 
 
 
 
@@ -213,7 +208,7 @@ namespace radmat
     std::map<std::string,std::vector<Hadron::KeyHadronNPartNPtCorr_t> > sorted; 
     std::map<std::string,std::vector<Hadron::KeyHadronNPartNPtCorr_t> >::iterator sorted_it; 
 
-    keys = m_correlators.build_correlator_xml(m_ini.threePointIni); 
+    keys = m_correlators.construct_correlator_xml(m_ini.threePointIni); 
 
     std::cout << __PRETTY_FUNCTION__ << " writing xml for " 
       << keys.size() << " correlators" << std::endl; 
@@ -263,7 +258,7 @@ namespace radmat
 
     std::vector<Hadron::KeyHadronNPartNPtCorr_t> keys;
     std::vector<Hadron::KeyHadronNPartNPtCorr_t>::const_iterator kit;
-    keys = m_correlators.build_correlator_xml(m_ini.threePointIni); 
+    keys = m_correlators.construct_correlator_xml(m_ini.threePointIni); 
 
     if ( keys.size() <= 0 ) 
       exit(12034); 
@@ -291,57 +286,57 @@ namespace radmat
 
   }
 
-  void RadmatDriver::nuke_graph(const std::string &inifile, 
-      const std::string &graph_db,
-      const std::string &nuke_xml_out)
-  {
-
-    read_xmlini(inifile);
-    if(m_ini.maxThread > 1)
-      omp_set_num_threads(m_ini.maxThread);
-
-    std::vector<Hadron::KeyHadronNPartNPtCorr_t> keys;
-    keys = m_correlators.build_correlator_xml(m_ini.threePointIni); 
-
-    DisconnectedGraphNuker n;
-    n.find_nukes(keys,graph_db); 
-    n.dump_nukes(nuke_xml_out); 
-  }
-
-
-  void RadmatDriver::build_stub_xml(const std::string &inifile)
-  {
-    read_xmlini(inifile);
-    if(m_ini.maxThread > 1)
-      omp_set_num_threads(m_ini.maxThread);
-
-    std::vector<Hadron::KeyHadronNPartNPtCorr_t> keys;
-    keys = m_correlators.build_correlator_xml(m_ini.threePointIni); 
-
-
-    stubify(keys);
-
-    ADATXML::XMLBufferWriter corrs;
-    ADATXML::Array<Hadron::KeyHadronNPartNPtCorr_t> bc;
-
-    bc.resize(keys.size()); 
-    for(unsigned int i = 0; i < keys.size(); ++i)
-      bc[i] = keys[i];
-
-    write(corrs,"NPointList",bc);
-
-    std::ofstream out("npt.list.xml");
-    corrs.print(out);
-    out.close();
-
-    std::vector<Hadron::KeyHadronNPartNPtCorr_t>::const_iterator it; 
-
-    out.open("npt.ensemFileNames.list"); 
-    for(it = keys.begin(); it != keys.end(); ++it)
-      out << Hadron::ensemFileName(*it) << "\n";
-    out.close(); 
-
-  }
+  //  void RadmatDriver::nuke_graph(const std::string &inifile, 
+  //      const std::string &graph_db,
+  //      const std::string &nuke_xml_out)
+  //  {
+  //
+  //    read_xmlini(inifile);
+  //    if(m_ini.maxThread > 1)
+  //      omp_set_num_threads(m_ini.maxThread);
+  //
+  //    std::vector<Hadron::KeyHadronNPartNPtCorr_t> keys;
+  //    keys = m_correlators.build_correlator_xml(m_ini.threePointIni); 
+  //
+  //    DisconnectedGraphNuker n;
+  //    n.find_nukes(keys,graph_db); 
+  //    n.dump_nukes(nuke_xml_out); 
+  //  }
+  //
+  //
+  //  void RadmatDriver::build_stub_xml(const std::string &inifile)
+  //  {
+  //    read_xmlini(inifile);
+  //    if(m_ini.maxThread > 1)
+  //      omp_set_num_threads(m_ini.maxThread);
+  //
+  //    std::vector<Hadron::KeyHadronNPartNPtCorr_t> keys;
+  //    keys = m_correlators.build_correlator_xml(m_ini.threePointIni); 
+  //
+  //
+  //    stubify(keys);
+  //
+  //    ADATXML::XMLBufferWriter corrs;
+  //    ADATXML::Array<Hadron::KeyHadronNPartNPtCorr_t> bc;
+  //
+  //    bc.resize(keys.size()); 
+  //    for(unsigned int i = 0; i < keys.size(); ++i)
+  //      bc[i] = keys[i];
+  //
+  //    write(corrs,"NPointList",bc);
+  //
+  //    std::ofstream out("npt.list.xml");
+  //    corrs.print(out);
+  //    out.close();
+  //
+  //    std::vector<Hadron::KeyHadronNPartNPtCorr_t>::const_iterator it; 
+  //
+  //    out.open("npt.ensemFileNames.list"); 
+  //    for(it = keys.begin(); it != keys.end(); ++it)
+  //      out << Hadron::ensemFileName(*it) << "\n";
+  //    out.close(); 
+  //
+  //  }
 
 
 
@@ -404,7 +399,7 @@ namespace radmat
 
     std::cout << "Loading correlators and inverting subduction.. " << std::endl; 
 
-    multi_lattice_data = m_correlators.build_multi_correlators(m_ini.threePointIni);
+    multi_lattice_data = m_correlators.construct_multi_correlators(m_ini.threePointIni);
 
     my_stopwatch.stop(); 
     std::cout << "Loading correlators and inverting subduction took " 
@@ -500,9 +495,15 @@ namespace radmat
     Util::StopWatch my_stopwatch; 
     my_stopwatch.start(); 
 
+    ADATXML::Array<int> timeslice_info;
+    timeslice_info = m_ini.threePointIni.threePointCorrXMLIni.redstar.param->timeslice_info(); 
+    POW2_ASSERT(timeslice_info.size() == 3); 
     int tsrc,tsnk;
-    tsrc = m_ini.threePointIni.threePointCorrXMLIni.continuumMatElemXML.source.t_slice; 
-    tsnk = m_ini.threePointIni.threePointCorrXMLIni.continuumMatElemXML.sink.t_slice; 
+
+    tsnk = timeslice_info[0]; 
+    tsrc = timeslice_info[2]; 
+
+    POW2_ASSERT(tsrc < tsnk); 
 
 #ifdef FIT_LLSQ_PARALLEL
 

@@ -1,7 +1,6 @@
 #ifndef RADMAT_SINGLE_Q2_DRIVER_H
 #define RADMAT_SINGLE_Q2_DRIVER_H 
 
-#include "radmat/load_data/build_correlators.h"
 #include "radmat/llsq/llsq_multi_driver.h"
 #include "radmat/fitting/fit_tins.h"
 #include "ensem/ensem.h"

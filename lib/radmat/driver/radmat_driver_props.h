@@ -4,7 +4,7 @@
 #include <string>
 #include "io/adat_xmlio.h"
 #include "jackFitter/three_point_fit_forms.h"
-#include "radmat/load_data/build_correlators.h"
+#include "radmat/construct_data/construct_correlators_xml.h"
 
 namespace radmat
 {

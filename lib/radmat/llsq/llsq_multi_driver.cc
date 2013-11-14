@@ -6,7 +6,7 @@
 
  * Creation Date : 22-02-2013
 
- * Last Modified : Tue 22 Oct 2013 09:42:03 AM EDT
+ * Last Modified : Wed 13 Nov 2013 06:02:49 PM EST
 
  * Created By : shultz
 
@@ -18,7 +18,6 @@
 #include "llsq_chisq.h"
 #include "llsq_multi_data_serialize.h"
 #include "radmat/utils/pow2assert.h"
-#include "radmat/load_data/build_correlators.h"
 #include "radmat/ff/ff_gen_llsq_row.h"
 #include "ensem/ensem.h"
 #include <complex>

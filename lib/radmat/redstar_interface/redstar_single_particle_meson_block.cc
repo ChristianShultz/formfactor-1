@@ -6,7 +6,7 @@
 
  * Creation Date : 11-11-2013
 
- * Last Modified : Mon 11 Nov 2013 09:41:33 PM EST
+ * Last Modified : Wed 13 Nov 2013 08:20:29 PM EST
 
  * Created By : shultz
 
@@ -14,7 +14,7 @@
 
 #include "redstar_single_particle_meson_block.h"
 #include "radmat/utils/pow2assert.h"
-#include "radmat/load_data/invert_subduction.h"
+#include "radmat/construct_data/invert_subduction.h"
 #include "radmat/utils/polarisation_tensors.h"
 #include "radmat/utils/tensor.h"
 #include "radmat/utils/obj_expr_t.h"
@@ -65,6 +65,14 @@ namespace radmat
       ADATXML::Array<int> can = FF::canonicalOrder(mom);
       std::stringstream ss;
       ss << "p" << can[0] << can[1] << can[2];
+      return ss.str(); 
+    }
+
+    std::string string_mom_no_space(const ADATXML::Array<int> &b)
+    {
+      std::stringstream ss; 
+      for(int i = 0; i < b.size(); ++i)
+        ss << b[i];
       return ss.str(); 
     }
 
@@ -166,7 +174,7 @@ namespace radmat
         ss << " " << t[i];
       return ss.str();  
     } 
-    
+
     std::string doPrint(const ADATXML::Array< ADATXML::Array<int> > &t)
     {
       std::stringstream ss; 
@@ -189,6 +197,33 @@ namespace radmat
       return ss.str(); 
     }
 
+  AbsRedstarInput_t * 
+    RedstarSingleParticleMesonInput::clone(void) const
+    {
+      RedstarSingleParticleMesonInput *f = new RedstarSingleParticleMesonInput; 
+      f->J = J; 
+      f->H = H; 
+      f->parity = parity; 
+      f->mom = mom; 
+      f->name = name; 
+      f->creation_op = creation_op; 
+      f->smearedP = smearedP; 
+      f->isProjected = isProjected; 
+      f->t_slice = t_slice; 
+
+      return f; 
+    }
+
+  std::string 
+    RedstarSingleParticleMesonInput::sname(void) const
+    {
+      std::stringstream ss; 
+      ss << name << "_p" << string_mom_no_space(FF::canonicalOrder(mom))
+        << ",J" << J << ",H" << H 
+        << ",p" << string_mom_no_space(mom)
+        << ",Iz" << twoI_z;
+      return ss.str(); 
+    }
 
   EnsemRedstarBlock
     RedstarSingleParticleMesonBlock::operator()(const AbsRedstarInput_t * base) const
@@ -244,8 +279,8 @@ namespace radmat
       if ( H.size() == 0) 
       {
         H.resize(2*J + 1);
-         for(int h = -J; h < J+1; ++h)
-           H[h+J] = h; 
+        for(int h = -J; h < J+1; ++h)
+          H[h+J] = h; 
       }
 
       if(fill_star)
@@ -277,9 +312,9 @@ namespace radmat
         }
     }
 
-    //! xml writer
-    void 
-      RedstarSingleParticleMesonXML::write(ADATXML::XMLWriter &xml, const std::string &path )
+  //! xml writer
+  void 
+    RedstarSingleParticleMesonXML::write(ADATXML::XMLWriter &xml, const std::string &path ) const
     {
       ADATXML::push(xml,path);
       ADATXML::write(xml,"J",J);
