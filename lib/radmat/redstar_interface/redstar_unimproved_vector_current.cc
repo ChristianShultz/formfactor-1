@@ -6,7 +6,7 @@
 
  * Creation Date : 11-11-2013
 
- * Last Modified : Wed 13 Nov 2013 08:45:49 PM EST
+ * Last Modified : Thu 14 Nov 2013 10:40:21 AM EST
 
  * Created By : shultz
 
@@ -301,22 +301,6 @@ namespace radmat
     return ss.str(); 
   }
 
-  AbsRedstarInput_t * 
-    RedstarUnimprovedVectorCurrentInput::clone(void) const
-    {
-      RedstarUnimprovedVectorCurrentInput *p; 
-      p = new RedstarUnimprovedVectorCurrentInput; 
-
-      p->lorentz = lorentz; 
-      p->mom = mom; 
-      p->photons = photons; 
-      p->creation_op = creation_op;
-      p->smearedP = smearedP;
-      p->t_slice = t_slice;
-
-      return p;
-    } 
-
 
   EnsemRedstarBlock
     RedstarUnimprovedVectorCurrentBlock::operator()(const AbsRedstarInput_t *base) const
@@ -360,7 +344,7 @@ namespace radmat
       }
 
 
-    void read_in_photons(std::vector<const AbsRedstarInput_t*> &v, 
+    void read_in_photons(std::vector<ADAT::Handle<AbsRedstarInput_t> > &v, 
         RedstarUnimprovedVectorCurrentXML::insertion &i,
         const int t_slice,
         const bool is_temporal)
@@ -379,7 +363,7 @@ namespace radmat
         RedstarUnimprovedVectorCurrentInput *t = new RedstarUnimprovedVectorCurrentInput;
         *t = tmp; 
         t->lorentz = 4; 
-        v.push_back(t); 
+        v.push_back(ADAT::Handle<AbsRedstarInput_t>(t)); 
       }
       else
       {
@@ -388,7 +372,7 @@ namespace radmat
           RedstarUnimprovedVectorCurrentInput *t = new RedstarUnimprovedVectorCurrentInput;
           *t = tmp; 
           t->lorentz = lor; 
-          v.push_back(t); 
+          v.push_back(ADAT::Handle<AbsRedstarInput_t>(t)); 
         }
       }
 

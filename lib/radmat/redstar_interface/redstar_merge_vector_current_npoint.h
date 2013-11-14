@@ -18,15 +18,6 @@ namespace radmat
       return std::string(Stringify<RedstarMergeVectorCurrentThreePoint>()); 
     }
 
-    virtual AbsRedstarMergeNPt* clone(void) const
-    {
-      RedstarMergeVectorCurrentThreePoint *f; 
-      f = new RedstarMergeVectorCurrentThreePoint; 
-      f->my_npt = my_npt; 
-      f->my_data = my_data; 
-      return f; 
-    }
-
     // multiply this thing out 
     virtual void do_work(void) ;
 

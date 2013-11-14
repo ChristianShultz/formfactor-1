@@ -14,7 +14,6 @@
 
 namespace radmat
 {
-  // the T class must have a clone method
   template<typename T> 
     struct AbstractNamedObject 
     {

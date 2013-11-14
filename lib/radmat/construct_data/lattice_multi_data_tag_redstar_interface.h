@@ -31,7 +31,7 @@ namespace radmat
   // const pointer to const data to avoid any 
   // copies of the npoints more than once
   std::vector<TaggedEnsemRedstarNPtBlock>
-    tag_lattice_xml( const AbsRedstarMergeNPtData_t * const,
+    tag_lattice_xml( const AbstractMergeNamedObject * const,
         const double mom_factor, 
         const double m_snk,
         const double m_src,

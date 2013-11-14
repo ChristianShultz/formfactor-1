@@ -6,7 +6,7 @@
 
  * Creation Date : 12-11-2013
 
- * Last Modified : Thu 14 Nov 2013 09:50:58 AM EST
+ * Last Modified : Thu 14 Nov 2013 10:34:14 AM EST
 
  * Created By : shultz
 
@@ -14,6 +14,7 @@
 
 #include "redstar_merge_vector_current_npoint.h"
 #include "redstar_abstract_merge_npoint.h"
+#include "handle_interface.h"
 #include "radmat/utils/pow2assert.h"
 #include "redstar_single_particle_meson_block.h"
 #include "redstar_unimproved_vector_current.h"
@@ -38,7 +39,7 @@ namespace radmat
       POW2_ASSERT(v == 0); 
     }
 
-    void check_meson(const AbsRedstarBlock_t * p)
+    void check_meson(const ADAT::Handle<AbsRedstarBlock_t> p)
     {
       bool meson = false; 
 
@@ -47,7 +48,7 @@ namespace radmat
       POW2_ASSERT( meson ); 
     }
 
-    void check_photon(const AbsRedstarBlock_t *p)
+    void check_photon(const ADAT::Handle<AbsRedstarBlock_t> p)
     {
       bool photon = false; 
 
@@ -104,13 +105,13 @@ namespace radmat
 
     // upcast to find data
     ADATXML::Array<int> 
-      find_meson_momentum(const AbsRedstarInput_t* foo)
+      find_meson_momentum(const ADAT::Handle<AbsRedstarInput_t> foo)
       {
         ADATXML::Array<int> ret; 
         if(foo->type() == Stringify<RedstarSingleParticleMesonInput>())
         {
           const RedstarSingleParticleMesonInput *p; 
-          p = dynamic_cast<const RedstarSingleParticleMesonInput*>(foo); 
+          p = dynamic_cast_handle<RedstarSingleParticleMesonInput,AbsRedstarInput_t>(foo); 
           ret = p->mom; 
         }
         else
@@ -124,14 +125,14 @@ namespace radmat
 
 
     // upcast to set data
-    void set_q(AbsRedstarInput_t *f, 
+    void set_q(ADAT::Handle<AbsRedstarInput_t> f, 
         const ADATXML::Array<int> psnk,
         const ADATXML::Array<int> psrc)
     {
       if ( f->type() == Stringify<RedstarUnimprovedVectorCurrentInput>())
       {
         RedstarUnimprovedVectorCurrentInput *p; 
-        p = dynamic_cast<RedstarUnimprovedVectorCurrentInput*>(f); 
+        p = dynamic_cast<RedstarUnimprovedVectorCurrentInput*>(&*f); 
         p->mom = momentumTransfer(psnk,psrc,p->creation_op);     
       }
       else
@@ -144,7 +145,7 @@ namespace radmat
 
 
     //  conserve momentum  
-    void fill_insertion_momentum(std::vector<AbsRedstarInput_t*> &inp)
+    void fill_insertion_momentum(std::vector<ADAT::Handle<AbsRedstarInput_t> > &inp)
     {
       bool success = true;  
       ADATXML::Array<int> psnk, psrc,q;  
@@ -243,22 +244,21 @@ namespace radmat
 
     // the work horse 
     merge do_merge(
-        const AbsRedstarBlock_t * snk, 
-        const AbsRedstarInput_t * snki,
-        const AbsRedstarBlock_t * ins, 
-        const AbsRedstarInput_t * insi, 
-        const AbsRedstarBlock_t * src, 
-        const AbsRedstarInput_t * srci, 
+        const ADAT::Handle<AbsRedstarBlock_t> snk, 
+        const ADAT::Handle<AbsRedstarInput_t> snki,
+        const ADAT::Handle<AbsRedstarBlock_t> ins, 
+        const ADAT::Handle<AbsRedstarInput_t> insi,
+        const ADAT::Handle<AbsRedstarBlock_t> src, 
+        const ADAT::Handle<AbsRedstarInput_t> srci,
         const std::string ensemble) 
     {
       merge ret; 
       EnsemRedstarNPtBlock npt; 
       std::vector< ADAT::Handle<AbsRedstarInput_t > > input(3); 
 
-      // clone allocates with new 
-      input[0] = ADAT::Handle<AbsRedstarInput_t>(snki->clone()); 
-      input[1] = ADAT::Handle<AbsRedstarInput_t>(insi->clone()); 
-      input[2] = ADAT::Handle<AbsRedstarInput_t>(srci->clone()); 
+      input[0] = snki; 
+      input[0] = insi; 
+      input[0] = srci; 
 
       // conserve momentum with the photon
       fill_insertion_momentum(input); 
@@ -288,12 +288,8 @@ namespace radmat
 
       if(ins.param->type() == Stringify<RedstarUnimprovedVectorCurrentXML>())
       {
-        // handles let us not have to worry about memory management
-        //     but the tradeoff comes with hacky statements like this 
-        //     where we need to get at the actual pointer, maybe there 
-        //     should be a method?
         const RedstarUnimprovedVectorCurrentXML *p; 
-        p = dynamic_cast<const RedstarUnimprovedVectorCurrentXML*>( &(*ins.param) ); 
+        p = dynamic_cast_handle<RedstarUnimprovedVectorCurrentXML,AbsRedstarXMLInterface_t>(ins.param); 
         pmin = p->pmin; 
         pmax = p->pmax; 
 
@@ -336,9 +332,9 @@ namespace radmat
       source = npt.npoint[2];
 
       // pointers to the functors we need to use
-      const AbsRedstarBlock_t * snkF = sink.param->objFunctorPtr;
-      const AbsRedstarBlock_t * insF = insertion.param->objFunctorPtr;
-      const AbsRedstarBlock_t * srcF = source.param->objFunctorPtr;
+      ADAT::Handle<AbsRedstarBlock_t> snkF = sink.param->objFunctorPtr;
+      ADAT::Handle<AbsRedstarBlock_t> insF = insertion.param->objFunctorPtr;
+      ADAT::Handle<AbsRedstarBlock_t> srcF = source.param->objFunctorPtr;
 
       // check that they do correspond to mesons/photon 
       check_meson(snkF); 

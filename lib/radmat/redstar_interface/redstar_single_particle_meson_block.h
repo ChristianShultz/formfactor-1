@@ -33,7 +33,6 @@ namespace radmat
 
     virtual std::string write(void) const; 
 
-    virtual AbsRedstarInput_t * clone(void) const; 
 
     std::string sname(void) const; 
 
@@ -71,7 +70,6 @@ namespace radmat
     virtual EnsemRedstarBlock 
       operator()(const AbsRedstarInput_t * ptr2derived) const ; 
 
-    virtual AbsRedstarBlock_t* clone(void) const {return new RedstarSingleParticleMesonBlock;}
   };
 
 
@@ -104,9 +102,6 @@ namespace radmat
     virtual std::string write(void) const;  
     virtual void write(ADATXML::XMLWriter &xml, 
         const std::string &path) const; 
-
-    virtual AbsRedstarXMLInterface_t * 
-      clone(void) const {return new RedstarSingleParticleMesonXML(*this); }
 
     virtual int timeslice(void) const {return t_slice;}
 

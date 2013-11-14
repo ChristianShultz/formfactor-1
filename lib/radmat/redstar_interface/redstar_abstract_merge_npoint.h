@@ -19,55 +19,6 @@ namespace radmat
           Hadron::KeyHadronNPartNPtCorr_t> EnsemRedstarNPtBlock; 
 
 
-//  // the merged npoint data store
-//  struct AbsRedstarMergeNPtData_t
-//  {
-//    AbsRedstarMergeNPtData_t(void) {}
-//    AbsRedstarMergeNPtData_t( const AbsRedstarMergeNPtData_t &o) 
-//    {
-//      npoint = o.npoint; 
-//
-//      std::vector<std::vector<AbsRedstarInput_t*> >::const_iterator big; 
-//      std::vector<AbsRedstarInput_t*>::const_iterator small;
-//
-//      for(big = o.input.begin(); big != o.input.end(); ++big)
-//      {
-//        std::vector<AbsRedstarInput_t*> s;
-//        for(small = big->begin(); small != big->end(); ++small)
-//          s.push_back ( (*small)->clone()); 
-//
-//        input.push_back(s); 
-//      }
-//    }
-//
-//    AbsRedstarMergeNPtData_t& operator=(const AbsRedstarMergeNPtData_t &o)
-//    {
-//      if (this != &o) 
-//      { 
-//        AbsRedstarMergeNPtData_t foo(o); 
-//        std::swap(npoint,foo.npoint); 
-//        std::swap(input,foo.input); 
-//      }
-//
-//      return *this; 
-//    }
-//
-//
-//    std::vector<EnsemRedstarNPtBlock> npoint; 
-//    std::vector<std::vector<AbsRedstarInput_t*> > input; 
-//
-//    // make him responsible for the cleanup 
-//    virtual ~AbsRedstarMergeNPtData_t(void)
-//    {
-//      std::vector<std::vector<AbsRedstarInput_t*> >::const_iterator big; 
-//      std::vector<AbsRedstarInput_t*>::const_iterator small;
-//
-//      for(big = input.begin(); big != input.end(); ++big)
-//        for(small = big->begin(); small != big->end(); ++small)
-//          delete *small; 
-//    }
-//  };
-//
   // the merged npoint data store
   struct AbsRedstarMergeNPtData_t
   {
@@ -108,7 +59,6 @@ namespace radmat
     virtual void 
       do_work(void) = 0; 
 
-    virtual AbsRedstarMergeNPt* clone(void) const = 0; 
 
     virtual std::vector<EnsemRedstarNPtBlock> 
       xml(void) const {return my_data.npoint;} 

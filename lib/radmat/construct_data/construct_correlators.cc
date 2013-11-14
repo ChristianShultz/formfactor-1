@@ -6,7 +6,7 @@
 
  * Creation Date : 04-12-2012
 
- * Last Modified : Wed 13 Nov 2013 05:12:10 PM EST
+ * Last Modified : Thu 14 Nov 2013 11:03:39 AM EST
 
  * Created By : shultz
 
@@ -145,12 +145,10 @@ namespace radmat
         std::string elem_id = ini.matElemID; 
         const radmatDBProp_t *db_prop = &ini.radmatDBProp; 
         const ThreePointCorrXMLIni_t *three_pt = &ini.threePointCorrXMLIni; 
-        const AbsRedstarMergeNPtData_t* xml_data;
-        xml_data = dynamic_cast<const AbsRedstarMergeNPtData_t*>(&(three_pt->redstar)); 
 
         std::vector<TaggedEnsemRedstarNPtBlock> unsorted_elems; 
         unsorted_elems = tag_lattice_xml(
-            xml_data,
+            &(three_pt->redstar), 
             p_factor, 
             three_pt->maSink, 
             three_pt->maSource, 
@@ -221,12 +219,10 @@ namespace radmat
       std::string elem_id = m_ini.matElemID; 
       const radmatDBProp_t *db_prop = &m_ini.radmatDBProp; 
       const ThreePointCorrXMLIni_t *three_pt = &m_ini.threePointCorrXMLIni; 
-      const AbsRedstarMergeNPtData_t* xml_data;
-      xml_data = dynamic_cast<const AbsRedstarMergeNPtData_t*>(&(three_pt->redstar)); 
 
       std::vector<TaggedEnsemRedstarNPtBlock> unsorted_elems; 
       unsorted_elems = tag_lattice_xml(
-          xml_data,
+          &(three_pt->redstar),
           p_factor, 
           three_pt->maSink, 
           three_pt->maSource, 

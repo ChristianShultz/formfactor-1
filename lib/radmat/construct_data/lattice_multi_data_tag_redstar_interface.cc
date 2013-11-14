@@ -6,13 +6,14 @@
 
  * Creation Date : 12-11-2013
 
- * Last Modified : Wed 13 Nov 2013 08:04:17 PM EST
+ * Last Modified : Thu 14 Nov 2013 11:33:40 AM EST
 
  * Created By : shultz
 
  _._._._._._._._._._._._._._._._._._._._._.*/
 
 #include "lattice_multi_data_tag_redstar_interface.h"
+#include "radmat/redstar_interface/handle_interface.h"
 #include "radmat/utils/mink_qsq.h"
 #include "radmat/utils/pow2assert.h"
 #include <sstream>
@@ -62,9 +63,9 @@ namespace radmat
     // general template that likes to blow up in your face
     template<typename A, typename B, typename C>
       data_store
-      generate_tag(const AbsRedstarInput_t *snk, 
-          const AbsRedstarInput_t *ins, 
-          const AbsRedstarInput_t *src,
+      generate_tag(const ADAT::Handle<AbsRedstarInput_t> & snk, 
+          const ADAT::Handle<AbsRedstarInput_t> & ins, 
+          const ADAT::Handle<AbsRedstarInput_t> & src,
           const std::string &elem_id)
       {
         __builtin_trap(); 
@@ -75,9 +76,9 @@ namespace radmat
     template<>
       data_store
       generate_tag<GENERATE_TAG_ERROR,GENERATE_TAG_ERROR,GENERATE_TAG_ERROR>
-      (const AbsRedstarInput_t *snk, 
-          const AbsRedstarInput_t *ins, 
-          const AbsRedstarInput_t *src,
+      (const ADAT::Handle<AbsRedstarInput_t> & snk, 
+          const ADAT::Handle<AbsRedstarInput_t> & ins, 
+          const ADAT::Handle<AbsRedstarInput_t> & src,
           const std::string &elem_id)
       {
         data_store dummy; 
@@ -93,9 +94,9 @@ namespace radmat
       generate_tag<
       RedstarSingleParticleMesonInput,
       RedstarUnimprovedVectorCurrentInput,
-      RedstarSingleParticleMesonInput>(const AbsRedstarInput_t *a, 
-          const AbsRedstarInput_t *b, 
-          const AbsRedstarInput_t *c,
+      RedstarSingleParticleMesonInput>(const ADAT::Handle<AbsRedstarInput_t> & a, 
+          const ADAT::Handle<AbsRedstarInput_t> & b, 
+          const ADAT::Handle<AbsRedstarInput_t> & c,
           const std::string &elem_id)
       {
         data_store ret; 
@@ -103,9 +104,9 @@ namespace radmat
         const RedstarSingleParticleMesonInput *snk;
         const RedstarUnimprovedVectorCurrentInput *ins;
         const RedstarSingleParticleMesonInput *src; 
-        snk = dynamic_cast<const RedstarSingleParticleMesonInput*>(a); 
-        ins = dynamic_cast<const RedstarUnimprovedVectorCurrentInput*>(b); 
-        src = dynamic_cast<const RedstarSingleParticleMesonInput*>(c); 
+        snk = dynamic_cast_handle<RedstarSingleParticleMesonInput,AbsRedstarInput_t>(a); 
+        ins = dynamic_cast_handle<RedstarUnimprovedVectorCurrentInput,AbsRedstarInput_t>(b); 
+        src = dynamic_cast_handle<RedstarSingleParticleMesonInput,AbsRedstarInput_t>(c); 
 
         std::stringstream ss, mat_elem; 
         ss << snk->sname() << ".V_" << ins->lorentz 
@@ -128,9 +129,9 @@ namespace radmat
 
     // return value
     typedef data_store 
-      (*FunctionPtr)(const AbsRedstarInput_t *,
-          const AbsRedstarInput_t *,
-          const AbsRedstarInput_t *,
+      (*FunctionPtr)(const ADAT::Handle<AbsRedstarInput_t> & ,
+          const ADAT::Handle<AbsRedstarInput_t> & ,
+          const ADAT::Handle<AbsRedstarInput_t> & ,
           const std::string &);
 
     // last guy in call chain 
@@ -144,7 +145,7 @@ namespace radmat
     // deal with the source
     template<typename A, typename B> 
       FunctionPtr
-      function_factory(const AbsRedstarInput_t * source)
+      function_factory(const ADAT::Handle<AbsRedstarInput_t> &  source)
       {
         FunctionPtr foo = &generate_tag<GENERATE_TAG_ERROR,
         GENERATE_TAG_ERROR,
@@ -166,8 +167,8 @@ namespace radmat
     // deals with the insertion 
     template<typename A> 
       FunctionPtr
-      function_factory(const AbsRedstarInput_t *insertion, 
-          const AbsRedstarInput_t *source)
+      function_factory(const ADAT::Handle<AbsRedstarInput_t> & insertion, 
+          const ADAT::Handle<AbsRedstarInput_t> & source)
       {
         FunctionPtr foo = &generate_tag<GENERATE_TAG_ERROR,
         GENERATE_TAG_ERROR,
@@ -188,9 +189,9 @@ namespace radmat
 
     // deals with the sink 
     FunctionPtr 
-      function_factory(const AbsRedstarInput_t *sink,
-          const AbsRedstarInput_t *insertion,
-          const AbsRedstarInput_t *source)
+      function_factory(const ADAT::Handle<AbsRedstarInput_t> & sink,
+          const ADAT::Handle<AbsRedstarInput_t> & insertion,
+          const ADAT::Handle<AbsRedstarInput_t> & source)
       {
         FunctionPtr foo = &generate_tag<GENERATE_TAG_ERROR,
         GENERATE_TAG_ERROR,
@@ -217,7 +218,7 @@ namespace radmat
     //              to blow up with gcc 
     //    3) make and return the tag
     LatticeMultiDataTag
-      do_work(const std::vector<AbsRedstarInput_t*> &elem, 
+      do_work(const std::vector<ADAT::Handle<AbsRedstarInput_t> > &elem, 
           const double mom_factor, 
           const double m_snk, 
           const double m_src, 
@@ -235,7 +236,7 @@ namespace radmat
 
   // the hard part
   LatticeMultiDataTag
-    retrieve_tag(const std::vector<AbsRedstarInput_t*> &elem, 
+    retrieve_tag(const std::vector<ADAT::Handle<AbsRedstarInput_t> > &elem, 
         const double mom_factor, 
         const double m_snk, 
         const double m_src, 
@@ -246,14 +247,15 @@ namespace radmat
 
 
   std::vector<TaggedEnsemRedstarNPtBlock>
-    tag_lattice_xml(const AbsRedstarMergeNPtData_t * const ptr, 
+    tag_lattice_xml(const AbstractMergeNamedObject * const ptr, 
         const double mom_factor, 
         const double m_snk, 
         const double m_src, 
         const std::string &elem_id)
     { 
-      unsigned int sz = ptr->npoint.size(); 
-      POW2_ASSERT(sz == ptr->input.size()); 
+      const AbsRedstarMergeNPtData_t * data_ptr = &(ptr->param->my_data); 
+      unsigned int sz = data_ptr->npoint.size(); 
+      POW2_ASSERT(sz == data_ptr->input.size()); 
       std::vector<TaggedEnsemRedstarNPtBlock> ret(sz);
 
       int idx,stop = int(sz); 
@@ -264,8 +266,8 @@ namespace radmat
 
       for (idx = 0; idx < stop; ++idx)
       {
-        ret[idx] = TaggedEnsemRedstarNPtBlock(ptr->npoint[idx],
-            retrieve_tag(ptr->input[idx],mom_factor,m_snk,m_src,elem_id)); 
+        ret[idx] = TaggedEnsemRedstarNPtBlock(data_ptr->npoint[idx],
+            retrieve_tag(data_ptr->input[idx],mom_factor,m_snk,m_src,elem_id)); 
       }
       
 #ifdef PARALLEL_TAG_REDSTAR_DATA

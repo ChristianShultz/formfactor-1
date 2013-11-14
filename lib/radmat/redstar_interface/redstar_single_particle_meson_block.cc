@@ -6,7 +6,7 @@
 
  * Creation Date : 11-11-2013
 
- * Last Modified : Wed 13 Nov 2013 08:20:29 PM EST
+ * Last Modified : Thu 14 Nov 2013 10:09:15 AM EST
 
  * Created By : shultz
 
@@ -197,22 +197,6 @@ namespace radmat
       return ss.str(); 
     }
 
-  AbsRedstarInput_t * 
-    RedstarSingleParticleMesonInput::clone(void) const
-    {
-      RedstarSingleParticleMesonInput *f = new RedstarSingleParticleMesonInput; 
-      f->J = J; 
-      f->H = H; 
-      f->parity = parity; 
-      f->mom = mom; 
-      f->name = name; 
-      f->creation_op = creation_op; 
-      f->smearedP = smearedP; 
-      f->isProjected = isProjected; 
-      f->t_slice = t_slice; 
-
-      return f; 
-    }
 
   std::string 
     RedstarSingleParticleMesonInput::sname(void) const
