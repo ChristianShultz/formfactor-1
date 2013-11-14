@@ -39,6 +39,11 @@ namespace radmat
 
     virtual std::string write(void) const; 
 
+    virtual AbsRedstarInput_t * clone(void) const 
+    {
+      return new RedstarUnimprovedVectorCurrentInput(*this); 
+    }
+
     const_iterator begin(void) const {return photons.begin();}
     const_iterator end(void) const {return photons.end();}
 

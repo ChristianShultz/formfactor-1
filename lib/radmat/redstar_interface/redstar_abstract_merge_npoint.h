@@ -41,10 +41,8 @@ namespace radmat
       return *this; 
     }
 
-
     std::vector<EnsemRedstarNPtBlock> npoint; 
     std::vector<std::vector< ADAT::Handle< AbsRedstarInput_t > > > input; 
-
   };
 
 
@@ -60,14 +58,20 @@ namespace radmat
       do_work(void) = 0; 
 
 
-    virtual std::vector<EnsemRedstarNPtBlock> 
+    virtual const std::vector<EnsemRedstarNPtBlock>& 
       xml(void) const {return my_data.npoint;} 
-    virtual AbsRedstarMergeNPtData_t 
+
+    virtual const AbsRedstarMergeNPtData_t& 
       data(void) const {return my_data;}
+
+    virtual const NPointXML& 
+      nptXML(void) const {return my_npt;}
+
     virtual void 
       read(ADATXML::XMLReader &xml, const std::string &path) 
       {
         ::radmat::read(xml,path,my_npt); 
+        do_work(); 
       }
 
     // what timeslices do each guy sit on

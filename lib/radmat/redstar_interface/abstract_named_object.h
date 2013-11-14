@@ -5,7 +5,7 @@
 #include <string>
 #include <algorithm>
 #include <exception>
-#include "adat/handle.h"
+#include "radmat/utils/handle_interface.h"
 
 //   NB: the handles are NOT thread safe so this can 
 //       only be used through single threadded sections
@@ -18,7 +18,7 @@ namespace radmat
     struct AbstractNamedObject 
     {
       std::string object_name; 
-      ADAT::Handle<T> param; 
+      rHandle<T> param; 
 
       AbstractNamedObject(void) {}
       AbstractNamedObject(const AbstractNamedObject &o)

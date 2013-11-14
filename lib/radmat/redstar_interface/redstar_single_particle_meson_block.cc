@@ -6,7 +6,7 @@
 
  * Creation Date : 11-11-2013
 
- * Last Modified : Thu 14 Nov 2013 10:09:15 AM EST
+ * Last Modified : Thu 14 Nov 2013 03:09:48 PM EST
 
  * Created By : shultz
 
@@ -30,6 +30,11 @@
 #include <exception>
 #include <iostream>
 #include <sstream>
+
+
+#define  DEBUG_MSG_ON
+#define  DEBUG_HANDLE_ON
+#include "debug_props.h"
 
 namespace radmat
 {
@@ -120,6 +125,7 @@ namespace radmat
 
     EnsemRedstarBlock handle_work(const RedstarSingleParticleMesonInput &e)
     {
+      DEBUG_MSG(entering);
       // return value
       EnsemRedstarBlock ret; 
 
@@ -134,6 +140,8 @@ namespace radmat
         lattice_meson = invertSubduction(meson); 
       else
         lattice_meson = conj(invertSubduction(meson)); 
+
+      DEBUG_MSG(inverted subduction);
 
       // do this sum
       // O_{J,H} \sim \sum_{\lambda,\mu} S_{J,H}^{\lambda,\mu} O^{\lambda,\mu}
@@ -165,6 +173,8 @@ namespace radmat
 
         ret = ret + EnsemRedstarBlock::ListObj_t(it->m_coeff,npt); 
       }
+      DEBUG_MSG(exiting);
+      return ret; 
     }
 
     std::string doPrint(const ADATXML::Array<int> &t)
@@ -237,9 +247,10 @@ namespace radmat
       std::stringstream ss; 
       ss << "J= " << J << " H= " << doPrint(H) << " par= " << parity
         << " fill_star= " << fill_star 
-        << " mom= " << doPrint(mom) << " twoI_z= " << twoI_z << " name = " << name 
+        << " twoI_z= " << twoI_z << " name = " << name 
         << " creation_op= " << creation_op << " smearedP= " << smearedP
-        << " isProjected= " << isProjected << " t_slice= " << t_slice;
+        << " isProjected= " << isProjected << " t_slice= " << t_slice
+        << " momlist: \n " << doPrint(mom); 
       return ss.str(); 
     }
 

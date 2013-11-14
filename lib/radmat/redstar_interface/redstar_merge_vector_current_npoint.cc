@@ -6,7 +6,7 @@
 
  * Creation Date : 12-11-2013
 
- * Last Modified : Thu 14 Nov 2013 10:34:14 AM EST
+ * Last Modified : Thu 14 Nov 2013 03:07:16 PM EST
 
  * Created By : shultz
 
@@ -21,6 +21,21 @@
 #include "adat/adat_stopwatch.h"
 #include "hadron/irrep_util.h"
 #include "hadron/ensem_filenames.h"
+
+
+#define  DEBUG_MSG_OFF
+#define  DEBUG_HANDLE_ON
+#include "debug_props.h"
+
+namespace
+{
+  int SINK_INDEX(0);
+  int INSERTION_INDEX(1);
+  int SOURCE_INDEX(2);
+  int SINK_INDEX_D1(1);
+  int INSERTION_INDEX_D1(2);
+  int SOURCE_INDEX_D1(3);
+}
 
 namespace radmat
 {
@@ -57,11 +72,13 @@ namespace radmat
       POW2_ASSERT( photon ); 
     }
 
-
     // do the cut
-    bool cutMomentum(const ADATXML::Array<int> &mom, const int minmom , const int maxmom)
+    bool cutMomentum(const ADATXML::Array<int> &mom,
+        const int minmom ,
+        const int maxmom)
     {
       int sq(0);
+      POW2_ASSERT(mom.size() == 3); 
       for(int i = 0; i < 3; ++i)
         sq += mom[i]*mom[i];
       return   !!! ( (sq >= minmom) && (sq <= maxmom) ) ;  // false if its too big or too small 
@@ -107,9 +124,13 @@ namespace radmat
     ADATXML::Array<int> 
       find_meson_momentum(const ADAT::Handle<AbsRedstarInput_t> foo)
       {
+        DEBUG_MSG(entering); 
+        DEBUG_HANDLE(foo); 
+
         ADATXML::Array<int> ret; 
         if(foo->type() == Stringify<RedstarSingleParticleMesonInput>())
         {
+          DEBUG_MSG(casting);
           const RedstarSingleParticleMesonInput *p; 
           p = dynamic_cast_handle<RedstarSingleParticleMesonInput,AbsRedstarInput_t>(foo); 
           ret = p->mom; 
@@ -120,6 +141,36 @@ namespace radmat
             << ": Error, unrecognized meson " << foo->type() << std::endl; 
           exit(1); 
         }
+
+        DEBUG_MSG(exiting);
+
+        return ret; 
+      }
+
+    // upcast to find data
+    ADATXML::Array<int> 
+      find_photon_momentum(const ADAT::Handle<AbsRedstarInput_t> f)
+      {
+        DEBUG_MSG(entering); 
+        DEBUG_HANDLE(f); 
+
+        ADATXML::Array<int> ret; 
+        if ( f->type() == Stringify<RedstarUnimprovedVectorCurrentInput>())
+        {
+          DEBUG_MSG(casting); 
+          const RedstarUnimprovedVectorCurrentInput *p; 
+          p = dynamic_cast_handle<RedstarUnimprovedVectorCurrentInput,AbsRedstarInput_t>(&*f); 
+          ret = p->mom;     
+        }
+        else
+        {
+          std::cerr << __PRETTY_FUNCTION__ << __FILE__ 
+            << ": Error, unrecognized photon " << f->type() << std::endl; 
+          exit(1); 
+        }
+
+        DEBUG_MSG(exiting);
+
         return ret; 
       }
 
@@ -129,8 +180,10 @@ namespace radmat
         const ADATXML::Array<int> psnk,
         const ADATXML::Array<int> psrc)
     {
+      DEBUG_MSG(entering);
       if ( f->type() == Stringify<RedstarUnimprovedVectorCurrentInput>())
       {
+        DEBUG_MSG(casting); 
         RedstarUnimprovedVectorCurrentInput *p; 
         p = dynamic_cast<RedstarUnimprovedVectorCurrentInput*>(&*f); 
         p->mom = momentumTransfer(psnk,psrc,p->creation_op);     
@@ -141,19 +194,23 @@ namespace radmat
           << ": Error, unrecognized insertion " << f->type() << std::endl; 
         exit(1); 
       }
+      DEBUG_MSG(exiting);
     }
 
 
     //  conserve momentum  
     void fill_insertion_momentum(std::vector<ADAT::Handle<AbsRedstarInput_t> > &inp)
     {
-      bool success = true;  
+      DEBUG_MSG(entering);
+
       ADATXML::Array<int> psnk, psrc,q;  
 
-      psnk = find_meson_momentum(inp[0]); 
-      psrc = find_meson_momentum(inp[2]); 
+      psnk = find_meson_momentum(inp[SINK_INDEX]); 
+      psrc = find_meson_momentum(inp[SOURCE_INDEX]); 
 
-      set_q(inp[0],psnk,psrc);  
+      set_q(inp[INSERTION_INDEX],psnk,psrc);  
+
+      DEBUG_MSG(exiting);
     } 
 
 
@@ -170,9 +227,9 @@ namespace radmat
 
         coeff = snk.m_coeff * ins.m_coeff * src.m_coeff; 
         npt.npoint.resize(3); 
-        npt.npoint[1] = snk.m_obj;
-        npt.npoint[2] = ins.m_obj; 
-        npt.npoint[3] = src.m_obj;
+        npt.npoint[SINK_INDEX_D1] = snk.m_obj;
+        npt.npoint[INSERTION_INDEX_D1] = ins.m_obj; 
+        npt.npoint[SOURCE_INDEX_D1] = src.m_obj;
 
         ret.m_coeff = coeff; 
         ret.m_obj = npt; 
@@ -252,16 +309,27 @@ namespace radmat
         const ADAT::Handle<AbsRedstarInput_t> srci,
         const std::string ensemble) 
     {
+      DEBUG_MSG(entering);
+
       merge ret; 
       EnsemRedstarNPtBlock npt; 
       std::vector< ADAT::Handle<AbsRedstarInput_t > > input(3); 
 
-      input[0] = snki; 
-      input[0] = insi; 
-      input[0] = srci; 
+      DEBUG_HANDLE(snk); 
+      DEBUG_HANDLE(snki); 
+      DEBUG_HANDLE(ins); 
+      DEBUG_HANDLE(insi); 
+      DEBUG_HANDLE(src); 
+      DEBUG_HANDLE(srci); 
+
+      input[SINK_INDEX] = ADAT::Handle<AbsRedstarInput_t>(snki->clone()); 
+      input[INSERTION_INDEX] = ADAT::Handle<AbsRedstarInput_t>(insi->clone()); 
+      input[SOURCE_INDEX] = ADAT::Handle<AbsRedstarInput_t>(srci->clone()); 
 
       // conserve momentum with the photon
       fill_insertion_momentum(input); 
+
+      DEBUG_MSG(subducing);
 
       // do the subduction 
       EnsemRedstarBlock snkb,insb,srcb; 
@@ -273,6 +341,8 @@ namespace radmat
 
       ret.npt = npt; 
       ret.input = input; 
+
+      DEBUG_MSG(exiting);
       return ret; 
     }
 
@@ -293,8 +363,7 @@ namespace radmat
         pmin = p->pmin; 
         pmax = p->pmax; 
 
-        EnsemRedstarNPtBlock::ListObj_t dum =  *(tmp.npt.begin()); 
-        q = dum.m_obj.npoint[2].irrep.mom;  
+        q = find_photon_momentum(tmp.input[INSERTION_INDEX]) ;  
       }
       else
       {
@@ -312,7 +381,9 @@ namespace radmat
 
     AbsRedstarMergeNPtData_t handle_work(const NPointXML &npt)
     {
-      // An RGE-ism 
+      DEBUG_MSG(entering); 
+
+      // A RGE-ism 
       Util::StopWatch snoop; 
       snoop.start(); 
 
@@ -327,19 +398,33 @@ namespace radmat
       // iteration variables, pull out some named data
       AbsRedstarXMLInterface_t::const_iterator src,ins,snk;
       AbstractBlockNamedObject source,insertion,sink; 
-      sink = npt.npoint[0];
-      insertion = npt.npoint[1]; 
-      source = npt.npoint[2];
+      sink = npt.npoint[SINK_INDEX];
+      insertion = npt.npoint[INSERTION_INDEX]; 
+      source = npt.npoint[SOURCE_INDEX];
+
+#ifdef DEBUG_MSG_ON 
+      std::cout << __PRETTY_FUNCTION__ << " :: type_info \n" 
+        << "sink -> " << sink.param->type() 
+        << "\ninsertion -> " << insertion.param->type() 
+        << "\nsource -> " << source.param->type() << std::endl;
+#endif
 
       // pointers to the functors we need to use
       ADAT::Handle<AbsRedstarBlock_t> snkF = sink.param->objFunctorPtr;
       ADAT::Handle<AbsRedstarBlock_t> insF = insertion.param->objFunctorPtr;
       ADAT::Handle<AbsRedstarBlock_t> srcF = source.param->objFunctorPtr;
 
+      DEBUG_HANDLE(snkF);
+      DEBUG_HANDLE(insF); 
+      DEBUG_HANDLE(srcF); 
+
+
       // check that they do correspond to mesons/photon 
       check_meson(snkF); 
       check_meson(srcF); 
       check_photon(insF); 
+
+      DEBUG_MSG(bigloop);
 
       // big loop, each continuum operator is a sum of lattice operators, 
       //    this sum needs to be multiplied out, do it here
@@ -370,6 +455,8 @@ namespace radmat
       snoop.stop(); 
       std::cout << __PRETTY_FUNCTION__ << ":" << __FILE__ 
         << " took " << snoop.getTimeInSeconds() << " seconds" << std::endl; 
+
+      DEBUG_MSG(exiting);
 
       return ret;
     }

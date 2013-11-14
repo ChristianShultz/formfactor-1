@@ -6,7 +6,7 @@
 
  * Creation Date : 04-12-2012
 
- * Last Modified : Thu 14 Nov 2013 11:03:39 AM EST
+ * Last Modified : Thu 14 Nov 2013 12:19:05 PM EST
 
  * Created By : shultz
 
@@ -199,6 +199,49 @@ namespace radmat
 
   ///////////////////////////////////////////////////////
   ///////////////////////////////////////////////////////
+  
+  namespace
+  {
+    void print_timeslice_info(const ADAT::Handle<AbsRedstarMergeNPt> &r)
+    {
+      ADATXML::Array<int>  tslice = r->timeslice_info(); 
+      for(int i = 0; i < tslice.size(); ++i)
+        std::cout << "npt[" << i << "] lives on timeslice " 
+          << tslice[i] << std::endl;  
+    }
+
+    void print_npoint_xml_info(const NPointXML & npt)
+    {
+      std::cout << "NPointXML" << std::endl; 
+      std::cout << "version  -> " << npt.version << std::endl; 
+      std::cout << "N        -> " << npt.N << std::endl; 
+      std::cout << "ensemble -> " << npt.ensemble << std::endl; 
+      for(int i =0; i < npt.npoint.size(); ++i)
+        std::cout << npt.npoint[i].object_name << ":\n"
+          << npt.npoint[i].param->write() << std::endl; 
+    }
+
+    void print_merge_npt_data_info(const AbsRedstarMergeNPtData_t & data)
+    {
+      std::cout << "AbsRedstarMergeNPtData_t " << std::endl; 
+      std::cout << "N_EnsemRedstarNPtBlocks = " << data.npoint.size() << std::endl; 
+    }
+  }
+
+  ///////////////////////////////////////////////////////
+  // print some of the xml info for debuggin 
+  void
+    ConstructCorrelators::print_redstar(const AbstractMergeNamedObject &r)
+    {
+      ADAT::Handle<AbsRedstarMergeNPt> rr = r.param; 
+      std::cout << __func__ << ": type -> " << rr->type() << std::endl; 
+      print_npoint_xml_info(rr->nptXML());
+      print_timeslice_info(rr); 
+      print_merge_npt_data_info(rr->data()); 
+    }
+
+  ///////////////////////////////////////////////////////
+  // construct lots of correlators
   std::vector<ADAT::Handle<LLSQLatticeMultiData> >
     ConstructCorrelators::construct_multi_correlators(void) const
     {
@@ -206,6 +249,8 @@ namespace radmat
     }
 
 
+  ///////////////////////////////////////////////////////
+  // just make some xml 
   std::vector<Hadron::KeyHadronNPartNPtCorr_t>
     ConstructCorrelators::construct_correlator_xml(void) const
     {
@@ -228,6 +273,8 @@ namespace radmat
           three_pt->maSource, 
           elem_id); 
 
+      std::cout << __PRETTY_FUNCTION__ << ": $#unsorted = " << unsorted_elems.size() << std::endl; 
+
       std::vector<TaggedEnsemRedstarNPtBlock>::const_iterator block;
       EnsemRedstarNPtBlock::const_iterator npt; 
       ADAT::MapObject<EnsemRedstarNPtBlock::Obj_t,int> hash; 
@@ -239,7 +286,8 @@ namespace radmat
 
 #ifdef TIME_CONSTRUCT_ALL_CORRS
       snoop.stop(); 
-      std::cout << " ** time to build all correlator xml " << snoop.getTimeInSeconds() << " seconds" << std::endl;
+      std::cout << " ** time to build xml for " <<  hash.size() 
+        << " correlators " << snoop.getTimeInSeconds() << " seconds" << std::endl;
 #endif
 
       return hash.keys(); 

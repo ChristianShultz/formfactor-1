@@ -4,7 +4,7 @@
 #include "hadron/hadron_npart_npt_corr.h"
 #include "io/adat_xmlio.h"
 #include "radmat/utils/obj_expr_t.h"
-#include "adat/handle.h"
+#include "radmat/utils/handle.h"
 #include "ensem/ensem.h"
 #include <string>
 
@@ -24,7 +24,7 @@ namespace radmat
     {
       virtual std::string type(void) const = 0; 
       virtual std::string write(void) const = 0; 
-      virtual ~AbsRedstarInput_t() {}
+      virtual AbsRedstarInput_t* clone(void) const = 0; 
     }; 
 
   // an abstract polymorphic base to cast from
@@ -38,7 +38,7 @@ namespace radmat
       virtual ~AbsRedstarBlock_t() {}
       virtual std::string type(void) const = 0; 
       virtual EnsemRedstarBlock operator()(const AbsRedstarInput_t * ) const = 0; 
-      virtual EnsemRedstarBlock operator()(const ADAT::Handle<AbsRedstarInput_t> &h ) const 
+      virtual EnsemRedstarBlock operator()(const rHandle<AbsRedstarInput_t> &h ) const 
       { 
         return this->operator()(&*h); // hack
       } 
@@ -47,7 +47,7 @@ namespace radmat
 
   struct AbsRedstarXMLInterface_t
   {
-    typedef std::vector<ADAT::Handle<AbsRedstarInput_t> >::const_iterator const_iterator; 
+    typedef std::vector<rHandle<AbsRedstarInput_t> >::const_iterator const_iterator; 
 
     AbsRedstarXMLInterface_t() {}
     AbsRedstarXMLInterface_t& operator=(const AbsRedstarXMLInterface_t &); // not impl
@@ -70,8 +70,8 @@ namespace radmat
     // a nice way of storing information and then getting out the continuum version
     virtual EnsemRedstarBlock operator()(const AbsRedstarInput_t *inp) { (*objFunctorPtr)(inp); }
 
-    ADAT::Handle< AbsRedstarBlock_t > objFunctorPtr; 
-    std::vector< ADAT::Handle< AbsRedstarInput_t > > inputList; 
+    rHandle< AbsRedstarBlock_t > objFunctorPtr; 
+    std::vector< rHandle< AbsRedstarInput_t > > inputList; 
   }; 
 
 

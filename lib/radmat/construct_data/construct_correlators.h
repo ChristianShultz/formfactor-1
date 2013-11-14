@@ -29,7 +29,11 @@ namespace radmat
       registerSubductionTables(); 
       have_ini = true;
       m_ini = ini; 
+
+      print_redstar(m_ini.threePointCorrXMLIni.redstar); 
     }
+
+    void print_redstar(const AbstractMergeNamedObject &); 
 
     // sum over irreps to produce cont correlators
     std::vector<ADAT::Handle<LLSQLatticeMultiData> >

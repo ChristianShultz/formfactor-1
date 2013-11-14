@@ -6,7 +6,7 @@
 
  * Creation Date : 11-11-2013
 
- * Last Modified : Thu 14 Nov 2013 10:40:21 AM EST
+ * Last Modified : Thu 14 Nov 2013 03:14:27 PM EST
 
  * Created By : shultz
 
@@ -35,6 +35,9 @@
 #include <map>
 #include <exception>
 #include <sstream>
+
+#define DEBUG_MSG_ON
+#include "debug_props.h"
 
 
 using namespace ADATXML; 
@@ -197,7 +200,10 @@ namespace radmat
     EnsemRedstarBlock
       handle_temporal_work(const RedstarUnimprovedVectorCurrentInput &v)
       {
+        DEBUG_MSG(entering);
         EnsemRedstarBlock ret; 
+
+        POW2_ASSERT( v.lorentz == 4 );
 
         // piggy back off single particle mesons
         RedstarSingleParticleMesonInput back; 
@@ -221,6 +227,8 @@ namespace radmat
           ret = ret + SEMBLE::toScalar(weight) * (piggy(&back)); 
         }
 
+        DEBUG_MSG(exiting);
+
         return ret;
       }
 
@@ -228,7 +236,11 @@ namespace radmat
     EnsemRedstarBlock
       handle_spatial_work(const RedstarUnimprovedVectorCurrentInput &v)
       {
+        DEBUG_MSG(entering);
         EnsemRedstarBlock ret; 
+
+        POW2_ASSERT( v.lorentz < 4 );
+        POW2_ASSERT( v.lorentz > 0 );
 
         // piggy back off single particle mesons
         RedstarSingleParticleMesonInput back; 
@@ -265,6 +277,8 @@ namespace radmat
           // NB: some numbering assumptions in here -- pull the guy we want
           ret = ret + SEMBLE::toScalar(weight) * ( cart[ v.lorentz - 1] ) ;   
         }
+
+        DEBUG_MSG(exiting);
 
         return ret;
       }
@@ -449,7 +463,7 @@ namespace radmat
       doXMLRead(ptop,"space",space,__PRETTY_FUNCTION__);       
 
 
-      objFunctorPtr = new RedstarUnimprovedVectorCurrentBlock; 
+      objFunctorPtr = ADAT::Handle<AbsRedstarBlock_t>(new RedstarUnimprovedVectorCurrentBlock); 
 
       // populate the inputList vector
       read_in_photons(inputList,time,t_slice,true); 
@@ -461,8 +475,8 @@ namespace radmat
     {
       std::stringstream ss;
       ss << "pmin= " << pmin << " pmax=" << pmax << " t_slice= " << t_slice; 
-      ss << "time= " << toString(time) << std::endl;
-      ss << "space= " << toString(space) << std::endl;
+      ss << "\ntime:\n" << toString(time) << std::endl;
+      ss << "\nspace:\n" << toString(space) << std::endl;
       return ss.str(); 
     }
 

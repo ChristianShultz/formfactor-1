@@ -5,7 +5,7 @@
 
 #include "adat/objfactory.h"
 #include "adat/singleton.h"
-#include "adat/handle.h"
+#include "radmat/utils/handle.h"
 #include "io/adat_xmlio.h"
 #include "redstar_abstract_block_base.h"
 #include <string>

@@ -33,8 +33,12 @@ namespace radmat
 
     virtual std::string write(void) const; 
 
+    virtual AbsRedstarInput_t * clone(void) const
+    {
+      return new RedstarSingleParticleMesonInput(*this);
+    } 
 
-    std::string sname(void) const; 
+    virtual std::string sname(void) const; 
 
     int J;                            // continuum spin
     int H;                            // helicity 

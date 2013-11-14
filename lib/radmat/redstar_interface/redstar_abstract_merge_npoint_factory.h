@@ -5,7 +5,7 @@
 
 #include "adat/objfactory.h"
 #include "adat/singleton.h"
-#include "adat/handle.h"
+#include "radmat/utils/handle.h"
 #include "io/adat_xmlio.h"
 #include "redstar_abstract_merge_npoint.h"
 #include <string>
@@ -24,7 +24,7 @@ namespace radmat
   namespace TheRedstarAbstractMergeNPtFactoryEnv
   {
     bool registerAll(void); 
-    ADAT::Handle<AbsRedstarMergeNPt> callFactory(const std::string &id); 
+    rHandle<AbsRedstarMergeNPt> callFactory(const std::string &id); 
   }
 
 } // radmat

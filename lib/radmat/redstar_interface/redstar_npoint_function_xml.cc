@@ -6,7 +6,7 @@
 
  * Creation Date : 12-11-2013
 
- * Last Modified : Thu 14 Nov 2013 08:51:41 AM EST
+ * Last Modified : Thu 14 Nov 2013 01:53:37 PM EST
 
  * Created By : shultz
 
@@ -95,6 +95,15 @@ namespace radmat
         std::cout << "unknown version " << npt.version << std::endl; 
         exit(1); 
     }
+    // auto fill size info 
+    npt.N = npt.npoint.size(); 
+
+    std::cout << __PRETTY_FUNCTION__ << "\n    : read \n" << std::endl; 
+    for(int i =0; i < npt.N; ++i)
+      std::cout << "\nnpt[" << i << "]: " << npt.npoint[i].object_name 
+        << " -> " << npt.npoint[i].param->type() 
+        << "\n      " << npt.npoint[i].param->write() 
+        << std::endl;
 
   }
 
