@@ -358,7 +358,7 @@ namespace radmat
       }
 
 
-    void read_in_photons(std::vector<ADAT::Handle<AbsRedstarInput_t> > &v, 
+    void read_in_photons(std::vector<rHandle<AbsRedstarInput_t> > &v, 
         RedstarUnimprovedVectorCurrentXML::insertion &i,
         const int t_slice,
         const bool is_temporal)
@@ -377,7 +377,7 @@ namespace radmat
         RedstarUnimprovedVectorCurrentInput *t = new RedstarUnimprovedVectorCurrentInput;
         *t = tmp; 
         t->lorentz = 4; 
-        v.push_back(ADAT::Handle<AbsRedstarInput_t>(t)); 
+        v.push_back(rHandle<AbsRedstarInput_t>(t)); 
       }
       else
       {
@@ -386,7 +386,7 @@ namespace radmat
           RedstarUnimprovedVectorCurrentInput *t = new RedstarUnimprovedVectorCurrentInput;
           *t = tmp; 
           t->lorentz = lor; 
-          v.push_back(ADAT::Handle<AbsRedstarInput_t>(t)); 
+          v.push_back(rHandle<AbsRedstarInput_t>(t)); 
         }
       }
 
@@ -463,7 +463,7 @@ namespace radmat
       doXMLRead(ptop,"space",space,__PRETTY_FUNCTION__);       
 
 
-      objFunctorPtr = ADAT::Handle<AbsRedstarBlock_t>(new RedstarUnimprovedVectorCurrentBlock); 
+      objFunctorPtr = rHandle<AbsRedstarBlock_t>(new RedstarUnimprovedVectorCurrentBlock); 
 
       // populate the inputList vector
       read_in_photons(inputList,time,t_slice,true); 

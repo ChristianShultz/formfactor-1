@@ -7,7 +7,7 @@
 #include <vector>
 #include "ensem/ensem.h"
 #include "semble/semble_vector.h"
-#include "adat/handle.h"
+#include "radmat/utils/handle.h"
 #include "radmat/llsq/llsq_q2_pack.h"
 #include "jackFitter/three_point_fit_forms.h"
 
@@ -42,7 +42,7 @@ namespace radmat
     ENSEM::EnsemReal getFF(const int ffnum) const; 
 
     // get the fit associated with ffnum
-    ADAT::Handle<FitThreePoint> getFit(const int ffnum) const;
+    rHandle<FitThreePoint> getFit(const int ffnum) const;
 
     // get the ensemble value for q2
     ENSEM::EnsemReal getQ2(void) const {return Q2;}
@@ -68,7 +68,7 @@ namespace radmat
 
     // data store
     bool didFit;
-    std::map<int,ADAT::Handle<FitThreePoint> > fitters; 
+    std::map<int,rHandle<FitThreePoint> > fitters; 
     ENSEM::EnsemReal Q2;
     SEMBLE::SembleVector<double> ff;
   };

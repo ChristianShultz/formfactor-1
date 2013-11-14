@@ -6,7 +6,7 @@
 #include "semble/semble_vector.h"
 #include "semble/semble_meta.h"
 #include <map>
-#include "adat/handle.h"
+#include "radmat/utils/handle.h"
 
 namespace radmat
 {
@@ -176,11 +176,11 @@ namespace radmat
 
 
   template<typename T>
-    ADAT::Handle<LLSQRet_ff_Q2Pack<T> >  transformLLSQRetPack(const LLSQRet_t_Q2Pack<T> &in)
+    rHandle<LLSQRet_ff_Q2Pack<T> >  transformLLSQRetPack(const LLSQRet_t_Q2Pack<T> &in)
     {
 
 
-      ADAT::Handle<LLSQRet_ff_Q2Pack<T> > out(new LLSQRet_ff_Q2Pack<T>);      
+      rHandle<LLSQRet_ff_Q2Pack<T> > out(new LLSQRet_ff_Q2Pack<T>);      
       typename SEMBLE::PromoteEnsemVec<T>::Type zero;
 
       int ncfg = in.begin()->second.getB();

@@ -40,7 +40,7 @@ namespace radmat
 
     ///////////////////////////////////////////////////////
     ///////////////////////////////////////////////////////
-    std::pair<bool,ADAT::Handle<LLSQLatticeMultiData> >
+    std::pair<bool,rHandle<LLSQLatticeMultiData> >
       build_a_correlator(
           const double qsq,
           const std::vector<TaggedEnsemRedstarNPtBlock> &corrs,
@@ -70,10 +70,10 @@ namespace radmat
 
         std::vector<ConstructCorrsMatrixElement>::const_iterator it; 
         bool any_data = false; 
-        ADAT::Handle<LLSQLatticeMultiData> data(new LLSQLatticeMultiData()); 
+        rHandle<LLSQLatticeMultiData> data(new LLSQLatticeMultiData()); 
 
         if ( !!! tmp.first ) 
-          return std::pair<bool,ADAT::Handle<LLSQLatticeMultiData> >(false,data); 
+          return std::pair<bool,rHandle<LLSQLatticeMultiData> >(false,data); 
 
         // another data sanity check.. 
         for(it = tmp.second.begin(); it != tmp.second.end(); ++it)
@@ -91,7 +91,7 @@ namespace radmat
             << " took " << snoop.getTimeInSeconds() << " seconds" << std::endl;
 #endif
 
-        return std::pair<bool,ADAT::Handle<LLSQLatticeMultiData> >(any_data,data); 
+        return std::pair<bool,rHandle<LLSQLatticeMultiData> >(any_data,data); 
       }
 
 
@@ -99,7 +99,7 @@ namespace radmat
     ///////////////////////////////////////////////////////
     ///////////////////////////////////////////////////////
     std::vector< 
-      std::pair<bool,ADAT::Handle<LLSQLatticeMultiData> > 
+      std::pair<bool,rHandle<LLSQLatticeMultiData> > 
       >
       build_llsq_corrs(
           const std::vector<std::pair<double,std::vector<TaggedEnsemRedstarNPtBlock> > > &loop_data,
@@ -109,7 +109,7 @@ namespace radmat
           const DatabaseInterface_t &db)
       {
 
-        std::vector<std::pair<bool,ADAT::Handle<LLSQLatticeMultiData> > > ret(loop_data.size()); 
+        std::vector<std::pair<bool,rHandle<LLSQLatticeMultiData> > > ret(loop_data.size()); 
         int idx;
         int sz ( loop_data.size() ) ; 
 
@@ -132,7 +132,7 @@ namespace radmat
     ///////////////////////////////////////////////////////
     ///////////////////////////////////////////////////////
     // the brain 
-    std::vector<ADAT::Handle<LLSQLatticeMultiData> >
+    std::vector<rHandle<LLSQLatticeMultiData> >
       do_work(const ThreePointCorrIni_t &ini)
       {
 
@@ -164,15 +164,15 @@ namespace radmat
           loop_data.push_back(std::pair<double,std::vector<TaggedEnsemRedstarNPtBlock> >(it->first,it->second)); 
 
 
-        std::vector<std::pair<bool,ADAT::Handle<LLSQLatticeMultiData> > > lattice_data; 
+        std::vector<std::pair<bool,rHandle<LLSQLatticeMultiData> > > lattice_data; 
         DatabaseInterface_t db(*db_prop) ; 
 
         lattice_data = build_llsq_corrs(loop_data,three_pt->sink_id, three_pt->source_id, 
             three_pt->renormalization, db); 
 
 
-        std::vector<ADAT::Handle<LLSQLatticeMultiData> > ret; 
-        std::vector<std::pair<bool,ADAT::Handle<LLSQLatticeMultiData> > >::const_iterator dcheck; 
+        std::vector<rHandle<LLSQLatticeMultiData> > ret; 
+        std::vector<std::pair<bool,rHandle<LLSQLatticeMultiData> > >::const_iterator dcheck; 
 
         for(dcheck = lattice_data.begin(); dcheck != lattice_data.end(); ++dcheck) 
         {
@@ -202,7 +202,7 @@ namespace radmat
   
   namespace
   {
-    void print_timeslice_info(const ADAT::Handle<AbsRedstarMergeNPt> &r)
+    void print_timeslice_info(const rHandle<AbsRedstarMergeNPt> &r)
     {
       ADATXML::Array<int>  tslice = r->timeslice_info(); 
       for(int i = 0; i < tslice.size(); ++i)
@@ -233,7 +233,7 @@ namespace radmat
   void
     ConstructCorrelators::print_redstar(const AbstractMergeNamedObject &r)
     {
-      ADAT::Handle<AbsRedstarMergeNPt> rr = r.param; 
+      rHandle<AbsRedstarMergeNPt> rr = r.param; 
       std::cout << __func__ << ": type -> " << rr->type() << std::endl; 
       print_npoint_xml_info(rr->nptXML());
       print_timeslice_info(rr); 
@@ -242,7 +242,7 @@ namespace radmat
 
   ///////////////////////////////////////////////////////
   // construct lots of correlators
-  std::vector<ADAT::Handle<LLSQLatticeMultiData> >
+  std::vector<rHandle<LLSQLatticeMultiData> >
     ConstructCorrelators::construct_multi_correlators(void) const
     {
       return do_work(m_ini); 

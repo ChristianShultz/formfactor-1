@@ -6,7 +6,7 @@
 
  * Creation Date : 12-11-2013
 
- * Last Modified : Thu 14 Nov 2013 03:07:16 PM EST
+ * Last Modified : Thu 14 Nov 2013 05:04:27 PM EST
 
  * Created By : shultz
 
@@ -14,7 +14,7 @@
 
 #include "redstar_merge_vector_current_npoint.h"
 #include "redstar_abstract_merge_npoint.h"
-#include "handle_interface.h"
+#include "radmat/utils/handle.h"
 #include "radmat/utils/pow2assert.h"
 #include "redstar_single_particle_meson_block.h"
 #include "redstar_unimproved_vector_current.h"
@@ -54,7 +54,7 @@ namespace radmat
       POW2_ASSERT(v == 0); 
     }
 
-    void check_meson(const ADAT::Handle<AbsRedstarBlock_t> p)
+    void check_meson(const rHandle<AbsRedstarBlock_t> p)
     {
       bool meson = false; 
 
@@ -63,7 +63,7 @@ namespace radmat
       POW2_ASSERT( meson ); 
     }
 
-    void check_photon(const ADAT::Handle<AbsRedstarBlock_t> p)
+    void check_photon(const rHandle<AbsRedstarBlock_t> p)
     {
       bool photon = false; 
 
@@ -122,7 +122,7 @@ namespace radmat
 
     // upcast to find data
     ADATXML::Array<int> 
-      find_meson_momentum(const ADAT::Handle<AbsRedstarInput_t> foo)
+      find_meson_momentum(const rHandle<AbsRedstarInput_t> foo)
       {
         DEBUG_MSG(entering); 
         DEBUG_HANDLE(foo); 
@@ -131,8 +131,7 @@ namespace radmat
         if(foo->type() == Stringify<RedstarSingleParticleMesonInput>())
         {
           DEBUG_MSG(casting);
-          const RedstarSingleParticleMesonInput *p; 
-          p = dynamic_cast_handle<RedstarSingleParticleMesonInput,AbsRedstarInput_t>(foo); 
+          rHandle<RedstarSingleParticleMesonInput> p; 
           ret = p->mom; 
         }
         else
@@ -149,7 +148,7 @@ namespace radmat
 
     // upcast to find data
     ADATXML::Array<int> 
-      find_photon_momentum(const ADAT::Handle<AbsRedstarInput_t> f)
+      find_photon_momentum(const rHandle<AbsRedstarInput_t> f)
       {
         DEBUG_MSG(entering); 
         DEBUG_HANDLE(f); 
@@ -158,8 +157,7 @@ namespace radmat
         if ( f->type() == Stringify<RedstarUnimprovedVectorCurrentInput>())
         {
           DEBUG_MSG(casting); 
-          const RedstarUnimprovedVectorCurrentInput *p; 
-          p = dynamic_cast_handle<RedstarUnimprovedVectorCurrentInput,AbsRedstarInput_t>(&*f); 
+          rHandle<RedstarUnimprovedVectorCurrentInput> p(f); 
           ret = p->mom;     
         }
         else
@@ -176,7 +174,7 @@ namespace radmat
 
 
     // upcast to set data
-    void set_q(ADAT::Handle<AbsRedstarInput_t> f, 
+    void set_q(rHandle<AbsRedstarInput_t> f, 
         const ADATXML::Array<int> psnk,
         const ADATXML::Array<int> psrc)
     {
@@ -184,8 +182,7 @@ namespace radmat
       if ( f->type() == Stringify<RedstarUnimprovedVectorCurrentInput>())
       {
         DEBUG_MSG(casting); 
-        RedstarUnimprovedVectorCurrentInput *p; 
-        p = dynamic_cast<RedstarUnimprovedVectorCurrentInput*>(&*f); 
+        rHandle<RedstarUnimprovedVectorCurrentInput> p(f); 
         p->mom = momentumTransfer(psnk,psrc,p->creation_op);     
       }
       else
@@ -199,7 +196,7 @@ namespace radmat
 
 
     //  conserve momentum  
-    void fill_insertion_momentum(std::vector<ADAT::Handle<AbsRedstarInput_t> > &inp)
+    void fill_insertion_momentum(std::vector<rHandle<AbsRedstarInput_t> > &inp)
     {
       DEBUG_MSG(entering);
 
@@ -296,24 +293,24 @@ namespace radmat
     struct merge
     {
       EnsemRedstarNPtBlock npt; 
-      std::vector<ADAT::Handle<AbsRedstarInput_t> > input; 
+      std::vector<rHandle<AbsRedstarInput_t> > input; 
     };
 
     // the work horse 
     merge do_merge(
-        const ADAT::Handle<AbsRedstarBlock_t> snk, 
-        const ADAT::Handle<AbsRedstarInput_t> snki,
-        const ADAT::Handle<AbsRedstarBlock_t> ins, 
-        const ADAT::Handle<AbsRedstarInput_t> insi,
-        const ADAT::Handle<AbsRedstarBlock_t> src, 
-        const ADAT::Handle<AbsRedstarInput_t> srci,
+        const rHandle<AbsRedstarBlock_t> snk, 
+        const rHandle<AbsRedstarInput_t> snki,
+        const rHandle<AbsRedstarBlock_t> ins, 
+        const rHandle<AbsRedstarInput_t> insi,
+        const rHandle<AbsRedstarBlock_t> src, 
+        const rHandle<AbsRedstarInput_t> srci,
         const std::string ensemble) 
     {
       DEBUG_MSG(entering);
 
       merge ret; 
       EnsemRedstarNPtBlock npt; 
-      std::vector< ADAT::Handle<AbsRedstarInput_t > > input(3); 
+      std::vector< rHandle<AbsRedstarInput_t > > input(3); 
 
       DEBUG_HANDLE(snk); 
       DEBUG_HANDLE(snki); 
@@ -322,9 +319,9 @@ namespace radmat
       DEBUG_HANDLE(src); 
       DEBUG_HANDLE(srci); 
 
-      input[SINK_INDEX] = ADAT::Handle<AbsRedstarInput_t>(snki->clone()); 
-      input[INSERTION_INDEX] = ADAT::Handle<AbsRedstarInput_t>(insi->clone()); 
-      input[SOURCE_INDEX] = ADAT::Handle<AbsRedstarInput_t>(srci->clone()); 
+      input[SINK_INDEX] = rHandle<AbsRedstarInput_t>(snki->clone()); 
+      input[INSERTION_INDEX] = rHandle<AbsRedstarInput_t>(insi->clone()); 
+      input[SOURCE_INDEX] = rHandle<AbsRedstarInput_t>(srci->clone()); 
 
       // conserve momentum with the photon
       fill_insertion_momentum(input); 
@@ -358,8 +355,7 @@ namespace radmat
 
       if(ins.param->type() == Stringify<RedstarUnimprovedVectorCurrentXML>())
       {
-        const RedstarUnimprovedVectorCurrentXML *p; 
-        p = dynamic_cast_handle<RedstarUnimprovedVectorCurrentXML,AbsRedstarXMLInterface_t>(ins.param); 
+        rHandle<RedstarUnimprovedVectorCurrentXML> p; 
         pmin = p->pmin; 
         pmax = p->pmax; 
 
@@ -388,7 +384,7 @@ namespace radmat
       snoop.start(); 
 
       std::vector<EnsemRedstarNPtBlock> npt_xml;
-      std::vector<std::vector< ADAT::Handle< AbsRedstarInput_t > > > npt_inp; 
+      std::vector<std::vector< rHandle< AbsRedstarInput_t > > > npt_inp; 
       AbsRedstarMergeNPtData_t ret; 
 
       // is it a three point and do we understand what it is
@@ -410,9 +406,9 @@ namespace radmat
 #endif
 
       // pointers to the functors we need to use
-      ADAT::Handle<AbsRedstarBlock_t> snkF = sink.param->objFunctorPtr;
-      ADAT::Handle<AbsRedstarBlock_t> insF = insertion.param->objFunctorPtr;
-      ADAT::Handle<AbsRedstarBlock_t> srcF = source.param->objFunctorPtr;
+      rHandle<AbsRedstarBlock_t> snkF = sink.param->objFunctorPtr;
+      rHandle<AbsRedstarBlock_t> insF = insertion.param->objFunctorPtr;
+      rHandle<AbsRedstarBlock_t> srcF = source.param->objFunctorPtr;
 
       DEBUG_HANDLE(snkF);
       DEBUG_HANDLE(insF); 

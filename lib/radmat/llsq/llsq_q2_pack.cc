@@ -6,7 +6,7 @@
 
  * Creation Date : 17-01-2013
 
- * Last Modified : Sun Jan 27 09:26:28 2013
+ * Last Modified : Thu 14 Nov 2013 04:32:49 PM EST
 
  * Created By : shultz
 
@@ -23,7 +23,6 @@
 #include "semble/semble_matrix.h"
 #include "semble/semble_algebra.h"
 #include "semble/semble_file_management.h"
-#include "adat/handle.h"
 #include <vector>
 #include <string>
 #include <sstream>

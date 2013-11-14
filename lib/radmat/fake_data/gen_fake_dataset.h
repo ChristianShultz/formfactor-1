@@ -7,7 +7,7 @@
 #include "ensem/ensem.h"
 #include "radmat/utils/pow2assert.h"
 #include "radmat/utils/splash.h"
-#include "adat/handle.h"
+#include "radmat/utils/handle.h"
 #include "semble/semble_file_management.h"
 #include <string>
 #include <sstream>
@@ -22,8 +22,8 @@ namespace radmat
     struct GenFakeDataSet
     {
       typedef Fake3ptCorr<T> Corr;
-      typedef typename ADAT::Handle<FakeDataInputs_p<T> > PrimInput_h;
-      typedef typename ADAT::Handle<FakeDataInputs<T> > Input_h;
+      typedef  rHandle<FakeDataInputs_p<T> > PrimInput_h;
+      typedef rHandle<FakeDataInputs<T> > Input_h;
       typedef FakeMatrixElement::ffFunction ffFunction;
 
 
@@ -36,13 +36,13 @@ namespace radmat
       void write_spectrum_log(const Input_h &iptm, const pProp_t &mom);  
       std::vector<ffFunction> get_FF_inputs(void) const {return m_ff_input_functions;}
 
-      typename ADAT::Handle<std::vector<Corr> > get(void);
+     rHandle<std::vector<Corr> > get(void);
 
       private:
       bool m_haveIni;
       bool m_have3Pt;
       FakeDataIni_t m_ini;
-      typename ADAT::Handle<std::vector<Corr> > m_3Pt;
+      rHandle<std::vector<Corr> > m_3Pt;
       std::vector<ffFunction> m_ff_input_functions;
 
     };
@@ -70,7 +70,7 @@ namespace radmat
       POW2_ASSERT(m_haveIni);
 
       // basically safely dispose of the old guy/ allocate a new guy
-      typename ADAT::Handle<std::vector<Corr> > foo(new std::vector<Corr>() );
+     rHandle<std::vector<Corr> > foo(new std::vector<Corr>() );
       m_3Pt = foo;
       POW2_ASSERT(&*m_3Pt);
 
@@ -170,7 +170,7 @@ namespace radmat
 
 
   template<typename T>
-    ADAT::Handle<std::vector< typename GenFakeDataSet<T>::Corr> > GenFakeDataSet<T>::get(void)
+    rHandle<std::vector< typename GenFakeDataSet<T>::Corr> > GenFakeDataSet<T>::get(void)
     {
       if(m_have3Pt)
         return m_3Pt;

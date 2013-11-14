@@ -5,7 +5,7 @@
 #include <vector>
 #include <exception>
 #include "ensem/ensem.h"
-#include "adat/handle.h"
+#include "radmat/utils/handle.h"
 #include "AllConfStoreDB.h"
 #include "AllConfStoreMultipleDB.h"
 #include "io/adat_io.h"
@@ -76,8 +76,8 @@ namespace radmat
       NORMDATA fetch_dagger(const NORMKEY &) const;  
 
       public:
-      ADAT::Handle<FILEDB::AllConfStoreMultipleDB<S_C_KEY,S_C_DATA> > m_corr_db;
-      ADAT::Handle<FILEDB::AllConfStoreMultipleDB<S_N_KEY,S_N_DATA> > m_norm_db;  
+      rHandle<FILEDB::AllConfStoreMultipleDB<S_C_KEY,S_C_DATA> > m_corr_db;
+      rHandle<FILEDB::AllConfStoreMultipleDB<S_N_KEY,S_N_DATA> > m_norm_db;  
       radmatDBProp_t db_props;
 
       mutable std::ofstream outlog; // this is naughty but i wanted to move all of the 
@@ -98,8 +98,8 @@ namespace radmat
     void radmatAllConfDatabaseInterface<CORRKEY,CORRDATA,NORMKEY,NORMDATA>::alloc(void)
     {
 
-      m_corr_db = ADAT::Handle<FILEDB::AllConfStoreMultipleDB<S_C_KEY,S_C_DATA> > (new FILEDB::AllConfStoreMultipleDB<S_C_KEY,S_C_DATA>() );
-      m_norm_db = ADAT::Handle<FILEDB::AllConfStoreMultipleDB<S_N_KEY,S_N_DATA> > (new FILEDB::AllConfStoreMultipleDB<S_N_KEY,S_N_DATA>() );
+      m_corr_db = rHandle<FILEDB::AllConfStoreMultipleDB<S_C_KEY,S_C_DATA> > (new FILEDB::AllConfStoreMultipleDB<S_C_KEY,S_C_DATA>() );
+      m_norm_db = rHandle<FILEDB::AllConfStoreMultipleDB<S_N_KEY,S_N_DATA> > (new FILEDB::AllConfStoreMultipleDB<S_N_KEY,S_N_DATA>() );
 
       m_corr_db->setCacheSize(1*1024*1024*1024); 
       m_norm_db->setCacheSize(1*1024*1024*1024); 

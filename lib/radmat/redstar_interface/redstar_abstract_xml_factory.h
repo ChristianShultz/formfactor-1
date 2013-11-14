@@ -24,7 +24,7 @@ namespace radmat
   namespace TheRedstarAbstractXMLFactoryEnv
   {
     bool registerAll(void); 
-    ADAT::Handle<AbsRedstarXMLInterface_t> callFactory(const std::string &id); 
+    rHandle<AbsRedstarXMLInterface_t> callFactory(const std::string &id); 
   }
 
 } // radmat

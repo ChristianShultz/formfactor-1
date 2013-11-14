@@ -60,7 +60,7 @@ namespace radmat
       return success; 
     }
 
-    ADAT::Handle<AbsRedstarMergeNPt>
+    rHandle<AbsRedstarMergeNPt>
       callFactory(const std::string &id)
       {
         POW2_ASSERT( FacEnv::registerAll() ); 
@@ -76,7 +76,7 @@ namespace radmat
 
         POW2_ASSERT(foo); 
 
-        return ADAT::Handle<AbsRedstarMergeNPt>(foo); 
+        return rHandle<AbsRedstarMergeNPt>(foo); 
       }
 
   } // TheRedstarAbstractMergeNPtFactoryEnv

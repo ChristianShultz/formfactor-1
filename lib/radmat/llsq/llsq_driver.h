@@ -4,7 +4,7 @@
 
 #include "llsq_q2_pack.h"
 #include "llsq_solver.h"
-#include "adat/handle.h"
+#include "radmat/utils/handle.h"
 #include <string>
 
 namespace radmat
@@ -24,7 +24,7 @@ namespace radmat
       {  }
 
 
-      ADAT::Handle<LLSQRet_ff_Q2Pack<T> > operator()(const ADAT::Handle<LLSQDataPointQ2Pack> &in) const
+      rHandle<LLSQRet_ff_Q2Pack<T> > operator()(const rHandle<LLSQDataPointQ2Pack> &in) const
       {
         LLSQDataPointQ2Pack::const_iterator it;
         LLSQRet_t_Q2Pack<T> tmp;

@@ -40,7 +40,7 @@ namespace radmat
       virtual EnsemRedstarBlock operator()(const AbsRedstarInput_t * ) const = 0; 
       virtual EnsemRedstarBlock operator()(const rHandle<AbsRedstarInput_t> &h ) const 
       { 
-        return this->operator()(&*h); // hack
+        return this->operator()(h.get_ptr()); 
       } 
     };
 

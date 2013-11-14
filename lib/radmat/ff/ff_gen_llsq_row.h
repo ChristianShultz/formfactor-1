@@ -4,7 +4,7 @@
 
 #include "radmat/utils/pow2assert.h"
 #include "radmat/utils/tensor.h"
-#include "adat/handle.h"
+#include "radmat/utils/handle.h"
 #include "itpp/itbase.h"
 #include "io/adat_xmlio.h"
 #include "semble/semble_vector.h"
@@ -162,7 +162,7 @@ namespace radmat
     {
       // save some typing
       typedef  ffBlockBase_t<T> BBType;
-      typedef typename ADAT::Handle< ffBlockBase_t< T > > BBHandle_t;
+      typedef rHandle< ffBlockBase_t< T > > BBHandle_t;
       typedef std::list< BBHandle_t > ff_list;
 
       // this will be useful when we derive
@@ -290,7 +290,7 @@ namespace radmat
     struct ffKinematicFactors_t
     {
       // save some typing
-      typedef typename ADAT::Handle<ffBase_t<T> > ffBase_h;
+      typedef rHandle<ffBase_t<T> > ffBase_h;
       typedef typename SEMBLE::SembleMatrix<T> KinematicFactorMatrix;
 
       // the only available constructor

@@ -101,7 +101,7 @@ int main(int argc, char *argv[])
 
   FormFactorDecompositionFactoryEnv::registerAll(); 
 
-  ADAT::Handle<ffBase_t<std::complex<double> > > foo = FormFactorDecompositionFactoryEnv::callFactory(fred.matElemID); 
+  rHandle<ffBase_t<std::complex<double> > > foo = FormFactorDecompositionFactoryEnv::callFactory(fred.matElemID); 
 
   if(fred.jmu)
   {

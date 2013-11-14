@@ -2,7 +2,7 @@
 #define MINIMAL_FAKE_DATA_H_H_GUARD
 
 
-#include "adat/handle.h"
+#include "radmat/utils/handle.h"
 #include "radmat/ff/ff_gen_llsq_row.h"
 #include "semble/semble_matrix.h"
 #include <string>
@@ -55,7 +55,7 @@ namespace radmat
   private:
     genMinimalFakeData_c(void);
 
-    ADAT::Handle<ffBase_t<std::complex<double> > > m_matGen_h;
+    rHandle<ffBase_t<std::complex<double> > > m_matGen_h;
   };
 
 

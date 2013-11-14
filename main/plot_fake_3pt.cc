@@ -83,9 +83,9 @@ main(int argc, char *argv[])
 
 
   /*
-     ADAT::Handle<FakeDataInputs_p<std::complex<double> > > 
+     rHandle<FakeDataInputs_p<std::complex<double> > > 
      orig = generateOriginalInputs<std::complex<double> >(fakeinikeys);
-     ADAT::Handle<FakeDataInputs<std::complex<double> > > input = copyFakeInput(orig);
+     rHandle<FakeDataInputs<std::complex<double> > > input = copyFakeInput(orig);
      applyZSuppression(input->working);
      applyDispersion(input->working,fakeinikeys.dataProps.momenta[0]);
 
@@ -167,8 +167,8 @@ main(int argc, char *argv[])
   Q2Builder.load(C3);
   Q2Builder.strip_propagation_factor();
 
-  std::vector<ADAT::Handle<LLSQDataPointQ2Pack> > q2_packs = Q2Builder.getQ2Packs();
-  std::vector<ADAT::Handle<LLSQDataPointQ2Pack> >::const_iterator q2_pack_iterator;
+  std::vector<rHandle<LLSQDataPointQ2Pack> > q2_packs = Q2Builder.getQ2Packs();
+  std::vector<rHandle<LLSQDataPointQ2Pack> >::const_iterator q2_pack_iterator;
 
   int major_index(0);
   for(q2_pack_iterator = q2_packs.begin(); q2_pack_iterator != q2_packs.end(); ++q2_pack_iterator, ++major_index)

@@ -9,7 +9,7 @@
 #include "semble/semble_matrix.h"
 #include "semble/semble_algebra.h"
 #include "semble/semble_file_management.h"
-#include "adat/handle.h"
+#include "radmat/utils/handle.h"
 #include <vector>
 #include <string>
 #include <sstream>
@@ -155,7 +155,7 @@ namespace radmat
   ///////////////////////////////////////////////////////////////////////////////////////////
 
   template<typename T>
-    ADAT::Handle<LLSQInputType_t<T> > generateLLSQSystem(const std::vector<LLSQDataPoint> &unsorted_data, const int t_ins)
+    rHandle<LLSQInputType_t<T> > generateLLSQSystem(const std::vector<LLSQDataPoint> &unsorted_data, const int t_ins)
     {
 
       typename LLSQInputType_t<T>::KinematicFactors K,KWork;
@@ -281,7 +281,7 @@ namespace radmat
 
       double q2 = SEMBLE::toScalar(ENSEM::mean(data.begin()->Q2())); 
 
-      return ADAT::Handle<LLSQInputType_t<T> >( new LLSQInputType_t<T>(K,matElems,q2));
+      return rHandle<LLSQInputType_t<T> >( new LLSQInputType_t<T>(K,matElems,q2));
     }
 
   ///////////////////////////////////////////////////////////////////////////////////////////
@@ -289,8 +289,8 @@ namespace radmat
   template<typename T>
     struct LLSQBaseSolver_t
     {
-      typedef typename ADAT::Handle<LLSQRetTypeBase_t<T> > LLSQRetTypeBase_h;
-      typedef typename ADAT::Handle<LLSQInputType_t<T> > LLSQInputType_h;
+      typedef rHandle< LLSQRetTypeBase_t<T> > LLSQRetTypeBase_h;
+      typedef rHandle< LLSQInputType_t<T> > LLSQInputType_h;
       virtual void print_llsq_system(const LLSQInputType_h &d, const int t_ins) const
       {
         std::string path = SEMBLE::SEMBLEIO::getPath(); 

@@ -1,6 +1,7 @@
 #ifndef RADMAT_SINGLE_Q2_DRIVER_H
 #define RADMAT_SINGLE_Q2_DRIVER_H 
 
+#include "radmat/utils/handle.h"
 #include "radmat/llsq/llsq_multi_driver.h"
 #include "radmat/fitting/fit_tins.h"
 #include "ensem/ensem.h"
@@ -18,12 +19,12 @@ namespace radmat
     RadmatSingleQ2Driver(const RadmatSingleQ2Driver &o);
     RadmatSingleQ2Driver& operator=(const RadmatSingleQ2Driver &o);
 
-    bool load_llsq(const ADAT::Handle<LLSQLatticeMultiData> &lattice_data,
+    bool load_llsq(const rHandle<LLSQLatticeMultiData> &lattice_data,
         const double pole_mass_squared, 
         const double tolerance);
 
     // single q2 backdoor
-    bool load_llsq(const ADAT::Handle<LLSQLatticeMultiData> &lattice_data,
+    bool load_llsq(const rHandle<LLSQLatticeMultiData> &lattice_data,
         const double tolerance);
 
     void solve_llsq(const std::string &soln_ID);

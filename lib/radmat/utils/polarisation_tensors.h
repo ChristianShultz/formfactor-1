@@ -3,7 +3,7 @@
 
 #include "tensor.h"
 #include "aux.h"
-#include "adat/handle.h"
+#include "radmat/utils/handle.h"
 #include "ensem/ensem.h"
 #include "hadron/irrep_util.h"
 #include "hadron/clebsch.h"
@@ -90,8 +90,8 @@ namespace radmat
       // save some typing
       typedef XMLArray::Array<int> mom_t;
       typedef std::map<pKey_t,TensorBase*> map_t;
-      typedef ADAT::Handle<map_t> map_handle;
-      typedef ADAT::Handle<mom_t> mom_handle;
+      typedef rHandle<map_t> map_handle;
+      typedef rHandle<mom_t> mom_handle;
 
       genPolTens3D(void); // hidden
 
@@ -151,8 +151,8 @@ namespace radmat
     {
       typedef XMLArray::Array<int> mom_t;
       typedef std::map<pKey_t,TensorBase*> map_t;
-      typedef ADAT::Handle<map_t> map_handle;
-      typedef ADAT::Handle<mom_t> mom_handle;
+      typedef rHandle<map_t> map_handle;
+      typedef rHandle<mom_t> mom_handle;
 
       genPolTens3D(void); // hidden
 
@@ -276,8 +276,8 @@ namespace radmat
     {
       typedef XMLArray::Array<int> mom_t;
       typedef std::map<pKey_t,TensorBase*> map_t;
-      typedef ADAT::Handle<map_t> map_handle;
-      typedef ADAT::Handle<mom_t> mom_handle;
+      typedef rHandle<map_t> map_handle;
+      typedef rHandle<mom_t> mom_handle;
 
       genPolTens(void); // hidden
 
@@ -339,8 +339,8 @@ namespace radmat
     {
       typedef XMLArray::Array<int> mom_t;
       typedef std::map<pKey_t,TensorBase*> map_t;
-      typedef ADAT::Handle<map_t> map_handle;
-      typedef ADAT::Handle<mom_t> mom_handle;
+      typedef rHandle<map_t> map_handle;
+      typedef rHandle<mom_t> mom_handle;
 
       genPolTens(void); // hidden
 

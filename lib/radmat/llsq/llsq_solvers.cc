@@ -9,7 +9,6 @@
 #include <exception>
 #include "adat/singleton.h"
 #include "adat/objfactory.h"
-#include "adat/handle.h"
 #include "radmat/utils/pow2assert.h"
 #include "semble/semble_linear_algebra.h"
 #include <omp.h>
@@ -216,7 +215,7 @@ namespace radmat
 
 
     // interface between the factory and the outside world for ease of use
-    ADAT::Handle<LLSQBaseSolver_t<std::complex<double> > > callFactory(const std::string &solnID)
+    rHandle<LLSQBaseSolver_t<std::complex<double> > > callFactory(const std::string &solnID)
     {
       POW2_ASSERT(FacEnv::registerAll());
       LLSQBaseSolver_t<std::complex<double> > *foo;
@@ -231,7 +230,7 @@ namespace radmat
       }
 
       POW2_ASSERT(foo);
-      return ADAT::Handle<LLSQBaseSolver_t<std::complex<double> > >(foo);
+      return rHandle<LLSQBaseSolver_t<std::complex<double> > >(foo);
     }
 
 

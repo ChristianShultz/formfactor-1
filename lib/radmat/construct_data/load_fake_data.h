@@ -24,7 +24,7 @@ namespace radmat
       // parallelize me please ~ 95% of the work oes throuugh me
       std::vector<ThreePointCorrelator<T> > genData(void)
       {
-        typename ADAT::Handle<std::vector< typename GenFakeDataSet<T>::Corr> > fake_data;
+        rHandle<std::vector< typename GenFakeDataSet<T>::Corr> > fake_data;
         GenFakeDataSet<T> gen_data(m_ini);
         gen_data.generate();
         fake_data = gen_data.get();

@@ -8,7 +8,7 @@
 #include "radmat/utils/pow2assert.h"
 #include "radmat/utils/splash.h"
 #include "radmat/fake_data/fake_3pt_function_aux.h"
-#include "adat/handle.h"
+#include "radmat/utils/handle.h"
 #include <vector>
 #include <iostream>
 #include <sstream>
@@ -51,7 +51,7 @@ namespace radmat
       // void normalizeExp(void);
       void strip_propagation_factor(void);
 
-      std::vector<ADAT::Handle<LLSQDataPointQ2Pack> > getQ2Packs(void);
+      std::vector<rHandle<LLSQDataPointQ2Pack> > getQ2Packs(void);
 
 
       private:
@@ -405,7 +405,7 @@ namespace radmat
   // we've also assumed the dispersion relation is exact to first order in p^2 there
   // could be incompatible Q2 problems here too I think..
   template<typename T>
-    std::vector<ADAT::Handle<LLSQDataPointQ2Pack> > BuildQ2Packs<T>::getQ2Packs(void)
+    std::vector<rHandle<LLSQDataPointQ2Pack> > BuildQ2Packs<T>::getQ2Packs(void)
     {
       POW2_ASSERT(stripped_prop_fac);
 
@@ -462,10 +462,10 @@ namespace radmat
 
       // set up the return vector and pre allocate the storage so we can go 
       // into a parallel region safely
-      std::vector<ADAT::Handle<LLSQDataPointQ2Pack> > q2_pack;  
+      std::vector<rHandle<LLSQDataPointQ2Pack> > q2_pack;  
       for(int i = 0; i < npacks; i++)
       {
-        ADAT::Handle<LLSQDataPointQ2Pack> bar(new LLSQDataPointQ2Pack());
+        rHandle<LLSQDataPointQ2Pack> bar(new LLSQDataPointQ2Pack());
         q2_pack.push_back(bar);
       }
 
@@ -478,7 +478,7 @@ namespace radmat
       {
 
         std::vector<int> m_threepoints = sortQ2[packnum].second;
-        ADAT::Handle<LLSQDataPointQ2Pack> m_handle = q2_pack[packnum];
+        rHandle<LLSQDataPointQ2Pack> m_handle = q2_pack[packnum];
         POW2_ASSERT(&*m_handle); // check allocation
 
         m_handle->setQ2(m_cor[m_threepoints[0]].Q2);

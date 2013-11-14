@@ -35,7 +35,7 @@ namespace radmat
     struct Fake3ptCorr
     {
 
-      Fake3ptCorr(const typename ADAT::Handle<FakeDataInputs<T> > &inputs, 
+      Fake3ptCorr(const rHandle<FakeDataInputs<T> > &inputs, 
           const int lorentz, 
           const int hel_source, 
           const int hel_sink, 
@@ -55,8 +55,8 @@ namespace radmat
       typename SEMBLE::PromoteEnsemVec<T>::Type& get3pt(void) {return m_threePtFcn;}
 
       // peek and poke the input parameters
-      const typename ADAT::Handle<FakeDataInputs<T> >& getInputs(void) const {return m_inputs;}
-      typename ADAT::Handle<FakeDataInputs<T> >& getInputs(void) {return m_inputs;}
+      const rHandle<FakeDataInputs<T> >& getInputs(void) const {return m_inputs;}
+       rHandle<FakeDataInputs<T> >& getInputs(void) {return m_inputs;}
 
 
       // get one of the guys in the sum 
@@ -76,14 +76,14 @@ namespace radmat
       Fake3ptKey m_key;
       typename SEMBLE::PromoteEnsemVec<T>::Type m_threePtFcn; 
       typename std::vector<SEMBLE::SembleMatrix<T> > m_three; // vector index is time, matrix is source, sink
-      typename ADAT::Handle<FakeDataInputs<T> > m_inputs;
+      rHandle<FakeDataInputs<T> > m_inputs;
     };
 
 
   // impl
 
   template<typename T>
-    Fake3ptCorr<T>::Fake3ptCorr(const typename ADAT::Handle<FakeDataInputs<T> > &inputs, 
+    Fake3ptCorr<T>::Fake3ptCorr(const rHandle<FakeDataInputs<T> > &inputs, 
         const int lorentz, 
         const int hel_source, 
         const int hel_sink, 

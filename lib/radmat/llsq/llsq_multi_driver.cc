@@ -136,7 +136,7 @@ namespace radmat
 
     // take the fit form factors and compute the chisq of the fit across time 
     std::string chisq_per_t(const SEMBLE::SembleVector<std::complex<double> > &FF,
-        const ADAT::Handle<LLSQLatticeMultiData> &lattice_data,
+        const rHandle<LLSQLatticeMultiData> &lattice_data,
         const SEMBLE::SembleMatrix<std::complex<double> > &K,
         const double tol)
     {
@@ -158,7 +158,7 @@ namespace radmat
 
 
     std::string chisq_per_data_of_fit_range(const SEMBLE::SembleVector<std::complex<double> > &FF,
-        const ADAT::Handle<LLSQLatticeMultiData> &lattice_data,
+        const rHandle<LLSQLatticeMultiData> &lattice_data,
         const SEMBLE::SembleMatrix<std::complex<double> > &K,
         const double tol,
         const int tlow,
@@ -191,7 +191,7 @@ namespace radmat
 
 
     std::string chisq_of_system_of_fit_range(const SEMBLE::SembleVector<std::complex<double> > &FF,
-        const ADAT::Handle<LLSQLatticeMultiData> &lattice_data,
+        const rHandle<LLSQLatticeMultiData> &lattice_data,
         const SEMBLE::SembleMatrix<std::complex<double> > &K,
         const double tol,
         const int tlow,
@@ -233,7 +233,7 @@ namespace radmat
   }
 
 
-  bool LLSQMultiDriver_t::load_data(const ADAT::Handle<LLSQLatticeMultiData> &d,
+  bool LLSQMultiDriver_t::load_data(const rHandle<LLSQLatticeMultiData> &d,
       const double tolerance)
   {
     init_false();
@@ -255,7 +255,7 @@ namespace radmat
 
   void LLSQMultiDriver_t::sort_data(void)
   {
-    ADAT::Handle<LLSQLatticeMultiData> sorted_data(new LLSQLatticeMultiData); 
+    rHandle<LLSQLatticeMultiData> sorted_data(new LLSQLatticeMultiData); 
     std::vector<LatticeMultiDataTag> tags = lattice_data->tags(); 
     std::map<std::string,std::vector<int> > elems;
     std::map<std::string,std::vector<int> >::iterator it; 
@@ -294,7 +294,7 @@ namespace radmat
 
     // splash_tags();
 
-    ADAT::Handle<LLSQLatticeMultiData> non_zero_data(new LLSQLatticeMultiData);
+    rHandle<LLSQLatticeMultiData> non_zero_data(new LLSQLatticeMultiData);
     std::vector<LatticeMultiDataTag> old_tags;
     SEMBLE::SembleMatrix<std::complex<double> > Junk; 
     SEMBLE::SembleVector<std::complex<double> > Zero; 
@@ -368,7 +368,7 @@ namespace radmat
   {
     check_exit_lat();
 
-    ADAT::Handle<LLSQBaseSolver_t<std::complex<double> > >
+    rHandle<LLSQBaseSolver_t<std::complex<double> > >
       foo = LLSQSolverFactoryEnv::callFactory(soln_ID);
 
 
@@ -483,7 +483,7 @@ namespace radmat
   bool LLSQMultiDriver_t::solve_fast(const std::string &soln_ID)
   {
     check_exit_lat();    
-    ADAT::Handle<LLSQBaseSolver_t<std::complex<double> > > 
+    rHandle<LLSQBaseSolver_t<std::complex<double> > > 
       my_solver = LLSQSolverFactoryEnv::callFactory(soln_ID);
     POW2_ASSERT(&*my_solver); 
 

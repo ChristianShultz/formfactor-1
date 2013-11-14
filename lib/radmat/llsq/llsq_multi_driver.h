@@ -24,7 +24,7 @@ namespace radmat
     LLSQMultiDriver_t(void);
 
     
-    bool load_data(const ADAT::Handle<LLSQLatticeMultiData> &dat, 
+    bool load_data(const rHandle<LLSQLatticeMultiData> &dat, 
         const double tolerance); 
     void splash_tags(void) const; 
     bool run_zero_filter(const double tolerance);  
@@ -64,7 +64,7 @@ namespace radmat
     void check_exit(const bool, const char *) const ;     
 
     bool init_lat,init_K,init_Kinv,init_FF; 
-    ADAT::Handle<LLSQLatticeMultiData> lattice_data;
+    rHandle<LLSQLatticeMultiData> lattice_data;
     SEMBLE::SembleMatrix<T> K,Kinv,FF_t;
     LLSQLatticeMultiData zeroed_data; 
   };

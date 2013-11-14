@@ -3,7 +3,7 @@
 
 
 #include <string>
-#include "adat/handle.h"
+#include "radmat/utils/handle.h"
 #include "radmat/construct_data/construct_correlators.h"
 #include "radmat/llsq/llsq_multi_data.h"
 #include "radmat_driver_props.h"
@@ -66,7 +66,7 @@ namespace radmat
     RDriverProps_t m_ini;  
     ConstructCorrelators m_correlators; 
     std::vector<bool> good_qs;
-    std::vector<ADAT::Handle<LLSQLatticeMultiData> > multi_lattice_data; 
+    std::vector<rHandle<LLSQLatticeMultiData> > multi_lattice_data; 
     std::vector<RadmatSingleQ2Driver> linear_systems_of_Q2; 
   };
 

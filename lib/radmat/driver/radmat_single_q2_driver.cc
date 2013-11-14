@@ -84,7 +84,7 @@ namespace radmat
     return *this; 
   }
 
-  bool RadmatSingleQ2Driver::load_llsq(const ADAT::Handle<LLSQLatticeMultiData> &d, 
+  bool RadmatSingleQ2Driver::load_llsq(const rHandle<LLSQLatticeMultiData> &d, 
       const double pole_mass_squared,
       const double tolerance)
   {
@@ -114,7 +114,7 @@ namespace radmat
     return true;
   }
 
-  bool RadmatSingleQ2Driver::load_llsq(const ADAT::Handle<LLSQLatticeMultiData> &d, 
+  bool RadmatSingleQ2Driver::load_llsq(const rHandle<LLSQLatticeMultiData> &d, 
       const double tolerance)
   {
 
@@ -177,7 +177,7 @@ namespace radmat
 
     for(int fn = 0; fn < fit_across_time.nFF(); ++fn)
     {
-      ADAT::Handle<FitThreePoint> some_fit = fit_across_time.getFit(fn); 
+      rHandle<FitThreePoint> some_fit = fit_across_time.getFit(fn); 
       if ( some_fit->tlow() > tlow) 
         tlow = some_fit->tlow(); 
 

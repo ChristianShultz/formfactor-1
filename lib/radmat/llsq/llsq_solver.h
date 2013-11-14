@@ -3,7 +3,7 @@
 
 #include "llsq_solvers.h"
 #include "llsq_gen_system.h"
-#include "adat/handle.h"
+#include "radmat/utils/handle.h"
 #include <string>
 #include <complex>
 
@@ -17,7 +17,7 @@ namespace radmat
     // save some typing
     typedef typename LLSQBaseSolver_t<T>::LLSQRetTypeBase_h LLSQRetTypeBase_h;
     typedef typename LLSQBaseSolver_t<T>::LLSQInputType_h LLSQInputType_h;
-    typedef typename ADAT::Handle<LLSQBaseSolver_t<T> > LLSQBaseSolver_h; 
+    typedef rHandle<LLSQBaseSolver_t<T> > LLSQBaseSolver_h; 
 
     LLSQSolver_t(void) {}
 

@@ -9,7 +9,6 @@
 #include <exception>
 #include "adat/singleton.h"
 #include "adat/objfactory.h"
-#include "adat/handle.h"
 
 // ffs
 #include "lorentzff_PiPi.h"
@@ -47,7 +46,7 @@ namespace radmat
     // never played with this toy before so we are just going to 
     // make it blow up if anything goes wrong by wrapping another 
     // call around the factory.createObj method
-    ADAT::Handle<ffBase_t<std::complex<double> > > callFactory(const std::string &matElemID)
+    rHandle<ffBase_t<std::complex<double> > > callFactory(const std::string &matElemID)
     {
       POW2_ASSERT(FacEnv::registerAll());
       ffBase_t<std::complex<double> > *foo;
@@ -62,7 +61,7 @@ namespace radmat
       }
 
       POW2_ASSERT(foo);
-      return ADAT::Handle<ffBase_t<std::complex<double> > >(foo);
+      return rHandle<ffBase_t<std::complex<double> > >(foo);
     }
 
     // register the factory "inventory"

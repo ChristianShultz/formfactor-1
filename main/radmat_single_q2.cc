@@ -6,7 +6,7 @@
 
  * Creation Date : 25-02-2013
 
- * Last Modified : Wed 13 Nov 2013 08:47:26 PM EST
+ * Last Modified : Thu 14 Nov 2013 05:10:59 PM EST
 
  * Created By : shultz
 
@@ -21,7 +21,7 @@
 #include "radmat/llsq/llsq_multi_data_serialize.h"
 #include "radmat/utils/pow2assert.h"
 #include "radmat/utils/splash.h"
-#include "adat/handle.h"
+#include "radmat/utils/handle.h"
 #include "io/adat_io.h"
 #include "io/adat_xmlio.h"
 #include "jackFitter/three_point_fit_forms.h"
@@ -83,7 +83,7 @@ namespace
   }
 
 
-  void pull_elems(ADAT::Handle< radmat::LLSQLatticeMultiData > &inout , const SingleQ2Prop_t &p)
+  void pull_elems(radmat::rHandle< radmat::LLSQLatticeMultiData > &inout , const SingleQ2Prop_t &p)
   {
     radmat::LLSQLatticeMultiData trim;
     for (int i = 0; i < p.lat_elems.size(); ++i)
@@ -115,7 +115,7 @@ int main(int argc, char *argv[])
   std::istringstream val(argv[1]);
   val >> xmlini;
 
-  ADAT::Handle< radmat::LLSQLatticeMultiData > foo( new radmat::LLSQLatticeMultiData() ); 
+  radmat::rHandle< radmat::LLSQLatticeMultiData > foo( new radmat::LLSQLatticeMultiData() ); 
   POW2_ASSERT( &*foo ) ; 
   SingleQ2Prop_t ini; 
 

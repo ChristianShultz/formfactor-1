@@ -6,7 +6,7 @@
 
  * Creation Date : 01-08-2012
 
- * Last Modified : Tue 22 Oct 2013 12:50:51 PM EDT
+ * Last Modified : Thu 14 Nov 2013 04:59:32 PM EST
 
  * Created By : shultz
 
@@ -22,7 +22,6 @@
 #include "jackFitter/ensem_data.h"
 #include "jackFitter/three_point_fit_forms.h"
 #include "jackFitter/plot.h"
-#include "adat/handle.h"
 #include <string>
 #include <math.h>
 #include <vector>
@@ -30,6 +29,7 @@
 #include <complex>
 #include "radmat/utils/splash.h"
 #include "radmat/utils/pow2assert.h"
+#include "adat/handle.h"
 
 
 
@@ -176,7 +176,7 @@ namespace radmat
 
     ADAT::Handle<FitComparator> fitComp = constructThreePointFitComparator(fitProps);
     // NB: I Have assumed that no chopping has gone on in the data
-    ADAT::Handle<FitThreePoint> fitCorr (new FitThreePoint(corrData,tsnk,tsrc,
+    rHandle<FitThreePoint> fitCorr (new FitThreePoint(corrData,tsnk,tsrc,
           fitProps.thigh,fitProps.tlow,fitComp,fitProps.minTSlice,fitProps.fit_type));
 
     // send to files
@@ -186,13 +186,13 @@ namespace radmat
     ff.loadEnsemElement(ffnum,fitCorr->getFF());
     write(fit.str(),fitCorr->getFF()); 
 
-    fitters.insert(std::map<int,ADAT::Handle<FitThreePoint> >::value_type(ffnum,fitCorr));
+    fitters.insert(std::map<int,rHandle<FitThreePoint> >::value_type(ffnum,fitCorr));
   }
 
 
   void TinsFitter::writeFitLogs(const std::string &path) const
   {
-    std::map<int,ADAT::Handle<FitThreePoint> >::const_iterator it;
+    std::map<int,rHandle<FitThreePoint> >::const_iterator it;
     for(it = fitters.begin(); it != fitters.end(); ++it)
     {
       std::stringstream ss;
@@ -206,7 +206,7 @@ namespace radmat
 
   void TinsFitter::writeFitPlotsWithComponents(const std::string & path) const
   {
-    std::map<int,ADAT::Handle<FitThreePoint> >::const_iterator it;
+    std::map<int,rHandle<FitThreePoint> >::const_iterator it;
     for(it = fitters.begin(); it != fitters.end(); ++it)
     {
       std::stringstream ss; 
@@ -233,10 +233,10 @@ namespace radmat
     return ff.getEnsemElement(index);
   }
 
-  ADAT::Handle<FitThreePoint> TinsFitter::getFit(const int ffnum) const
+  rHandle<FitThreePoint> TinsFitter::getFit(const int ffnum) const
   {
     POW2_ASSERT(fitters.find(ffnum) != fitters.end());
-    return ADAT::Handle<FitThreePoint>(fitters.find(ffnum)->second);
+    return rHandle<FitThreePoint>(fitters.find(ffnum)->second);
   }
 
 

@@ -12,7 +12,7 @@
 #include "invert_subduction.h"
 #include "lattice_multi_data_object.h"
 #include "hadron/hadron_npart_npt_corr.h"
-#include "adat/handle.h"
+#include "radmat/utils/handle.h"
 #include <vector>
 
 namespace radmat
@@ -36,14 +36,14 @@ namespace radmat
     void print_redstar(const AbstractMergeNamedObject &); 
 
     // sum over irreps to produce cont correlators
-    std::vector<ADAT::Handle<LLSQLatticeMultiData> >
+    std::vector<rHandle<LLSQLatticeMultiData> >
      construct_multi_correlators(const ThreePointCorrIni_t &ini)
     {
       load(ini); 
       return construct_multi_correlators(); 
     }
 
-    std::vector<ADAT::Handle<LLSQLatticeMultiData> > 
+    std::vector<rHandle<LLSQLatticeMultiData> > 
       construct_multi_correlators(void) const;
 
     // figure out what xml we would need

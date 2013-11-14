@@ -6,7 +6,7 @@
 #include <complex>
 #include "adat/singleton.h"
 #include "adat/objfactory.h"
-#include "adat/handle.h"
+#include "radmat/utils/handle.h"
 
 namespace radmat
 {
@@ -23,7 +23,7 @@ namespace radmat
   namespace FormFactorDecompositionFactoryEnv
   {
     bool registerAll();
-    ADAT::Handle<ffBase_t<std::complex<double> > > callFactory(const std::string &matElemID);
+    rHandle<ffBase_t<std::complex<double> > > callFactory(const std::string &matElemID);
   }
 
 }

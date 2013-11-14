@@ -42,7 +42,7 @@ namespace radmat
     }
 
     std::vector<EnsemRedstarNPtBlock> npoint; 
-    std::vector<std::vector< ADAT::Handle< AbsRedstarInput_t > > > input; 
+    std::vector<std::vector< rHandle< AbsRedstarInput_t > > > input; 
   };
 
 

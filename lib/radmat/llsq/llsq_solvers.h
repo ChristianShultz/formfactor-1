@@ -7,7 +7,7 @@
 #include <complex>
 #include "adat/singleton.h"
 #include "adat/objfactory.h"
-#include "adat/handle.h"
+#include "radmat/utils/handle.h"
 #include "semble/semble_vector.h"
 #include "semble/semble_matrix.h"
 #include "semble/semble_algebra.h"
@@ -28,7 +28,7 @@ namespace radmat
   namespace LLSQSolverFactoryEnv
   {
     bool registerAll();
-    ADAT::Handle<LLSQBaseSolver_t<std::complex<double> > > callFactory(const std::string &solnID);
+    rHandle<LLSQBaseSolver_t<std::complex<double> > > callFactory(const std::string &solnID);
   }
 
 

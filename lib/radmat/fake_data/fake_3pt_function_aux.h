@@ -9,7 +9,7 @@
 #include "radmat/utils/splash.h"
 #include "radmat/ff/formfactor_factory.h"
 #include "radmat/ff/ff_gen_llsq_row.h"
-#include "adat/handle.h"
+#include "radmat/utils/handle.h"
 #include "fake_data_ini.h"
 #include "fake_spectrum.h"
 #include "fake_overlaps.h"
@@ -37,27 +37,27 @@ namespace radmat
 
   // make a copy of the originals and apply dispersion etc to them
   template<typename T>
-    typename ADAT::Handle< FakeDataInputs<T> >
-    copyFakeInput(const typename ADAT::Handle<FakeDataInputs_p<T> > &orig);
+    rHandle< FakeDataInputs<T> >
+    copyFakeInput(const rHandle<FakeDataInputs_p<T> > &orig);
 
   // get the first round
   template<typename T>
-    typename ADAT::Handle<FakeDataInputs_p<T> > generateOriginalInputs(const FakeDataIni_t &ini);
+    rHandle<FakeDataInputs_p<T> > generateOriginalInputs(const FakeDataIni_t &ini);
 
   // apply Z suppression.. basically try to make something that looks like optimized operators were used
   // its a hack and i don't know at the time of typing this if its even worth the effort
   template<typename T>
-    void applyZSuppression(typename ADAT::Handle<FakeDataInputs_p<T> > &input);
+    void applyZSuppression( rHandle<FakeDataInputs_p<T> > &input);
 
   // assume all states are stable against decay and use a dispersion relation to 
   // determine the energies at non-zero momentum 
   // aaEE = aamm + xi*xi *(2pi/L_s)^2 * p*p   || a is the temporal spacing
   template<typename T>
-    void applyDispersion(typename ADAT::Handle<FakeDataInputs_p<T> > &input, const pProp_t &mom);
+    void applyDispersion( rHandle<FakeDataInputs_p<T> > &input, const pProp_t &mom);
 
   template<typename T>
     SEMBLE::SembleMatrix<T>  
-    makeFakeDataPoint(const ADAT::Handle<FakeDataInputs<T> > &inputs,
+    makeFakeDataPoint(const rHandle<FakeDataInputs<T> > &inputs,
         const pProp_t &mom,
         const int hel_sink,
         const int hel_source,
@@ -228,8 +228,8 @@ namespace radmat
   template<typename T>
     struct FakeDataInputs
     {
-      typename ADAT::Handle<FakeDataInputs_p<T> > working;   // after dispersion and suppression
-      typename ADAT::Handle<FakeDataInputs_p<T> > original;  // the original guy
+       rHandle<FakeDataInputs_p<T> > working;   // after dispersion and suppression
+       rHandle<FakeDataInputs_p<T> > original;  // the original guy
     };
 
 
@@ -249,9 +249,9 @@ namespace radmat
 
 
   template<typename T>
-    ADAT::Handle<FakeDataInputs_p<T> > generateOriginalInputs(const FakeDataIni_t &ini)
+    rHandle<FakeDataInputs_p<T> > generateOriginalInputs(const FakeDataIni_t &ini)
     {
-      ADAT::Handle<FakeDataInputs_p<T> > handle(new FakeDataInputs_p<T> );
+      rHandle<FakeDataInputs_p<T> > handle(new FakeDataInputs_p<T> );
       POW2_ASSERT(&*handle);
 
       // Z
@@ -303,7 +303,7 @@ namespace radmat
       // ffgenerator
       itpp::Mat<std::vector<FakeMatrixElement::ffFunction> > ffmv(szSource,szSink);
 
-      typename ADAT::Handle<ffBase_t<T> > foobar =
+       rHandle<ffBase_t<T> > foobar =
         FormFactorDecompositionFactoryEnv::callFactory(ini.matElemProps.diag);
       int nff = foobar->nFacs();
 
@@ -336,13 +336,13 @@ namespace radmat
   /////////////////////////////////////////////////////////////////////////////
 
   template<typename T>
-    typename ADAT::Handle<FakeDataInputs<T> >
-    copyFakeInput(const typename ADAT::Handle<FakeDataInputs_p <T> > &orig)
+    rHandle<FakeDataInputs<T> >
+    copyFakeInput(const  rHandle<FakeDataInputs_p <T> > &orig)
     {
 
       FakeDataInputs<T> *ret = new FakeDataInputs<T>();
       ret->original = orig;
-      ret->working = ADAT::Handle<FakeDataInputs_p<T> >(new FakeDataInputs_p<T>);
+      ret->working = rHandle<FakeDataInputs_p<T> >(new FakeDataInputs_p<T>);
 
       // need to copy 'by hand' here since we want a "new" set of inputs
       ret->working->zsource = orig->zsource;
@@ -353,7 +353,7 @@ namespace radmat
       ret->working->ini = orig->ini;
       ret->working->mom_factor = orig->mom_factor;
 
-      return ADAT::Handle<FakeDataInputs<T> >(ret);
+      return rHandle<FakeDataInputs<T> >(ret);
     }
 
 
@@ -361,7 +361,7 @@ namespace radmat
   /////////////////////////////////////////////////////////////////////////////
 
   template<typename T>
-    void applyZSuppression(ADAT::Handle<FakeDataInputs_p<T> > &input)
+    void applyZSuppression(rHandle<FakeDataInputs_p<T> > &input)
     {
       // NB don't do anything if we're reading them from an xml file
       if(!!!input->ini.stateProps.readZ)
@@ -415,7 +415,7 @@ namespace radmat
   // determine the energies at non-zero momentum 
   // aaEE = aamm + 1/(xi*xi) *(2pi/L_s)^2 * p*p   || a is the temporal spacing
   template<typename T>
-    void applyDispersion(typename ADAT::Handle<FakeDataInputs_p<T> > &input, const pProp_t &mom)
+    void applyDispersion( rHandle<FakeDataInputs_p<T> > &input, const pProp_t &mom)
     {
       // (1/ xi) * 2pi/L_s
 
@@ -452,7 +452,7 @@ namespace radmat
 
   template<typename T>
     SEMBLE::SembleMatrix<T> 
-    makeFakeDataPoint(const typename ADAT::Handle<FakeDataInputs<T> > &inputs,
+    makeFakeDataPoint(const rHandle<FakeDataInputs<T> > &inputs,
         const pProp_t &mom,
         const int hel_sink,
         const int hel_source,
@@ -461,7 +461,7 @@ namespace radmat
     {
       const SEMBLE::SembleVector<T> *zsource, *zsink;
       const SEMBLE::SembleVector<double> *specsink, *specsource, *specsink_ins, *specsource_ins;
-      typename ADAT::Handle<FakeDataInputs_p<T> > handle(inputs->working);
+       rHandle<FakeDataInputs_p<T> > handle(inputs->working);
 
       zsource = &(handle->zsource[handle->ini.timeProps.tsource]);
       zsink = &(handle->zsink[handle->ini.timeProps.tsink]);

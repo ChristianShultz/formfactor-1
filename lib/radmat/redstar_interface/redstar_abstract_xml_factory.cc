@@ -67,7 +67,7 @@ namespace radmat
       return success; 
     }
 
-    ADAT::Handle<AbsRedstarXMLInterface_t>
+    rHandle<AbsRedstarXMLInterface_t>
       callFactory(const std::string &id)
       {
         POW2_ASSERT( FacEnv::registerAll() ); 
@@ -83,7 +83,7 @@ namespace radmat
 
         POW2_ASSERT(foo); 
 
-        return ADAT::Handle<AbsRedstarXMLInterface_t>(foo); 
+        return rHandle<AbsRedstarXMLInterface_t>(foo); 
       }
 
   } // TheRedstarAbstractBlockFactoryEnv

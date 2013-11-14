@@ -5,7 +5,7 @@
 #include <string>
 #include <algorithm>
 #include <exception>
-#include "radmat/utils/handle_interface.h"
+#include "radmat/utils/handle.h"
 
 //   NB: the handles are NOT thread safe so this can 
 //       only be used through single threadded sections
