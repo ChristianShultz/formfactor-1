@@ -16,17 +16,26 @@ namespace radmat
       public:
         //! Initialize pointer with existing pointer
         /*! Requires that the pointer p is a return value of new */
-        rHandle(T* p=0) : ptr(p), count(new int(1)) {}
+        rHandle(T* p=0)
+          : ptr(p), count(new int(1))
+        {}
 
         //! Copy pointer (one more owner)
-        rHandle(const rHandle& p) : ptr(p.ptr), count(p.count) 
-      {++*count;}
+        rHandle(const rHandle& p) 
+          : ptr(p.ptr), count(p.count) 
+        {
+          ++*count;
+        }
 
         // dynamic cast via construction 
         template<typename Q>
           rHandle(const rHandle<Q> &p)
-          : count(new int(1)) 
           {
+
+            if(p.ptr == 0x0 ) { 
+              std::cerr << "You are trying to cast a null pointer" << std::endl;
+              exit(1);
+            }
 
             ptr = dynamic_cast<T*>(p.ptr);
             if( ptr == 0x0 ) { 
@@ -34,7 +43,6 @@ namespace radmat
               std::cerr << "You are trying to cast to a class you cannot cast to" << std::endl;
               exit(1);
             }
-            delete count;
 
             count = p.count;
             ++*count;
@@ -58,6 +66,18 @@ namespace radmat
         }
 
 
+        void detach(void) 
+        {
+          T* pold = ptr; 
+          int* cold = count; 
+
+          ptr = new T (*pold); 
+
+          dispose(); 
+
+          count = new int(1); 
+        }
+
         //! The cast function requires all rHandles<Q> to be friends of rHandle<T>
         template<typename Q> friend class rHandle;
 
@@ -78,7 +98,7 @@ namespace radmat
 
       private:
         T* ptr;        // pointer to the value
-        mutable int* count;    // shared number of owners
+        int* count;    // shared number of owners
     };
 
   //  // this is a nasty hack to get temporary access to the 

@@ -6,7 +6,7 @@
 
  * Creation Date : 13-11-2013
 
- * Last Modified : Wed 13 Nov 2013 05:24:55 PM EST
+ * Last Modified : Fri 15 Nov 2013 03:42:31 PM EST
 
  * Created By : shultz
 
@@ -14,11 +14,17 @@
 
 
 #include "construct_correlators_utils.h"
+#include "construct_correlators_bad_data_repository.h"
 #include "radmat/fake_data/fake_3pt_function_aux.h"
 #include "semble/semble_meta.h"
 #include "semble/semble_file_management.h"
 #include "adat/adat_stopwatch.h"
 #include "hadron/ensem_filenames.h"
+#include "radmat/redstar_interface/debug_props.h"
+
+
+#define DEBUG_MSG_ON 
+#include "radmat/redstar_interface/debug_props.h"
 
 #define DO_TIMING_SORT_MAT_ELEMS_BY_Q2
 #define DO_TIMING_CACHE_NORM_MAT_ELEMS
@@ -27,6 +33,16 @@
 namespace radmat
 {
 
+  namespace BAD_DATA_REPO
+  {
+    BuildCorrsLocalBadDataRepo_t local_bad_data_repo; 
+    void dump_bad_data(void)
+    {
+      local_bad_data_repo.dump_baddies(); 
+    }
+  }
+
+
 
   namespace
   {
@@ -34,7 +50,7 @@ namespace radmat
     typedef ADAT::MapObject<Hadron::KeyHadronNPartNPtCorr_t,
             ENSEM::EnsemVectorComplex> singleThreadQ2NormalizedCorrCache;
 
-  ////////////////////////////////////////////////////////////////////
+    ////////////////////////////////////////////////////////////////////
 
     // do the work and return the unique elems from the vector
     singleThreadQ2NormalizedCorrCache
@@ -53,6 +69,9 @@ namespace radmat
         snoop.start();
 #endif
 
+        DEBUG_MSG(entering); 
+        std::cout << corrs.size() << std::endl;
+
         singleThreadQ2NormalizedCorrCache cache; 
         std::vector<TaggedEnsemRedstarNPtBlock>::const_iterator block; 
         EnsemRedstarNPtBlock::const_iterator npt; 
@@ -67,7 +86,10 @@ namespace radmat
           for(npt = block->coeff_lattice_xml.begin(); npt != block->coeff_lattice_xml.end(); ++npt) 
           {
             if(cache.exist(npt->m_obj))
+            {
+              DEBUG_MSG(breaking early on success);
               continue; 
+            }
 
             // can we make it?
             bool found = true; 
@@ -90,7 +112,10 @@ namespace radmat
 
             // break early if we're missing ingredients 
             if ( !!! found ) 
+            {
+              DEBUG_MSG(breaking out early b/c missing data);
               continue; 
+            }
 
             // --- DO NORMALIZATION/RENORMALIZATION HERE
             // these are real but the * operator is only overloaded
@@ -166,7 +191,7 @@ namespace radmat
 
 #ifdef DO_TIMING_CACHE_NORM_MAT_ELEMS
         snoop.stop(); 
-        std::cout << __PRETTY_FUNCTION__ << ": normalizing "
+        std::cout << __func__ << ": normalizing "
           << cache.size() << " unique npts took"
           << snoop.getTimeInSeconds() << " seconds" << std::endl; 
 #endif
@@ -212,7 +237,7 @@ namespace radmat
       for(it1 = ret.begin(); it1 != ret.end(); ++it1)
         ct += it1->second.size();
 
-      std::cout << __PRETTY_FUNCTION__ << ": sorting, " << ct << " elems took " 
+      std::cout << __func__ << ": sorting, " << ct << " elems took " 
         << snoop.getTimeInSeconds() << " seconds "  << std::endl; 
 #endif 
       return ret;
@@ -225,8 +250,6 @@ namespace radmat
   std::pair<bool, std::vector<ConstructCorrsMatrixElement> > 
     build_correlators(
         const std::vector<TaggedEnsemRedstarNPtBlock> &corrs,
-        std::vector<Hadron::KeyHadronNPartNPtCorr_t> &missed_xml, 
-        std::vector<RadmatExtendedKeyHadronNPartIrrep_t> &missed_norm, 
         const std::string &sink_id, 
         const std::string &source_id, 
         const ThreePointCorrXMLIni_t::RenormalizationProp &Z_V,
@@ -237,12 +260,31 @@ namespace radmat
       snoop.start(); 
 #endif
 
+      std::vector<Hadron::KeyHadronNPartNPtCorr_t> missed_xml; 
+      std::vector<RadmatExtendedKeyHadronNPartIrrep_t> missed_norm; 
+
       std::vector<ConstructCorrsMatrixElement> ret; 
       double qsq; 
 
       singleThreadQ2NormalizedCorrCache npoint_cache; 
       npoint_cache = normalize_correlators( corrs, missed_xml, missed_norm, 
           sink_id, source_id, Z_V, db);
+
+      BAD_DATA_REPO::local_bad_data_repo.insert(omp_get_thread_num(),missed_xml);   
+      BAD_DATA_REPO::local_bad_data_repo.insert(omp_get_thread_num(),missed_norm);   
+
+      if(npoint_cache.size() == 0) 
+      {
+        DEBUG_MSG(exiting early);
+#ifdef DO_TIMING_SUM_NORM_MAT_ELEMS
+        snoop.stop(); 
+        std::cout << __func__ << " :qsq = " << qsq
+          << " :building " << ret.size() << " elems took "
+          << snoop.getTimeInSeconds() << " seconds" << std::endl; 
+#endif
+        return std::pair<bool, std::vector<ConstructCorrsMatrixElement> >(false,ret); 
+      }
+
 
       ENSEM::EnsemReal ScalarZeroR;
       ENSEM::EnsemVectorComplex VectorZeroC; 

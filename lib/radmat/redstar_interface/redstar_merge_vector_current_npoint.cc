@@ -6,7 +6,7 @@
 
  * Creation Date : 12-11-2013
 
- * Last Modified : Thu 14 Nov 2013 05:04:27 PM EST
+ * Last Modified : Fri 15 Nov 2013 03:36:15 PM EST
 
  * Created By : shultz
 
@@ -81,7 +81,7 @@ namespace radmat
       POW2_ASSERT(mom.size() == 3); 
       for(int i = 0; i < 3; ++i)
         sq += mom[i]*mom[i];
-      return   !!! ( (sq >= minmom) && (sq <= maxmom) ) ;  // false if its too big or too small 
+      return ( (sq >= minmom) && (sq <= maxmom) ) ;  // false if its too big or too small 
     }
 
     // LG that we know about
@@ -107,6 +107,8 @@ namespace radmat
         const ADATXML::Array<int> &source, 
         const bool create)
     { 
+      POW2_ASSERT(sink.size() == source.size());
+      POW2_ASSERT(sink.size() == 3); 
       ADATXML::Array<int> ret;
       ret.resize(3);
 
@@ -117,7 +119,11 @@ namespace radmat
       if (create) 
         return -ret;
 
-      return ret; 
+      std::cout << "pf" << sink[0] << sink[1] << sink[2] 
+        << "  pi" << source[0] << source[1] << source[2] 
+        << "   q" << ret[0] << ret[1] << ret[2]; 
+
+        return ret; 
     }
 
     // upcast to find data
@@ -131,7 +137,8 @@ namespace radmat
         if(foo->type() == Stringify<RedstarSingleParticleMesonInput>())
         {
           DEBUG_MSG(casting);
-          rHandle<RedstarSingleParticleMesonInput> p; 
+          rHandle<RedstarSingleParticleMesonInput> p(foo); 
+          DEBUG_HANDLE(p);
           ret = p->mom; 
         }
         else
@@ -158,6 +165,7 @@ namespace radmat
         {
           DEBUG_MSG(casting); 
           rHandle<RedstarUnimprovedVectorCurrentInput> p(f); 
+          DEBUG_HANDLE(p);
           ret = p->mom;     
         }
         else
@@ -183,6 +191,7 @@ namespace radmat
       {
         DEBUG_MSG(casting); 
         rHandle<RedstarUnimprovedVectorCurrentInput> p(f); 
+        DEBUG_HANDLE(p);
         p->mom = momentumTransfer(psnk,psrc,p->creation_op);     
       }
       else
@@ -227,6 +236,7 @@ namespace radmat
         npt.npoint[SINK_INDEX_D1] = snk.m_obj;
         npt.npoint[INSERTION_INDEX_D1] = ins.m_obj; 
         npt.npoint[SOURCE_INDEX_D1] = src.m_obj;
+        npt.ensemble = ensemble;
 
         ret.m_coeff = coeff; 
         ret.m_obj = npt; 
@@ -319,6 +329,11 @@ namespace radmat
       DEBUG_HANDLE(src); 
       DEBUG_HANDLE(srci); 
 
+      // make unique copies of the input data and shove it into 
+      // THIS vector which corresponds to the xml for THIS mat
+      // elem, then conserve momentum, all further operations 
+      // corresponding to this mat elem must use the input vector
+      // else we end up using uninitialized variables which sucks
       input[SINK_INDEX] = rHandle<AbsRedstarInput_t>(snki->clone()); 
       input[INSERTION_INDEX] = rHandle<AbsRedstarInput_t>(insi->clone()); 
       input[SOURCE_INDEX] = rHandle<AbsRedstarInput_t>(srci->clone()); 
@@ -328,11 +343,12 @@ namespace radmat
 
       DEBUG_MSG(subducing);
 
-      // do the subduction 
+      // do the subduction -- need to use input vector
+      //    since he has had the photon momentum filled 
       EnsemRedstarBlock snkb,insb,srcb; 
-      snkb = (*snk)(snki); 
-      insb = (*ins)(insi); 
-      srcb = (*src)(srci); 
+      snkb = (*snk)(input[SINK_INDEX]); 
+      insb = (*ins)(input[INSERTION_INDEX]); 
+      srcb = (*src)(input[SOURCE_INDEX]); 
 
       npt = sum_duplicates( loop_npt(snkb,insb,srcb,ensemble) ) ; 
 
@@ -343,7 +359,7 @@ namespace radmat
       return ret; 
     }
 
-
+    // a true means continue working with this combo
     bool check_merge(const merge &tmp, const AbstractBlockNamedObject &ins)
     {
       if( tmp.npt.size() == 0) 
@@ -355,7 +371,8 @@ namespace radmat
 
       if(ins.param->type() == Stringify<RedstarUnimprovedVectorCurrentXML>())
       {
-        rHandle<RedstarUnimprovedVectorCurrentXML> p; 
+        rHandle<RedstarUnimprovedVectorCurrentXML> p(ins.param); 
+        DEBUG_HANDLE(p);
         pmin = p->pmin; 
         pmax = p->pmax; 
 

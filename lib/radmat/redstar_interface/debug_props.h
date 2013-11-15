@@ -6,8 +6,8 @@
 #include "radmat/utils/handle.h"
 
 
-// #undef DEBUG_MSG_ON
-// #undef DEBUG_HANDLE_ON
+#undef DEBUG_MSG_ON
+#undef DEBUG_HANDLE_ON
 
 #ifdef DEBUG_MSG_ON
 #define DEBUG_MSG(X) \

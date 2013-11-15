@@ -28,7 +28,6 @@ namespace radmat
   struct RedstarUnimprovedVectorCurrentInput
     : public AbsRedstarInput_t 
   {
-
     typedef RedstarUnimprovedVectorCurrentPFrag pfrag;
     typedef std::vector<pfrag>::const_iterator const_iterator; 
 

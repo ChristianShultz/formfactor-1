@@ -6,7 +6,7 @@
 
  * Creation Date : 11-11-2013
 
- * Last Modified : Thu 14 Nov 2013 03:14:27 PM EST
+ * Last Modified : Fri 15 Nov 2013 03:35:01 PM EST
 
  * Created By : shultz
 
@@ -36,7 +36,7 @@
 #include <exception>
 #include <sstream>
 
-#define DEBUG_MSG_ON
+#define DEBUG_MSG_OFF
 #include "debug_props.h"
 
 
@@ -212,6 +212,7 @@ namespace radmat
         back.H = 0; 
         back.parity = true; 
         back.mom = v.mom; 
+        back.twoI_z = 0; 
         back.creation_op = v.creation_op; 
         back.smearedP = v.smearedP;
         back.isProjected = false; 
@@ -248,6 +249,7 @@ namespace radmat
         back.J = 1; 
         back.parity = false; 
         back.mom = v.mom; 
+        back.twoI_z = 0; 
         back.creation_op = v.creation_op; 
         back.smearedP = v.smearedP;
         back.isProjected = false; 
@@ -466,8 +468,17 @@ namespace radmat
       objFunctorPtr = rHandle<AbsRedstarBlock_t>(new RedstarUnimprovedVectorCurrentBlock); 
 
       // populate the inputList vector
-      read_in_photons(inputList,time,t_slice,true); 
-      read_in_photons(inputList,space,t_slice,false);  
+      if ( time.active ) 
+        read_in_photons(inputList,time,t_slice,true); 
+      if ( space.active )
+        read_in_photons(inputList,space,t_slice,false);  
+
+      if ( time.active && space.active ) 
+      {
+        std::cout << __PRETTY_FUNCTION__ << __FILE__ << __LINE__
+          << ": Warning, you decided to mix time and" 
+          << " space and I don't think you should " << std::endl; 
+      }
     }
 
   std::string 

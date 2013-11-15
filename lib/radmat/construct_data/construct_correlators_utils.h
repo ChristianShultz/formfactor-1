@@ -36,6 +36,8 @@ namespace radmat
     {
       sink = RadmatExtendedKeyHadronNPartIrrep_t(id_sink,k.npoint[1].irrep);
       source = RadmatExtendedKeyHadronNPartIrrep_t(id_source,k.npoint[3].irrep); 
+      sink.doLG_symmetry();
+      source.doLG_symmetry();
     }
 
     Hadron::KeyHadronNPartNPtCorr_t npt;
@@ -60,13 +62,15 @@ namespace radmat
   std::pair<bool,std::vector<ConstructCorrsMatrixElement> >
     build_correlators(
         const std::vector<TaggedEnsemRedstarNPtBlock> &corrs,
-        std::vector<Hadron::KeyHadronNPartNPtCorr_t> &missed_xml, 
-        std::vector<RadmatExtendedKeyHadronNPartIrrep_t> &missed_norm, 
         const std::string &sink_id, 
         const std::string &source_id, 
         const ThreePointCorrXMLIni_t::RenormalizationProp &,
         const DatabaseInterface_t & );
 
+  namespace BAD_DATA_REPO
+  {
+    void dump_bad_data(void); 
+  }
 
 } // radmat
 

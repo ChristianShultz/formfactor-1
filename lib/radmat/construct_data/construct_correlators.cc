@@ -6,7 +6,7 @@
 
  * Creation Date : 04-12-2012
 
- * Last Modified : Thu 14 Nov 2013 12:19:05 PM EST
+ * Last Modified : Fri 15 Nov 2013 03:43:53 PM EST
 
  * Created By : shultz
 
@@ -25,7 +25,7 @@
 #include <utility>
 #include <omp.h>
 
-#define CONSTRUCT_CORRELATORS_PARALLEL
+// #define CONSTRUCT_CORRELATORS_PARALLEL
 #define TIME_CONSTRUCT_SINGLE_CORRS
 #define TIME_CONSTRUCT_ALL_CORRS
 
@@ -34,8 +34,6 @@ namespace radmat
 
   namespace 
   {
-    ///////////////////////////////////////////////////////
-    BuildCorrsLocalBadDataRepo_t local_bad_data_repo; 
 
 
     ///////////////////////////////////////////////////////
@@ -61,12 +59,7 @@ namespace radmat
         std::vector<Hadron::KeyHadronNPartNPtCorr_t> missed_xml; 
         std::vector<RadmatExtendedKeyHadronNPartIrrep_t> missed_norm;
 
-        tmp = build_correlators(corrs,missed_xml,missed_norm,sink_id,source_id,Z_V,db); 
-
-        if ( !!! missed_xml.empty() ) 
-          local_bad_data_repo.insert(omp_get_thread_num(),missed_xml);
-        if ( !!! missed_norm.empty() ) 
-          local_bad_data_repo.insert(omp_get_thread_num(),missed_norm);
+        tmp = build_correlators(corrs,sink_id,source_id,Z_V,db); 
 
         std::vector<ConstructCorrsMatrixElement>::const_iterator it; 
         bool any_data = false; 
@@ -125,6 +118,7 @@ namespace radmat
 #pragma omp barrier
 #endif 
 
+        return ret; 
       }
 
 
@@ -170,6 +164,8 @@ namespace radmat
         lattice_data = build_llsq_corrs(loop_data,three_pt->sink_id, three_pt->source_id, 
             three_pt->renormalization, db); 
 
+        // stop and dump anything that we may be missing 
+        ::radmat::BAD_DATA_REPO::dump_bad_data();
 
         std::vector<rHandle<LLSQLatticeMultiData> > ret; 
         std::vector<std::pair<bool,rHandle<LLSQLatticeMultiData> > >::const_iterator dcheck; 
@@ -182,10 +178,6 @@ namespace radmat
           }
           ret.push_back(dcheck->second); 
         }
-
-        local_bad_data_repo.dump_baddies();
-
-
 
 #ifdef TIME_CONSTRUCT_ALL_CORRS
         snoop.stop(); 
