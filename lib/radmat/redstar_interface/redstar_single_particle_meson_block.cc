@@ -6,7 +6,7 @@
 
  * Creation Date : 11-11-2013
 
- * Last Modified : Thu 14 Nov 2013 06:00:14 PM EST
+ * Last Modified : Fri 15 Nov 2013 05:36:14 PM EST
 
  * Created By : shultz
 
@@ -215,7 +215,8 @@ namespace radmat
       ss << name << "_p" << string_mom_no_space(FF::canonicalOrder(mom))
         << ",J" << J << ",H" << H 
         << ",p" << string_mom_no_space(mom)
-        << ",Iz" << twoI_z;
+        << ",Iz" << twoI_z
+        << ",t" << t_slice; 
       return ss.str(); 
     }
 

@@ -44,7 +44,7 @@ radmat_SOURCES = radmat.cc
 
 radmat_single_q2_SOURCES = radmat_single_q2.cc
 
-test_jfit_SOURCES = test_jfit.cc
+# test_jfit_SOURCES = test_jfit.cc
 
 # no idea how/why this works, cut paste job
 #

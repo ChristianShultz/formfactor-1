@@ -6,7 +6,7 @@
 
  * Creation Date : 12-11-2013
 
- * Last Modified : Thu 14 Nov 2013 05:06:35 PM EST
+ * Last Modified : Fri 15 Nov 2013 05:35:20 PM EST
 
  * Created By : shultz
 
@@ -107,9 +107,9 @@ namespace radmat
 
         std::stringstream ss, mat_elem; 
         ss << snk->sname() << ".V_" << ins->lorentz 
-          << "." << src->sname() << std::endl; 
+          << "." << src->sname(); 
 
-        mat_elem << "_" << snk->H << "_" << src->H; 
+        mat_elem << elem_id << "_" << snk->H << "_" << src->H; 
 
         ret.file_id = ss.str(); 
         ret.jmu = ins->lorentz;

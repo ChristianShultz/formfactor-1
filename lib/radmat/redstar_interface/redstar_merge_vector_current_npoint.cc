@@ -6,7 +6,7 @@
 
  * Creation Date : 12-11-2013
 
- * Last Modified : Fri 15 Nov 2013 03:36:15 PM EST
+ * Last Modified : Fri 15 Nov 2013 06:34:44 PM EST
 
  * Created By : shultz
 
@@ -43,17 +43,20 @@ namespace radmat
   namespace 
   {
 
+    ////////////////////////////////////////////////////
     // some sanity checks  
     void check_n(const int N)
     {
       POW2_ASSERT(N == 3); 
     }
 
+    ////////////////////////////////////////////////////
     void check_version(const int v)
     {
       POW2_ASSERT(v == 0); 
     }
 
+    ////////////////////////////////////////////////////
     void check_meson(const rHandle<AbsRedstarBlock_t> p)
     {
       bool meson = false; 
@@ -63,6 +66,7 @@ namespace radmat
       POW2_ASSERT( meson ); 
     }
 
+    ////////////////////////////////////////////////////
     void check_photon(const rHandle<AbsRedstarBlock_t> p)
     {
       bool photon = false; 
@@ -72,6 +76,7 @@ namespace radmat
       POW2_ASSERT( photon ); 
     }
 
+    ////////////////////////////////////////////////////
     // do the cut
     bool cutMomentum(const ADATXML::Array<int> &mom,
         const int minmom ,
@@ -81,9 +86,16 @@ namespace radmat
       POW2_ASSERT(mom.size() == 3); 
       for(int i = 0; i < 3; ++i)
         sq += mom[i]*mom[i];
+
+
+      //      std::cout << __func__ << ": " << sq 
+      //        << " " << minmom << " " << maxmom 
+      //        << " " << ( (sq >= minmom) && (sq <= maxmom) ) << std::endl;
+
       return ( (sq >= minmom) && (sq <= maxmom) ) ;  // false if its too big or too small 
     }
 
+    ////////////////////////////////////////////////////
     // LG that we know about
     bool acceptable_mom(const ADATXML::Array<int> &mom)
     {
@@ -101,6 +113,7 @@ namespace radmat
       return false;
     }
 
+    ////////////////////////////////////////////////////
     // determine the momentum transfer -- this is our phase convention, 
     //    mess with it at your own risk
     ADATXML::Array<int> momentumTransfer(const ADATXML::Array<int> &sink, 
@@ -123,9 +136,10 @@ namespace radmat
         << "  pi" << source[0] << source[1] << source[2] 
         << "   q" << ret[0] << ret[1] << ret[2]; 
 
-        return ret; 
+      return ret; 
     }
 
+    ////////////////////////////////////////////////////
     // upcast to find data
     ADATXML::Array<int> 
       find_meson_momentum(const rHandle<AbsRedstarInput_t> foo)
@@ -153,6 +167,7 @@ namespace radmat
         return ret; 
       }
 
+    ////////////////////////////////////////////////////
     // upcast to find data
     ADATXML::Array<int> 
       find_photon_momentum(const rHandle<AbsRedstarInput_t> f)
@@ -181,6 +196,7 @@ namespace radmat
       }
 
 
+    ////////////////////////////////////////////////////
     // upcast to set data
     void set_q(rHandle<AbsRedstarInput_t> f, 
         const ADATXML::Array<int> psnk,
@@ -204,6 +220,7 @@ namespace radmat
     }
 
 
+    ////////////////////////////////////////////////////
     //  conserve momentum  
     void fill_insertion_momentum(std::vector<rHandle<AbsRedstarInput_t> > &inp)
     {
@@ -221,6 +238,8 @@ namespace radmat
 
 
 
+    ////////////////////////////////////////////////////
+    // hardwire for three point
     EnsemRedstarNPtBlock::ListObj_t 
       construct_npoint( const EnsemRedstarBlock::ListObj_t snk, 
           const EnsemRedstarBlock::ListObj_t ins, 
@@ -245,6 +264,8 @@ namespace radmat
 
 
 
+    ////////////////////////////////////////////////////
+    // sum this thing out 
     EnsemRedstarNPtBlock loop_npt(const EnsemRedstarBlock &snkl, 
         const EnsemRedstarBlock &insl, 
         const EnsemRedstarBlock &srcl,
@@ -264,6 +285,8 @@ namespace radmat
     }
 
 
+    ////////////////////////////////////////////////////
+    // 0.7 * A + 0.5 *B + 0.2*A -> 0.9*A + 0.5*B
     EnsemRedstarNPtBlock sum_duplicates( const EnsemRedstarNPtBlock &in)
     {
       EnsemRedstarNPtBlock ret; 
@@ -299,14 +322,55 @@ namespace radmat
       return ret; 
     }
 
+    ////////////////////////////////////////////////////
     // an intermediary 
     struct merge
     {
+      merge(void) : success(false) {}
+
+      bool success; 
       EnsemRedstarNPtBlock npt; 
       std::vector<rHandle<AbsRedstarInput_t> > input; 
     };
 
-    // the work horse 
+    ////////////////////////////////////////////////////
+    // a true means continue working with this combo
+    bool allowed_photon_momentum(const rHandle<AbsRedstarInput_t> photon , 
+        const AbstractBlockNamedObject &ins)
+    {
+
+      bool success = true; 
+      ADATXML::Array<int> q; 
+      int pmin,pmax;  
+
+      if(ins.param->type() == Stringify<RedstarUnimprovedVectorCurrentXML>())
+      {
+        rHandle<RedstarUnimprovedVectorCurrentXML> p(ins.param); 
+        DEBUG_HANDLE(p);
+        pmin = p->pmin; 
+        pmax = p->pmax; 
+
+        q = find_photon_momentum(photon) ;  
+      }
+      else
+      {
+        std::cerr << __PRETTY_FUNCTION__ << __FILE__ 
+          << ": Error, unrecognized insertionXML " << ins.param->type() << std::endl; 
+        exit(1); 
+      }
+
+      success &= cutMomentum(q,pmin,pmax);
+      // need to put a check here or else the 
+      // irrep utils will bug out on weird things
+      // like 2 -2 1 
+      if(success)  
+        success &= acceptable_mom(q); 
+
+      return success; 
+    }
+
+    ////////////////////////////////////////////////////
+    // the work horse -- handle subducing  
     merge do_merge(
         const rHandle<AbsRedstarBlock_t> snk, 
         const rHandle<AbsRedstarInput_t> snki,
@@ -314,6 +378,7 @@ namespace radmat
         const rHandle<AbsRedstarInput_t> insi,
         const rHandle<AbsRedstarBlock_t> src, 
         const rHandle<AbsRedstarInput_t> srci,
+        const AbstractBlockNamedObject &insXML,
         const std::string ensemble) 
     {
       DEBUG_MSG(entering);
@@ -321,6 +386,7 @@ namespace radmat
       merge ret; 
       EnsemRedstarNPtBlock npt; 
       std::vector< rHandle<AbsRedstarInput_t > > input(3); 
+      bool success(true); 
 
       DEBUG_HANDLE(snk); 
       DEBUG_HANDLE(snki); 
@@ -341,57 +407,36 @@ namespace radmat
       // conserve momentum with the photon
       fill_insertion_momentum(input); 
 
-      DEBUG_MSG(subducing);
+      // check that it is an allowed photon momentum 
+      success &= allowed_photon_momentum( input[INSERTION_INDEX] , insXML ); 
 
-      // do the subduction -- need to use input vector
-      //    since he has had the photon momentum filled 
-      EnsemRedstarBlock snkb,insb,srcb; 
-      snkb = (*snk)(input[SINK_INDEX]); 
-      insb = (*ins)(input[INSERTION_INDEX]); 
-      srcb = (*src)(input[SOURCE_INDEX]); 
+      if ( success ) 
+      {
+        DEBUG_MSG(subducing);
 
-      npt = sum_duplicates( loop_npt(snkb,insb,srcb,ensemble) ) ; 
+        // do the subduction -- need to use input vector
+        //    since he has had the photon momentum filled 
+        EnsemRedstarBlock snkb,insb,srcb; 
+        snkb = (*snk)(input[SINK_INDEX]); 
+        insb = (*ins)(input[INSERTION_INDEX]); 
+        srcb = (*src)(input[SOURCE_INDEX]); 
+
+        npt = sum_duplicates( loop_npt(snkb,insb,srcb,ensemble) ) ; 
+        success &= (npt.size() != 0); 
+      }
 
       ret.npt = npt; 
       ret.input = input; 
+      ret.success = success ; 
 
       DEBUG_MSG(exiting);
       return ret; 
     }
 
-    // a true means continue working with this combo
-    bool check_merge(const merge &tmp, const AbstractBlockNamedObject &ins)
-    {
-      if( tmp.npt.size() == 0) 
-        return false; 
-
-      bool success = true; 
-      ADATXML::Array<int> q; 
-      int pmin,pmax;  
-
-      if(ins.param->type() == Stringify<RedstarUnimprovedVectorCurrentXML>())
-      {
-        rHandle<RedstarUnimprovedVectorCurrentXML> p(ins.param); 
-        DEBUG_HANDLE(p);
-        pmin = p->pmin; 
-        pmax = p->pmax; 
-
-        q = find_photon_momentum(tmp.input[INSERTION_INDEX]) ;  
-      }
-      else
-      {
-        std::cerr << __PRETTY_FUNCTION__ << __FILE__ 
-          << ": Error, unrecognized insertionXML " << ins.param->type() << std::endl; 
-        exit(1); 
-      }
-
-      success &= cutMomentum(q,pmin,pmax);
-      success &= acceptable_mom(q); 
-
-      return success; 
-    }
 
 
+    ////////////////////////////////////////////////////
+    // try to build ALL xml data
     AbsRedstarMergeNPtData_t handle_work(const NPointXML &npt)
     {
       DEBUG_MSG(entering); 
@@ -449,10 +494,11 @@ namespace radmat
             merge tmp = do_merge(snkF,*snk,
                 insF,*ins,
                 srcF,*src,
+                insertion,
                 npt.ensemble);
 
-            // more chuck conditions
-            if ( ! check_merge(tmp,insertion) ) 
+            // chuck conditions
+            if ( !!! tmp.success ) 
               continue; 
 
             // push it to the big lists
@@ -477,6 +523,8 @@ namespace radmat
   } // anonomyous 
 
 
+  ////////////////////////////////////////////////////
+  // wrapper
   void RedstarMergeVectorCurrentThreePoint::do_work(void)  
   {
     my_data = handle_work(my_npt); 

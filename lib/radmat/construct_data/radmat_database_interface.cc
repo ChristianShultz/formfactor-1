@@ -6,7 +6,7 @@
 
  * Creation Date : 04-12-2012
 
- * Last Modified : Mon 11 Nov 2013 10:15:00 AM EST
+ * Last Modified : Fri 15 Nov 2013 04:50:23 PM EST
 
  * Created By : shultz
 
@@ -65,6 +65,8 @@ namespace radmat
     ADATXML::XMLReader ptop(xml,path);
     doXMLRead(ptop,"dbname",prop.dbname,__PRETTY_FUNCTION__);
     doXMLRead(ptop,"badlist",prop.badlist,__PRETTY_FUNCTION__);
+    if(prop.dbname.size() == 0)
+      std::cerr <<__PRETTY_FUNCTION__ << ": warning, dbname had no elems" << std::endl; 
   }
 
   void write(ADATXML::XMLWriter &xml, const std::string &path, const dbProp_t &prop)

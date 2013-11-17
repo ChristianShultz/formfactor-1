@@ -31,13 +31,13 @@ namespace radmat
     //! two point xml hack
     void build_xml_twopoint(const std::string &inifile);
 
-//    //! just figure out what disconnected graphs we have to nuke for redstar
-//    void nuke_graph(const std::string &inifile ,
-//                    const std::string &graph_db,
-//                    const std::string &nuke_xml_out);   
-//
-//    //! stick in stubs for gen_prop generation
-//    void build_stub_xml(const std::string &inifile); 
+    //    //! just figure out what disconnected graphs we have to nuke for redstar
+    //    void nuke_graph(const std::string &inifile ,
+    //                    const std::string &graph_db,
+    //                    const std::string &nuke_xml_out);   
+    //
+    //    //! stick in stubs for gen_prop generation
+    //    void build_stub_xml(const std::string &inifile); 
 
     private:
 
@@ -53,7 +53,7 @@ namespace radmat
     void check_exit_chisq(void) const {check_exit(chisq_analysis,__func__);}
     void check_exit(const bool &, const char *) const;
 
-// for running the full analysis 
+    // for running the full analysis 
     void read_xmlini(const std::string &ini); 
     void build_correlators(void);
     void solve_llsq(void);

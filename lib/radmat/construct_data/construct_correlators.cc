@@ -6,7 +6,7 @@
 
  * Creation Date : 04-12-2012
 
- * Last Modified : Fri 15 Nov 2013 03:43:53 PM EST
+ * Last Modified : Fri 15 Nov 2013 05:29:38 PM EST
 
  * Created By : shultz
 
@@ -25,7 +25,7 @@
 #include <utility>
 #include <omp.h>
 
-// #define CONSTRUCT_CORRELATORS_PARALLEL
+#define CONSTRUCT_CORRELATORS_PARALLEL
 #define TIME_CONSTRUCT_SINGLE_CORRS
 #define TIME_CONSTRUCT_ALL_CORRS
 
@@ -34,12 +34,43 @@ namespace radmat
 
   namespace 
   {
+// garbage intermediary 
+    template<typename T, typename U, typename V>
+      struct triplet
+      {
+        triplet(void) {}
+        triplet(const T &tt, const U &uu, const V &vv)
+          : first(tt) , second(uu) , third(vv)
+        {  }
+
+        triplet(const std::pair<T,U> FandS, const V &vv)
+          : first(FandS.first) , second(FandS.second) , third(vv)
+        { }
+
+        //        triplet& operator=(const triplet &o)
+        //        {
+        //          if(this != &o)
+        //          {
+        //            triplet<T,U,V> f(o.first,o.second,o.third);
+        //            std::swap(first,f.first);
+        //            std::swap(second,f.second);
+        //            std::swap(third,f.third);
+        //          }
+        //          return *this;
+        //        }
+
+        T first; 
+        U second; 
+        V third; 
+      };
 
 
     ///////////////////////////////////////////////////////
     ///////////////////////////////////////////////////////
+    // decide if there is any data and move from tagged 
+    // ensem redstar blocks to handles of LLSQL...Data type
     std::pair<bool,rHandle<LLSQLatticeMultiData> >
-      build_a_correlator(
+      construct_lattice_data(
           const double qsq,
           const std::vector<TaggedEnsemRedstarNPtBlock> &corrs,
           const std::string &sink_id, 
@@ -56,8 +87,6 @@ namespace radmat
         std::cout << __func__ << ": working on Q2 =" << qsq << std::endl;
 
         std::pair<bool,std::vector<ConstructCorrsMatrixElement> > tmp; 
-        std::vector<Hadron::KeyHadronNPartNPtCorr_t> missed_xml; 
-        std::vector<RadmatExtendedKeyHadronNPartIrrep_t> missed_norm;
 
         tmp = build_correlators(corrs,sink_id,source_id,Z_V,db); 
 
@@ -91,8 +120,10 @@ namespace radmat
 
     ///////////////////////////////////////////////////////
     ///////////////////////////////////////////////////////
+    // wrap the above code and possible parallelization  
+    // on the q2 sort values here 
     std::vector< 
-      std::pair<bool,rHandle<LLSQLatticeMultiData> > 
+      triplet<bool, rHandle<LLSQLatticeMultiData>, double > 
       >
       build_llsq_corrs(
           const std::vector<std::pair<double,std::vector<TaggedEnsemRedstarNPtBlock> > > &loop_data,
@@ -102,7 +133,7 @@ namespace radmat
           const DatabaseInterface_t &db)
       {
 
-        std::vector<std::pair<bool,rHandle<LLSQLatticeMultiData> > > ret(loop_data.size()); 
+        std::vector<triplet<bool,rHandle<LLSQLatticeMultiData>,double > > ret(loop_data.size()); 
         int idx;
         int sz ( loop_data.size() ) ; 
 
@@ -111,8 +142,10 @@ namespace radmat
 #endif
 
         for(idx = 0; idx < sz; ++idx)
-          ret[idx] = build_a_correlator( loop_data[idx].first, loop_data[idx].second, 
-              snk_id, src_id, Z_V, db);
+          ret[idx] =
+            triplet<bool, rHandle<LLSQLatticeMultiData>, double > 
+            (construct_lattice_data( loop_data[idx].first, loop_data[idx].second, 
+                                     snk_id, src_id, Z_V, db), loop_data[idx].first);
 
 #ifdef CONSTRUCT_CORRELATORS_PARALLEL
 #pragma omp barrier
@@ -158,7 +191,7 @@ namespace radmat
           loop_data.push_back(std::pair<double,std::vector<TaggedEnsemRedstarNPtBlock> >(it->first,it->second)); 
 
 
-        std::vector<std::pair<bool,rHandle<LLSQLatticeMultiData> > > lattice_data; 
+        std::vector<triplet<bool, rHandle<LLSQLatticeMultiData>, double > > lattice_data; 
         DatabaseInterface_t db(*db_prop) ; 
 
         lattice_data = build_llsq_corrs(loop_data,three_pt->sink_id, three_pt->source_id, 
@@ -168,12 +201,15 @@ namespace radmat
         ::radmat::BAD_DATA_REPO::dump_bad_data();
 
         std::vector<rHandle<LLSQLatticeMultiData> > ret; 
-        std::vector<std::pair<bool,rHandle<LLSQLatticeMultiData> > >::const_iterator dcheck; 
+        std::vector<triplet<bool,rHandle<LLSQLatticeMultiData>,double > >::const_iterator dcheck; 
 
         for(dcheck = lattice_data.begin(); dcheck != lattice_data.end(); ++dcheck) 
         {
-          if( dcheck->first )
+          // this is a have some data flag
+          if( !!! dcheck->first )
           {
+            std::cout << __func__ << ": dropping Q2 = " << dcheck->third 
+              << " because it has 0 elems" << std::endl;  
             continue;    
           }
           ret.push_back(dcheck->second); 
@@ -182,6 +218,7 @@ namespace radmat
 #ifdef TIME_CONSTRUCT_ALL_CORRS
         snoop.stop(); 
         std::cout << " ** time to build all correlators " << snoop.getTimeInSeconds() << " seconds" << std::endl;
+        std::cout << " ** returning " << ret.size() << " possible Q2 points " << std::endl; 
 #endif
         return ret;  
       }
@@ -191,7 +228,7 @@ namespace radmat
 
   ///////////////////////////////////////////////////////
   ///////////////////////////////////////////////////////
-  
+
   namespace
   {
     void print_timeslice_info(const rHandle<AbsRedstarMergeNPt> &r)

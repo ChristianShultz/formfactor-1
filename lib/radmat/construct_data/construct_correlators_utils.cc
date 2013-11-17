@@ -6,7 +6,7 @@
 
  * Creation Date : 13-11-2013
 
- * Last Modified : Fri 15 Nov 2013 03:42:31 PM EST
+ * Last Modified : Fri 15 Nov 2013 04:57:22 PM EST
 
  * Created By : shultz
 
@@ -20,10 +20,8 @@
 #include "semble/semble_file_management.h"
 #include "adat/adat_stopwatch.h"
 #include "hadron/ensem_filenames.h"
-#include "radmat/redstar_interface/debug_props.h"
 
-
-#define DEBUG_MSG_ON 
+#define DEBUG_MSG_OFF
 #include "radmat/redstar_interface/debug_props.h"
 
 #define DO_TIMING_SORT_MAT_ELEMS_BY_Q2
@@ -70,7 +68,6 @@ namespace radmat
 #endif
 
         DEBUG_MSG(entering); 
-        std::cout << corrs.size() << std::endl;
 
         singleThreadQ2NormalizedCorrCache cache; 
         std::vector<TaggedEnsemRedstarNPtBlock>::const_iterator block; 
@@ -192,7 +189,7 @@ namespace radmat
 #ifdef DO_TIMING_CACHE_NORM_MAT_ELEMS
         snoop.stop(); 
         std::cout << __func__ << ": normalizing "
-          << cache.size() << " unique npts took"
+          << cache.size() << " unique npts took "
           << snoop.getTimeInSeconds() << " seconds" << std::endl; 
 #endif
 
@@ -278,9 +275,8 @@ namespace radmat
         DEBUG_MSG(exiting early);
 #ifdef DO_TIMING_SUM_NORM_MAT_ELEMS
         snoop.stop(); 
-        std::cout << __func__ << " :qsq = " << qsq
-          << " :building " << ret.size() << " elems took "
-          << snoop.getTimeInSeconds() << " seconds" << std::endl; 
+        std::cout << __func__ << "npoint_cache is empty"
+         << " exiting early " << std::endl; 
 #endif
         return std::pair<bool, std::vector<ConstructCorrsMatrixElement> >(false,ret); 
       }
@@ -362,9 +358,9 @@ namespace radmat
 
 #ifdef DO_TIMING_SUM_NORM_MAT_ELEMS
       snoop.stop(); 
-      std::cout << __PRETTY_FUNCTION__ << " :qsq = " << qsq
-        << " :building " << ret.size() << " elems took "
-        << snoop.getTimeInSeconds() << " seconds" << std::endl; 
+      std::cout << __func__ << ": building " << ret.size() 
+        << " matrix elements took " << snoop.getTimeInSeconds() 
+        << " seconds" << std::endl; 
 #endif
 
       return std::pair<bool, std::vector<ConstructCorrsMatrixElement> >(any_data,ret);  
