@@ -6,7 +6,7 @@
 
  * Creation Date : 11-11-2013
 
- * Last Modified : Fri 15 Nov 2013 05:36:14 PM EST
+ * Last Modified : Thu 21 Nov 2013 10:32:32 AM EST
 
  * Created By : shultz
 
@@ -34,7 +34,7 @@
 
 #define  DEBUG_MSG_OFF
 #define  DEBUG_HANDLE_ON
-#include "debug_props.h"
+#include "radmat/utils/debug_handler.h"
 
 namespace radmat
 {

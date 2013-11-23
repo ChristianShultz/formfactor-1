@@ -6,7 +6,7 @@
 
  * Creation Date : 12-11-2013
 
- * Last Modified : Fri 15 Nov 2013 06:34:44 PM EST
+ * Last Modified : Fri 22 Nov 2013 03:39:56 PM EST
 
  * Created By : shultz
 
@@ -18,6 +18,7 @@
 #include "radmat/utils/pow2assert.h"
 #include "redstar_single_particle_meson_block.h"
 #include "redstar_unimproved_vector_current.h"
+#include "redstar_improved_vector_current.h"
 #include "adat/adat_stopwatch.h"
 #include "hadron/irrep_util.h"
 #include "hadron/ensem_filenames.h"
@@ -25,7 +26,7 @@
 
 #define  DEBUG_MSG_OFF
 #define  DEBUG_HANDLE_ON
-#include "debug_props.h"
+#include "radmat/utils/debug_handler.h"
 
 namespace
 {
@@ -72,6 +73,7 @@ namespace radmat
       bool photon = false; 
 
       photon |= (p->type() == Stringify<RedstarUnimprovedVectorCurrentBlock>());
+      photon |= (p->type() == Stringify<RedstarImprovedVectorCurrentBlock>()); 
 
       POW2_ASSERT( photon ); 
     }
@@ -183,6 +185,13 @@ namespace radmat
           DEBUG_HANDLE(p);
           ret = p->mom;     
         }
+        else if ( f->type() == Stringify<RedstarImprovedVectorCurrentInput>())
+        {
+          DEBUG_MSG(casting); 
+          rHandle<RedstarImprovedVectorCurrentInput> p(f); 
+          DEBUG_HANDLE(p);
+          ret = p->mom;     
+        }
         else
         {
           std::cerr << __PRETTY_FUNCTION__ << __FILE__ 
@@ -209,6 +218,15 @@ namespace radmat
         rHandle<RedstarUnimprovedVectorCurrentInput> p(f); 
         DEBUG_HANDLE(p);
         p->mom = momentumTransfer(psnk,psrc,p->creation_op);     
+      }
+      else if (f->type() == Stringify<RedstarImprovedVectorCurrentInput>())
+      {
+        DEBUG_MSG(casting); 
+        rHandle<RedstarImprovedVectorCurrentInput> p(f); 
+        DEBUG_HANDLE(p);
+        p->mom = momentumTransfer(psnk,psrc,p->creation_op);     
+        p->psrc = psrc; 
+        p->psnk = psnk;
       }
       else
       {
@@ -352,6 +370,15 @@ namespace radmat
 
         q = find_photon_momentum(photon) ;  
       }
+      else if(ins.param->type() == Stringify<RedstarImprovedVectorCurrentXML>())
+      {
+        rHandle<RedstarImprovedVectorCurrentXML> p(ins.param); 
+        DEBUG_HANDLE(p);
+        pmin = p->pmin; 
+        pmax = p->pmax; 
+
+        q = find_photon_momentum(photon) ;  
+      }
       else
       {
         std::cerr << __PRETTY_FUNCTION__ << __FILE__ 
@@ -400,9 +427,9 @@ namespace radmat
       // elem, then conserve momentum, all further operations 
       // corresponding to this mat elem must use the input vector
       // else we end up using uninitialized variables which sucks
-      input[SINK_INDEX] = rHandle<AbsRedstarInput_t>(snki->clone()); 
-      input[INSERTION_INDEX] = rHandle<AbsRedstarInput_t>(insi->clone()); 
-      input[SOURCE_INDEX] = rHandle<AbsRedstarInput_t>(srci->clone()); 
+      input[SINK_INDEX] = snki->clone(); 
+      input[INSERTION_INDEX] = insi->clone(); 
+      input[SOURCE_INDEX] = srci->clone(); 
 
       // conserve momentum with the photon
       fill_insertion_momentum(input); 

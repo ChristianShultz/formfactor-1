@@ -61,7 +61,7 @@ namespace radmat
     }
 
 
-      bool invertable(void) const {return true;}
+    bool invertable(void) const {return true;}
 
     SEMBLE::SembleMatrix<T> inv(const SEMBLE::SembleMatrix<T> &in) const
     {
@@ -101,7 +101,7 @@ namespace radmat
       return ret;
     };
 
-      bool invertable(void) const {return true;}
+    bool invertable(void) const {return true;}
 
     // Ax = b, A'Ax = A'b , x = (A'A)^-1 * A'b  prime means dagger
     SEMBLE::SembleMatrix<T> inv(const SEMBLE::SembleMatrix<T> &in) const
@@ -148,7 +148,7 @@ namespace radmat
 
     };
 
-      bool invertable(void) const {return true;}
+    bool invertable(void) const {return true;}
 
     SEMBLE::SembleMatrix<T> inv(const SEMBLE::SembleMatrix<T> &in) const
     {
@@ -163,15 +163,18 @@ namespace radmat
       // do we want to cut in the future?
       SEMBLE::pseudoInvert(s,s.getN(),true); // s -> 1/s
 
-      Sinv.reDim(s.getB(),V.getN(),U.getN());
-      const int bd = (V.getN() < U.getN()) ? V.getN() : U.getN();
+      // assume V is square here -- it should be 
+      // assume we had nrow > ncol in orig matrix -- we should
+      Sinv.reDim(s.getB(),s.getN(),s.getN());
       Sinv.zeros();
 
-      for(int diag = 0; diag < bd; ++diag)
+      for(int diag = 0; diag < s.getN(); ++diag)
         Sinv.loadEnsemElement(diag,diag,s.getEnsemElement(diag)); 
 
       Smul = SEMBLE::recast<T,double>(Sinv);
 
+      // the dimensions should work out right through here
+      // if they don't then someone made a mess somewhere
       return  V * Smul * SEMBLE::adj(U) ; 
     }
 

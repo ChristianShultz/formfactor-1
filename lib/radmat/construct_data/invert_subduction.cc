@@ -6,7 +6,7 @@
 
  * Creation Date : 12-10-2012
 
- * Last Modified : Wed 13 Nov 2013 06:34:33 PM EST
+ * Last Modified : Fri 22 Nov 2013 02:52:15 PM EST
 
  * Created By : shultz
 
@@ -18,6 +18,7 @@
 #include "radmat/construct_data/invert_subduction.h"
 #include "radmat/utils/polarisation_tensors.h"
 #include "radmat/utils/pow2assert.h"
+#include "radmat/utils/handle.h"
 
 #include "hadron/subduce_tables_factory.h"
 #include "semble/semble_meta.h"
@@ -237,7 +238,7 @@ namespace  // a bunch of local stuff to make my life easier
 
     for(it = irreps.begin(); it != irreps.end(); ++it)
     {
-      Hadron::SubduceTable *subduce = callSubduceFactory(it->subduce_key); 
+      radmat::rHandle<Hadron::SubduceTable> subduce(callSubduceFactory(it->subduce_key)); 
       int rep_bound = subduce->dimt();
 
       for(int irrep_row = 1; irrep_row <= rep_bound; ++irrep_row)
@@ -289,7 +290,7 @@ namespace  // a bunch of local stuff to make my life easier
 
     for(it = irreps.begin(); it != irreps.end(); ++it)
     {
-      Hadron::SubduceTable * subduce = callSubduceFactory(it->subduce_key);
+      radmat::rHandle<Hadron::SubduceTable>  subduce( callSubduceFactory(it->subduce_key) );
       int rep_bound = subduce->dimt();
 
       if(abs(expr.H) == 0)

@@ -38,7 +38,8 @@ bin_PROGRAMS = fake_radmat$(EXEEXT) mass_overlap_db_create$(EXEEXT) \
 	grab_pol$(EXEEXT) grab_vector_mean_cmp$(EXEEXT) \
 	invert_subduced$(EXEEXT) phases2$(EXEEXT) \
 	check_rotations$(EXEEXT) corr_norm$(EXEEXT) \
-	radmat_util$(EXEEXT) radmat$(EXEEXT) radmat_single_q2$(EXEEXT)
+	radmat_util$(EXEEXT) radmat$(EXEEXT) radmat_single_q2$(EXEEXT) \
+	test_tens$(EXEEXT)
 subdir = main
 DIST_COMMON = $(srcdir)/Makefile.am $(srcdir)/Makefile.in
 ACLOCAL_M4 = $(top_srcdir)/aclocal.m4
@@ -117,6 +118,10 @@ am_single_plot_OBJECTS = single_plot.$(OBJEXT)
 single_plot_OBJECTS = $(am_single_plot_OBJECTS)
 single_plot_LDADD = $(LDADD)
 single_plot_DEPENDENCIES =
+am_test_tens_OBJECTS = test_tens.$(OBJEXT)
+test_tens_OBJECTS = $(am_test_tens_OBJECTS)
+test_tens_LDADD = $(LDADD)
+test_tens_DEPENDENCIES =
 DEFAULT_INCLUDES = -I.@am__isrc@
 depcomp = $(SHELL) $(top_srcdir)/config/depcomp
 am__depfiles_maybe = depfiles
@@ -134,7 +139,7 @@ SOURCES = $(check_rotations_SOURCES) $(corr_norm_SOURCES) \
 	$(mass_overlap_db_util_SOURCES) $(phases_SOURCES) \
 	$(phases2_SOURCES) $(radmat_SOURCES) \
 	$(radmat_single_q2_SOURCES) $(radmat_util_SOURCES) \
-	$(single_plot_SOURCES)
+	$(single_plot_SOURCES) $(test_tens_SOURCES)
 DIST_SOURCES = $(check_rotations_SOURCES) $(corr_norm_SOURCES) \
 	$(fake_radmat_SOURCES) $(grab_ff_SOURCES) $(grab_pol_SOURCES) \
 	$(grab_vector_mean_cmp_SOURCES) $(invert_subduced_SOURCES) \
@@ -143,7 +148,7 @@ DIST_SOURCES = $(check_rotations_SOURCES) $(corr_norm_SOURCES) \
 	$(mass_overlap_db_util_SOURCES) $(phases_SOURCES) \
 	$(phases2_SOURCES) $(radmat_SOURCES) \
 	$(radmat_single_q2_SOURCES) $(radmat_util_SOURCES) \
-	$(single_plot_SOURCES)
+	$(single_plot_SOURCES) $(test_tens_SOURCES)
 ETAGS = etags
 CTAGS = ctags
 DISTFILES = $(DIST_COMMON) $(DIST_SOURCES) $(TEXINFOS) $(EXTRA_DIST)
@@ -276,6 +281,7 @@ corr_norm_SOURCES = corr_norm.cc
 radmat_util_SOURCES = radmat_util.cc
 radmat_SOURCES = radmat.cc
 radmat_single_q2_SOURCES = radmat_single_q2.cc
+test_tens_SOURCES = test_tens.cc
 
 # test_jfit_SOURCES = test_jfit.cc
 
@@ -404,6 +410,9 @@ radmat_util$(EXEEXT): $(radmat_util_OBJECTS) $(radmat_util_DEPENDENCIES)
 single_plot$(EXEEXT): $(single_plot_OBJECTS) $(single_plot_DEPENDENCIES) 
 	@rm -f single_plot$(EXEEXT)
 	$(CXXLINK) $(single_plot_OBJECTS) $(single_plot_LDADD) $(LIBS)
+test_tens$(EXEEXT): $(test_tens_OBJECTS) $(test_tens_DEPENDENCIES) 
+	@rm -f test_tens$(EXEEXT)
+	$(CXXLINK) $(test_tens_OBJECTS) $(test_tens_LDADD) $(LIBS)
 
 mostlyclean-compile:
 	-rm -f *.$(OBJEXT)
@@ -427,6 +436,7 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/radmat_single_q2.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/radmat_util.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/single_plot.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/test_tens.Po@am__quote@
 
 .cc.o:
 @am__fastdepCXX_TRUE@	$(CXXCOMPILE) -MT $@ -MD -MP -MF $(DEPDIR)/$*.Tpo -c -o $@ $<

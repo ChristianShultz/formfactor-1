@@ -6,7 +6,7 @@
 
 * Creation Date : 12-11-2013
 
-* Last Modified : Thu 14 Nov 2013 09:24:11 AM EST
+* Last Modified : Thu 21 Nov 2013 05:34:15 PM EST
 
 * Created By : shultz
 
@@ -19,6 +19,7 @@ _._._._._._._._._._._._._._._._._._._._._.*/
 
 #include "redstar_single_particle_meson_block.h"
 #include "redstar_unimproved_vector_current.h"
+#include "redstar_improved_vector_current.h"
 
 namespace FacEnv = radmat::TheRedstarAbstractXMLFactoryEnv;
 typedef radmat::TheRedstarAbstractXMLFactory Factory; 
@@ -62,6 +63,7 @@ namespace radmat
       {
         success &= do_reg<RedstarSingleParticleMesonXML>();
         success &= do_reg<RedstarUnimprovedVectorCurrentXML>(); 
+        success &= do_reg<RedstarImprovedVectorCurrentXML>(); 
         local_registration = true; 
       }
       return success; 

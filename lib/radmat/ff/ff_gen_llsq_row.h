@@ -49,7 +49,7 @@
 
    \end{document}
 
- */
+*/
 
 using namespace ADATXML;
 //using namespace ADATIO;
@@ -95,6 +95,8 @@ namespace radmat
     {
       idx_t dim = v.getDim(0);
       itpp::Vec<T> foo(dim);
+      foo.zeros(); 
+
       for(idx_t i = 0; i < dim; i++)
         foo[i] = v[i];
 
@@ -218,7 +220,8 @@ namespace radmat
         for (it = m_list.begin(); it != m_list.end(); it++)
           ret.append_col(toItpp<T>((**it)(p_f,p_i,mom_fac)));
 
-          
+        // std::cout << __FILE__ <<  __func__ <<  ret << std::endl;
+
         return ret;
       }
 
@@ -285,7 +288,7 @@ namespace radmat
     @details ie: a 4 x n form factors matrix where the row index is the lorentz index.
     These then need to get stitched together higher up 
 
-   */
+*/
   template<typename T>
     struct ffKinematicFactors_t
     {

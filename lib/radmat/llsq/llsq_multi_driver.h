@@ -9,9 +9,12 @@
 #include <complex>
 #include <string>
 
-// roughly this is an optimization class, if its possible to just invert the matrix once 
-// then we should be intelligent enough to do so, Jo's fancy explicit chisq extremization 
-// method is an example where we actually have to do the inversion on every t_ins
+// roughly this is an optimization class, 
+// if its possible to just invert the matrix once 
+// then we should be intelligent enough to
+// do so, Jo's fancy explicit chisq extremization 
+// method is an example where we actually 
+// have to do the inversion on every t_ins
 namespace radmat
 {
 

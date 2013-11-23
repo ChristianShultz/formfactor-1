@@ -100,12 +100,17 @@ namespace radmat
         : h_map(new map_t()) , h_mom(new mom_t(_p))
       { }
 
+      ~genPolTens3D(void) { refresh_map(); }
+
       //! get a polarisation tensor for the inputs in the direction of p
       Tensor<std::complex<double>,1> operator()(const short hel)
       {
         return make(hel);
       }
 
+
+
+      protected:
       //!  do not use!
       genPolTens3D(map_handle &_h_map, mom_handle & _h_mom )
         : h_map(_h_map) , h_mom(_h_mom)
@@ -123,7 +128,6 @@ namespace radmat
         return get(hel);
       }
 
-      protected:
       //! do not use!
       Tensor<std::complex<double> , 1> m_downcast(TensorBase* bar)
       {
@@ -132,11 +136,26 @@ namespace radmat
         return *foo;
       }
 
+
+      // clean up the map each time we get a new input
+      void refresh_map(void)
+      {
+        map_t::iterator it;
+        for(it = h_map->begin(); it != h_map->end(); it++)
+        {
+          delete it->second;
+          it->second = NULL;
+        }
+        h_map->clear();
+      }
+
       //! make a J = 1 polarisation tensor
       Tensor<std::complex<double>,1> make( const short hel)
       {
         return creation_op_J1_3(*h_mom,hel); 
       }
+
+      friend struct genPolTens3D<2>;
 
       // shared data store    
       map_handle h_map;
@@ -160,6 +179,11 @@ namespace radmat
       genPolTens3D(const mom_t &_p)
         : h_map(new map_t()) , h_mom(new mom_t(_p))
       { }
+
+      ~genPolTens3D(void) 
+      {
+        refresh_map(); 
+      }
 
       //! return a polarisation tensor of rank J for the inputs
       Tensor<std::complex<double>, J> operator()(const short hel)
@@ -286,10 +310,28 @@ namespace radmat
         : h_map(new map_t()) , h_mom(new mom_t(_p))
       { }
 
+      ~genPolTens(void) 
+      {
+        refresh_map(); 
+      }
+
       //! get a polarisation tensor for the inputs in the direction of p
       Tensor<std::complex<double>,1> operator()(const double E, const short hel,const double mom_factor)
       {
         return make(E,hel,mom_factor);
+      }
+
+      protected:
+      // clean up the map each time we get a new input
+      void refresh_map(void)
+      {
+        map_t::iterator it;
+        for(it = h_map->begin(); it != h_map->end(); it++)
+        {
+          delete it->second;
+          it->second = NULL;
+        }
+        h_map->clear();
       }
 
       //!  do not use!
@@ -298,7 +340,8 @@ namespace radmat
       { }
 
       //! do not use!
-      Tensor<std::complex<double> , 1> get(const double E, const short hel, const double mom_factor)
+      Tensor<std::complex<double> , 1> 
+        get(const double E, const short hel, const double mom_factor)
       {
         map_t::const_iterator it;
         it = h_map->find(pKey_t(1,hel));
@@ -309,7 +352,6 @@ namespace radmat
         return get(E,hel,mom_factor);
       }
 
-      protected:
       //! do not use!
       Tensor<std::complex<double> , 1> m_downcast(TensorBase* bar)
       {
@@ -325,6 +367,12 @@ namespace radmat
       {
         return creation_op_J1_4(*h_mom,hel,E,mom_factor); 
       }
+
+      friend struct genPolTens<2>;
+      friend struct genPolTens<3>;
+      friend struct genPolTens<4>;
+      friend struct genPolTens<5>;
+      friend struct genPolTens<6>;
 
       // shared data store    
       map_handle h_map;
@@ -349,6 +397,11 @@ namespace radmat
         : h_map(new map_t()) ,  h_mom(new mom_t(_p))
       { }
 
+      ~genPolTens(void) 
+      {
+        refresh_map(); 
+      }
+
       //! return a polarisation tensor of rank J for the inputs
       Tensor<std::complex<double>, J> operator()(const double E, const short hel,const double mom_factor)
       {
@@ -370,7 +423,8 @@ namespace radmat
       }
 
       // wrap make in a sensible form
-      Tensor<std::complex<double> , J> get(const double E, const short hel,const double mom_factor)
+      Tensor<std::complex<double> , J> 
+        get(const double E, const short hel,const double mom_factor)
       {
         map_t::const_iterator it;
         it = h_map->find(pKey_t(J,hel));
@@ -382,7 +436,8 @@ namespace radmat
       }
 
       // downcast the base pointers to the derived type and return an actual obj
-      Tensor<std::complex<double>, J> m_downcast(TensorBase * bar)
+      Tensor<std::complex<double>, J> 
+        m_downcast(TensorBase * bar)
       {
         Tensor<std::complex<double> , J> * foo = dynamic_cast<Tensor<std::complex<double>, J >* >(bar);
         POW2_ASSERT(foo);

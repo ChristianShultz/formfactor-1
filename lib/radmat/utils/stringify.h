@@ -19,17 +19,20 @@ namespace radmat
     struct StringifyBase
     {
       StringifyBase() {}
+      virtual ~StringifyBase() {}
       virtual std::string name() const = 0; 
     }; 
 
   template<class T>
-    struct StringifyTemp : public StringifyBase
-  { };
+    struct StringifyType : public StringifyBase
+  { 
+    ~StringifyType() {}
+  };
 
 
 #define REGISTER_STRINGIFY_TYPE(X)                \
   template<>                                      \
-  struct StringifyTemp<X> : public StringifyBase  \
+  struct StringifyType<X> : public StringifyBase  \
   {                                               \
     std::string name() const { return #X ;}       \
   };                                              \
@@ -38,7 +41,7 @@ namespace radmat
   template<typename T>
     std::string Stringify(void)
     {
-      StringifyTemp<T> f;
+      StringifyType<T> f;
       return f.name(); 
     }
 

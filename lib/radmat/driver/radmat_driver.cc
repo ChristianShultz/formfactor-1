@@ -6,7 +6,7 @@
 
  * Creation Date : 25-02-2013
 
- * Last Modified : Wed 13 Nov 2013 06:33:20 PM EST
+ * Last Modified : Fri 22 Nov 2013 10:42:01 PM EST
 
  * Created By : shultz
 
@@ -42,7 +42,6 @@
 #include <iostream>
 #include <sstream>
 #include <exception>
-#include <omp.h>
 
 using namespace radmat;
 using namespace ENSEM;
@@ -55,26 +54,59 @@ using namespace ADATIO;
 #define FIT_LLSQ_PARALLEL
 #define CHISQ_ANALYSIS_PARALLEL
 
+#ifdef LOAD_LLSQ_PARALLEL 
+#include <omp.h>
+#endif 
+
+#ifdef FIT_LLSQ_PARALLEL
+#include <omp.h>
+#endif 
+
+#ifdef CHISQ_ANALYSIS_PARALLEL
+#include <omp.h>
+#endif 
 
 namespace radmat
 {
+
+  namespace 
+  {
+    void 
+      do_void_return_print(const std::string &s)
+      {
+        std::cout << s << std::endl; 
+        return;
+      }
+  }
 
 
   void RadmatDriver::run_program(const std::string &inifile)
   {
     init_false(); 
-    read_xmlini(inifile);
+    if ( !!! read_xmlini(inifile))
+      return do_void_return_print("failed to read xml ini");    
+
     if(m_ini.maxThread > 1)
     {
       std::cout << "\n\n\n" << __PRETTY_FUNCTION__ << ": setting num threads to " 
         << m_ini.maxThread << "\n\n\n" << std::endl;
       omp_set_num_threads(m_ini.maxThread);
     }
-    build_correlators();
-    solve_llsq();
-    fit_ffs();
-    do_chisq_analysis();
-    make_FF_of_Q2_plots();
+    
+    if ( !!! build_correlators() )
+      return do_void_return_print("failed to build_corrs"); 
+
+    if( !!! solve_llsq() ) 
+      return do_void_return_print("failed to solve llsq");
+    
+    if( !!! fit_ffs() ) 
+      return do_void_return_print("falied to fit ffs"); 
+
+    if( !!! make_FF_of_Q2_plots() ) 
+      return do_void_return_print("failed to make FF of Q2 plots");
+
+    if( !!! do_chisq_analysis() ) 
+      return do_void_return_print("failed to do chisq analysis"); 
   }
 
 
@@ -360,7 +392,7 @@ namespace radmat
   }
 
 
-  void RadmatDriver::read_xmlini(const std::string &xmlini)
+  bool RadmatDriver::read_xmlini(const std::string &xmlini)
   {
 
 
@@ -386,11 +418,13 @@ namespace radmat
     }
 
     read_ini = true; 
+
+    return read_ini;
   }
 
 
 
-  void RadmatDriver::build_correlators(void)
+  bool RadmatDriver::build_correlators(void)
   {
     check_exit_ini(); 
 
@@ -407,9 +441,10 @@ namespace radmat
 
     built_correlators = true; 
 
+    return built_correlators; 
   }
 
-  void RadmatDriver::solve_llsq(void)
+  bool RadmatDriver::solve_llsq(void)
   {
     check_exit_corrs(); 
 
@@ -419,7 +454,7 @@ namespace radmat
     if(sz == 0)
     {
       std::cerr << __func__ << ": error nothing to solve" << std::endl;
-      exit(1); 
+      return false;  
     }
 
     linear_systems_of_Q2.resize(multi_lattice_data.size());
@@ -482,9 +517,11 @@ namespace radmat
     for(idx = 0; idx < sz; ++idx)
       if(good_qs[idx])                        // can only print the successful guys
         linear_systems_of_Q2[idx].dump_llsq(); 
+
+    return solved_llsq;
   }
 
-  void RadmatDriver::fit_ffs(void)
+  bool RadmatDriver::fit_ffs(void)
   {
     check_exit_llsq(); 
 
@@ -527,13 +564,15 @@ namespace radmat
     for(idx = 0; idx < sz; ++idx)
       if(good_qs[idx])                        // can only print the successful guys
         linear_systems_of_Q2[idx].dump_fits(); 
+
+    return fit_formfacs;
   }
 
 
-  void RadmatDriver::do_chisq_analysis(void)
+  bool RadmatDriver::do_chisq_analysis(void)
   {
     if ( m_ini.chisq == "none") 
-      return ;
+      return true; // hack job here
 
     check_exit_fit();
 
@@ -567,11 +606,12 @@ namespace radmat
       << my_stopwatch.getTimeInSeconds() << " seconds " << std::endl;
 
     chisq_analysis = true; 
-
+    
+    return chisq_analysis;
   }
 
 
-  void RadmatDriver::make_FF_of_Q2_plots(void)
+  bool RadmatDriver::make_FF_of_Q2_plots(void)
   {
     std::string pth = SEMBLE::SEMBLEIO::getPath();
     std::stringstream path;
@@ -657,10 +697,11 @@ namespace radmat
       out2.close(); 
     }
 
+    return true; 
   }
 
 
-  void RadmatDriver::print_Q2_list(void) 
+  bool RadmatDriver::print_Q2_list(void) 
   {
     check_exit_init_llsq(); 
     std::stringstream ss;
@@ -672,6 +713,8 @@ namespace radmat
       if(it->check_linear_system())
         out << it->tags_at_this_Q2() << delim; 
     out.close();
+
+    return true; 
   }
 
 

@@ -336,10 +336,10 @@ namespace radmat
         xx.close();
       }
       virtual LLSQRetTypeBase_h operator()(const LLSQInputType_h &, const int t_ins) const = 0;
-      
+
       virtual bool invertable(void) const = 0;  
       virtual SEMBLE::SembleMatrix<T> inv(const SEMBLE::SembleMatrix<T> &in) const = 0;
-      
+
       virtual std::string echo(void) const = 0;
       virtual ~LLSQBaseSolver_t(void) {}
     };

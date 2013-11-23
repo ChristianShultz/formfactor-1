@@ -6,7 +6,7 @@
 
  * Creation Date : 13-11-2013
 
- * Last Modified : Fri 15 Nov 2013 04:57:22 PM EST
+ * Last Modified : Thu 21 Nov 2013 10:33:07 AM EST
 
  * Created By : shultz
 
@@ -22,7 +22,7 @@
 #include "hadron/ensem_filenames.h"
 
 #define DEBUG_MSG_OFF
-#include "radmat/redstar_interface/debug_props.h"
+#include "radmat/utils/debug_handler.h"
 
 #define DO_TIMING_SORT_MAT_ELEMS_BY_Q2
 #define DO_TIMING_CACHE_NORM_MAT_ELEMS

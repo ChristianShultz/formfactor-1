@@ -6,7 +6,7 @@
 
  * Creation Date : 04-12-2012
 
- * Last Modified : Fri 15 Nov 2013 05:29:38 PM EST
+ * Last Modified : Fri 22 Nov 2013 10:41:08 PM EST
 
  * Created By : shultz
 
@@ -23,9 +23,12 @@
 #include <string>
 #include <vector>
 #include <utility>
-#include <omp.h>
 
 #define CONSTRUCT_CORRELATORS_PARALLEL
+#ifdef CONSTRUCT_CORRELATORS_PARALLEL
+#include <omp.h>
+#endif 
+
 #define TIME_CONSTRUCT_SINGLE_CORRS
 #define TIME_CONSTRUCT_ALL_CORRS
 

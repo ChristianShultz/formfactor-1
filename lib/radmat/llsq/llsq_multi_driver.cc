@@ -6,7 +6,7 @@
 
  * Creation Date : 22-02-2013
 
- * Last Modified : Wed 13 Nov 2013 06:02:49 PM EST
+ * Last Modified : Fri 22 Nov 2013 09:53:25 PM EST
 
  * Created By : shultz
 
@@ -41,10 +41,30 @@ namespace radmat
         const SEMBLE::SembleVector<std::complex<double> > &first_row)
     {
       SEMBLE::SembleMatrix<std::complex<double> > foo(first_row.getB(),1,first_row.getN());
+      foo.zeros(); 
       for(int elem = 0; elem < first_row.getN(); ++elem)
         foo.loadEnsemElement(0,elem,first_row.getEnsemElement(elem)); 
 
+      /*  std::cout << __FILE__ << __func__ 
+          << "to_init " << foo.mean() 
+          << "\nfirst_row" << first_row.mean() << std::endl;  
+          */
       to_init = foo; 
+    }
+
+    int remap_jmu_4_to_0(const int &i)
+    {
+      if ( i == 4 ) 
+        return 0; 
+      else if ( i < 4 && i > 0 ) 
+        return i;
+      else
+      {
+        std::cout << __PRETTY_FUNCTION__ << __FILE__ 
+          << "error index " << i << " is out of range" 
+          << std::endl; 
+        exit(1337);
+      }
     }
 
     SemblePInv makeMomInvariants(const LatticeMultiDataTag &t)
@@ -326,7 +346,10 @@ namespace radmat
       SEMBLE::SembleVector<std::complex<double> > workV;
 
       workM = KK.genFactors(makeMomInvariants(old_tags[elem]));
-      workV = SEMBLE::round_to_zero(workM.getRow(old_tags[elem].jmu), tolerance);
+      // std::cout << __FILE__ << __func__ << workM.mean() << std::endl;
+      workV = SEMBLE::round_to_zero(
+          workM.getRow(
+            remap_jmu_4_to_0(old_tags[elem].jmu)), tolerance);
 
       if(workV == Zero)
       {
@@ -491,9 +514,6 @@ namespace radmat
 
     generate_kinematic_factors();
 
-    //    std::cout << "K = \n" << SEMBLE::mean(K) << std::endl;
-
-
     Kinv = my_solver->inv(K); 
     init_Kinv = true; 
 
@@ -533,13 +553,16 @@ namespace radmat
       SEMBLE::SembleMatrix<std::complex<double> > work;
       work = KK.genFactors(makeMomInvariants(*it));
 
-      //      std::cout << it->file_id << std::endl;
-      //      std::cout << SEMBLE::mean(work) << std::endl;
-
+      /*  std::cout << __FILE__ << __func__ 
+          << "\n" <<  it->file_id << std::endl;
+          std::cout << SEMBLE::mean(work) << std::endl;
+          */
       if(it == tags.begin())
-        init_dim(K, work.getRow(it->jmu));
+        init_dim(K, work.getRow(
+              remap_jmu_4_to_0(it->jmu)));
       else
-        K.append_row(work.getRow(it->jmu));
+        K.append_row(work.getRow(
+              remap_jmu_4_to_0(it->jmu)));
     }
 
     init_K = true; 

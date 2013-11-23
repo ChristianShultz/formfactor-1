@@ -6,7 +6,7 @@
 
  * Creation Date : 12-11-2013
 
- * Last Modified : Fri 15 Nov 2013 05:35:20 PM EST
+ * Last Modified : Fri 22 Nov 2013 10:41:42 PM EST
 
  * Created By : shultz
 
@@ -17,9 +17,11 @@
 #include "radmat/utils/mink_qsq.h"
 #include "radmat/utils/pow2assert.h"
 #include <sstream>
-#include <omp.h>
 
 #define PARALLEL_TAG_REDSTAR_DATA
+#ifdef PARALLEL_TAG_REDSTAR_DATA
+#include <omp.h>
+#endif
 
 namespace radmat
 {
@@ -120,6 +122,38 @@ namespace radmat
         return ret;
       }
 
+    // specialization 
+    template<>
+      data_store
+      generate_tag<
+      RedstarSingleParticleMesonInput,
+      RedstarImprovedVectorCurrentInput,
+      RedstarSingleParticleMesonInput>(const rHandle<AbsRedstarInput_t> & a, 
+          const rHandle<AbsRedstarInput_t> & b, 
+          const rHandle<AbsRedstarInput_t> & c,
+          const std::string &elem_id)
+      {
+        data_store ret; 
+
+        rHandle<RedstarSingleParticleMesonInput> snk(a);
+        rHandle<RedstarImprovedVectorCurrentInput> ins(b);
+        rHandle<RedstarSingleParticleMesonInput> src(c); 
+
+        std::stringstream ss, mat_elem; 
+        ss << snk->sname() << ".V_" << ins->lorentz 
+          << "." << src->sname(); 
+
+        mat_elem << elem_id << "_" << snk->H << "_" << src->H; 
+
+        ret.file_id = ss.str(); 
+        ret.jmu = ins->lorentz;
+        ret.p_f = snk->mom;
+        ret.p_i = src->mom; 
+        ret.mat_elem_id = mat_elem.str(); 
+
+        return ret;
+      }
+
     // the next series of templates auto unrolls into the complicated 
     //     if else structure that is systemic across hadspec codes
     //     NB: unspecialized templates blow up!!
@@ -174,6 +208,10 @@ namespace radmat
         if ( insertion->type() == Stringify<RedstarUnimprovedVectorCurrentInput>() ) 
         {
           foo = function_factory<A,RedstarUnimprovedVectorCurrentInput>(source); 
+        }
+        else if ( insertion->type() == Stringify<RedstarImprovedVectorCurrentInput>() ) 
+        {
+          foo = function_factory<A,RedstarImprovedVectorCurrentInput>(source); 
         }
         else
         {
@@ -258,7 +296,7 @@ namespace radmat
       int idx,stop = int(sz); 
       
 #ifdef PARALLEL_TAG_REDSTAR_DATA
-#pragma omp parallel for shared(idx,stop) schedule(dynamic,100)
+#pragma omp parallel for shared(idx) schedule(dynamic,100)
 #endif 
 
       for (idx = 0; idx < stop; ++idx)

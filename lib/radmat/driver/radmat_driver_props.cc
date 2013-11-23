@@ -1,16 +1,16 @@
 /* -.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.
 
-* File Name : radmat_driver_props.cc
+ * File Name : radmat_driver_props.cc
 
-* Purpose :
+ * Purpose :
 
-* Creation Date : 29-11-2012
+ * Creation Date : 29-11-2012
 
-* Last Modified : Tue 22 Oct 2013 10:53:59 AM EDT
+ * Last Modified : Thu 21 Nov 2013 06:19:23 PM EST
 
-* Created By : shultz
+ * Created By : shultz
 
-_._._._._._._._._._._._._._._._._._._._._.*/
+ _._._._._._._._._._._._._._._._._._._._._.*/
 
 #include "radmat/driver/radmat_driver_props.h"
 
@@ -44,14 +44,14 @@ namespace radmat
   std::string toString (const RDriverProps_t &prop)
   {
     std::stringstream ss;
-      ss << "version = " << prop.version; 
-      ss << "\nthreePointComparatorProps = " << prop.threePointComparatorProps;
-      ss << "\nthreePointIni = " << prop.threePointIni;
-      ss << "\nchisq = " << prop.chisq; 
-      ss << "\nmaxThread = " << prop.maxThread; 
-      ss << "\npoleMass^2 = " <<  prop.poleMass; 
-      ss << "\ntolerance = " << prop.tolerance; 
-      return ss.str(); 
+    ss << "version = " << prop.version; 
+    ss << "\nthreePointComparatorProps = " << prop.threePointComparatorProps;
+    ss << "\nthreePointIni = " << prop.threePointIni;
+    ss << "\nchisq = " << prop.chisq; 
+    ss << "\nmaxThread = " << prop.maxThread; 
+    ss << "\npoleMass^2 = " <<  prop.poleMass; 
+    ss << "\ntolerance = " << prop.tolerance; 
+    return ss.str(); 
   }
 
   std::ostream& operator<<(std::ostream& o, const RDriverProps_t &p)
@@ -60,7 +60,7 @@ namespace radmat
     return o; 
   }
 
-  
+
   namespace
   {
     void check_version(const int v)

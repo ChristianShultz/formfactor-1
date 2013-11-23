@@ -54,13 +54,13 @@ namespace radmat
     void check_exit(const bool &, const char *) const;
 
     // for running the full analysis 
-    void read_xmlini(const std::string &ini); 
-    void build_correlators(void);
-    void solve_llsq(void);
-    void fit_ffs(void); 
-    void do_chisq_analysis(void);  
-    void make_FF_of_Q2_plots(void);
-    void print_Q2_list(void);  
+    bool read_xmlini(const std::string &ini); 
+    bool build_correlators(void);
+    bool solve_llsq(void);
+    bool fit_ffs(void); 
+    bool do_chisq_analysis(void);  
+    bool make_FF_of_Q2_plots(void);
+    bool print_Q2_list(void);  
 
 
     RDriverProps_t m_ini;  

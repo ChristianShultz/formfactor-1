@@ -6,7 +6,7 @@
 
  * Creation Date : 07-05-2013
 
- * Last Modified : Fri May 10 09:05:31 2013
+ * Last Modified : Fri 22 Nov 2013 02:33:51 PM EST
 
  * Created By : shultz
 
@@ -111,7 +111,7 @@ eps3d(const ADATXML::Array<int> &mom , const bool create)
 
   for(int h = 1; h > -2; --h)
   {
-    tmp = eps.get(h);
+    tmp = eps(h);
 
     for(int i = 0; i < 3; ++i)
       if(create)

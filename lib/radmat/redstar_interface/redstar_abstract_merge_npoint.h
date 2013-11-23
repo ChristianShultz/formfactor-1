@@ -50,6 +50,8 @@ namespace radmat
   // an abstract polymorphic base to tell us what to do with the NPointXML
   struct AbsRedstarMergeNPt
   {
+    virtual ~AbsRedstarMergeNPt() {}
+
     virtual std::string 
       type(void) const = 0; 
 

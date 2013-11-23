@@ -24,7 +24,8 @@ namespace radmat
     {
       virtual std::string type(void) const = 0; 
       virtual std::string write(void) const = 0; 
-      virtual AbsRedstarInput_t* clone(void) const = 0; 
+      virtual rHandle<AbsRedstarInput_t> clone(void) const = 0; 
+      virtual ~AbsRedstarInput_t() {}
     }; 
 
   // an abstract polymorphic base to cast from
@@ -51,6 +52,7 @@ namespace radmat
 
     AbsRedstarXMLInterface_t() {}
     AbsRedstarXMLInterface_t& operator=(const AbsRedstarXMLInterface_t &); // not impl
+    virtual ~AbsRedstarXMLInterface_t(){}
 
     // teaches us how to read a given xml type and populate 
     // the input list / allocate memory for the functor & list

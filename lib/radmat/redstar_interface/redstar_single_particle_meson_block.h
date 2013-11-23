@@ -33,9 +33,10 @@ namespace radmat
 
     virtual std::string write(void) const; 
 
-    virtual AbsRedstarInput_t * clone(void) const
+    virtual rHandle<AbsRedstarInput_t> clone(void) const
     {
-      return new RedstarSingleParticleMesonInput(*this);
+      return rHandle<AbsRedstarInput_t>(
+          new RedstarSingleParticleMesonInput(*this) );
     } 
 
     virtual std::string sname(void) const; 
