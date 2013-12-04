@@ -6,7 +6,7 @@
 
  * Creation Date : 22-02-2013
 
- * Last Modified : Fri 22 Nov 2013 09:53:25 PM EST
+ * Last Modified : Mon 02 Dec 2013 01:42:05 PM EST
 
  * Created By : shultz
 
@@ -111,7 +111,7 @@ namespace radmat
     template<typename T>
       void my_writer_mean(const std::string &fname, const SEMBLE::SembleMatrix<T> &in)
       {
-        itpp::Mat<T> mean = in.mean();
+        itpp::Mat<T> mean = itpp::round_to_zero( in.mean() , 1e-5 );
         std::ofstream out(fname.c_str());
         out << mean ;
         out.close(); 
@@ -346,7 +346,7 @@ namespace radmat
       SEMBLE::SembleVector<std::complex<double> > workV;
 
       workM = KK.genFactors(makeMomInvariants(old_tags[elem]));
-      // std::cout << __FILE__ << __func__ << workM.mean() << std::endl;
+     // std::cout << __FILE__ << __func__ << workM.mean() << std::endl;
       workV = SEMBLE::round_to_zero(
           workM.getRow(
             remap_jmu_4_to_0(old_tags[elem].jmu)), tolerance);
@@ -361,14 +361,14 @@ namespace radmat
       }
     }
 
-    /*
+#if 0
        std::cout << __func__ << ": old_Lat(t)" << std::endl;
        std::cout << SEMBLE::mean(lattice_data->data()) << std::endl;
        std::cout << "\n\nnew_Lat(t)" << std::endl;
        std::cout << SEMBLE::mean(non_zero_data->data()) << std::endl;
        std::cout << "old_tags.size() = " << sz 
-       << " zeroed_elems.size() = " << zeroed_elems.size() << std::endl;
-       */
+       << " zeroed_elems.size() = " << zeroed_data.nrows() << std::endl;
+#endif  
 
     lattice_data = non_zero_data;
 
@@ -485,6 +485,10 @@ namespace radmat
     my_writer_mean(A.str(),K);
     my_writer_mean(Ainv.str(),Kinv);
     my_writer_rows(x.str(), FF_t); 
+
+    std::ofstream out( path + std::string("solver.log") ); 
+    out << solver_log; 
+    out.close(); 
   }
 
 
@@ -515,6 +519,7 @@ namespace radmat
     generate_kinematic_factors();
 
     Kinv = my_solver->inv(K); 
+    solver_log = my_solver->solution_log(); 
     init_Kinv = true; 
 
     FF_t = Kinv * lattice_data->data(); 

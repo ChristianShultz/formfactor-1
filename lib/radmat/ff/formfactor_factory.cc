@@ -15,6 +15,7 @@
 #include "lorentzff_PiPiStar.h"
 #include "lorentzff_PiRho.h"
 #include "lorentzff_RhoPi.h"
+#include "lorentzff_RhoRho.h"
 
 #include <omp.h>
 
@@ -28,9 +29,6 @@ namespace radmat
   namespace FormFactorDecompositionFactoryEnv
   {
 
-    namespace 
-    {
-
       // helper function
       template<class T, class U> 
         T* upCast(void)
@@ -40,8 +38,22 @@ namespace radmat
           return t;
         }
 
-      volatile bool registered = false;
-    }
+
+
+      template<typename T> 
+      bool 
+        do_reg(const std::string &reg_id, T* (*ptr)())
+        {
+          bool reg = Factory::Instance().registerObject(reg_id,ptr); 
+         
+          if ( !!! reg ) 
+          {
+            std::cout << __PRETTY_FUNCTION__ << ": reg error for " << reg_id << std::endl;
+          } 
+          return reg; 
+        }
+
+    bool registered = false;
 
     // never played with this toy before so we are just going to 
     // make it blow up if anything goes wrong by wrapping another 
@@ -55,9 +67,23 @@ namespace radmat
       {
         foo = TheFormFactorDecompositionFactory::Instance().createObject(matElemID);
       }
+      catch(std::exception &e)
+      {
+        std::cout << "elem - " << matElemID << std::endl;
+        std::cout << __PRETTY_FUNCTION__ << e.what(); 
+        throw e; 
+      }
+      catch(std::string &s)
+      {
+        std::cout << "elem - " << matElemID << std::endl;
+        std::cout << __PRETTY_FUNCTION__ << s << std::endl;
+        throw s;
+      }
       catch(...)
       {
-        POW2_ASSERT(false);
+        std::cout << "elem - " << matElemID << std::endl;
+        std::cout << __PRETTY_FUNCTION__ << ": some error" << std::endl;
+        POW2_ASSERT(false); 
       }
 
       POW2_ASSERT(foo);
@@ -77,19 +103,56 @@ namespace radmat
         if(!!!registered)
         {
           // <Pi | jmu | Pi >
-          success &= Factory::Instance().registerObject(std::string("PiPi"),FacEnv::upCast<ffBase_t<std::complex<double> > ,radmat::PiPi::PiPi>);
-          success &= Factory::Instance().registerObject(std::string("PiPi_0_0"),FacEnv::upCast<ffBase_t<std::complex<double> > ,radmat::PiPi::PiPi>);
-          success &= Factory::Instance().registerObject(std::string("PiPiStar_0_0"),FacEnv::upCast<ffBase_t<std::complex<double> > ,radmat::PiPiStar::PiPiStar>);
+          // success &= Factory::Instance().registerObject(std::string("PiPi"),FacEnv::upCast<ffBase_t<std::complex<double> > ,radmat::PiPi::PiPi>);
+          
+          success &= do_reg(std::string("PiPi"), FacEnv::upCast<ffBase_t<std::complex<double> > ,radmat::PiPi::PiPi>);
+          success &= do_reg(std::string("PiPi_0_0"),FacEnv::upCast<ffBase_t<std::complex<double> > ,radmat::PiPi::PiPi>);
+          success &= do_reg(std::string("PiPiStar_0_0"),FacEnv::upCast<ffBase_t<std::complex<double> > ,radmat::PiPiStar::PiPiStar>);
 
           // <Pi | jmu | Rho>
-          success &= Factory::Instance().registerObject(std::string("PiRho_0_-1"),FacEnv::upCast<ffBase_t<std::complex<double> >, radmat::PiRho::PiRho<-1> >);
-          success &= Factory::Instance().registerObject(std::string("PiRho_0_0"),FacEnv::upCast<ffBase_t<std::complex<double> >, radmat::PiRho::PiRho<0> >);
-          success &= Factory::Instance().registerObject(std::string("PiRho_0_1"),FacEnv::upCast<ffBase_t<std::complex<double> >, radmat::PiRho::PiRho<1> >);
+          success &= do_reg(std::string("PiRho_0_-1"),FacEnv::upCast<ffBase_t<std::complex<double> >, radmat::PiRho::PiRho<-1> >);
+          success &= do_reg(std::string("PiRho_0_0"),FacEnv::upCast<ffBase_t<std::complex<double> >, radmat::PiRho::PiRho<0> >);
+          success &= do_reg(std::string("PiRho_0_1"),FacEnv::upCast<ffBase_t<std::complex<double> >, radmat::PiRho::PiRho<1> >);
 
           // <Rho | jmu | Pi> 
-          success &= Factory::Instance().registerObject(std::string("RhoPi_-1_0"),FacEnv::upCast<ffBase_t<std::complex<double> >, radmat::RhoPi::RhoPi<-1> >);
-          success &= Factory::Instance().registerObject(std::string("RhoPi_0_0"),FacEnv::upCast<ffBase_t<std::complex<double> >, radmat::RhoPi::RhoPi<0> >);
-          success &= Factory::Instance().registerObject(std::string("RhoPi_1_0"),FacEnv::upCast<ffBase_t<std::complex<double> >, radmat::RhoPi::RhoPi<1> >);
+          success &= do_reg(std::string("RhoPi_-1_0"),FacEnv::upCast<ffBase_t<std::complex<double> >, radmat::RhoPi::RhoPi<-1> >);
+          success &= do_reg(std::string("RhoPi_0_0"),FacEnv::upCast<ffBase_t<std::complex<double> >, radmat::RhoPi::RhoPi<0> >);
+          success &= do_reg(std::string("RhoPi_1_0"),FacEnv::upCast<ffBase_t<std::complex<double> >, radmat::RhoPi::RhoPi<1> >);
+
+          // <Rho | jum | Rho> 
+          success &= do_reg(std::string("RhoRho_1_-1"),FacEnv::upCast<ffBase_t<std::complex<double> >, radmat::RhoRho::RhoRho<1,-1> >);
+          success &= do_reg(std::string("RhoRho_1_0"),FacEnv::upCast<ffBase_t<std::complex<double> >, radmat::RhoRho::RhoRho<1,0> >);
+          success &= do_reg(std::string("RhoRho_1_1"),FacEnv::upCast<ffBase_t<std::complex<double> >, radmat::RhoRho::RhoRho<1,1> >);
+
+          success &= do_reg(std::string("RhoRho_0_-1"),FacEnv::upCast<ffBase_t<std::complex<double> >, radmat::RhoRho::RhoRho<0,-1> >);
+          success &= do_reg(std::string("RhoRho_0_0"),FacEnv::upCast<ffBase_t<std::complex<double> >, radmat::RhoRho::RhoRho<0,0> >);
+          success &= do_reg(std::string("RhoRho_0_1"),FacEnv::upCast<ffBase_t<std::complex<double> >, radmat::RhoRho::RhoRho<0,1> >);
+
+          success &= do_reg(std::string("RhoRho_-1_-1"),FacEnv::upCast<ffBase_t<std::complex<double> >, radmat::RhoRho::RhoRho<1,1> >);
+          success &= do_reg(std::string("RhoRho_-1_0"),FacEnv::upCast<ffBase_t<std::complex<double> >, radmat::RhoRho::RhoRho<-1,0> >);
+          success &= do_reg(std::string("RhoRho_-1_1"),FacEnv::upCast<ffBase_t<std::complex<double> >, radmat::RhoRho::RhoRho<-1,1> >);
+
+          // vector multipole
+          success &= do_reg(std::string("VectorMultipole_1_-1"),
+              FacEnv::upCast<ffBase_t<std::complex<double> >, radmat::VectorMultipole::RhoRho<1,-1> >);
+          success &= do_reg(std::string("VectorMultipole_1_0"),
+              FacEnv::upCast<ffBase_t<std::complex<double> >, radmat::VectorMultipole::RhoRho<1,0> >);
+          success &= do_reg(std::string("VectorMultipole_1_1"),
+              FacEnv::upCast<ffBase_t<std::complex<double> >, radmat::VectorMultipole::RhoRho<1,1> >);
+
+          success &= do_reg(std::string("VectorMultipole_0_-1"),
+              FacEnv::upCast<ffBase_t<std::complex<double> >, radmat::VectorMultipole::RhoRho<0,-1> >);
+          success &= do_reg(std::string("VectorMultipole_0_0"),
+              FacEnv::upCast<ffBase_t<std::complex<double> >, radmat::VectorMultipole::RhoRho<0,0> >);
+          success &= do_reg(std::string("VectorMultipole_0_1"),
+              FacEnv::upCast<ffBase_t<std::complex<double> >, radmat::VectorMultipole::RhoRho<0,1> >);
+
+          success &= do_reg(std::string("VectorMultipole_-1_-1"),
+              FacEnv::upCast<ffBase_t<std::complex<double> >, radmat::VectorMultipole::RhoRho<-1,-1> >);
+          success &= do_reg(std::string("VectorMultipole_-1_0"),
+              FacEnv::upCast<ffBase_t<std::complex<double> >, radmat::VectorMultipole::RhoRho<-1,0> >);
+          success &= do_reg(std::string("VectorMultipole_-1_1"),
+              FacEnv::upCast<ffBase_t<std::complex<double> >, radmat::VectorMultipole::RhoRho<-1,1> >);
 
 
           registered = true;

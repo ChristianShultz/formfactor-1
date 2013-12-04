@@ -6,7 +6,7 @@
 
  * Creation Date : 13-11-2013
 
- * Last Modified : Thu 21 Nov 2013 10:33:07 AM EST
+ * Last Modified : Mon 25 Nov 2013 10:20:28 AM EST
 
  * Created By : shultz
 
@@ -47,6 +47,73 @@ namespace radmat
 
     typedef ADAT::MapObject<Hadron::KeyHadronNPartNPtCorr_t,
             ENSEM::EnsemVectorComplex> singleThreadQ2NormalizedCorrCache;
+
+
+    TaggedEnsemRedstarNPtBlock
+      organizeCorrelatorSum(const TaggedEnsemRedstarNPtBlock &b)
+      {
+        typedef EnsemRedstarNPtBlock::ListObj_t ListObj_t; 
+        typedef EnsemRedstarNPtBlock::Coeff_t Coeff_t;
+
+        TaggedEnsemRedstarNPtBlock ret; 
+
+        ret.continuum_tag = b.continuum_tag; 
+
+        EnsemRedstarNPtBlock block = b.coeff_lattice_xml; 
+        EnsemRedstarNPtBlock::const_iterator it; 
+        std::map<std::string,ListObj_t> unique_elems; 
+        std::map<std::string,ListObj_t>::iterator map_iterator; 
+
+        for(it = block.begin(); it != block.end(); ++it)
+        {
+          std::string key = Hadron::ensemFileName(it->m_obj); 
+          map_iterator = unique_elems.find(key); 
+
+          if(map_iterator != unique_elems.end() )
+          {
+            ListObj_t foo = unique_elems[key]; 
+            Coeff_t weight = foo.m_coeff + it->m_coeff; 
+            foo.m_coeff = weight; 
+
+            // update value
+            if ( SEMBLE::toScalar(ENSEM::localNorm2(foo.m_coeff)) > 1e-6)
+              map_iterator->second = foo;
+            else
+              unique_elems.erase(key);  
+          }
+          else
+            unique_elems.insert(std::pair<std::string,ListObj_t>(key,*it)); 
+        }
+
+        std::map<std::string,ListObj_t>::const_iterator uniq; 
+        std::stringstream coeff_obj_list ; 
+
+        // construct the organized return xml list 
+        // and record the list 
+        for(uniq = unique_elems.begin(); uniq != unique_elems.end(); ++uniq)
+        {
+          ret.coeff_lattice_xml.push_back(uniq->second); 
+          coeff_obj_list << SEMBLE::toScalar(uniq->second.m_coeff) << " * "; 
+          coeff_obj_list << uniq->first << "\n";
+        }
+
+        std::string pth = SEMBLE::SEMBLEIO::getPath();
+        std::stringstream path;
+
+        // dump the ingredient list
+        path << pth << "Q2_" << ret.qsq_tag(); 
+        SEMBLE::SEMBLEIO::makeDirectoryPath(path.str()); 
+        path << "/continuum_corr_ingredients";
+        SEMBLE::SEMBLEIO::makeDirectoryPath(path.str());
+        path << "/" << ret.continuum_tag.file_id;
+
+        std::ofstream out(path.str().c_str()); 
+        out << coeff_obj_list.str();
+        out.close(); 
+
+        return ret; 
+      }
+
 
     ////////////////////////////////////////////////////////////////////
 
@@ -216,14 +283,11 @@ namespace radmat
 
       // loop everything and toss it into a vector if it matches else make a new vector
       for(it = unsorted.begin(); it != unsorted.end(); ++it)
-      {
-
         if(ret.find(it->qsq_tag()) != ret.end())
           ret.find(it->qsq_tag())->second.push_back(*it);
         else
           ret.insert(std::map<double,std::vector<TaggedEnsemRedstarNPtBlock> >::value_type(
                 it->qsq_tag(),std::vector<TaggedEnsemRedstarNPtBlock>(1,*it))); 
-      }
 
 
 #ifdef DO_TIMING_SORT_MAT_ELEMS_BY_Q2
@@ -276,7 +340,7 @@ namespace radmat
 #ifdef DO_TIMING_SUM_NORM_MAT_ELEMS
         snoop.stop(); 
         std::cout << __func__ << "npoint_cache is empty"
-         << " exiting early " << std::endl; 
+          << " exiting early " << std::endl; 
 #endif
         return std::pair<bool, std::vector<ConstructCorrsMatrixElement> >(false,ret); 
       }
@@ -285,16 +349,16 @@ namespace radmat
       ENSEM::EnsemReal ScalarZeroR;
       ENSEM::EnsemVectorComplex VectorZeroC; 
       bool any_data = false; 
-      std::vector<TaggedEnsemRedstarNPtBlock>::const_iterator block; 
+      std::vector<TaggedEnsemRedstarNPtBlock>::const_iterator block_it; 
       EnsemRedstarNPtBlock::const_iterator npt; 
 
       bool found = false; 
-      for ( block = corrs.begin(); block != corrs.end(); ++block)
+      for ( block_it = corrs.begin(); block_it != corrs.end(); ++block_it)
       {
         if (found ) 
           break; 
 
-        for(npt = block->coeff_lattice_xml.begin(); npt != block->coeff_lattice_xml.end(); ++npt) 
+        for(npt = block_it->coeff_lattice_xml.begin(); npt != block_it->coeff_lattice_xml.end(); ++npt) 
           if(npoint_cache.exist(npt->m_obj))
           {
             found = true; 
@@ -310,8 +374,10 @@ namespace radmat
       if ( !!! found ) 
         return std::pair<bool, std::vector<ConstructCorrsMatrixElement> >(false,ret);  
 
-      for ( block = corrs.begin(); block != corrs.end(); ++block)
+      for ( block_it = corrs.begin(); block_it != corrs.end(); ++block_it)
       {
+        TaggedEnsemRedstarNPtBlock block = organizeCorrelatorSum(*block_it); 
+
         ENSEM::EnsemVectorComplex corr; 
         ENSEM::EnsemReal E_snk, E_src; 
 
@@ -321,7 +387,7 @@ namespace radmat
         int ct(0); 
         bool success = true;  
 
-        for(npt = block->coeff_lattice_xml.begin(); npt != block->coeff_lattice_xml.end(); ++npt) 
+        for(npt = block.coeff_lattice_xml.begin(); npt != block.coeff_lattice_xml.end(); ++npt) 
         {
           success &= npoint_cache.exist(npt->m_obj);
 
@@ -347,7 +413,7 @@ namespace radmat
           E_src = E_src / SEMBLE::toScalar(double(ct)); 
         }
 
-        LatticeMultiDataTag tag = block->continuum_tag;
+        LatticeMultiDataTag tag = block.continuum_tag;
         tag.E_f = E_snk; 
         tag.E_i = E_src; 
 

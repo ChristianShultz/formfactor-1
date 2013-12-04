@@ -6,7 +6,7 @@
 
 * Creation Date : 22-04-2013
 
-* Last Modified : Tue 15 Oct 2013 07:48:41 PM EDT
+* Last Modified : Tue 03 Dec 2013 09:47:59 PM EST
 
 * Created By : shultz
 
@@ -107,7 +107,8 @@ int main(int argc, char *argv[])
   {
 
     itpp::Mat<std::complex<double> > baz = (*foo)(fred.pf,fred.pi,fred.pfac); 
-    itpp::Vec<std::complex<double> > bar = baz.get_row(fred.mu); 
+    itpp::Vec<std::complex<double> > bar;
+    bar = itpp::round_to_zero(baz.get_row(fred.mu) , 1e-6); 
 
     for(int elem = 0; elem < bar.size() -1; ++elem)
     {
@@ -123,7 +124,9 @@ int main(int argc, char *argv[])
   {
     std::cout << " The list of ffs is : \n" << foo->ff() << std::endl;
 
-    std::cout << "by value (row index is lorentz, col is FF num) \n" << (*foo)(fred.pf,fred.pi,fred.pfac);
+    std::cout << "by value (row index is lorentz, col is FF num) \n" 
+      << itpp::round_to_zero( (*foo)(fred.pf,fred.pi,fred.pfac) , 1e-6);
+
 
     std::cout << "\n\n" << std::endl;
   }

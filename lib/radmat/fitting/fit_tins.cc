@@ -6,7 +6,7 @@
 
  * Creation Date : 01-08-2012
 
- * Last Modified : Thu 14 Nov 2013 04:59:32 PM EST
+ * Last Modified : Tue 26 Nov 2013 03:08:51 PM EST
 
  * Created By : shultz
 
@@ -45,38 +45,60 @@ namespace radmat
       return 3.14159 * deg/180.;
     }
 
-    // this is a bit hackey since it includes contact terms and the ones where the insertion has run out past the source/sink
-    ENSEM::EnsemVectorReal convertToReal(const TinsFitter &fitter, const ENSEM::EnsemVectorComplex & in, const int tlow, const int thigh)
+    // run an avg fit on the real and imag bits
+    //      to try to find a phase
+    ENSEM::EnsemVectorReal 
+      convertToReal(const TinsFitter &fitter,
+          const ENSEM::EnsemVectorComplex & in, 
+          const int tlow,
+          const int thigh)
     {
       ENSEM::EnsemVectorReal real, imag;
 
-      double mean_phase(0); 
+      double const_real, const_imag; 
 
       real = ENSEM::real(in);
       imag = ENSEM::imag(in);
 
+      std::vector<double> t;
+      for(int i = 0; i < in.numElem(); ++i)
+        t.push_back(double(i)); 
 
-      for(int i = tlow; i < thigh; ++i)
+      EnsemData ereal(t,real),eimag(t,imag); 
+      ereal.hideDataAboveX(thigh - 0.1); 
+      eimag.hideDataBelowX(tlow -0.1); 
+
+      ADAT::Handle<FitFunction> freal(new ThreePointConstant), fimag(new ThreePointConstant);  
+      JackFit fit_real(ereal,freal), fit_imag(eimag,fimag); 
+
+      fit_real.runAvgFit(); 
+      fit_imag.runAvgFit(); 
+
+      const_real = fit_real.getAvgFitParValue(0);
+      const_imag = fit_imag.getAvgFitParValue(0);
+
+      // what if it is a longitudial factor or crossing 
+      //    we are only getting about 2% precision, 
+      //    assume a FF of O(1)
+      if( (const_real < 2e-2) && (const_imag < 2e-2) ) 
       {
-        double rl,im;
-        rl = SEMBLE::toScalar(ENSEM::mean(ENSEM::peekObs(real,i)));
-        im = SEMBLE::toScalar(ENSEM::mean(ENSEM::peekObs(imag,i)));
-        
-        double phase = std::arg(std::complex<double>(rl,im)); 
-        
-        
-       //  std::cout << __func__ << " t = " << i << " phase = " << phase << " (" << phase*180./3.14159 <<" deg)"<< std::endl;
-
-      
-        if(phase < -3.*3.14159/4.)
-          phase = - phase; 
-    
-        // std::cout << __func__ << " t = " << i << " phase = " << phase << " (" << phase*180./3.14159 <<" deg)"<< std::endl;
-
-        mean_phase += phase; 
+        // doesn't matter, both are zero to precision  
+        return real;
       }
 
-      double phase = mean_phase/double(thigh - tlow); 
+      if ( isnan(const_real) && isnan(const_imag))
+      {
+        return real; 
+      }
+
+
+      double fit_phase = std::arg(std::complex<double>(const_real,const_imag)); 
+
+      if(fit_phase < -3.*3.14159/4.)
+        fit_phase = - fit_phase; 
+
+
+      double phase = fit_phase ; 
 
       if( (phase < 0.174528) && (phase > -0.174708) ) // +/- 10 degree about 0 in rad
         return real;
@@ -89,6 +111,7 @@ namespace radmat
       else
       {
         std::cout << "The calculated phase was " << phase*180./3.14159 << " (deg)" << std::endl;
+        std::cout << "rl = " << const_real << " im = " << const_imag << std::endl;
         std::cout << "for Q2 = " << SEMBLE::toScalar(ENSEM::mean(fitter.getQ2())) << std::endl;  
         std::cout << "used tlow = " << tlow << " thigh = " << thigh << std::endl; 
         SPLASH("check bad_corr.jack, bad_corr.ax for the correlator"); 

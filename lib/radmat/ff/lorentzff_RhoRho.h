@@ -6,6 +6,7 @@
 #include "radmat/utils/levi_civita.h"
 #include "radmat/utils/pow2assert.h"
 #include <exception>
+#include <sstream>
 
 namespace radmat
 {
@@ -13,142 +14,434 @@ namespace radmat
   namespace RhoRho
   {
 
-    // arXiv:0902.2241v1 
-    //
-    //  F1 -> M1
-    //
-    //  F2 -> E2
-    //
-    //  F3 -> C0
-    //
-    //  F4 -> C2 
-    //
+    // PRD 73, 074507 (2006) 
     //
 
-
-    namespace util
-    {
-      Tensor<std::complex<double> > PiMu(const Tensor<double,1>, &p_f, const Tensor<double,1> &p_i)
-    }
-
-    template<short lambda_left, short lambda_right>
-      struct F1 : public ffBlockBase_t<std::complex<double> > , 
-        public leftPTensor<1,lambda_left>, 
-        public rightPTensor<1,lambda_right>
-    {
-      Tensor<std::complex<double> , 1> operator()(const Tensor<double,1> &p_f, 
-          const Tensor<double> &p_i, 
-          const double mom_fac)  const
+    // will bug if indicies arent correct
+    template<typename L, typename R>
+      typename Promote<L,R>::Type_t dot_out(const Tensor<L,1> &l, const Tensor<R,1> &r)
       {
-        // ingredient list
-        Tensor<std::complex<double> , 1> eps_left, eps_right, pplus, pminus, gdd;
+        return contract_b(l,r); 
+      }
+
+
+    template<int lambda_left, int lambda_right>
+      struct Ingredients
+      : public leftPTensor<1,lambda_left>, 
+      public rightPTensor<1,lambda_right>
+    {
+      Ingredients() {}
+
+      // ingredient list
+      Ingredients(const Tensor<double,1> &p_f, 
+          const Tensor<double,1> &p_i, 
+          const double mom_fac) 
+      {
         eps_left = this->left_p_tensor(p_f,mom_fac); 
         eps_right = this->right_p_tensor(p_i,mom_fac); 
         pplus = convertTensorUnderlyingType<std::complex<double>, double, 1>(pPlus(p_f,p_i)); 
         pminus = convertTensorUnderlyingType<std::complex<double>, double, 1>(pMinus(p_f,p_i)); 
-        gdd = convertTensorUnderlyingType<std::complex<double>, double, 1>(g_dd()); 
+        gdd = convertTensorUnderlyingType<std::complex<double>, double, 2>(g_dd()); 
+        p_left = convertTensorUnderlyingType<std::complex<double> , double, 1>(p_f);
+        p_right = convertTensorUnderlyingType<std::complex<double> , double, 1>(p_i);
+        mm_left = dot_out(p_left,applyMetric(p_left,gdd,0)).real(); 
+        enforce_positive(mm_left,"negative mass left");
+        mm_right = dot_out(p_right,applyMetric(p_right,gdd,0)).real(); 
+        enforce_positive(mm_right,"negative mass right"); 
+        enforce_equal(mm_right,mm_left,"m_left != m_right"); 
+        qq = dot_out(pminus,applyMetric(pminus,gdd,0)).real(); 
+        Q2 = -qq; 
       }
+
+
+
+      void 
+        enforce(const bool &b, const std::string &msg) const
+        {
+          if ( !!! b ) 
+          {
+            std::cout << __PRETTY_FUNCTION__ << ":error " << msg << std::endl; 
+            exit(1); 
+          }
+        }
+
+      // 1 part in 20
+      bool 
+        is_equal(const double &l, const double &r) const
+        {
+          return (fabs( (l - r) / (l+r)) < 5e-2); 
+        }
+
+      void 
+        enforce_positive(const double &d, const std::string &msg) const
+        {
+          enforce( d > 1e-6 , msg); 
+        }
+
+      void 
+        enforce_equal(const double d1 , const double &d2, const std::string &msg) const
+        {
+          std::stringstream ss;
+          ss << "d1=" << d1 << " d2=" << d2;
+          enforce(is_equal(d1,d2) , msg + ss.str()); 
+        }
+
+      Tensor<std::complex<double> , 1> 
+        init_4_tens() const
+        {
+          return Tensor<std::complex<double> , 1> ((TensorShape<1>())[4]); 
+        }
+
+      std::complex<double>
+        eps_left_dot_p_right() const
+        {
+          return dot_out(eps_left , applyMetric(p_right,gdd,0)); 
+        }
+
+
+      std::complex<double> 
+        eps_right_dot_p_left() const
+        {
+          return dot_out(eps_right, applyMetric(p_left,gdd,0)); 
+        }
+
+      std::complex<double> 
+        eps_left_dot_eps_right() const
+        {
+          return dot_out(eps_left, applyMetric(eps_right,gdd,0)); 
+        }
+
+      Tensor<std::complex<double>,1> eps_left; 
+      Tensor<std::complex<double>,1> eps_right; 
+      Tensor<std::complex<double>,1> pplus; 
+      Tensor<std::complex<double>,1> pminus; 
+      Tensor<std::complex<double>,2> gdd; 
+      Tensor<std::complex<double>,1> p_left; 
+      Tensor<std::complex<double>,1> p_right; 
+      double mm_left;
+      double mm_right; 
+      double qq; 
+      double Q2; 
     };
 
 
-    template<short lambda_left, short lambda_right>
-      struct F2 : public ffBlockBase_t<std::complex<double> > , 
-        public leftPTensor<1,lambda_left>, 
-        public rightPTensor<1,lambda_right>
+
+
+    //////////////////////////////////////////////////////////////////
+    //////////////////////////////////////////////////////////////////
+    template<int lambda_left, int lambda_right>
+      struct G1 : public ffBlockBase_t<std::complex<double> >  
     {
+      std::string
+        ff() const
+        {
+          return "-G_1(Q^2)(p_f + p_i)^\\mu \\epsilon^*_\\nu(p_f,\\lambda_f)\\epsilon^\\nu(p_i,\\lambda_i) \\\\";
+        }
+
+
+      Tensor<std::complex<double> , 1> 
+        operator()(const Tensor<double,1> &p_f, 
+            const Tensor<double,1> &p_i, 
+            const double mom_fac)  const
+        {
+          Ingredients<lambda_left,lambda_right> i(p_f,p_i,mom_fac); 
+          return  -i.pplus * i.eps_left_dot_eps_right(); 
+        }
+    };
+
+
+
+
+    //////////////////////////////////////////////////////////////////
+    //////////////////////////////////////////////////////////////////
+    template<int lambda_left, int lambda_right>
+      struct G2 : public ffBlockBase_t<std::complex<double> >  
+    {
+      std::string 
+        ff() const
+        {
+          std::string s = "G_2(Q^2)\\left[ \\epsilon^\\mu(p_i,\\lambda_i)\\epsilon^*_\\nu(p_f,\\lambda_f)p_i^\\nu";
+          s += "+ \\epsilon^{*\\mu}(p_f,\\lambda_f)\\epsilon_\\nu(p_i,\\lambda_i)p_f^\\nu \\right] \\\\";
+          return s;
+        }
+
       Tensor<std::complex<double> , 1> operator()(const Tensor<double,1> &p_f, 
-          const Tensor<double> &p_i, 
+          const Tensor<double,1> &p_i, 
           const double mom_fac)  const
       {
-        // ingredient list
-        Tensor<std::complex<double> , 1> eps_left, eps_right, pplus, pminus, gdd;
-        eps_left = this->left_p_tensor(p_f,mom_fac); 
-        eps_right = this->right_p_tensor(p_i,mom_fac); 
-        pplus = convertTensorUnderlyingType<std::complex<double>, double, 1>(pPlus(p_f,p_i)); 
-        pminus = convertTensorUnderlyingType<std::complex<double>, double, 1>(pMinus(p_f,p_i)); 
-        gdd = convertTensorUnderlyingType<std::complex<double>, double, 1>(g_dd()); 
+        Ingredients<lambda_left,lambda_right> i(p_f,p_i,mom_fac); 
+        Tensor<std::complex<double> , 1> ret(i.init_4_tens()); 
+
+        ret = i.eps_right * i.eps_left_dot_p_right(); 
+        ret += i.eps_left * i.eps_right_dot_p_left(); 
+
+        return ret; 
       }
     };
 
-    template<short lambda_left, short lambda_right>
-      struct F3 : public ffBlockBase_t<std::complex<double> > , 
-        public leftPTensor<1,lambda_left>, 
-        public rightPTensor<1,lambda_right>
+
+    //////////////////////////////////////////////////////////////////
+    //////////////////////////////////////////////////////////////////
+    template<int lambda_left, int lambda_right>
+      struct G3 : public ffBlockBase_t<std::complex<double> >  
     {
+      std::string
+        ff() const
+        {
+          std::string s =  "-\\frac{G_3(Q^2)}{2m_v^2}(p_f + p_i)^\\mu";
+          s += " \\epsilon^*_\\nu(p_f,\\lambda_f)p_i^\\nu";
+          s += " \\epsilon_\\alpha(p_i,\\lambda_f)p_f^\\alpha \\\\ ";
+          return s; 
+        }
       Tensor<std::complex<double> , 1> operator()(const Tensor<double,1> &p_f, 
-          const Tensor<double> &p_i, 
+          const Tensor<double,1> &p_i, 
           const double mom_fac)  const
       {
-        // ingredient list
-        Tensor<std::complex<double> , 1> eps_left, eps_right, pplus, pminus, gdd;
-        eps_left = this->left_p_tensor(p_f,mom_fac); 
-        eps_right = this->right_p_tensor(p_i,mom_fac); 
-        pplus = convertTensorUnderlyingType<std::complex<double>, double, 1>(pPlus(p_f,p_i)); 
-        pminus = convertTensorUnderlyingType<std::complex<double>, double, 1>(pMinus(p_f,p_i)); 
-        gdd = convertTensorUnderlyingType<std::complex<double>, double, 1>(g_dd()); 
+        Ingredients<lambda_left,lambda_right> i(p_f,p_i,mom_fac); 
+        return - i.pplus * ( i.eps_left_dot_p_right() * i.eps_right_dot_p_left() / (2. * i.mm_left)); 
       }
     };
 
 
-    template<short lambda_left, short lambda_right> 
+
+    //////////////////////////////////////////////////////////////////
+    //////////////////////////////////////////////////////////////////
+    template<int lambda_left, int lambda_right> 
       ffBase_t<std::complex<double> >::ff_list genList(void)
       {
         ffBase_t<std::complex<double> >::ff_list retRhoRho; 
-        ffBase_t<std::complex<double> >::BBType *f1 , *f2, *f3, *f4; 
-       
+        ffBase_t<std::complex<double> >::BBType *g1 , *g2, *g3; 
+
         try
         {
-          f1 = new radmat::RhoRho::F1<lambda_left,lambda_right>();
-          f2 = new radmat::RhoRho::F2<lambda_left,lambda_right>();
-          f3 = new radmat::RhoRho::F3<lambda_left,lambda_right>();
-          f4 = new radmat::RhoRho::F3<lambda_left,lambda_right>();
+          g1 = new radmat::RhoRho::G1<lambda_left,lambda_right>();
+          g2 = new radmat::RhoRho::G2<lambda_left,lambda_right>();
+          g3 = new radmat::RhoRho::G3<lambda_left,lambda_right>();
 
-          // POW2_ASSERT(f1 && f2 && f3);
-          POW2_ASSERT( f1 );
-          POW2_ASSERT( f2 );
-          POW2_ASSERT( f3 );
+          // POW2_ASSERT(g1 && g2 && g3);
+          POW2_ASSERT( g1 );
+          POW2_ASSERT( g2 );
+          POW2_ASSERT( g3 );
 
-          retRhoRho.push_back(ffBase_t<std::complex<double> >::BBHandle_t(f1)); 
-          retRhoRho.push_back(ffBase_t<std::complex<double> >::BBHandle_t(f2)); 
-          retRhoRho.push_back(ffBase_t<std::complex<double> >::BBHandle_t(f3)); 
-          retRhoRho.push_back(ffBase_t<std::complex<double> >::BBHandle_t(f4)); 
+          retRhoRho.push_back(ffBase_t<std::complex<double> >::BBHandle_t(g1)); 
+          retRhoRho.push_back(ffBase_t<std::complex<double> >::BBHandle_t(g2)); 
+          retRhoRho.push_back(ffBase_t<std::complex<double> >::BBHandle_t(g3)); 
         }
         catch(...)
         {
           POW2_ASSERT(false); 
         } 
-      
+
         return retRhoRho;
       }
 
 
-    template<short lambda_left, short lambda_right>
+    //////////////////////////////////////////////////////////////////
+    //////////////////////////////////////////////////////////////////
+    template<int lambda_left, int lambda_right>
       struct RhoRho : public ffBase_t<std::complex<double> >
+    {
+      RhoRho(void)
+        : ffBase_t<std::complex<double> >(radmat::RhoRho::genList<lambda_left,lambda_right>())
+      { }
+
+      RhoRho& operator=(const RhoRho &o)
       {
-        RhoRho(void)
-          : ffBase_t<std::complex<double> >(radmat::RhoRho::genList<lambda_left,lambda_right>())
-        { }
-    
-        RhoRho& operator=(const RhoRho &o)
-        {
-          if (this != &o)
-            ffBase_t<std::complex<double> >::operator=(o);
+        if (this != &o)
+          ffBase_t<std::complex<double> >::operator=(o);
 
-          return *this; 
-        }
+        return *this; 
+      }
 
-        RhoRho(const RhoRho &o)
-          : ffBase_t<std::complex<double> >(o)
-        {  }
+      RhoRho(const RhoRho &o)
+        : ffBase_t<std::complex<double> >(o)
+      {  }
 
-        private: 
-        RhoRho(const ffBase_t<std::complex<double> >::ff_list &); 
-        RhoRho(const ffBase_t<std::complex<double> >::ff_list ); 
-      };
-
-
+      private: 
+      RhoRho(const ffBase_t<std::complex<double> >::ff_list &); 
+      RhoRho(const ffBase_t<std::complex<double> >::ff_list ); 
+    };
 
   } // namespace RhoRho
+
+
+  namespace VectorMultipole
+  {
+
+
+
+    //////////////////////////////////////////////////////////////////
+    //////////////////////////////////////////////////////////////////
+    template<int lambda_left, int lambda_right>
+      struct Gc : public ffBlockBase_t<std::complex<double> > , 
+      public leftPTensor<1,lambda_left>, 
+      public rightPTensor<1,lambda_right>
+    {
+      std::string
+        ff() const
+        {
+          std::string s; 
+          s += "( 1 + \\frac{2}{3}\\eta))" + g1.ff(); 
+          s += "-\\frac{2}{3}\\eta " + g2.ff(); 
+          s += "\\frac{2}{3}\\eta(1+\\eta)" + g3.ff(); 
+          return s; 
+        }
+
+      double eta(const radmat::RhoRho::Ingredients<lambda_left,lambda_right> &i ) const
+      {
+        return (i.Q2 / (4. * i.mm_left ) ); 
+      }
+
+      Tensor<std::complex<double> , 1> operator()(const Tensor<double,1> &p_f, 
+          const Tensor<double,1> &p_i, 
+          const double mom_fac)  const
+      {
+        radmat::RhoRho::Ingredients<lambda_left,lambda_right> i(p_f,p_i,mom_fac); 
+
+        double m_eta = eta(i); 
+        double two_thirds_eta = m_eta * (2./3.);
+
+        return ( (1. + two_thirds_eta) * g1(p_f,p_i,mom_fac) 
+            - two_thirds_eta * g2(p_f,p_i,mom_fac) 
+            + two_thirds_eta * ( 1. + m_eta ) * g3(p_f,p_i,mom_fac)
+            ); 
+      }
+
+      radmat::RhoRho::G1<lambda_left,lambda_right> g1; 
+      radmat::RhoRho::G2<lambda_left,lambda_right> g2; 
+      radmat::RhoRho::G3<lambda_left,lambda_right> g3; 
+    };
+
+
+    //////////////////////////////////////////////////////////////////
+    //////////////////////////////////////////////////////////////////
+    template<int lambda_left, int lambda_right>
+      struct Gm : public ffBlockBase_t<std::complex<double> > , 
+      public leftPTensor<1,lambda_left>, 
+      public rightPTensor<1,lambda_right>
+    {
+      std::string
+        ff() const
+        {
+          std::string s; 
+          s += "-" + g2.ff(); 
+          return s; 
+        }
+
+
+      Tensor<std::complex<double> , 1> operator()(const Tensor<double,1> &p_f, 
+          const Tensor<double,1> &p_i, 
+          const double mom_fac)  const
+      {
+        return  (-1. * g2(p_f,p_i,mom_fac)); 
+      }
+
+      radmat::RhoRho::G2<lambda_left,lambda_right> g2; 
+    };
+
+    //////////////////////////////////////////////////////////////////
+    //////////////////////////////////////////////////////////////////
+    template<int lambda_left, int lambda_right>
+      struct Gq : public ffBlockBase_t<std::complex<double> > , 
+      public leftPTensor<1,lambda_left>, 
+      public rightPTensor<1,lambda_right>
+    {
+      std::string
+        ff() const
+        {
+          std::string s; 
+          s += g1.ff(); 
+          s += "-" + g2.ff(); 
+          s += "(1+\\eta)" + g3.ff(); 
+          return s; 
+        }
+
+      double eta(const radmat::RhoRho::Ingredients<lambda_left,lambda_right> &i ) const
+      {
+        return (i.Q2 / (4. * i.mm_left ) ); 
+      }
+
+      Tensor<std::complex<double> , 1> operator()(const Tensor<double,1> &p_f, 
+          const Tensor<double,1> &p_i, 
+          const double mom_fac)  const
+      {
+        radmat::RhoRho::Ingredients<lambda_left,lambda_right> i(p_f,p_i,mom_fac); 
+
+        double m_eta = eta(i); 
+
+        return ( g1(p_f,p_i,mom_fac) 
+            - g2(p_f,p_i,mom_fac) 
+            + ( 1. + m_eta ) * g3(p_f,p_i,mom_fac)
+            ); 
+      }
+
+      radmat::RhoRho::G1<lambda_left,lambda_right> g1; 
+      radmat::RhoRho::G2<lambda_left,lambda_right> g2; 
+      radmat::RhoRho::G3<lambda_left,lambda_right> g3; 
+    };
+
+
+
+    //////////////////////////////////////////////////////////////////
+    //////////////////////////////////////////////////////////////////
+    template<int lambda_left, int lambda_right> 
+      ffBase_t<std::complex<double> >::ff_list genList(void)
+      {
+        ffBase_t<std::complex<double> >::ff_list retRhoRho; 
+        ffBase_t<std::complex<double> >::BBType *gc , *gm, *gq; 
+
+        try
+        {
+          gc = new radmat::VectorMultipole::Gc<lambda_left,lambda_right>();
+          gm = new radmat::VectorMultipole::Gm<lambda_left,lambda_right>();
+          gq = new radmat::VectorMultipole::Gq<lambda_left,lambda_right>();
+
+          // POW2_ASSERT(g1 && g2 && g3);
+          POW2_ASSERT( gc );
+          POW2_ASSERT( gm );
+          POW2_ASSERT( gq );
+
+          retRhoRho.push_back(ffBase_t<std::complex<double> >::BBHandle_t(gc)); 
+          retRhoRho.push_back(ffBase_t<std::complex<double> >::BBHandle_t(gm)); 
+          retRhoRho.push_back(ffBase_t<std::complex<double> >::BBHandle_t(gq)); 
+        }
+        catch(...)
+        {
+          POW2_ASSERT(false); 
+        } 
+
+        return retRhoRho;
+      }
+
+
+    //////////////////////////////////////////////////////////////////
+    //////////////////////////////////////////////////////////////////
+    template<int lambda_left, int lambda_right>
+      struct RhoRho : public ffBase_t<std::complex<double> >
+    {
+      RhoRho(void)
+        : ffBase_t<std::complex<double> >(radmat::VectorMultipole::genList<lambda_left,lambda_right>())
+      { }
+
+      RhoRho& operator=(const RhoRho &o)
+      {
+        if (this != &o)
+          ffBase_t<std::complex<double> >::operator=(o);
+
+        return *this; 
+      }
+
+      RhoRho(const RhoRho &o)
+        : ffBase_t<std::complex<double> >(o)
+      {  }
+
+      private: 
+      RhoRho(const ffBase_t<std::complex<double> >::ff_list &); 
+      RhoRho(const ffBase_t<std::complex<double> >::ff_list ); 
+    };
+
+  } // VectorMultipole
+
 
 } // namespace radmat
 

@@ -46,7 +46,7 @@ namespace radmat
     typedef typename LLSQBaseSolver_t<T>::LLSQRetTypeBase_h LLSQRetTypeBase_h;
     typedef typename LLSQBaseSolver_t<T>::LLSQInputType_h LLSQInputType_h;
 
-    LLSQRetTypeBase_h operator()(const LLSQInputType_h & input, const int t_ins) const
+    LLSQRetTypeBase_h operator()(const LLSQInputType_h & input, const int t_ins) 
     {
       print_llsq_system(input, t_ins);
       LLSQRetTypeBase_t<T> *foo = new LLSQRetTypeBase_t<T>();
@@ -63,7 +63,7 @@ namespace radmat
 
     bool invertable(void) const {return true;}
 
-    SEMBLE::SembleMatrix<T> inv(const SEMBLE::SembleMatrix<T> &in) const
+    SEMBLE::SembleMatrix<T> inv(const SEMBLE::SembleMatrix<T> &in) 
     {
       SEMBLE::SembleMatrix<T> out;
       SEMBLE::inv(in,out);
@@ -87,7 +87,7 @@ namespace radmat
     typedef typename LLSQBaseSolver_t<T>::LLSQRetTypeBase_h LLSQRetTypeBase_h;
     typedef typename LLSQBaseSolver_t<T>::LLSQInputType_h LLSQInputType_h;
 
-    LLSQRetTypeBase_h operator()(const LLSQInputType_h &input, const int t_ins) const
+    LLSQRetTypeBase_h operator()(const LLSQInputType_h &input, const int t_ins) 
     {
       print_llsq_system(input, t_ins);
       LLSQRetTypeBase_t<T> *foo = new LLSQRetTypeBase_t<T>();
@@ -104,12 +104,12 @@ namespace radmat
     bool invertable(void) const {return true;}
 
     // Ax = b, A'Ax = A'b , x = (A'A)^-1 * A'b  prime means dagger
-    SEMBLE::SembleMatrix<T> inv(const SEMBLE::SembleMatrix<T> &in) const
+    SEMBLE::SembleMatrix<T> inv(const SEMBLE::SembleMatrix<T> &in) 
     {
       SEMBLE::SembleMatrix<T> out;
       SEMBLE::SembleMatrix<T> KinvDag_Kinv = SEMBLE::adj(in)*(in),U,V;
       SEMBLE::SembleVector<double> s;
-      std::string svd_log = SEMBLE::svd(KinvDag_Kinv,U,s,V);
+      set_solution_log( SEMBLE::svd(KinvDag_Kinv,U,s,V) );
       SEMBLE::pseudoInvert(s,s.getN(),true); // s -> 1/s
       out = V * (SEMBLE::diagAsym<T,double>(s) )* (SEMBLE::adj(U) ) * SEMBLE::adj(in) ;   
       return out;     
@@ -131,7 +131,7 @@ namespace radmat
     typedef typename LLSQBaseSolver_t<T>::LLSQRetTypeBase_h LLSQRetTypeBase_h;
     typedef typename LLSQBaseSolver_t<T>::LLSQInputType_h LLSQInputType_h;
 
-    LLSQRetTypeBase_h operator()(const LLSQInputType_h &input, const int t_ins) const
+    LLSQRetTypeBase_h operator()(const LLSQInputType_h &input, const int t_ins) 
     {
       print_llsq_system(input, t_ins);
       LLSQRetTypeBase_t<T> *foo = new LLSQRetTypeBase_t<T>();
@@ -150,7 +150,7 @@ namespace radmat
 
     bool invertable(void) const {return true;}
 
-    SEMBLE::SembleMatrix<T> inv(const SEMBLE::SembleMatrix<T> &in) const
+    SEMBLE::SembleMatrix<T> inv(const SEMBLE::SembleMatrix<T> &in) 
     {
       SEMBLE::SembleMatrix<T> K(in); 
       SEMBLE::SembleMatrix<T> U,V,Smul;
@@ -158,10 +158,10 @@ namespace radmat
       SEMBLE::SembleVector<double> s;
 
       // dump the log?
-      std::string svd_log = SEMBLE::svdNonSquare(K,U,s,V); 
+      set_solution_log( SEMBLE::svdNonSquare(K,U,s,V) ); 
 
-      // do we want to cut in the future?
-      SEMBLE::pseudoInvert(s,s.getN(),true); // s -> 1/s
+      //      kill anything below 1e-6
+      SEMBLE::pseudoInvertValue(s,1e-6,true); // s -> 1/s
 
       // assume V is square here -- it should be 
       // assume we had nrow > ncol in orig matrix -- we should
@@ -207,7 +207,7 @@ namespace radmat
     typedef typename LLSQBaseSolver_t<T>::LLSQInputType_h LLSQInputType_h;
 
 
-    LLSQRetTypeBase_h operator()(const LLSQInputType_h &input, const int t_ins) const
+    LLSQRetTypeBase_h operator()(const LLSQInputType_h &input, const int t_ins) 
     {
       print_llsq_system(input, t_ins);
 
@@ -226,15 +226,13 @@ namespace radmat
     bool invertable(void) const {return false;}
 
 
-    SEMBLE::SembleMatrix<T> inv(const SEMBLE::SembleMatrix<T> &in) const
+    SEMBLE::SembleMatrix<T> inv(const SEMBLE::SembleMatrix<T> &in) 
     {
       std::cerr << __func__ << ": error: unsupported operation " << std::endl;
       exit(1);
     }
 
     std::string echo(void) const {return std::string("LLSQExtremizeChisq_t");}
-
-
   };
 
 

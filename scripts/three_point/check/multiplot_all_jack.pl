@@ -13,14 +13,27 @@ my @dat = `ls *.jack`;
 chomp @dat; 
 
 my @stems = ();
+my @ffs = (); 
 
 foreach (@dat)
 {
   my ($stem,$trash) = split(/\./,$_);
-  push @stems , $stem;
+    
+  if ( $stem =~ "ff") 
+  {
+    push @ffs , $stem; 
+  }
+  else
+  {
+    push @stems , $stem;
+  }
 }
 
 @stems = sort{do_split_last($a) <=> do_split_last($b)}  @stems;
+@ffs = sort{do_split_last($a) <=> do_split_last($b)} @ffs; 
+
+# front load ffs
+@stems = (@ffs,@stems); 
 
 #print @stems;
 

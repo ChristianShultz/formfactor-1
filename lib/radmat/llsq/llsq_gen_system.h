@@ -62,7 +62,7 @@ namespace radmat
     std::string toString(void) const
     {
       std::stringstream ss;
- 
+
       ss << matElemID << "_pf" << p_f[0] << p_f[1] << p_f[2] << "_pi" << p_i[0] << p_i[1] << p_i[2]; 
       ss << "_t" << zero.first << "_" << SEMBLE::toScalar(ENSEM::mean(zero.second));
       ss << "_x" << one.first << "_" << SEMBLE::toScalar(ENSEM::mean(one.second));
@@ -155,7 +155,9 @@ namespace radmat
   ///////////////////////////////////////////////////////////////////////////////////////////
 
   template<typename T>
-    rHandle<LLSQInputType_t<T> > generateLLSQSystem(const std::vector<LLSQDataPoint> &unsorted_data, const int t_ins)
+    rHandle<LLSQInputType_t<T> >
+    generateLLSQSystem(const std::vector<LLSQDataPoint> &unsorted_data, 
+        const int t_ins)
     {
 
       typename LLSQInputType_t<T>::KinematicFactors K,KWork;
@@ -274,7 +276,9 @@ namespace radmat
 
       } while(true);
 
-      SEMBLE::SembleVector<std::complex<double> > matElems(KWork.getB(),vectorData.size());
+      SEMBLE::SembleVector<std::complex<double> >
+        matElems(KWork.getB(),vectorData.size());
+
       for(unsigned int i =0; i < vectorData.size(); i++)
         matElems.loadEnsemElement(i,vectorData[i]);
 
@@ -291,57 +295,73 @@ namespace radmat
     {
       typedef rHandle< LLSQRetTypeBase_t<T> > LLSQRetTypeBase_h;
       typedef rHandle< LLSQInputType_t<T> > LLSQInputType_h;
-      virtual void print_llsq_system(const LLSQInputType_h &d, const int t_ins) const
-      {
-        std::string path = SEMBLE::SEMBLEIO::getPath(); 
-        path += std::string("llsq");
-        SEMBLE::SEMBLEIO::makeDirectoryPath(path);
-        path += std::string("/system");
-        SEMBLE::SEMBLEIO::makeDirectoryPath(path);  
-        std::stringstream Q2;
-        Q2 << "/Q2_" << d->qsq; 
-        path += Q2.str(); 
-        SEMBLE::SEMBLEIO::makeDirectoryPath(path); 
-        std::stringstream ss; 
-        ss << path << "/Q2_" << d->qsq << "__t_ins_" << t_ins <<"__"; 
-        std::string A = ss.str() + std::string("A.txt");
-        std::string b = ss.str() + std::string("b.txt"); 
+      virtual void 
+        print_llsq_system(const LLSQInputType_h &d,
+            const int t_ins) const
+        {
+          std::string path = SEMBLE::SEMBLEIO::getPath(); 
+          path += std::string("llsq");
+          SEMBLE::SEMBLEIO::makeDirectoryPath(path);
+          path += std::string("/system");
+          SEMBLE::SEMBLEIO::makeDirectoryPath(path);  
+          std::stringstream Q2;
+          Q2 << "/Q2_" << d->qsq; 
+          path += Q2.str(); 
+          SEMBLE::SEMBLEIO::makeDirectoryPath(path); 
+          std::stringstream ss; 
+          ss << path << "/Q2_" << d->qsq << "__t_ins_" << t_ins <<"__"; 
+          std::string A = ss.str() + std::string("A.txt");
+          std::string b = ss.str() + std::string("b.txt"); 
 
-        std::ofstream AA, bb;
-        AA.open(A.c_str()); 
-        AA << d->m_KFacs.mean(); 
-        AA.close();
-        bb.open(b.c_str()); 
-        bb << d->m_MatElems.mean(); 
-        bb.close(); 
-      }
-      virtual void print_llsq_soln(const LLSQInputType_h &d, const LLSQRetTypeBase_h &soln, const int t_ins) const
-      {
-        std::string path = SEMBLE::SEMBLEIO::getPath(); 
-        path += std::string("llsq");
-        SEMBLE::SEMBLEIO::makeDirectoryPath(path); 
-        path += std::string("/system");
-        SEMBLE::SEMBLEIO::makeDirectoryPath(path);  
-        std::stringstream Q2;
-        Q2 << "/Q2_" << d->qsq; 
-        path += Q2.str(); 
-        SEMBLE::SEMBLEIO::makeDirectoryPath(path); 
-        std::stringstream ss; 
-        ss << path << "/Q2_" << d->qsq << "__t_ins_" << t_ins <<"__"; 
+          std::ofstream AA, bb;
+          AA.open(A.c_str()); 
+          AA << d->m_KFacs.mean(); 
+          AA.close();
+          bb.open(b.c_str()); 
+          bb << d->m_MatElems.mean(); 
+          bb.close(); 
+        }
+      virtual void
+        print_llsq_soln(const LLSQInputType_h &d,
+            const LLSQRetTypeBase_h &soln, 
+            const int t_ins) const
+        {
+          std::string path = SEMBLE::SEMBLEIO::getPath(); 
+          path += std::string("llsq");
+          SEMBLE::SEMBLEIO::makeDirectoryPath(path); 
+          path += std::string("/system");
+          SEMBLE::SEMBLEIO::makeDirectoryPath(path);  
+          std::stringstream Q2;
+          Q2 << "/Q2_" << d->qsq; 
+          path += Q2.str(); 
+          SEMBLE::SEMBLEIO::makeDirectoryPath(path); 
+          std::stringstream ss; 
+          ss << path << "/Q2_" << d->qsq << "__t_ins_" << t_ins <<"__"; 
 
-        std::string x = ss.str() + std::string("x.txt");
-        std::ofstream xx;
-        xx.open(x.c_str());
-        xx << soln->m_FF.mean();
-        xx.close();
-      }
-      virtual LLSQRetTypeBase_h operator()(const LLSQInputType_h &, const int t_ins) const = 0;
+          std::string x = ss.str() + std::string("x.txt");
+          std::ofstream xx;
+          xx.open(x.c_str());
+          xx << soln->m_FF.mean();
+          xx.close();
+        }
+      virtual LLSQRetTypeBase_h 
+        operator()(const LLSQInputType_h &, 
+            const int t_ins) = 0;
 
       virtual bool invertable(void) const = 0;  
-      virtual SEMBLE::SembleMatrix<T> inv(const SEMBLE::SembleMatrix<T> &in) const = 0;
+      virtual SEMBLE::SembleMatrix<T> 
+        inv(const SEMBLE::SembleMatrix<T> &in) = 0;
 
       virtual std::string echo(void) const = 0;
       virtual ~LLSQBaseSolver_t(void) {}
+
+      virtual std::string solution_log(void) const
+      { return my_solution_log; }
+
+      virtual void set_solution_log(const std::string &s) 
+      { my_solution_log = s; }
+
+      std::string my_solution_log; 
     };
 
 

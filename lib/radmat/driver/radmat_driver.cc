@@ -6,7 +6,7 @@
 
  * Creation Date : 25-02-2013
 
- * Last Modified : Fri 22 Nov 2013 10:42:01 PM EST
+ * Last Modified : Wed 04 Dec 2013 10:54:49 AM EST
 
  * Created By : shultz
 
@@ -50,9 +50,9 @@ using namespace ADATIO;
 
 
 
-#define LOAD_LLSQ_PARALLEL 
-#define FIT_LLSQ_PARALLEL
-#define CHISQ_ANALYSIS_PARALLEL
+ #define LOAD_LLSQ_PARALLEL 
+ #define FIT_LLSQ_PARALLEL
+ #define CHISQ_ANALYSIS_PARALLEL
 
 #ifdef LOAD_LLSQ_PARALLEL 
 #include <omp.h>
@@ -86,25 +86,35 @@ namespace radmat
     if ( !!! read_xmlini(inifile))
       return do_void_return_print("failed to read xml ini");    
 
-    if(m_ini.maxThread > 1)
+    if(m_ini.maxThread < 1)
     {
-      std::cout << "\n\n\n" << __PRETTY_FUNCTION__ << ": setting num threads to " 
-        << m_ini.maxThread << "\n\n\n" << std::endl;
-      omp_set_num_threads(m_ini.maxThread);
+      std::stringstream err;
+      err << "\n\n\n" << __PRETTY_FUNCTION__ << ": maxThread must be positive " 
+        << "(maxthread = " << m_ini.maxThread << ")\n\n\n" << std::endl;
+      check_exit(false,err.str().c_str());  
     }
-    
+
+    // If the scoping works the way omp says it does then 
+    // this should control the max number of threads for the entire program 
+    omp_set_num_threads(m_ini.maxThread);
+
+    // build corrs or abort
     if ( !!! build_correlators() )
       return do_void_return_print("failed to build_corrs"); 
 
+    // solve llsq or abort
     if( !!! solve_llsq() ) 
       return do_void_return_print("failed to solve llsq");
-    
+
+    // fit ffs or abort
     if( !!! fit_ffs() ) 
       return do_void_return_print("falied to fit ffs"); 
 
+    // make plots or abort
     if( !!! make_FF_of_Q2_plots() ) 
       return do_void_return_print("failed to make FF of Q2 plots");
 
+    // do chisq or abort
     if( !!! do_chisq_analysis() ) 
       return do_void_return_print("failed to do chisq analysis"); 
   }
@@ -146,13 +156,9 @@ namespace radmat
   void RadmatDriver::build_xml(const std::string &inifile)
   {
     read_xmlini(inifile);
-    if(m_ini.maxThread > 1)
-      omp_set_num_threads(m_ini.maxThread);
 
     std::vector<Hadron::KeyHadronNPartNPtCorr_t> keys;
     keys = m_correlators.construct_correlator_xml(m_ini.threePointIni); 
-
-
 
     ADATXML::XMLBufferWriter corrs;
     ADATXML::Array<Hadron::KeyHadronNPartNPtCorr_t> bc;
@@ -232,8 +238,6 @@ namespace radmat
   void RadmatDriver::build_xml_split_p2(const std::string &inifile)
   {
     read_xmlini(inifile);
-    if(m_ini.maxThread > 1)
-      omp_set_num_threads(m_ini.maxThread);
 
     std::vector<Hadron::KeyHadronNPartNPtCorr_t> keys;
     std::vector<Hadron::KeyHadronNPartNPtCorr_t>::const_iterator unsorted_it;
@@ -285,8 +289,6 @@ namespace radmat
   void RadmatDriver::build_xml_twopoint(const std::string &inifile)
   {
     read_xmlini(inifile);
-    if(m_ini.maxThread > 1)
-      omp_set_num_threads(m_ini.maxThread);
 
     std::vector<Hadron::KeyHadronNPartNPtCorr_t> keys;
     std::vector<Hadron::KeyHadronNPartNPtCorr_t>::const_iterator kit;
@@ -324,8 +326,6 @@ namespace radmat
   //  {
   //
   //    read_xmlini(inifile);
-  //    if(m_ini.maxThread > 1)
-  //      omp_set_num_threads(m_ini.maxThread);
   //
   //    std::vector<Hadron::KeyHadronNPartNPtCorr_t> keys;
   //    keys = m_correlators.build_correlator_xml(m_ini.threePointIni); 
@@ -339,8 +339,6 @@ namespace radmat
   //  void RadmatDriver::build_stub_xml(const std::string &inifile)
   //  {
   //    read_xmlini(inifile);
-  //    if(m_ini.maxThread > 1)
-  //      omp_set_num_threads(m_ini.maxThread);
   //
   //    std::vector<Hadron::KeyHadronNPartNPtCorr_t> keys;
   //    keys = m_correlators.build_correlator_xml(m_ini.threePointIni); 
@@ -606,7 +604,7 @@ namespace radmat
       << my_stopwatch.getTimeInSeconds() << " seconds " << std::endl;
 
     chisq_analysis = true; 
-    
+
     return chisq_analysis;
   }
 

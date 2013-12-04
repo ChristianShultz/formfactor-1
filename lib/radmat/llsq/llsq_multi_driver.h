@@ -18,8 +18,6 @@
 namespace radmat
 {
 
-
-
   struct LLSQMultiDriver_t
   {
     typedef std::complex<double> T;
@@ -70,6 +68,7 @@ namespace radmat
     rHandle<LLSQLatticeMultiData> lattice_data;
     SEMBLE::SembleMatrix<T> K,Kinv,FF_t;
     LLSQLatticeMultiData zeroed_data; 
+    std::string solver_log; 
   };
 
 

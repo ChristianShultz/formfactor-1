@@ -6,7 +6,7 @@
 
  * Creation Date : 25-02-2013
 
- * Last Modified : Tue 22 Oct 2013 09:43:47 AM EDT
+ * Last Modified : Tue 03 Dec 2013 08:55:02 PM EST
 
  * Created By : shultz
 
@@ -54,6 +54,17 @@ namespace radmat
       std::stringstream ss; 
       ss << bpth << "Q2.jack";
       ENSEM::write(ss.str(),fits.getQ2()); 
+    }
+
+    void write_single_jackfile_fit_report ( const TinsFitter &fits, const std::string &bpth, const int ff)
+    {
+      std::stringstream ss;
+      ss << bpth << "FF_" << ff << ".jack";
+      ENSEM::write(ss.str(),fits.getFF(0));  
+
+      std::stringstream s; 
+      s << bpth << "Q2.jack";
+      ENSEM::write(s.str(),fits.getQ2()); 
     }
 
   } // anonomyous 
@@ -167,6 +178,47 @@ namespace radmat
     init_fits = true; 
   }
 
+  void 
+    RadmatSingleQ2Driver::fit_and_dump_single_ffs(const ThreePointComparatorProps_t &fit_props, 
+        const int tsrc,
+        const int tsnk,
+        const int ff) const
+    {
+      // do we have a solved llsq system
+      check_exit_linear_system();
+      check_exit_solved_llsq(); 
+
+      // snarf (RGEism)  ffs
+      SEMBLE::SembleMatrix<std::complex<double> > FF_of_t = linear_system.peek_FF(); 
+      LLSQRet_ff_Q2Pack<std::complex<double> > tmp;
+
+
+      std::cout << itpp::round_to_zero(FF_of_t.mean() , 1e-6) << std::endl; 
+
+      // build a "fake" pack
+      tmp.insert(ff,get_ensem_row(ff,FF_of_t));
+      tmp.setQ2(linear_system.Q2()); 
+
+      // i/o junk 
+      SEMBLE::SEMBLEIO::makeDirectoryPath(base_path() + std::string("t_ins_fits/"));
+
+      // run a fit on this ff 
+      TinsFitter local_fit_across_time; 
+      local_fit_across_time.fit<std::complex<double> >(base_path() + std::string("t_ins_fits/"),
+          tmp,
+          fit_props,
+          tsrc,
+          tsnk);
+
+      // dump results
+      SEMBLE::SEMBLEIO::makeDirectoryPath(base_path() + std::string("fit_logs/"));
+      local_fit_across_time.writeFitLogs(base_path() + std::string("fit_logs/"));
+      SEMBLE::SEMBLEIO::makeDirectoryPath(base_path() + std::string("component_fits/")); 
+      local_fit_across_time.writeFitPlotsWithComponents(base_path() + std::string("component_fits/"));
+      SEMBLE::SEMBLEIO::makeDirectoryPath(base_path() + std::string("jack_files/")); 
+      write_single_jackfile_fit_report ( local_fit_across_time, base_path() + std::string("jack_files/"), ff);
+
+    }
 
   void RadmatSingleQ2Driver::chisq_analysis(const int tlows, const int thighs)
   {

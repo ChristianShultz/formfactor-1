@@ -6,7 +6,7 @@
 
 * Creation Date : 22-11-2013
 
-* Last Modified : Fri 22 Nov 2013 02:03:48 PM EST
+* Last Modified : Mon 25 Nov 2013 10:08:49 PM EST
 
 * Created By : shultz
 
@@ -16,6 +16,8 @@ _._._._._._._._._._._._._._._._._._._._._.*/
 
 #include "radmat/utils/tensor.h"
 #include "radmat/utils/handle.h"
+#include "radmat/ff/lorentzff_RhoRho.h"
+#include "radmat/ff/formfactor_factory.h"
 #include <iostream>
 
 int 
@@ -30,6 +32,11 @@ main(void)
 
   radmat::rHandle<radmat::Tensor<double,1> > p ( foo.clone() ); 
   radmat::Tensor<double,1> *pp = baz.clone(); 
+  
+  radmat::FormFactorDecompositionFactoryEnv::registerAll();
+
+  radmat::RhoRho::RhoRho<-1,-1> rho;
+  std::cout << rho.ff() << std::endl;
 
   delete pp;
 

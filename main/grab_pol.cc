@@ -6,7 +6,7 @@
 
  * Creation Date : 22-04-2013
 
- * Last Modified : Tue May  7 09:52:00 2013
+ * Last Modified : Tue 03 Dec 2013 10:10:54 PM EST
 
  * Created By : shultz
 
@@ -27,27 +27,27 @@ void printTensor(const Tensor<double,1> &p, const int J, const int hel, const do
   {
     case 1:
       {
-      HelicityPolarizationTensor<1> foo;
-      std::cout << foo(p,hel,pfac);
-      break;
+        HelicityPolarizationTensor<1> foo;
+        std::cout << foo(p,hel,pfac) << std::endl;
+        break;
       }
     case 2:
       {
-      HelicityPolarizationTensor<2> foo;
-      std::cout << foo(p,hel,pfac);
-      break;
+        HelicityPolarizationTensor<2> foo;
+        std::cout << foo(p,hel,pfac) << std::endl;
+        break;
       }
     case 3:
       {
-      HelicityPolarizationTensor<3> foo;
-      std::cout << foo(p,hel,pfac);
-      break;
+        HelicityPolarizationTensor<3> foo;
+        std::cout << foo(p,hel,pfac) << std::endl;
+        break;
       }
     case 4:
       {
-      HelicityPolarizationTensor<4> foo;
-      std::cout << foo(p,hel,pfac);
-      break;
+        HelicityPolarizationTensor<4> foo;
+        std::cout << foo(p,hel,pfac) << std::endl;
+        break;
       }
     default: 
       std::cout << "J = " << J << " is not supported" << std::endl;
@@ -82,13 +82,13 @@ inp usage(int argc, char *argv[])
 
   {std::stringstream ss(argv[7]); ss >> foo.pfac;}
 
-    { std::stringstream z(argv[3]),o(argv[4]),t(argv[5]),th(argv[6]);
+  { std::stringstream z(argv[3]),o(argv[4]),t(argv[5]),th(argv[6]);
     Tensor<double,1> fred((TensorShape<1>())[4],0.);
     z >> fred[0];
     o >> fred[1];
     t >> fred[2];
     th >> fred[3];
-     
+
     foo.p = fred; }
 
     double pp(0.); 

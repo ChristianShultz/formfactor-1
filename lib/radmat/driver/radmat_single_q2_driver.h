@@ -31,6 +31,13 @@ namespace radmat
     void fit_data(const ThreePointComparatorProps_t &fitProps, 
         const int tsrc,
         const int tsnk);
+
+    // single q2 fit individual ffs
+    void fit_and_dump_single_ffs(const ThreePointComparatorProps_t &props,
+        const int tsrc, 
+        const int tsnk,
+        const int ff) const;
+
     void chisq_analysis(const int tlow, const int thigh);
 
     ENSEM::EnsemReal Q2(void) const; 
