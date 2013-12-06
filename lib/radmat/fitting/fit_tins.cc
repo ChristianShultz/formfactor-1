@@ -6,7 +6,7 @@
 
  * Creation Date : 01-08-2012
 
- * Last Modified : Tue 26 Nov 2013 03:08:51 PM EST
+ * Last Modified : Fri 06 Dec 2013 12:32:32 PM EST
 
  * Created By : shultz
 
@@ -130,6 +130,48 @@ namespace radmat
 
 
   } // anonymous
+
+  template<>
+    void TinsFitter::single_fit<double>(const std::string &fname, 
+        const LLSQRet_ff_Q2Pack<double> &pack,
+        const int ff_max, 
+        const ThreePointComparatorProps_t &fitProps,
+        const int tsrc, 
+        const int tsnk)
+    {
+      const int nbins = pack.Q2().size();
+      ff.reDim(nbins,ff_max);
+      Q2 = pack.Q2();
+
+      LLSQRet_ff_Q2Pack<double>::const_iterator it;
+
+      for(it = pack.begin(); it != pack.end(); ++it)
+        doFit(fname,it->second,it->first,fitProps,tsrc,tsnk);
+
+      didFit = true;
+    }
+
+
+
+  template<>
+    void TinsFitter::single_fit<std::complex<double> >(const std::string &fname , 
+        const LLSQRet_ff_Q2Pack<std::complex<double> > &pack,
+        const int ff_max,
+        const ThreePointComparatorProps_t &fitProps,
+        const int tsrc,
+        const int tsnk)
+    {
+      const int nbins = pack.Q2().size();
+      ff.reDim(nbins,ff_max);
+      Q2 = pack.Q2();
+
+      LLSQRet_ff_Q2Pack<std::complex<double> >::const_iterator it;
+
+      for(it = pack.begin(); it != pack.end(); ++it)
+        doFit(fname,convertToReal(*this,it->second,tsrc,tsnk),it->first,fitProps,tsrc,tsnk);
+
+      didFit = true;
+    }
 
 
   template<>

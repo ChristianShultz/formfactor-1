@@ -12,6 +12,8 @@ namespace radmat
   template<typename T> 
     struct FormFacSolutions
     {
+      FormFacSolutions() {}
+
       FormFacSolutions(const SEMBLE::SembleMatrix<T> &ff, 
           const std::vector<LatticeMultiDataTag> &i)
         : FF_t(ff) , Ingredients(i) 
@@ -64,11 +66,14 @@ namespace radmat
         SEMBLE::SembleVector<T> foo; 
         ENSEM::read(bin,e); 
         foo = e; 
+        if( ff == 0 ) // first append 
+          f.FF_t.reDim(foo.getB(),0,foo.getN()); 
         f.FF_t.append_row(foo); 
       }
 
       int nt; 
       read(bin,nt); 
+      f.Ingredients.resize(nt);
       for(int i =0; i < nt; ++i)
         read(bin,f.Ingredients[i]); 
 

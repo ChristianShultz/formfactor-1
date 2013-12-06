@@ -27,13 +27,23 @@ namespace radmat
       Q2 = ENSEM::toDouble(10000000.);
     }
 
-    // template to do the fit with real or complex data -- needs work
+    // template to do the fit with real or complex data
     template<typename T>
       void fit(const std::string &filenameBase, 
           const LLSQRet_ff_Q2Pack<T> &data,
           const ThreePointComparatorProps_t &fitProps, 
           const int tsrc,
           const int tsnk);
+
+    // template to do the fit with real or complex data
+    template<typename T>
+      void single_fit(const std::string &filenameBase, 
+          const LLSQRet_ff_Q2Pack<T> &data,
+          const int ff_max, 
+          const ThreePointComparatorProps_t &fitProps, 
+          const int tsrc,
+          const int tsnk);
+
 
     // get the form factors at this q2
     std::pair<ENSEM::EnsemReal, SEMBLE::SembleVector<double> > fetchFF(void) const;
@@ -91,7 +101,23 @@ namespace radmat
         const int tsnk);
 
 
+    // template to do the fit with real or complex data
+    template<>
+      void TinsFitter::single_fit<std::complex<double> >(const std::string &filenameBase, 
+          const LLSQRet_ff_Q2Pack<std::complex<double> > &data,
+          const int ff_max, 
+          const ThreePointComparatorProps_t &fitProps, 
+          const int tsrc,
+          const int tsnk);
 
+    // template to do the fit with real or complex data
+    template<>
+      void TinsFitter::single_fit<double>(const std::string &filenameBase, 
+          const LLSQRet_ff_Q2Pack<double> &data,
+          const int ff_max, 
+          const ThreePointComparatorProps_t &fitProps, 
+          const int tsrc,
+          const int tsnk);
 
 
 } // namespace radmat

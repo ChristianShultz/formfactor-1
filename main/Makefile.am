@@ -9,7 +9,7 @@ AM_LDFLAGS  = -L@top_builddir@/lib/ \
 
 LDADD = -lradmat @SEMBLE_LIBS@ @JACKFITTER_LIBS@ @ADAT_LIBS@ @ITPP_LIBS@ @LIBS@ 
 
-bin_PROGRAMS =   fake_radmat mass_overlap_db_create mass_overlap_db_combine single_plot phases mass_overlap_db_util grab_ff grab_pol grab_vector_mean_cmp invert_subduced phases2 check_rotations corr_norm radmat_util radmat radmat_single_q2 test_tens print_twoquark_ops radmat_single_q2_ff
+bin_PROGRAMS =   fake_radmat mass_overlap_db_create mass_overlap_db_combine single_plot phases mass_overlap_db_util grab_ff grab_pol grab_vector_mean_cmp invert_subduced phases2 check_rotations corr_norm radmat_util radmat test_tens print_twoquark_ops
 
 
 fake_radmat_SOURCES = fake_radmat.cc
@@ -42,13 +42,10 @@ radmat_util_SOURCES = radmat_util.cc
 
 radmat_SOURCES = radmat.cc
 
-radmat_single_q2_SOURCES = radmat_single_q2.cc
-
 test_tens_SOURCES = test_tens.cc
 
 print_twoquark_ops_SOURCES = print_twoquark_ops.cc
 
-radmat_single_q2_ff_SOURCES = radmat_single_q2_ff.cc
 
 # test_jfit_SOURCES = test_jfit.cc
 
