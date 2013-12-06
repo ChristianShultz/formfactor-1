@@ -4,6 +4,7 @@
 
 #include "construct_correlators_xml.h"
 #include "lattice_multi_data_tag_redstar_interface.h"
+#include "lattice_multi_data_object.h"
 #include "hadron/hadron_npart_npt_corr.h"
 #include "radmat_database_interface.h"
 #include "radmat_overlap_key_val_db.h"
@@ -66,6 +67,16 @@ namespace radmat
         const std::string &source_id, 
         const ThreePointCorrXMLIni_t::RenormalizationProp &,
         const DatabaseInterface_t & );
+
+  // memory soft version of above -- faster 
+  std::pair<bool, rHandle<LLSQLatticeMultiData> >
+    build_correlators_no_copy(
+        const std::vector<TaggedEnsemRedstarNPtBlock> &corrs,
+        const std::string &sink_id, 
+        const std::string &source_id, 
+        const ThreePointCorrXMLIni_t::RenormalizationProp &,
+        const DatabaseInterface_t & );
+
 
   namespace BAD_DATA_REPO
   {

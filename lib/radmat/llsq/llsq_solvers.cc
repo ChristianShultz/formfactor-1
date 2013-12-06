@@ -201,9 +201,9 @@ namespace radmat
           success &= Factory::Instance().registerObject(std::string("SVDMakeSquare"),
               FacEnv::upCast<LLSQBaseSolver_t<std::complex<double> >, 
               LLSQSolverSVDMakeSquare_t<std::complex<double> > > );
-          success &= Factory::Instance().registerObject(std::string("SVDNonSquare"),
+          success &= Factory::Instance().registerObject(std::string("SVDNonSquareThreadCfg"),
               FacEnv::upCast<LLSQBaseSolver_t<std::complex<double> >, 
-              LLSQSolverSVDNonSquare_t<std::complex<double> > > );
+              LLSQSolverSVDNonSquareThreadCfg_t<std::complex<double> > > );
 
 
           registered = true;

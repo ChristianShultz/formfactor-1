@@ -125,7 +125,7 @@ namespace radmat
   // to do -- also return residual of the solution 
 
   template<typename T>
-    struct LLSQSolverSVDNonSquare_t : public LLSQBaseSolver_t<T>
+    struct LLSQSolverSVDNonSquareThreadCfg_t : public LLSQBaseSolver_t<T>
   {
 
     typedef typename LLSQBaseSolver_t<T>::LLSQRetTypeBase_h LLSQRetTypeBase_h;
@@ -158,7 +158,7 @@ namespace radmat
       SEMBLE::SembleVector<double> s;
 
       // dump the log?
-      set_solution_log( SEMBLE::svdNonSquare(K,U,s,V) ); 
+      set_solution_log( SEMBLE::svdNonSquare_THREADED(K,U,s,V) ); 
 
       //      kill anything below 1e-6
       SEMBLE::pseudoInvertValue(s,1e-6,true); // s -> 1/s

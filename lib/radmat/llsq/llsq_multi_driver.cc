@@ -6,7 +6,7 @@
 
  * Creation Date : 22-02-2013
 
- * Last Modified : Mon 02 Dec 2013 01:42:05 PM EST
+ * Last Modified : Thu 05 Dec 2013 09:26:57 PM EST
 
  * Created By : shultz
 
@@ -17,6 +17,7 @@
 #include "llsq_solvers.h"
 #include "llsq_chisq.h"
 #include "llsq_multi_data_serialize.h"
+#include "llsq_solution.h"
 #include "radmat/utils/pow2assert.h"
 #include "radmat/ff/ff_gen_llsq_row.h"
 #include "ensem/ensem.h"
@@ -505,6 +506,20 @@ namespace radmat
   }
 
 
+  void LLSQMultiDriver_t::save_ff_state(const std::string &path) const
+  {
+    //    std::cout << __func__ << ": entering" << std::endl; 
+    check_exit_lat();
+    std::stringstream ss; 
+    ss << path << "ff_database.rad"; 
+    ADATIO::BinaryFileWriter bin(ss.str());
+    
+    FormFacSolutions<std::complex<double> >
+      ff(peek_FF(),peek_tags()); 
+
+    write(bin,ff); 
+    bin.close();
+  }
 
 
   bool LLSQMultiDriver_t::solve_fast(const std::string &soln_ID)

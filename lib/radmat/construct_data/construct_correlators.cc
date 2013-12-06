@@ -6,7 +6,7 @@
 
  * Creation Date : 04-12-2012
 
- * Last Modified : Fri 22 Nov 2013 10:41:08 PM EST
+ * Last Modified : Thu 05 Dec 2013 02:37:54 PM EST
 
  * Created By : shultz
 
@@ -89,14 +89,12 @@ namespace radmat
 
         std::cout << __func__ << ": working on Q2 =" << qsq << std::endl;
 
+#if 0
         std::pair<bool,std::vector<ConstructCorrsMatrixElement> > tmp; 
-
         tmp = build_correlators(corrs,sink_id,source_id,Z_V,db); 
-
         std::vector<ConstructCorrsMatrixElement>::const_iterator it; 
         bool any_data = false; 
         rHandle<LLSQLatticeMultiData> data(new LLSQLatticeMultiData()); 
-
         if ( !!! tmp.first ) 
           return std::pair<bool,rHandle<LLSQLatticeMultiData> >(false,data); 
 
@@ -107,16 +105,23 @@ namespace radmat
             data->append_row_ensem(it->data,it->tag);  
             any_data = true;
           }
+#endif 
+
+        std::pair<bool , rHandle<LLSQLatticeMultiData> >  data;
+        data = build_correlators_no_copy(corrs,sink_id,source_id,Z_V,db); 
 
 #ifdef TIME_CONSTRUCT_SINGLE_CORRS
         snoop.stop();
-        if(any_data)
+        if(data.first)
           std::cout << __func__ << ": q2 = " << qsq 
-            << " NxM -> " << data->nrows() << "x" << data->ncols()
+            << " NxM -> " << data.second->nrows() << "x" << data.second->ncols()
             << " took " << snoop.getTimeInSeconds() << " seconds" << std::endl;
+        else
+          std::cout << __func__ << ": q2 = " << qsq << " failure took " 
+            << snoop.getTimeInSeconds() << " seconds " << std::endl;
 #endif
 
-        return std::pair<bool,rHandle<LLSQLatticeMultiData> >(any_data,data); 
+        return data; 
       }
 
 

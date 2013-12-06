@@ -6,7 +6,7 @@
 
  * Creation Date : 25-02-2013
 
- * Last Modified : Tue 03 Dec 2013 08:55:02 PM EST
+ * Last Modified : Thu 05 Dec 2013 09:20:39 PM EST
 
  * Created By : shultz
 
@@ -152,6 +152,7 @@ namespace radmat
       << "  " << linear_system.peek_tags().begin()->mom_string() << std::endl;
 
     linear_system.solve_llsq(soln_ID);
+    linear_system.save_ff_state( base_path() ); 
     init_solved_llsq = true; 
   }
 

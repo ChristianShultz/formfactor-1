@@ -280,11 +280,11 @@ namespace radmat
       std::string
         ff() const
         {
-          std::string s; 
+          std::string s;
           s += "( 1 + \\frac{2}{3}\\eta))" + g1.ff(); 
           s += "-\\frac{2}{3}\\eta " + g2.ff(); 
           s += "\\frac{2}{3}\\eta(1+\\eta)" + g3.ff(); 
-          return s; 
+          return  std::string("\\\\") + s + std::string(" \\\\ "); 
         }
 
       double eta(const radmat::RhoRho::Ingredients<lambda_left,lambda_right> &i ) const
@@ -325,7 +325,7 @@ namespace radmat
         {
           std::string s; 
           s += "-" + g2.ff(); 
-          return s; 
+          return  std::string("\\\\") + s + std::string(" \\\\ "); 
         }
 
 
@@ -353,7 +353,7 @@ namespace radmat
           s += g1.ff(); 
           s += "-" + g2.ff(); 
           s += "(1+\\eta)" + g3.ff(); 
-          return s; 
+          return  std::string("\\\\") + s + std::string(" \\\\ "); 
         }
 
       double eta(const radmat::RhoRho::Ingredients<lambda_left,lambda_right> &i ) const

@@ -6,7 +6,7 @@
 
  * Creation Date : 25-02-2013
 
- * Last Modified : Wed 04 Dec 2013 10:54:49 AM EST
+ * Last Modified : Thu 05 Dec 2013 08:11:42 PM EST
 
  * Created By : shultz
 
@@ -447,7 +447,7 @@ namespace radmat
     check_exit_corrs(); 
 
     int idx, sz = multi_lattice_data.size(); 
-    std::string soln_ID = std::string ("SVDNonSquare");
+    std::string soln_ID = std::string ("SVDNonSquareThreadCfg");
 
     if(sz == 0)
     {
@@ -472,7 +472,7 @@ namespace radmat
 
 #pragma omp parallel for shared(idx)  schedule(dynamic,1)
 
-#endif    
+#endif 
     // POSSIBLE PARALLEL HERE
     for(idx =0; idx < sz; ++idx)
       good_qs[idx] =  linear_systems_of_Q2[idx].load_llsq(multi_lattice_data[idx],
@@ -494,15 +494,18 @@ namespace radmat
     // print the list here in case the solver flakes we can easily determine where it went wrong
     print_Q2_list(); 
 
+#if 0    // thread this section over cfgs for better memory management
 #ifdef LOAD_LLSQ_PARALLEL 
 
 #pragma omp parallel for shared(idx)  schedule(dynamic,1)
 
 #endif    
+#endif   
     for(idx = 0; idx < sz; ++idx)
       if(good_qs[idx])
         linear_systems_of_Q2[idx].solve_llsq(soln_ID); 
 
+    // leave a barrier since to prevent any possibility of a jump out from below
 #pragma omp barrier
 
     my_stopwatch.stop();

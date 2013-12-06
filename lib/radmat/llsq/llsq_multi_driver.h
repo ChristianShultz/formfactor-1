@@ -28,7 +28,7 @@ namespace radmat
     bool load_data(const rHandle<LLSQLatticeMultiData> &dat, 
         const double tolerance); 
     void splash_tags(void) const; 
-    bool run_zero_filter(const double tolerance);  
+    bool run_zero_filter(const double tolerance); 
     void solve_llsq(const std::string &soln_ID);
     void chisq_analysis(const SEMBLE::SembleVector<double> &ff, 
         const std::string &path,
@@ -39,6 +39,8 @@ namespace radmat
     void dump_llsq_lattice(const std::string &path);  
 
     void save_llsq_state(const std::string &path) const; 
+
+    void save_ff_state(const std::string &path) const; 
 
     SEMBLE::SembleMatrix<T> peek_K(void) const {check_exit_K();return K;}
     SEMBLE::SembleMatrix<T> peek_Kinv(void) const {check_exit_Kinv();return Kinv;}

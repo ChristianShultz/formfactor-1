@@ -51,6 +51,7 @@ nobase_include_HEADERS =   \
 													 radmat/llsq/llsq_multi_data_serialize.h				 \
 													 radmat/llsq/llsq_multi_driver.h				 \
 													 radmat/llsq/llsq_q2_pack.h				 \
+													 radmat/llsq/llsq_solution.h			\
 													 radmat/llsq/llsq_solver.h				 \
 													 radmat/llsq/llsq_solvers.h				 \
 													 radmat/llsq/llsq_zero_filter.h				 \
