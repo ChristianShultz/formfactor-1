@@ -6,7 +6,7 @@
 
  * Creation Date : 25-02-2013
 
- * Last Modified : Fri 06 Dec 2013 02:38:03 PM EST
+ * Last Modified : Sat 07 Dec 2013 05:39:49 PM EST
 
  * Created By : shultz
 
@@ -196,18 +196,19 @@ namespace radmat
       tmp.setQ2(Q2); 
 
       // i/o junk 
-      SEMBLE::SEMBLEIO::makeDirectoryPath(base_path() + std::string("t_ins_fits/"));
+      std::string base_p = std::string("REFIT/");
+      SEMBLE::SEMBLEIO::makeDirectoryPath(base_p); 
+      SEMBLE::SEMBLEIO::makeDirectoryPath(base_p + std::string("t_ins_fits/"));
 
       // run a fit on this ff 
       TinsFitter local_fit_across_time; 
-      local_fit_across_time.single_fit<std::complex<double> >(base_path() + std::string("t_ins_fits/"),
+      local_fit_across_time.single_fit<std::complex<double> >(base_p + std::string("t_ins_fits/"),
           tmp,
           ff_max, 
           fit_props,
           tsrc,
           tsnk);
 
-      std::string base_p = std::string("REFIT");
 
       // dump results
       SEMBLE::SEMBLEIO::makeDirectoryPath(base_p + std::string("fit_logs/"));
@@ -234,6 +235,13 @@ namespace radmat
       if ( some_fit->thigh() < thigh)
         thigh = some_fit->thigh();
 
+    }
+
+    if ( thigh < tlow ) 
+    {
+      std::cout << __func__ << ": range [" << tlow << "," << thigh << "]" << std::endl; 
+      std::cout << "thigh < tlow, unable to continue " << std::endl; 
+      return ; 
     }
 
     std::cout << __func__ << ": using range [" << tlow << "," << thigh << "]" << std::endl; 
@@ -317,7 +325,7 @@ namespace radmat
   std::string RadmatSingleQ2Driver::base_path(void) const
   {
     std::stringstream ss; 
-    ss << SEMBLE::SEMBLEIO::getPath() << "Q2_" << linear_system.Q2() << "/";
+    ss << SEMBLE::SEMBLEIO::getPath() << "Q2_" << linear_system.qsq_sort() << "/";
     SEMBLE::SEMBLEIO::makeDirectoryPath(ss.str());
     return ss.str(); 
   }

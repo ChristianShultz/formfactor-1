@@ -35,6 +35,11 @@ namespace radmat
         const int tlow,
         const int thigh,
         double tol=1e-6); 
+    void chisq_analysis_mean(const SEMBLE::SembleVector<double> &ff, 
+        const std::string &path,
+        const int tlow,
+        const int thigh,
+        double tol=1e-6); 
     void dump_llsq(const std::string &path);
     void dump_llsq_lattice(const std::string &path);  
 

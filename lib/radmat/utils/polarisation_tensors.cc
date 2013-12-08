@@ -6,7 +6,7 @@
 
  * Creation Date : 04-05-2013
 
- * Last Modified : Mon 04 Nov 2013 02:34:45 PM EST
+ * Last Modified : Sun 08 Dec 2013 11:10:32 AM EST
 
  * Created By : shultz
 
@@ -94,28 +94,9 @@ namespace radmat
       {
         rot = Hadron::cubicCanonicalRotation(mom); 
       }
-      Tensor<std::complex<double>, 2> RotMat;
-      RotMat = convertTensorUnderlyingType<std::complex<double> , double , 2 > (genRotationMatrix(mom));
-      itpp::Mat<std::complex<double> > R(3,3); 
-      R.zeros();
-
-      for(int i = 0; i < 3; ++i)
-        for(int j = 0; j < 3; ++j)
-          R(i,j) = RotMat[i+1][j+1];
-
-
-#if 0
-#warning " USING R *epsz(lambda) for 3D polarization "
-
-      eps = R*epsz(lambda_row); 
- 
-#else
-
-#warning " USING  D_{m,lambda} * epsz(m) for 3D polarization "
 
       for(int i = 1; i <= 3; ++i)
       {
-
         int M2 = -2*(i - 1) +J2;
         double phase = 1.;
 
@@ -123,7 +104,6 @@ namespace radmat
         if(std::norm(SEMBLE::toScalar(D)) > 0.00001) 
           eps = eps + phase*SEMBLE::toScalar(D) * epsz(i); 
       }
-#endif 
 
       return eps;
 

@@ -15,20 +15,22 @@ namespace radmat
     template<short lambda>
       struct F1 
       : public ffBlockBase_t<std::complex<double> > , 
-      public embedHelicityPolarizationTensor<1,lambda>
+      public rightPTensor<1,lambda>
     {
 
       std::string ff(void) const
       {
-        return std::string("F_1(Q^2) \\epsilon^{\\mu,\\nu,\\rho,\\sigma}\\epsilon_{\\nu}(p,\\lambda)p_{\\rho}^{+}p_{\\sigma}^{-}");
+        std::string s; 
+        s = "F_1(Q^2) \\epsilon^{\\mu,\\nu,\\rho,\\sigma}\\epsilon_{\\nu}";
+        s += "(p,\\lambda)p_{\\rho}^{+}p_{\\sigma}^{-}";
+        return s; 
       }
 
       Tensor<std::complex<double> , 1>  operator()(const Tensor<double,1> &p_f, 
           const Tensor<double,1> &p_i, const double mom_fac) const
       {
-
         // come up with the ingredient list
-        Tensor<std::complex<double>, 1> epsilon = this->ptensor(p_i,mom_fac); 
+        Tensor<std::complex<double>, 1> epsilon = this->right_p_tensor(p_i,mom_fac,p_f); 
         Tensor<std::complex<double>, 1> pplus, pminus;
         pplus = convertTensorUnderlyingType<std::complex<double>,double,1>( pPlus(p_f,p_i) );
         pminus = convertTensorUnderlyingType<std::complex<double>,double,1>( pMinus(p_f,p_i) );
@@ -36,8 +38,8 @@ namespace radmat
         Tensor<std::complex<double>, 2> gdd;
         gdd = convertTensorUnderlyingType<std::complex<double>,double,2>(g_dd());
 
-        // the intermediary steps.. since we are contracting w/ vectors we go down by one
-        // rank at each step.. duh
+        // the intermediary steps.. since we are contracting w/ vectors
+        // we go down by one rank at each step
         Tensor<std::complex<double>, 3> foo;
         Tensor<std::complex<double>, 2> bar;
         Tensor<std::complex<double>, 1> baz; 
@@ -54,10 +56,9 @@ namespace radmat
         std::stringstream ss; 
         ss << "momentum dotted into polarization was " << inner_prod.value() << std::endl ;
         if(std::norm(inner_prod.value()) > 0.000001 ) 
-         std::cout << ss.str() << std::endl;  
+          std::cout << ss.str() << std::endl;  
 
 #endif
-
         // the kinematic factor carries one lorentz index
         return baz;
       }

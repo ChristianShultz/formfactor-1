@@ -37,23 +37,43 @@ namespace radmat
           const Tensor<double,1> &p_i, 
           const double mom_fac) 
       {
-        eps_left = this->left_p_tensor(p_f,mom_fac); 
-        eps_right = this->right_p_tensor(p_i,mom_fac); 
-        pplus = convertTensorUnderlyingType<std::complex<double>, double, 1>(pPlus(p_f,p_i)); 
-        pminus = convertTensorUnderlyingType<std::complex<double>, double, 1>(pMinus(p_f,p_i)); 
-        gdd = convertTensorUnderlyingType<std::complex<double>, double, 2>(g_dd()); 
+        // polarization tensors (up indicies)
+        eps_left = this->left_p_tensor(p_f,mom_fac,p_i); 
+        eps_right = this->right_p_tensor(p_i,mom_fac,p_f); 
+
+        // momentum tensors (up indicies) 
         p_left = convertTensorUnderlyingType<std::complex<double> , double, 1>(p_f);
         p_right = convertTensorUnderlyingType<std::complex<double> , double, 1>(p_i);
+
+        // sum and difference (up indicies)
+        pplus = convertTensorUnderlyingType<std::complex<double>, double, 1>(pPlus(p_f,p_i)); 
+        pminus = convertTensorUnderlyingType<std::complex<double>, double, 1>(pMinus(p_f,p_i)); 
+
+        // metric tensor
+        gdd = convertTensorUnderlyingType<std::complex<double>, double, 2>(g_dd()); 
+
+        // lorentz scalars
         mm_left = dot_out(p_left,applyMetric(p_left,gdd,0)).real(); 
-        enforce_positive(mm_left,"negative mass left");
         mm_right = dot_out(p_right,applyMetric(p_right,gdd,0)).real(); 
-        enforce_positive(mm_right,"negative mass right"); 
-        enforce_equal(mm_right,mm_left,"m_left != m_right"); 
         qq = dot_out(pminus,applyMetric(pminus,gdd,0)).real(); 
         Q2 = -qq; 
+
+        // sanity
+        enforce_positive(mm_left,"negative mass left");
+        enforce_positive(mm_right,"negative mass right"); 
+        enforce_equal(mm_right,mm_left,"m_left != m_right"); 
       }
 
-
+      void print_ingredients(void)
+      {
+        std::cout << __func__ << ":\n"
+          << "p_left " << p_left << "" 
+          << "eps_left " << eps_left << ""
+          << "mm_left " << mm_left << "\n" 
+          << "\np_right " << p_right << ""
+          << "eps_right " << eps_right << ""
+          << "mm_right " << mm_right << std::endl; 
+      }
 
       void 
         enforce(const bool &b, const std::string &msg) const

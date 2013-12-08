@@ -15,7 +15,8 @@ namespace radmat
 
 
 
-  // 
+  // provide an interface to churn out helicity polarization 
+  // tensors from the momentum tensors 
   template<idx_t J>
     struct HelicityPolarizationTensor
     {
@@ -30,15 +31,11 @@ namespace radmat
 
       mom_t int_based_mom(const Tensor<double,1> &p, const double mom_factor)
       {
-
-        //        std::cout << __func__ << " sent in " << p << std::endl; 
         mom_t ret;
         ret.resize(3);
         ret[0] = round(p[1]/mom_factor);
         ret[1] = round(p[2]/mom_factor);
         ret[2] = round(p[3]/mom_factor);
-
-        //        std::cout << __func__ << " sending out " << ret[0] << ret[1] << ret[2] << std::endl;
 
         return ret; 
       };
@@ -59,7 +56,7 @@ namespace radmat
           return std::complex<double>(round_to_zero(d.real(),thresh) , round_to_zero(d.imag(),thresh)); 
         }
 
-
+      // do work 
       Tensor<std::complex<double>, J> 
         operator()(const Tensor<double,1> &p, 
             const int hel, 
@@ -77,18 +74,66 @@ namespace radmat
         }
     };
 
+
+  //  embed the target helicity as a template parameter
+  //      and set apply the outside world rest rotation 
+  //      convention here 
+  //
+  ////////////////////////////////////////////////////////////////////////
+  ////////////////////////////////////////////////////////////////////////
   template<idx_t J, int hel>
     struct embedHelicityPolarizationTensor
     {
+      typedef typename genPolTens<J>::mom_t mom_t; // Array<int> 
       virtual ~embedHelicityPolarizationTensor() {}
 
+      // return the polarization tensor associated with p,
+      //    if the particle with momentum p is at rest then 
+      //    apply the rotation convention for particle p_prime 
+      //    to the rest polarization vector to force a rotation
+      //
+      //    this corresponds to taking the z frame of the 
+      //    particle in flight as the reference frame
       virtual Tensor<std::complex<double> , J>
         ptensor(const Tensor<double,1> &p,
-            const double mom_factor) const
+            const double mom_factor, 
+            const Tensor<double,1> p_prime) const
         {
           HelicityPolarizationTensor<J> foo;
-          return foo(p,hel,mom_factor); 
+          mom_t p_mom = foo.int_based_mom(p,mom_factor);  
+          mom_t p_prime_mom = foo.int_based_mom(p_prime,mom_factor);  
+          Tensor<std::complex<double>,J> epsilon(foo(p,hel,mom_factor)); 
+
+          if ( is_rest(p_mom) ) 
+            return apply_rest_rotation_convention( epsilon , p_prime_mom ); 
+
+          return epsilon;
         }
+
+
+      virtual Tensor<std::complex<double> , J> 
+        apply_rest_rotation_convention(const Tensor<std::complex<double> ,J> &eps,
+            const mom_t &p_prime) const
+        {
+          Tensor<std::complex<double> ,2> R;
+          R = convertTensorUnderlyingType<std::complex<double>,double,2>(genRotationMatrix(p_prime)); 
+#if 0
+          std::cout << __func__ << R << std::endl; 
+          std::cout << __func__ << eps << std::endl;
+#endif
+          Tensor<std::complex<double> , J> out =  contract( R , eps, 1, 0);
+
+          for(int jj = 1; jj < J; ++jj)
+            out = contract( R, out, 1, jj); 
+
+          return out;  
+        }
+
+
+      bool is_rest(const mom_t &mom) const
+      {
+        return ((mom[0] == 0) && (mom[1] == 0) && (mom[2] == 0)); 
+      }
 
       virtual Tensor<std::complex<double> , J> 
         conjugate(const Tensor<std::complex<double> , J> &inp) const
@@ -104,32 +149,50 @@ namespace radmat
     };
 
 
+
+  //  Classes that need polarization tensors should derive from the 
+  //  leftPTensor and rightPTensor class to enforce consistency 
+  //
+  //  take care of the left/right who is complex convention
+  //
+  ////////////////////////////////////////////////////////////////////////
+  ////////////////////////////////////////////////////////////////////////
+  ////////////////////////////////////////////////////////////////////////
+
+  
+  ////////////////////////////////////////////////////////////////////////
+  //  left polarization tensors (final state, annih ops)
   template<idx_t J_left, int hel_left>
     struct leftPTensor
     {
       virtual ~leftPTensor() {}
 
       virtual Tensor<std::complex<double> , J_left > 
-        left_p_tensor(const Tensor<double,1> &p, const double mom_factor ) const
+        left_p_tensor(const Tensor<double,1> &p, 
+            const double mom_factor ,
+            const Tensor<double,1> &pp) const
         {
           embedHelicityPolarizationTensor<J_left,hel_left> foo; 
-          return foo.conjugate( foo.ptensor(p,mom_factor) ); 
+          return foo.conjugate( foo.ptensor(p,mom_factor,pp) ); 
         }
     };
 
 
+  ////////////////////////////////////////////////////////////////////////
+  //  right polarization tensors (initial state, creation ops)
   template<idx_t J_right, int hel_right>
     struct rightPTensor
     {
       virtual ~rightPTensor() {}
       virtual Tensor<std::complex<double> , J_right > 
-        right_p_tensor(const Tensor<double,1> &p, const double mom_factor ) const
+        right_p_tensor(const Tensor<double,1> &p, 
+            const double mom_factor,
+            const Tensor<double,1> &pp ) const
         {
           embedHelicityPolarizationTensor<J_right,hel_right> foo; 
-          return foo.ptensor(p,mom_factor); 
+          return foo.ptensor(p,mom_factor,pp); 
         }
     };
-
 
 }
 

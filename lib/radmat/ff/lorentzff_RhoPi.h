@@ -13,12 +13,16 @@ namespace radmat
   namespace RhoPi
   {
     template <short lambda> 
-      struct F1 : public ffBlockBase_t<std::complex<double> > , public embedHelicityPolarizationTensor<1,lambda>
+      struct F1 : public ffBlockBase_t<std::complex<double> > ,
+      public leftPTensor<1,lambda>
     {
 
       std::string ff(void) const
       {
-        return std::string("F_1(Q^2) \\epsilon^{\\mu,\\nu,\\rho,\\sigma}\\epsilon^{*}_{\\nu}(p,\\lambda)p_{\\rho}^{+}p_{\\sigma}^{-}");
+        std::string s;
+        s += "F_1(Q^2) \\epsilon^{\\mu,\\nu,\\rho,\\sigma}\\epsilon^{*}_{\\nu}";
+        s += "(p,\\lambda)p_{\\rho}^{+}p_{\\sigma}^{-}";
+        return s; 
       }
 
 
@@ -27,8 +31,7 @@ namespace radmat
       {
 
         // come up with the ingredient list
-        Tensor<std::complex<double>, 1> epsilon = this->conjugate((this->ptensor(p_f,mom_fac))); // nb final state conjugation 
-        //   Tensor<std::complex<double>, 1 > epsilon = this->ptensor(p_f,mom_fac); 
+        Tensor<std::complex<double>, 1> epsilon = this->left_p_tensor(p_f,mom_fac,p_i);
         Tensor<std::complex<double>, 1> pplus, pminus;
         pplus = convertTensorUnderlyingType<std::complex<double>,double,1>( pPlus(p_f,p_i) );
         pminus = convertTensorUnderlyingType<std::complex<double>,double,1>( pMinus(p_f,p_i) );
@@ -36,8 +39,8 @@ namespace radmat
         Tensor<std::complex<double>, 2> gdd;
         gdd = convertTensorUnderlyingType<std::complex<double>,double,2>(g_dd());
 
-        // the intermediary steps.. since we are contracting w/ vectors we go down by one
-        // rank at each step.. duh
+        // the intermediary steps.. since we are contracting w/ 
+        // vectors we go down by one rank at each step
         Tensor<std::complex<double>, 3> foo;
         Tensor<std::complex<double>, 2> bar;
         Tensor<std::complex<double>, 1> baz; 
@@ -47,27 +50,6 @@ namespace radmat
         epsilon = applyMetric(epsilon,gdd,0); 
 
 #if 1
-//       std::cout << "pplus_mu = " << pplus << std::endl;
-//       std::cout << "pminus_mu = " << pminus << std::endl;
-//        std::cout << "eps_mu = " << epsilon << std::endl;
-//
-//
-//        std::cout << "levi non-zero " << std::endl;
-//        Tensor<std::complex<double>, 1> tt((TensorShape<1>())[4],0.); 
-//
-//
-//        for(int i = 0; i < 4; ++i)
-//          for(int j = 0; j < 4; ++j)
-//            for(int k = 0; k < 4; ++k)
-//              for(int l = 0; l < 4; ++l)
-//                if(levi[i][j][k][l] != 0.)
-//                {
-//                  tt[i] += levi[i][j][k][l]*epsilon[j]*pplus[k]*pminus[l];
-//                 // std::cout << i << " " << j << " " << k << " " << l << "   " << levi[i][j][k][l] << std::endl;
-//                }
-//        std::cout << __func__ << " the answer should be " << std::endl;
-//        std::cout << tt << std::endl; 
-//
         Tensor<std::complex<double> , 0> inner_prod = contract( epsilon, p_f , 0 , 0 ) ; 
         if ( std::norm ( inner_prod.value() ) >  0.000001 ) 
           std::cout << "mom dotted into polarization was " << inner_prod.value() << std::endl; 

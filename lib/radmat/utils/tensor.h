@@ -93,6 +93,7 @@ namespace radmat
   //! diag(+,---) -- indicies raised
   Tensor<double,2> g_uu(void);
 
+  // R^mu_nu ( 0 index is up, 1 index is down ) 
   Tensor<double,2> genRotationMatrix(const XMLArray::Array<int> &mom);
 
   Tensor<double,2> genRotationMatrix3D(const XMLArray::Array<int> &mom);
@@ -2633,7 +2634,13 @@ namespace radmat
   template<typename T, idx_t N>
     std::ostream &operator<<(std::ostream &o, const Tensor<T, N> &t)
     {
-      o << "[" << t[0];
+      o << "<";
+      std::vector<bool> ipos = t.getRaised();  
+      std::vector<bool>::const_iterator it; 
+      for(it = ipos.begin(); it != ipos.end(); ++it)
+        o << *it; 
+
+      o << ">\n[" << t[0];
 
       for(idx_t i = 1; i < t.Dimensions[0]; ++i)
         o << t[i];
@@ -2647,7 +2654,12 @@ namespace radmat
   template<typename T>
     std::ostream &operator<<(std::ostream &o, const Tensor<T, 1> &t)
     {
-      o << "[" << t[0];
+      o << "<";
+      std::vector<bool> ipos = t.getRaised();  
+      std::vector<bool>::const_iterator it; 
+      for(it = ipos.begin(); it != ipos.end(); ++it)
+        o << *it; 
+      o << ">\n[" << t[0];
 
       for(idx_t i = 1; i < t.getDim(0); ++i)
         o << "," << t[i];
@@ -2733,6 +2745,7 @@ namespace radmat
     Tensor<T,rank> convertTensorUnderlyingType(const Tensor<U,rank> &u)
     {
       Tensor<T,rank> ret;
+      ret.setRaised(u.getRaised()); 
       if(u.empty())
         return ret;
 
