@@ -37,6 +37,9 @@ namespace radmat
         ret[1] = round(p[2]/mom_factor);
         ret[2] = round(p[3]/mom_factor);
 
+        //  std::cout << __func__ << ": passed in " << p 
+        //    << "\n passing out " << ret[0] << ret[1] << ret[2] << std::endl;
+
         return ret; 
       };
 
@@ -112,21 +115,30 @@ namespace radmat
 
 
       virtual Tensor<std::complex<double> , J> 
-        apply_rest_rotation_convention(const Tensor<std::complex<double> ,J> &eps,
+        apply_rest_rotation_convention(
+            const Tensor<std::complex<double> ,J> &eps,
             const mom_t &p_prime) const
         {
-          Tensor<std::complex<double> ,2> R;
-          R = convertTensorUnderlyingType<std::complex<double>,double,2>(genRotationMatrix(p_prime)); 
-#if 0
-          std::cout << __func__ << R << std::endl; 
-          std::cout << __func__ << eps << std::endl;
-#endif
-          Tensor<std::complex<double> , J> out =  contract( R , eps, 1, 0);
+          // redstar allows us to twist one end w/o twisting the other 
+          //   so the idea of a rotation is a bit more complicated
+          //
+          //  when we spin about the momentum direction of a particle
+          //  redstar does not spin the definition of the corresponding 
+          //  matrix element, thus we are effectively measuring 
+          //  the matrix elems in different frames.  I think of this 
+          //  as twisting each end of the matrix element independently 
+          //
+          //  the result then is that the phases that occurr between 
+          //  unallowed rotations (spinning about a momentum direction)
+          //  need to be accounted for in the decompositions
+          //
+          //  if in fact the form factor is just a number then all possible
+          //  complex phase information must be stored somehow in the 
+          //  polarization vectors and getting these correct will allow
+          //  us to use the unrelated measurements in the same llsq
+          //
 
-          for(int jj = 1; jj < J; ++jj)
-            out = contract( R, out, 1, jj); 
-
-          return out;  
+          return eps;  
         }
 
 
@@ -159,7 +171,7 @@ namespace radmat
   ////////////////////////////////////////////////////////////////////////
   ////////////////////////////////////////////////////////////////////////
 
-  
+
   ////////////////////////////////////////////////////////////////////////
   //  left polarization tensors (final state, annih ops)
   template<idx_t J_left, int hel_left>

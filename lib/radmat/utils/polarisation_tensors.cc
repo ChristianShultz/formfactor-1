@@ -6,7 +6,7 @@
 
  * Creation Date : 04-05-2013
 
- * Last Modified : Sun 08 Dec 2013 11:10:32 AM EST
+ * Last Modified : Sun 08 Dec 2013 04:38:48 PM EST
 
  * Created By : shultz
 
@@ -31,7 +31,7 @@ namespace radmat
 
   namespace
   {
-
+    std::complex<double> complex_i(std::complex<double>(0.,1.)); 
 
     //
     //  3D for solving photon helicities -> cartesian, this is simply a definition from adat
@@ -61,13 +61,12 @@ namespace radmat
           ret[1] = std::complex<double>(0.,-1./sqrt(2.));
           break;
         default:
-          std::cerr << __func__ << ": unexpected row\n";
+          std::cerr << __func__ << ": unexpected row" << m_row << "\n";
           exit(1); 
-
       }
-      // skip phase hacking
-      // ret *= std::complex<double>(0.,1.);  
-       return ret; 
+
+      // match to the Rho_J1_Op in adat, phase is -complex_one * complex_i
+      return -complex_i * ret;  
     }
 
 
@@ -86,9 +85,7 @@ namespace radmat
 
       if((mom[0] == 0) && (mom[1] == 0) && (mom[2] == 0))
       {
-        rot.alpha = 0.;
-        rot.beta = 0.;
-        rot.gamma = 0.;
+        return epsz(lambda_row); 
       }
       else
       {
@@ -118,11 +115,9 @@ namespace radmat
 
 
 
-
-
     itpp::Vec<std::complex<double> > epsz(int m_row, const double p, const double E)
     {
-      // itpp::Vec<std::complex<double> > eps3 = epsz(m_row); 
+      itpp::Vec<std::complex<double> > eps3 = epsz(m_row); 
       itpp::Vec<std::complex<double> > ret(4);
       ret.zeros(); 
       double m = sqrt(E*E - p*p);
@@ -136,22 +131,16 @@ namespace radmat
       {
 
         case 3:
-          ret[1] = std::complex<double>(1./sqrt(2.),0.); 
-          ret[2] = std::complex<double>(0.,-1./sqrt(2.));
-          // ret[1] = eps3[0];
-          // ret[2] = eps3[1];
+          ret[1] = eps3[0];
+          ret[2] = eps3[1];
           break;
         case 2:
-          ret[0] = std::complex<double>(1.,0.)*t; 
-          ret[3] = std::complex<double>(1.,0.)*z; 
-          // ret[0] = t * eps3[2];
-          // ret[3] = z * eps3[2];
+          ret[0] = t * eps3[2];
+          ret[3] = z * eps3[2];
           break; 
         case 1:
-          ret[1] = std::complex<double>(-1./sqrt(2.),0.); 
-          ret[2] = std::complex<double>(0.,-1./sqrt(2.));          
-          // ret[1] = eps3[0];
-          // ret[2] = eps3[1];
+          ret[1] = eps3[0];
+          ret[2] = eps3[1];
           break;
         default:
           std::cerr << __func__ << ": unexpected row\n";
@@ -159,12 +148,13 @@ namespace radmat
 
       }
 
-      // this phase is the guy for spatial insertions, for temporal guys it introduces a factor of i 
-      // return std::complex<double>(0.,1.)*ret; 
+      //  std::cout << __func__ << ": m_row " << m_row
+      //   << " p " << p << " E " << E  
+      //    << ret << std::endl;
 
-       return ret; 
+      // undo the phase hack from the redstar op eps3
+      return complex_i * ret; 
     }
-
 
 
 
@@ -181,84 +171,26 @@ namespace radmat
 
       if((mom[0] == 0) && (mom[1] == 0) && (mom[2] == 0))
       {
-        rot.alpha = 0.;
-        rot.beta = 0.;
-        rot.gamma = 0.;
+        return epsz(lambda_row,p,E); 
       }
       else
       {
         rot = Hadron::cubicCanonicalRotation(mom); 
       }
 
-#if 1
-
-#warning "using R^u_v eps^v(p,lam) = eps^u(Rp,lam)"
-
       Tensor<std::complex<double>, 2> RotMat;
       RotMat = convertTensorUnderlyingType<std::complex<double> , double , 2 > (genRotationMatrix(mom));
       itpp::Mat<std::complex<double> > R(4,4); 
       R.zeros();
 
-
-
       for(int mu = 0; mu < 4; ++mu)
         for(int nu = 0; nu < 4; ++nu)
           R(mu,nu) = RotMat[mu][nu];
 
-
       eps = R*epsz(lambda_row,p,E);  
-
-
-    /*
-      std::cout << __func__ << " sent in mom = " << mom[0] << mom[1] << mom[2] << std::endl;
-      std::cout << __func__ << " euler angles = " << rot.alpha << " " << rot.beta << " " << rot.gamma << std::endl;
-      std::cout << __func__ << " rot mat \n" << R << std::endl; 
-      std::cout << __func__ << " eps z " << epsz(lambda_row,p,E) << std::endl;
-      std::cout << __func__ << " R*epsz " << eps << std::endl;
-      */
-
-#else 
-#warning "using eps^u(Rp,lam) = D_m,lam * R * eps(pz,m)"
-
-      for(int i = 1; i <= 3; ++i)
-      {
-        int M2 = -2*(i - 1) +J2;
-        double phase = 1.; 
-
-        ENSEM::Complex D = Hadron::Wigner_D(J2,M2,lambda2,rot.alpha,rot.beta,rot.gamma);
-        if(std::norm(SEMBLE::toScalar(D)) > 0.00001) 
-          eps = eps + phase*SEMBLE::toScalar(D) * R * epsz(i,p,E); 
-      }
-      
-       return itpp::conj(eps);
-#endif 
 
       return eps;
     }
-
-
-#if 0 
-
-    // form the matrix eps
-    //
-    // |j_+|    | eps_x eps_y eps_z |    |j_x|              
-    // |j_0|  = | eps_x eps_y eps_z |  x |j_y|               
-    // |j_-|    | eps_x eps_y eps_z |    |j_z|     
-    //
-
-    itpp::Mat<std::complex<double> > eps3d(const ADATXML::Array<int> &mom, const bool create)
-    {
-      itpp::Mat<std::complex<double> > ret(3,3);
-      ret.zeros();   
-
-      for(int i = 0; i < 3; ++i)
-      {
-        ret.set_row(i,eps_lambda(mom,i+1)); 
-      }
-      return ret; 
-    }
-
-#endif 
 
   } // anonomyous 
 

@@ -115,12 +115,14 @@ namespace radmat
 
 
   //////////////////////////////////////////////////////////////////
-  // invert the matrix eps
+  // invert the matrix eps -- return the dagger of the transformation 
+  // to helicity since this has to be a unitary transformation 
+  //    ie: it is only a basis change
   itpp::Mat<std::complex<double> > 
     invert2Cart(const ADATXML::Array<int> mom, 
         const bool create)
   { 
-    return itpp::round_to_zero(itpp::inv(eps3d(mom,create)),0.00001);
+    return itpp::hermitian_transpose(eps3d(mom,create));
   }
 
 } // radmat
