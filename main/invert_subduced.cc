@@ -6,7 +6,7 @@
 
 * Creation Date : 03-05-2013
 
-* Last Modified : Wed 13 Nov 2013 06:39:43 PM EST
+* Last Modified : Tue 10 Dec 2013 12:43:34 PM EST
 
 * Created By : shultz
 
@@ -14,7 +14,8 @@ _._._._._._._._._._._._._._._._._._._._._.*/
 
 
 
-#include "radmat/construct_data/invert_subduction.h"
+#include "radmat/register_all/register_all.h"
+#include "radmat/redstar_interface/redstar_invert_subduction.h"
 #include "semble/semble_meta.h"
 
 #include <string>
@@ -84,6 +85,7 @@ ContinuumBosonExprPrimitive usage(int argc, char *argv[])
 
 int main(int argc , char *argv[])
 {
+  AllFactoryEnv::registerAll();
   
   ContinuumBosonExprPrimitive fred = usage(argc,argv); 
   

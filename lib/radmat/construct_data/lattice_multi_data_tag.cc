@@ -6,7 +6,7 @@
 
 * Creation Date : 01-10-2013
 
-* Last Modified : Wed 13 Nov 2013 05:25:53 PM EST
+* Last Modified : Tue 10 Dec 2013 11:53:31 AM EST
 
 * Created By : shultz
 
@@ -14,7 +14,6 @@ _._._._._._._._._._._._._._._._._._._._._.*/
 
 
 #include "lattice_multi_data_tag.h"
-#include "invert_subduction.h"
 #include "radmat_database_interface.h"
 #include "radmat/fake_data/fake_3pt_function_aux.h"
 #include "radmat/utils/pow2assert.h"

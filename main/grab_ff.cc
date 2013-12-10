@@ -6,7 +6,7 @@
 
 * Creation Date : 22-04-2013
 
-* Last Modified : Tue 03 Dec 2013 09:47:59 PM EST
+* Last Modified : Tue 10 Dec 2013 11:45:36 AM EST
 
 * Created By : shultz
 
@@ -18,7 +18,7 @@ _._._._._._._._._._._._._._._._._._._._._.*/
 
 #include "radmat/ff/formfactor_factory.h"
 #include "radmat/utils/tensor.h"
-
+#include "radmat/register_all/register_all.h"
 
 using namespace radmat;
 using namespace std; 
@@ -96,6 +96,8 @@ inp usage(int argc, char *argv[])
 
 int main(int argc, char *argv[])
 {
+
+  AllFactoryEnv::registerAll(); 
 
   inp fred = usage(argc, argv); 
 

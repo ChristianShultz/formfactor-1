@@ -10,6 +10,7 @@
 #include <complex>
 #include <vector>
 #include <cmath>
+#include "hadron/irrep_util.h"
 #include "pow2assert.h"
 #include "type_computations.h"
 #include "xml_array.h"
@@ -95,6 +96,8 @@ namespace radmat
 
   // R^mu_nu ( 0 index is up, 1 index is down ) 
   Tensor<double,2> genRotationMatrix(const XMLArray::Array<int> &mom);
+
+  Tensor<double,2> genRotationMatrix(const Hadron::CubicCanonicalRotation_t &); 
 
   Tensor<double,2> genRotationMatrix3D(const XMLArray::Array<int> &mom);
 

@@ -190,8 +190,6 @@ namespace radmat
     {
 
       bool success = true;
-#pragma omp critical
-      {
 
         if(!!!registered)
         {
@@ -210,7 +208,12 @@ namespace radmat
 
           registered = true;
         }
-      } // critical
+
+      if(!!! success)
+      {   
+        throw std::string("reg error in the LLSQFactoryEnv"); 
+      }   
+
 
       return success;
     }

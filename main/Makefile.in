@@ -32,14 +32,12 @@ POST_INSTALL = :
 NORMAL_UNINSTALL = :
 PRE_UNINSTALL = :
 POST_UNINSTALL = :
-bin_PROGRAMS = fake_radmat$(EXEEXT) mass_overlap_db_create$(EXEEXT) \
-	mass_overlap_db_combine$(EXEEXT) single_plot$(EXEEXT) \
-	phases$(EXEEXT) mass_overlap_db_util$(EXEEXT) grab_ff$(EXEEXT) \
-	grab_pol$(EXEEXT) grab_vector_mean_cmp$(EXEEXT) \
-	invert_subduced$(EXEEXT) phases2$(EXEEXT) \
-	check_rotations$(EXEEXT) corr_norm$(EXEEXT) \
-	radmat_util$(EXEEXT) radmat$(EXEEXT) test_tens$(EXEEXT) \
-	test_redstar_ops$(EXEEXT)
+bin_PROGRAMS = corr_norm$(EXEEXT) grab_ff$(EXEEXT) grab_pol$(EXEEXT) \
+	grab_vector_mean_cmp$(EXEEXT) invert_subduced$(EXEEXT) \
+	mass_overlap_db_combine$(EXEEXT) \
+	mass_overlap_db_create$(EXEEXT) mass_overlap_db_util$(EXEEXT) \
+	radmat$(EXEEXT) radmat_util$(EXEEXT) single_plot$(EXEEXT) \
+	test_redstar_ops$(EXEEXT) test_tens$(EXEEXT)
 subdir = main
 DIST_COMMON = $(srcdir)/Makefile.am $(srcdir)/Makefile.in
 ACLOCAL_M4 = $(top_srcdir)/aclocal.m4
@@ -52,18 +50,10 @@ CONFIG_CLEAN_FILES =
 CONFIG_CLEAN_VPATH_FILES =
 am__installdirs = "$(DESTDIR)$(bindir)"
 PROGRAMS = $(bin_PROGRAMS)
-am_check_rotations_OBJECTS = check_rotations.$(OBJEXT)
-check_rotations_OBJECTS = $(am_check_rotations_OBJECTS)
-check_rotations_LDADD = $(LDADD)
-check_rotations_DEPENDENCIES =
 am_corr_norm_OBJECTS = corr_norm.$(OBJEXT)
 corr_norm_OBJECTS = $(am_corr_norm_OBJECTS)
 corr_norm_LDADD = $(LDADD)
 corr_norm_DEPENDENCIES =
-am_fake_radmat_OBJECTS = fake_radmat.$(OBJEXT)
-fake_radmat_OBJECTS = $(am_fake_radmat_OBJECTS)
-fake_radmat_LDADD = $(LDADD)
-fake_radmat_DEPENDENCIES =
 am_grab_ff_OBJECTS = grab_ff.$(OBJEXT)
 grab_ff_OBJECTS = $(am_grab_ff_OBJECTS)
 grab_ff_LDADD = $(LDADD)
@@ -94,14 +84,6 @@ am_mass_overlap_db_util_OBJECTS = mass_overlap_db_util.$(OBJEXT)
 mass_overlap_db_util_OBJECTS = $(am_mass_overlap_db_util_OBJECTS)
 mass_overlap_db_util_LDADD = $(LDADD)
 mass_overlap_db_util_DEPENDENCIES =
-am_phases_OBJECTS = phases.$(OBJEXT)
-phases_OBJECTS = $(am_phases_OBJECTS)
-phases_LDADD = $(LDADD)
-phases_DEPENDENCIES =
-am_phases2_OBJECTS = phases2.$(OBJEXT)
-phases2_OBJECTS = $(am_phases2_OBJECTS)
-phases2_LDADD = $(LDADD)
-phases2_DEPENDENCIES =
 am_radmat_OBJECTS = radmat.$(OBJEXT)
 radmat_OBJECTS = $(am_radmat_OBJECTS)
 radmat_LDADD = $(LDADD)
@@ -131,24 +113,20 @@ CXXCOMPILE = $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) \
 CXXLD = $(CXX)
 CXXLINK = $(CXXLD) $(AM_CXXFLAGS) $(CXXFLAGS) $(AM_LDFLAGS) $(LDFLAGS) \
 	-o $@
-SOURCES = $(check_rotations_SOURCES) $(corr_norm_SOURCES) \
-	$(fake_radmat_SOURCES) $(grab_ff_SOURCES) $(grab_pol_SOURCES) \
+SOURCES = $(corr_norm_SOURCES) $(grab_ff_SOURCES) $(grab_pol_SOURCES) \
 	$(grab_vector_mean_cmp_SOURCES) $(invert_subduced_SOURCES) \
 	$(mass_overlap_db_combine_SOURCES) \
 	$(mass_overlap_db_create_SOURCES) \
-	$(mass_overlap_db_util_SOURCES) $(phases_SOURCES) \
-	$(phases2_SOURCES) $(radmat_SOURCES) $(radmat_util_SOURCES) \
-	$(single_plot_SOURCES) $(test_redstar_ops_SOURCES) \
-	$(test_tens_SOURCES)
-DIST_SOURCES = $(check_rotations_SOURCES) $(corr_norm_SOURCES) \
-	$(fake_radmat_SOURCES) $(grab_ff_SOURCES) $(grab_pol_SOURCES) \
-	$(grab_vector_mean_cmp_SOURCES) $(invert_subduced_SOURCES) \
-	$(mass_overlap_db_combine_SOURCES) \
+	$(mass_overlap_db_util_SOURCES) $(radmat_SOURCES) \
+	$(radmat_util_SOURCES) $(single_plot_SOURCES) \
+	$(test_redstar_ops_SOURCES) $(test_tens_SOURCES)
+DIST_SOURCES = $(corr_norm_SOURCES) $(grab_ff_SOURCES) \
+	$(grab_pol_SOURCES) $(grab_vector_mean_cmp_SOURCES) \
+	$(invert_subduced_SOURCES) $(mass_overlap_db_combine_SOURCES) \
 	$(mass_overlap_db_create_SOURCES) \
-	$(mass_overlap_db_util_SOURCES) $(phases_SOURCES) \
-	$(phases2_SOURCES) $(radmat_SOURCES) $(radmat_util_SOURCES) \
-	$(single_plot_SOURCES) $(test_redstar_ops_SOURCES) \
-	$(test_tens_SOURCES)
+	$(mass_overlap_db_util_SOURCES) $(radmat_SOURCES) \
+	$(radmat_util_SOURCES) $(single_plot_SOURCES) \
+	$(test_redstar_ops_SOURCES) $(test_tens_SOURCES)
 ETAGS = etags
 CTAGS = ctags
 DISTFILES = $(DIST_COMMON) $(DIST_SOURCES) $(TEXINFOS) $(EXTRA_DIST)
@@ -265,27 +243,19 @@ AM_LDFLAGS = -L@top_builddir@/lib/ \
                @LDFLAGS@ @SEMBLE_LDFLAGS@ @JACKFITTER_LDFLAGS@ @ADAT_LDFLAGS@ 
 
 LDADD = -lradmat @SEMBLE_LIBS@ @JACKFITTER_LIBS@ @ADAT_LIBS@ @ITPP_LIBS@ @LIBS@ 
-fake_radmat_SOURCES = fake_radmat.cc
-mass_overlap_db_create_SOURCES = mass_overlap_db_create.cc
-mass_overlap_db_combine_SOURCES = mass_overlap_db_combine.cc
-mass_overlap_db_util_SOURCES = mass_overlap_db_util.cc
-single_plot_SOURCES = single_plot.cc
-phases_SOURCES = phases.cc
-phases2_SOURCES = phases2.cc
+corr_norm_SOURCES = corr_norm.cc
 grab_ff_SOURCES = grab_ff.cc
 grab_pol_SOURCES = grab_pol.cc
 grab_vector_mean_cmp_SOURCES = grab_vector_mean_cmp.cc
 invert_subduced_SOURCES = invert_subduced.cc
-check_rotations_SOURCES = check_rotations.cc
-corr_norm_SOURCES = corr_norm.cc
-radmat_util_SOURCES = radmat_util.cc
+mass_overlap_db_combine_SOURCES = mass_overlap_db_combine.cc
+mass_overlap_db_create_SOURCES = mass_overlap_db_create.cc
+mass_overlap_db_util_SOURCES = mass_overlap_db_util.cc
 radmat_SOURCES = radmat.cc
-test_tens_SOURCES = test_tens.cc
+radmat_util_SOURCES = radmat_util.cc
+single_plot_SOURCES = single_plot.cc
 test_redstar_ops_SOURCES = test_redstar_ops.cc
-
-# test_jfit_SOURCES = test_jfit.cc
-
-# no idea how/why this works, cut paste job
+test_tens_SOURCES = test_tens.cc
 #
 # The folow rule will always try to rebuild libadat.a when you 
 # try to compile a main prog
@@ -362,15 +332,9 @@ uninstall-binPROGRAMS:
 
 clean-binPROGRAMS:
 	-test -z "$(bin_PROGRAMS)" || rm -f $(bin_PROGRAMS)
-check_rotations$(EXEEXT): $(check_rotations_OBJECTS) $(check_rotations_DEPENDENCIES) 
-	@rm -f check_rotations$(EXEEXT)
-	$(CXXLINK) $(check_rotations_OBJECTS) $(check_rotations_LDADD) $(LIBS)
 corr_norm$(EXEEXT): $(corr_norm_OBJECTS) $(corr_norm_DEPENDENCIES) 
 	@rm -f corr_norm$(EXEEXT)
 	$(CXXLINK) $(corr_norm_OBJECTS) $(corr_norm_LDADD) $(LIBS)
-fake_radmat$(EXEEXT): $(fake_radmat_OBJECTS) $(fake_radmat_DEPENDENCIES) 
-	@rm -f fake_radmat$(EXEEXT)
-	$(CXXLINK) $(fake_radmat_OBJECTS) $(fake_radmat_LDADD) $(LIBS)
 grab_ff$(EXEEXT): $(grab_ff_OBJECTS) $(grab_ff_DEPENDENCIES) 
 	@rm -f grab_ff$(EXEEXT)
 	$(CXXLINK) $(grab_ff_OBJECTS) $(grab_ff_LDADD) $(LIBS)
@@ -392,12 +356,6 @@ mass_overlap_db_create$(EXEEXT): $(mass_overlap_db_create_OBJECTS) $(mass_overla
 mass_overlap_db_util$(EXEEXT): $(mass_overlap_db_util_OBJECTS) $(mass_overlap_db_util_DEPENDENCIES) 
 	@rm -f mass_overlap_db_util$(EXEEXT)
 	$(CXXLINK) $(mass_overlap_db_util_OBJECTS) $(mass_overlap_db_util_LDADD) $(LIBS)
-phases$(EXEEXT): $(phases_OBJECTS) $(phases_DEPENDENCIES) 
-	@rm -f phases$(EXEEXT)
-	$(CXXLINK) $(phases_OBJECTS) $(phases_LDADD) $(LIBS)
-phases2$(EXEEXT): $(phases2_OBJECTS) $(phases2_DEPENDENCIES) 
-	@rm -f phases2$(EXEEXT)
-	$(CXXLINK) $(phases2_OBJECTS) $(phases2_LDADD) $(LIBS)
 radmat$(EXEEXT): $(radmat_OBJECTS) $(radmat_DEPENDENCIES) 
 	@rm -f radmat$(EXEEXT)
 	$(CXXLINK) $(radmat_OBJECTS) $(radmat_LDADD) $(LIBS)
@@ -420,9 +378,7 @@ mostlyclean-compile:
 distclean-compile:
 	-rm -f *.tab.c
 
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/check_rotations.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/corr_norm.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/fake_radmat.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/grab_ff.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/grab_pol.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/grab_vector_mean_cmp.Po@am__quote@
@@ -430,8 +386,6 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/mass_overlap_db_combine.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/mass_overlap_db_create.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/mass_overlap_db_util.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/phases.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/phases2.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/radmat.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/radmat_util.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/single_plot.Po@am__quote@
@@ -650,7 +604,8 @@ uninstall-am: uninstall-binPROGRAMS
 	mostlyclean-generic pdf pdf-am ps ps-am tags uninstall \
 	uninstall-am uninstall-binPROGRAMS
 
-${bin_PROGRAMS}: ${DEPENDENCIES}   # uncomment this when there are binprograms
+${bin_PROGRAMS}: ${DEPENDENCIES}  
+
 #${check_PROGRAMS}: ${DEPENDENCIES}
 #${EXTRA_PROGRAMS}: ${DEPENDENCIES}
 

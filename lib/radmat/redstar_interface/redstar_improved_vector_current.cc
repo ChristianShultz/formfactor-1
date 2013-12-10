@@ -6,7 +6,7 @@
 
  * Creation Date : 20-11-2013
 
- * Last Modified : Sat 23 Nov 2013 06:41:34 PM EST
+ * Last Modified : Tue 10 Dec 2013 11:27:05 AM EST
 
  * Created By : shultz
 
@@ -16,7 +16,7 @@
 #include "redstar_improved_vector_current.h"
 #include "redstar_cartesian_interface.h"
 #include "redstar_single_particle_meson_block.h"
-#include "radmat/construct_data/invert_subduction.h"
+#include "redstar_invert_subduction.h"
 #include "radmat/fake_data/fake_3pt_function_aux.h"
 
 #include "semble/semble_meta.h"
@@ -28,7 +28,7 @@
 #include "hadron/clebsch.h"
 #include "formfac/formfac_qsq.h"
 
-#include "radmat/utils/polarisation_tensors.h"
+#include "redstar_photon_polarization_tensor.h"
 #include "radmat/utils/tensor.h"
 #include "radmat/utils/obj_expr_t.h"
 #include "radmat/utils/pow2assert.h"

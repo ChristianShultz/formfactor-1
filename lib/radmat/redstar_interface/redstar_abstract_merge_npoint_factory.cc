@@ -6,7 +6,7 @@
 
 * Creation Date : 12-11-2013
 
-* Last Modified : Thu 14 Nov 2013 09:23:14 AM EST
+* Last Modified : Tue 10 Dec 2013 11:21:49 AM EST
 
 * Created By : shultz
 
@@ -57,6 +57,10 @@ namespace radmat
       {
         success &= do_reg<RedstarMergeVectorCurrentThreePoint>();
       }
+
+      if ( !!! success ) 
+        throw std::string("reg error in TheRedstarAbstractMergeNPtFactoryEnv"); 
+
       return success; 
     }
 

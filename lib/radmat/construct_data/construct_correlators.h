@@ -9,7 +9,6 @@
  */
 
 #include "construct_correlators_xml.h" 
-#include "invert_subduction.h"
 #include "lattice_multi_data_object.h"
 #include "hadron/hadron_npart_npt_corr.h"
 #include "radmat/utils/handle.h"
@@ -26,7 +25,6 @@ namespace radmat
     // load an ini
     void load(const ThreePointCorrIni_t &ini)
     {
-      registerSubductionTables(); 
       have_ini = true;
       m_ini = ini; 
 

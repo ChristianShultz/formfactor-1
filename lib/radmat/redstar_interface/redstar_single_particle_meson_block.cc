@@ -6,7 +6,7 @@
 
  * Creation Date : 11-11-2013
 
- * Last Modified : Thu 21 Nov 2013 10:32:32 AM EST
+ * Last Modified : Tue 10 Dec 2013 11:28:19 AM EST
 
  * Created By : shultz
 
@@ -14,8 +14,8 @@
 
 #include "redstar_single_particle_meson_block.h"
 #include "radmat/utils/pow2assert.h"
-#include "radmat/construct_data/invert_subduction.h"
-#include "radmat/utils/polarisation_tensors.h"
+#include "redstar_invert_subduction.h"
+#include "redstar_photon_polarization_tensor.h"
 #include "radmat/utils/tensor.h"
 #include "radmat/utils/obj_expr_t.h"
 

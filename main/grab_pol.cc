@@ -6,7 +6,7 @@
 
  * Creation Date : 22-04-2013
 
- * Last Modified : Tue 03 Dec 2013 10:10:54 PM EST
+ * Last Modified : Tue 10 Dec 2013 11:46:34 AM EST
 
  * Created By : shultz
 
@@ -14,6 +14,7 @@
 
 
 
+#include "radmat/register_all/register_all.h"
 #include "radmat/ff/lorentzff_polarization_embedding.h"
 #include <iostream>
 #include <sstream>
@@ -28,25 +29,25 @@ void printTensor(const Tensor<double,1> &p, const int J, const int hel, const do
     case 1:
       {
         HelicityPolarizationTensor<1> foo;
-        std::cout << foo(p,hel,pfac) << std::endl;
+        std::cout << foo(p,hel,pfac,p,p) << std::endl;
         break;
       }
     case 2:
       {
         HelicityPolarizationTensor<2> foo;
-        std::cout << foo(p,hel,pfac) << std::endl;
+        std::cout << foo(p,hel,pfac,p,p) << std::endl;
         break;
       }
     case 3:
       {
         HelicityPolarizationTensor<3> foo;
-        std::cout << foo(p,hel,pfac) << std::endl;
+        std::cout << foo(p,hel,pfac,p,p) << std::endl;
         break;
       }
     case 4:
       {
         HelicityPolarizationTensor<4> foo;
-        std::cout << foo(p,hel,pfac) << std::endl;
+        std::cout << foo(p,hel,pfac,p,p) << std::endl;
         break;
       }
     default: 
@@ -106,6 +107,7 @@ inp usage(int argc, char *argv[])
 
 int main(int argc, char *argv[])
 {
+  AllFactoryEnv::registerAll(); 
 
   inp foo = usage(argc, argv); 
 

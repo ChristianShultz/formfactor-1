@@ -6,7 +6,7 @@
 
  * Creation Date : 25-02-2013
 
- * Last Modified : Fri 06 Dec 2013 02:17:32 PM EST
+ * Last Modified : Tue 10 Dec 2013 12:45:33 PM EST
 
  * Created By : shultz
 
@@ -22,6 +22,7 @@
 #include <exception>
 #include <iostream>
 
+#include "radmat/register_all/register_all.h"
 #include "radmat/driver/radmat_driver.h"
 #include "radmat/construct_data/lattice_multi_data_object.h"
 #include "radmat/llsq/llsq_multi_data_serialize.h"
@@ -365,6 +366,8 @@ void do_work(std::string &op, int argc,char *argv[])
 // main program wrapper
 int main(int argc, char *argv[])
 {
+  radmat::AllFactoryEnv::registerAll(); 
+
   // we will always have at least 2 , radmat_util operation_with_no_inputs
   if(argc < 2)
   {

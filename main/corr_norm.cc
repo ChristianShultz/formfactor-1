@@ -6,12 +6,12 @@
 
  * Creation Date : 07-05-2013
 
- * Last Modified : Wed 13 Nov 2013 06:37:34 PM EST
+ * Last Modified : Tue 10 Dec 2013 11:43:49 AM EST
 
  * Created By : shultz
 
  _._._._._._._._._._._._._._._._._._._._._.*/
-
+#include "radmat/register_all/register_all.h"
 #include "radmat/construct_data/radmat_database_interface.h"
 #include "radmat/fake_data/fake_3pt_function_aux.h"
 #include "radmat/utils/pow2assert.h"
@@ -135,6 +135,9 @@ void do_work(const dbKeyObject &d, const DatabaseInterface_t &db)
 
 int main(int argc , char* argv[])
 {
+
+  AllFactoryEnv::registerAll(); 
+
   if(argc != 2)
   {
     std::cerr << "error: usage corr_norm <props.xml> " << std::endl;

@@ -9,53 +9,42 @@ AM_LDFLAGS  = -L@top_builddir@/lib/ \
 
 LDADD = -lradmat @SEMBLE_LIBS@ @JACKFITTER_LIBS@ @ADAT_LIBS@ @ITPP_LIBS@ @LIBS@ 
 
-bin_PROGRAMS =   fake_radmat mass_overlap_db_create mass_overlap_db_combine single_plot phases mass_overlap_db_util grab_ff grab_pol grab_vector_mean_cmp invert_subduced phases2 check_rotations corr_norm radmat_util radmat test_tens test_redstar_ops
+bin_PROGRAMS =   \
+								 corr_norm		\
+								 grab_ff		\
+								 grab_pol		\
+								 grab_vector_mean_cmp		\
+								 invert_subduced		\
+								 mass_overlap_db_combine		\
+								 mass_overlap_db_create		\
+								 mass_overlap_db_util		\
+								 radmat		\
+								 radmat_util		\
+								 single_plot		\
+								 test_redstar_ops		\
+								 test_tens		
 
-
-fake_radmat_SOURCES = fake_radmat.cc
-
-mass_overlap_db_create_SOURCES = mass_overlap_db_create.cc
-
-mass_overlap_db_combine_SOURCES = mass_overlap_db_combine.cc
-
-mass_overlap_db_util_SOURCES = mass_overlap_db_util.cc
-
-single_plot_SOURCES = single_plot.cc
-
-phases_SOURCES = phases.cc
-
-phases2_SOURCES = phases2.cc
-
-grab_ff_SOURCES = grab_ff.cc
-
-grab_pol_SOURCES = grab_pol.cc
-
-grab_vector_mean_cmp_SOURCES = grab_vector_mean_cmp.cc
-
-invert_subduced_SOURCES = invert_subduced.cc
-
-check_rotations_SOURCES = check_rotations.cc
 
 corr_norm_SOURCES = corr_norm.cc
-
-radmat_util_SOURCES = radmat_util.cc
-
+grab_ff_SOURCES = grab_ff.cc
+grab_pol_SOURCES = grab_pol.cc
+grab_vector_mean_cmp_SOURCES = grab_vector_mean_cmp.cc
+invert_subduced_SOURCES = invert_subduced.cc
+mass_overlap_db_combine_SOURCES = mass_overlap_db_combine.cc
+mass_overlap_db_create_SOURCES = mass_overlap_db_create.cc
+mass_overlap_db_util_SOURCES = mass_overlap_db_util.cc
 radmat_SOURCES = radmat.cc
-
-test_tens_SOURCES = test_tens.cc
-
+radmat_util_SOURCES = radmat_util.cc
+single_plot_SOURCES = single_plot.cc
 test_redstar_ops_SOURCES = test_redstar_ops.cc
-
-
-# test_jfit_SOURCES = test_jfit.cc
-
-# no idea how/why this works, cut paste job
+test_tens_SOURCES = test_tens.cc
 #
 # The folow rule will always try to rebuild libadat.a when you 
 # try to compile a main prog
 #
 DEPENDENCIES = build_lib
-${bin_PROGRAMS}: ${DEPENDENCIES}   # uncomment this when there are binprograms
+${bin_PROGRAMS}: ${DEPENDENCIES}  
+
 #${check_PROGRAMS}: ${DEPENDENCIES}
 #${EXTRA_PROGRAMS}: ${DEPENDENCIES}
 

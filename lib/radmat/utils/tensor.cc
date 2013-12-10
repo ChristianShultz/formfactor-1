@@ -54,6 +54,14 @@ namespace radmat
 
     Hadron::CubicCanonicalRotation_t eulerangles = Hadron::cubicCanonicalRotation(mom);
 
+    return genRotationMatrix(eulerangles);
+  }
+
+
+  // Z-Y-Z
+  Tensor<double,2> genRotationMatrix(const Hadron::CubicCanonicalRotation_t &eulerangles)
+  {
+
     Tensor<double,2> A((TensorShape<2>())[4][4],0.),B((TensorShape<2>())[4][4],0.),C((TensorShape<2>())[4][4],0.);
 
 
@@ -92,28 +100,6 @@ namespace radmat
     C[3][1] = 0.       ;    C[3][2] = 0.        ;    C[3][3] =  1.      ; 
 
 
-
-#if 0
-
-    for(idx_t i = 0; i < 4; ++i)
-      A[i][i] = 1.;
-
-    B = A;
-    C = A;
-
-
-    A[1][1] = A[2][2] = cos(eulerangles.gamma);
-    A[2][1] = sin(eulerangles.gamma);
-    A[1][2] = -A[2][1];
-
-    B[1][1] = B[3][3] = cos(eulerangles.beta);
-    B[3][1] = sin(eulerangles.beta);
-    B[1][3] = -B[3][1];
-
-    C[1][1] = C[2][2] = cos(eulerangles.alpha);
-    C[2][1] = sin(eulerangles.alpha);
-    C[1][2] = -C[2][1];
-#endif 
 
     A.lower_index(1);
     B.lower_index(1);

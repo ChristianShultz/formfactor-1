@@ -4,7 +4,7 @@
 #include "redstar_abstract_block_base.h"
 #include "radmat/utils/pow2assert.h"
 #include "radmat/utils/tensor.h"
-#include "radmat/utils/polarisation_tensors.h"
+#include "redstar_photon_polarization_tensor.h"
 #include "itpp/itbase.h"
 #include "semble/semble_meta.h"
 #include <complex>

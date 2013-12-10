@@ -6,7 +6,7 @@
 
  * Creation Date : 8-122013
 
- * Last Modified : Sun 08 Dec 2013 04:31:50 PM EST
+ * Last Modified : Tue 10 Dec 2013 03:26:42 PM EST
 
  * Created By : shultz
 
@@ -20,8 +20,10 @@
 #include "ensem/ensem.h"
 #include "io/adat_xmlio.h"
 #include "semble/semble_meta.h"
+#include "radmat/register_all/register_all.h"
 #include "radmat/redstar_interface/redstar_interface.h"
 #include "radmat/ff/lorentzff_polarization_embedding.h"
+#include "radmat/ff/lorentzff_canonical_rotation_groups.h"
 #include "itpp/itbase.h"
 #include <map>
 #include <algorithm>
@@ -506,9 +508,9 @@ void radmat_test_photon_inversion(int argc , char *argv[] )
   for(int i = 0; i < 3; ++i)
     cart[i] = gamma_matrix(i+1); // ensem offset
 
-  for(int x = -2; x < 2; ++x)
-    for(int y = -2; y < 2; ++y)
-      for(int z = -2; z < 2; ++z)
+  for(int x = -2; x <= 2; ++x)
+    for(int y = -2; y <= 2; ++y)
+      for(int z = -2; z <= 2; ++z)
       {
         if( x*x + y*y + z*z > 4 ) 
           continue; 
@@ -608,18 +610,18 @@ sum_out_polarization(const radmat::Tensor<double,1> &p,
   radmat::Tensor<std::complex<double> , 1> eps; 
   radmat::Tensor<std::complex<double> , 1> epsc; 
 
-  eps = P.ptensor(p,mom_kick,p); 
-  epsc = P.conjugate(P.ptensor(p,mom_kick,p)); 
+  eps = P.ptensor(p,mom_kick,p,p); 
+  epsc = P.conjugate(P.ptensor(p,mom_kick,p,p)); 
   sum += pad_out(eps,epsc); 
   check_ortho(eps,p,"+");
 
-  eps = Z.ptensor(p,mom_kick,p); 
-  epsc = Z.conjugate(Z.ptensor(p,mom_kick,p)); 
+  eps = Z.ptensor(p,mom_kick,p,p); 
+  epsc = Z.conjugate(Z.ptensor(p,mom_kick,p,p)); 
   sum += pad_out(eps,epsc); 
   check_ortho(eps,p,"0");
 
-  eps = M.ptensor(p,mom_kick,p); 
-  epsc = M.conjugate(M.ptensor(p,mom_kick,p)); 
+  eps = M.ptensor(p,mom_kick,p,p); 
+  epsc = M.conjugate(M.ptensor(p,mom_kick,p,p)); 
   sum += pad_out(eps,epsc); 
   check_ortho(eps,p,"-");
 
@@ -670,9 +672,9 @@ void radmat_test_polarization_ortho(int argc , char *argv[] )
   double mass = 0.216; 
 
 
-  for(int x = -2; x < 2; ++x)
-    for(int y = -2; y < 2; ++y)
-      for(int z = -2; z < 2; ++z)
+  for(int x = -2; x <= 2; ++x)
+    for(int y = -2; y <= 2; ++y)
+      for(int z = -2; z <= 2; ++z)
       {
         if( x*x + y*y + z*z > 4 ) 
           continue; 
@@ -780,9 +782,9 @@ void loop_diff_rad_red_rho(int argc, char *argv[])
   std::string op = "rhoxD0_J0__J1";
   int nt(0),nb(0); 
 
-  for(int x = -2; x < 2; ++x)
-    for(int y = -2; y < 2; ++y)
-      for(int z = -2; z < 2; ++z)
+  for(int x = -2; x <= 2; ++x)
+    for(int y = -2; y <= 2; ++y)
+      for(int z = -2; z <= 2; ++z)
       {
         if( x*x + y*y + z*z > 4 ) 
           continue; 
@@ -817,6 +819,74 @@ void loop_diff_rad_red_rho(int argc, char *argv[])
 }
 
 
+//////////////////////////////////////////////////////////
+//////////////////////////////////////////////////////////
+//////////////////////////////////////////////////////////
+
+
+void unique_frames(int argc, char *argv[])
+{
+  if ( argc != 2 ) 
+  {
+    std::cerr << "error usage: test_redstar ops ["<< __func__ << "] " 
+      << std::endl;
+    exit(1337); 
+  }
+
+
+  radmat::RotationGroupGenerator<2,4> foo;
+  std::vector<std::string> frames; 
+  std::vector<std::string>::const_iterator it; 
+  frames = foo.unique_frames(); 
+
+  for(it = frames.begin(); it != frames.end(); ++it)
+    std::cout << *it << std::endl;
+   
+}
+
+
+
+//////////////////////////////////////////////////////////
+//////////////////////////////////////////////////////////
+//////////////////////////////////////////////////////////
+
+
+
+
+void related_by_rotation(int argc, char *argv[])
+{
+  if ( argc != 8 ) 
+  {
+    std::cerr << "error usage: test_redstar ops ["<< __func__ << "] " 
+      << "<mom1>  <mom2> "<< std::endl;
+    exit(1337); 
+  }
+
+  std::istringstream v(argv[2]),vv(argv[3]),vvv(argv[4]);
+  std::istringstream w(argv[5]),ww(argv[6]),www(argv[7]);
+
+  ADATXML::Array<int> p1,p2; 
+  p1.resize(3); 
+  v >> p1[0]; 
+  vv >> p1[1]; 
+  vvv >> p1[2]; 
+  p2.resize(3); 
+  w >> p2[0];
+  ww >> p2[1];
+  www >> p2[2]; 
+ 
+
+  radmat::RotationGroupGenerator<2,4> foo;
+  std::vector<std::string> frames; 
+  std::vector<std::string>::const_iterator it; 
+  frames = foo.get_related_frames(p1,p2); 
+
+  for(it = frames.begin(); it != frames.end(); ++it)
+    std::cout << *it << std::endl;
+   
+}
+
+
 
 //////////////////////////////////////////////////
 //////////////////////////////////////////////////
@@ -832,6 +902,8 @@ void insert_op(const std::string &s, const fptr &f)
 
 void init_options(void)
 {
+  insert_op("unique_frames",&unique_frames); 
+  insert_op("related_by_rotation",&related_by_rotation); 
   insert_op("radmat_test_pol_ortho",&radmat_test_polarization_ortho); 
   insert_op("radmat_test_photon_inversion",&radmat_test_photon_inversion); 
   insert_op("cartesianize_red_rho",&radmat_cartesianize_red_rho); 
@@ -870,6 +942,8 @@ void do_work(std::string &op, int argc,char *argv[])
 // main program wrapper
 int main(int argc, char *argv[])
 {
+  radmat::AllFactoryEnv::registerAll(); 
+
   // we will always have at least 2 , radmat_util operation_with_no_inputs
   if(argc < 2)
   {
