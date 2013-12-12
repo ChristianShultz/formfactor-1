@@ -6,7 +6,7 @@
 
  * Creation Date : 8-122013
 
- * Last Modified : Tue 10 Dec 2013 03:26:42 PM EST
+ * Last Modified : Wed 11 Dec 2013 07:40:13 PM EST
 
  * Created By : shultz
 
@@ -23,7 +23,7 @@
 #include "radmat/register_all/register_all.h"
 #include "radmat/redstar_interface/redstar_interface.h"
 #include "radmat/ff/lorentzff_polarization_embedding.h"
-#include "radmat/ff/lorentzff_canonical_rotation_groups.h"
+#include "radmat/ff/lorentzff_canonical_rotations.h"
 #include "itpp/itbase.h"
 #include <map>
 #include <algorithm>
@@ -598,45 +598,120 @@ void check_ortho(const radmat::Tensor<std::complex<double>,1> &eps,
 }
 
 itpp::Mat<std::complex<double> > 
-sum_out_polarization(const radmat::Tensor<double,1> &p, 
+sum_out_polarization_lefty(const radmat::Tensor<double,1> &p, 
+    const radmat::Tensor<double,1> &pp, 
     const double mom_kick)
 {
-  radmat::embedHelicityPolarizationTensor<1,1> P; 
-  radmat::embedHelicityPolarizationTensor<1,0> Z; 
-  radmat::embedHelicityPolarizationTensor<1,-1> M; 
+  radmat::embedHelicityPolarizationTensor<1,1> foo; 
+
+  radmat::leftPTensor<1,1> P; 
+  radmat::leftPTensor<1,0> Z; 
+  radmat::leftPTensor<1,-1> M; 
 
   itpp::Mat<std::complex<double> > sum(4,4); 
   sum.zeros(); 
   radmat::Tensor<std::complex<double> , 1> eps; 
   radmat::Tensor<std::complex<double> , 1> epsc; 
 
-  eps = P.ptensor(p,mom_kick,p,p); 
-  epsc = P.conjugate(P.ptensor(p,mom_kick,p,p)); 
+  eps = P.left_p_tensor(p,pp,mom_kick); 
+  epsc = foo.conjugate(P.left_p_tensor(p,pp,mom_kick)); 
   sum += pad_out(eps,epsc); 
-  check_ortho(eps,p,"+");
+  check_ortho(eps,p,"left+");
 
-  eps = Z.ptensor(p,mom_kick,p,p); 
-  epsc = Z.conjugate(Z.ptensor(p,mom_kick,p,p)); 
+  eps = Z.left_p_tensor(p,pp,mom_kick); 
+  epsc = foo.conjugate(Z.left_p_tensor(p,pp,mom_kick)); 
   sum += pad_out(eps,epsc); 
-  check_ortho(eps,p,"0");
+  check_ortho(eps,p,"left0");
 
-  eps = M.ptensor(p,mom_kick,p,p); 
-  epsc = M.conjugate(M.ptensor(p,mom_kick,p,p)); 
+  eps = M.left_p_tensor(p,pp,mom_kick); 
+  epsc = foo.conjugate(M.left_p_tensor(p,pp,mom_kick)); 
   sum += pad_out(eps,epsc); 
-  check_ortho(eps,p,"-");
+  check_ortho(eps,p,"left-");
 
 
   return sum; 
+}
+
+void
+print_eps_lefty(const radmat::Tensor<double,1> &p, 
+    const radmat::Tensor<double,1> &pp, 
+    const double mom_kick)
+{
+  radmat::leftPTensor<1,1> P; 
+  radmat::leftPTensor<1,0> Z; 
+  radmat::leftPTensor<1,-1> M; 
+  radmat::Tensor<std::complex<double> , 1> eps; 
+
+  eps = P.left_p_tensor(p,pp,mom_kick); 
+  std::cout << "left+ " << eps; 
+
+  eps = Z.left_p_tensor(p,pp,mom_kick); 
+  std::cout << "left0 " << eps; 
+
+  eps = M.left_p_tensor(p,pp,mom_kick); 
+  std::cout << "left- " << eps; 
+}
+
+
+itpp::Mat<std::complex<double> > 
+sum_out_polarization_righty(const radmat::Tensor<double,1> &p, 
+    const radmat::Tensor<double,1> &pp, 
+    const double mom_kick)
+{
+  radmat::embedHelicityPolarizationTensor<1,1> foo; 
+
+  radmat::rightPTensor<1,1> P; 
+  radmat::rightPTensor<1,0> Z; 
+  radmat::rightPTensor<1,-1> M; 
+
+  itpp::Mat<std::complex<double> > sum(4,4); 
+  sum.zeros(); 
+  radmat::Tensor<std::complex<double> , 1> eps; 
+  radmat::Tensor<std::complex<double> , 1> epsc; 
+
+  eps = P.right_p_tensor(p,pp,mom_kick); 
+  epsc = foo.conjugate(P.right_p_tensor(p,pp,mom_kick)); 
+  sum += pad_out(eps,epsc); 
+  check_ortho(eps,pp,"right+");
+
+  eps = Z.right_p_tensor(p,pp,mom_kick); 
+  epsc = foo.conjugate(Z.right_p_tensor(p,pp,mom_kick)); 
+  sum += pad_out(eps,epsc); 
+  check_ortho(eps,pp,"right0");
+
+  eps = M.right_p_tensor(p,pp,mom_kick); 
+  epsc = foo.conjugate(M.right_p_tensor(p,pp,mom_kick)); 
+  sum += pad_out(eps,epsc); 
+  check_ortho(eps,pp,"right-");
+
+
+  return sum; 
+}
+
+void
+print_eps_righty(const radmat::Tensor<double,1> &p, 
+    const radmat::Tensor<double,1> &pp, 
+    const double mom_kick)
+{
+  radmat::rightPTensor<1,1> P; 
+  radmat::rightPTensor<1,0> Z; 
+  radmat::rightPTensor<1,-1> M; 
+  radmat::Tensor<std::complex<double> , 1> eps; 
+
+  eps = P.right_p_tensor(p,pp,mom_kick); 
+  std::cout << "right+ " << eps; 
+
+  eps = Z.right_p_tensor(p,pp,mom_kick); 
+  std::cout << "right0 " << eps; 
+
+  eps = M.right_p_tensor(p,pp,mom_kick); 
+  std::cout << "right- " << eps; 
 }
 
 
 //////////////////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////////////
-
-
-
-
 
 
 
@@ -649,17 +724,20 @@ void radmat_test_polarization_ortho(int argc , char *argv[] )
     exit(1337);
   }
 
-  ADATXML::Array<int> mom; 
+  ADATXML::Array<int> mom,mom2; 
   mom.resize(3); 
+  mom2.resize(3); 
 
   int nt(0),nb(0); // test count
 
 
   // expected answer
-  itpp::Mat<std::complex<double> >  sum, g, zero(4,4); 
-  radmat::Tensor<double,1> p4((radmat::TensorShape<1>())[4]);
+  itpp::Mat<std::complex<double> >  suml,sumr, g, zero(4,4); 
+  radmat::Tensor<double,1> p4((radmat::TensorShape<1>())[4]),pp4;
+  pp4 = p4; 
   zero.zeros();
-  sum = zero; 
+  suml = zero; 
+  sumr = zero; 
   g = zero; 
 
   g(0,0) = 1.; 
@@ -689,27 +767,75 @@ void radmat_test_polarization_ortho(int argc , char *argv[] )
         p4[2] = mom_kick*mom[1];
         p4[3] = mom_kick*mom[2];
 
-        sum = zero; 
-        for(int i =0; i < 4; ++i)
-          for(int j =0; j < 4; ++j)
-            sum(i,j) = -g(i,j) + p4[i]*p4[j]/mass/mass; 
+        suml = zero; 
+        for(int mu =0; mu < 4; ++mu)
+          for(int nu =0; nu < 4; ++nu)
+            suml(mu,nu) = -g(mu,nu) + p4[mu]*p4[nu]/mass/mass; 
 
-        std::cout << __func__ << ": testing mom " << x << y << z << std::endl;
+        for(int i = -2; i <= 2; ++i)
+          for(int j = -2; j <= 2; ++j)
+            for(int k = -2; k <= 2; ++k)
+            {
+              if( i*i + j*j + k*k > 4 ) 
+                continue; 
 
-        itpp::Mat<std::complex<double> > res = sum_out_polarization(p4,mom_kick);  
+              if( (x-i)*(x-i) + (y-j)*(y-j) + (z-k)*(z-k) > 4)
+                continue; 
 
-        // test this index
-        if( itpp::round_to_zero(sum - res,1e-6) != zero )
-        {
-          std::cout << __func__ << ": inversion error, mom=" 
-            << x << y << z  
-            << "\nanswer:\n" << itpp::round_to_zero(res,1e-6)
-            << "\nexpected:\n" << itpp::round_to_zero(sum,1e-6)
-            << "\ndifference:\n" << itpp::round_to_zero(res - sum, 1e-6) << std::endl;
-          ++nb;
-        }
-        ++nt; 
+
+              mom2[0] = i; 
+              mom2[1] = j; 
+              mom2[2] = k;
+
+              double E2 = sqrt(mass * mass + mom_kick*mom_kick*(i*i+ j*j + k*k));  
+              pp4[0] = E2; 
+              pp4[1] = mom_kick*mom2[0];
+              pp4[2] = mom_kick*mom2[1];
+              pp4[3] = mom_kick*mom2[2];
+
+
+
+              sumr = zero; 
+              for(int mu =0; mu < 4; ++mu)
+                for(int nu =0; nu < 4; ++nu)
+                  sumr(mu,nu) = -g(mu,nu) + pp4[mu]*pp4[nu]/mass/mass; 
+
+
+              std::cout << __func__ << ": testing lefty" << x << y << z 
+                << "   righty " << i << j << k << std::endl;
+
+              itpp::Mat<std::complex<double> > res_left = sum_out_polarization_lefty(p4,pp4,mom_kick);  
+
+              // test this index
+              if( itpp::round_to_zero(suml - res_left,1e-6) != zero )
+              {
+                std::cout << __func__ << ": lefty error, mom=" << p4 
+                  << "\nanswer:\n" << itpp::round_to_zero(res_left,1e-6)
+                  << "\nexpected:\n" << itpp::round_to_zero(suml,1e-6)
+                  << "\ndifference:\n" << itpp::round_to_zero(res_left - suml, 1e-6) << std::endl;
+                ++nb;
+               print_eps_lefty(p4,pp4,mom_kick);  
+              }
+              ++nt; 
+
+
+              itpp::Mat<std::complex<double> > res_right = sum_out_polarization_righty(p4,pp4,mom_kick);  
+
+              // test this index
+              if( itpp::round_to_zero(sumr - res_right,1e-6) != zero )
+              {
+                std::cout << __func__ << ": righty error, mom=" << pp4  
+                  << "\nanswer:\n" << itpp::round_to_zero(res_right,1e-6)
+                  << "\nexpected:\n" << itpp::round_to_zero(sumr,1e-6)
+                  << "\ndifference:\n" << itpp::round_to_zero(res_right - sumr, 1e-6) << std::endl;
+                ++nb;
+               print_eps_righty(p4,pp4,mom_kick);  
+              }
+              ++nt; 
+
+            }
       }
+
 
 
   // result 
@@ -834,14 +960,13 @@ void unique_frames(int argc, char *argv[])
   }
 
 
-  radmat::RotationGroupGenerator<2,4> foo;
   std::vector<std::string> frames; 
   std::vector<std::string>::const_iterator it; 
-  frames = foo.unique_frames(); 
+  frames = radmat::LatticeRotationEnv::TheRotationGroupGenerator::Instance().unique_frames();;
 
   for(it = frames.begin(); it != frames.end(); ++it)
     std::cout << *it << std::endl;
-   
+
 }
 
 
@@ -874,16 +999,15 @@ void related_by_rotation(int argc, char *argv[])
   w >> p2[0];
   ww >> p2[1];
   www >> p2[2]; 
- 
 
-  radmat::RotationGroupGenerator<2,4> foo;
+
   std::vector<std::string> frames; 
   std::vector<std::string>::const_iterator it; 
-  frames = foo.get_related_frames(p1,p2); 
+  frames = radmat::LatticeRotationEnv::TheRotationGroupGenerator::Instance().get_related_frames(p1,p2);;
 
   for(it = frames.begin(); it != frames.end(); ++it)
     std::cout << *it << std::endl;
-   
+
 }
 
 

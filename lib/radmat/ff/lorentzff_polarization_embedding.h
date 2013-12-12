@@ -4,6 +4,7 @@
 #include <complex>
 
 #include "lorentzff_polarization_tensors.h"
+#include "lorentzff_canonical_rotations.h"
 #include "ensem/ensem.h"
 #include "semble/semble_meta.h"
 #include "hadron/clebsch.h"
@@ -19,7 +20,6 @@ namespace radmat
   template<idx_t J>
     struct HelicityPolarizationTensor
     {
-      typedef typename genPolTens<J>::mom_t mom_t; // Array<int> 
 
       HelicityPolarizationTensor(void) {}
       virtual ~HelicityPolarizationTensor(void) {}
@@ -65,10 +65,10 @@ namespace radmat
             const int hel, 
             const double mom_factor)
         {
-          double mod_p = t[1]*t[1] + t[2]*t[2] + t[3]*t[3];
-          ZAxisPolarizationTensor<J> foo;
+          double mod_p = sqrt( t[1]*t[1] + t[2]*t[2] + t[3]*t[3] );
+          ZAxisHelicityTensor<J> foo;
 
-          Tensor<std::complex<double> , J> tens = foo(t[0],hel,mod_p); 
+          Tensor<std::complex<double> , J> tens = foo(mod_p,hel,t[0]); 
 
           typename Tensor<std::complex<double> , J>::iterator it;
           for(it = tens.begin(); it != tens.end(); ++it)
@@ -86,18 +86,29 @@ namespace radmat
   ////////////////////////////////////////////////////////////////////////
   template<idx_t J, int hel>
     struct embedHelicityPolarizationTensor
+    : public HelicityPolarizationTensor<J> 
     {
-      typedef typename genPolTens<J>::mom_t mom_t; // Array<int> 
+
       virtual ~embedHelicityPolarizationTensor() {}
 
-      virtual Tensor<std::complex<double> , J>
-        ptensor(const Tensor<double,1> &target,
-            const double mom_factor, 
-            const Tensor<double,1> &left,
-            const Tensor<double,1> &right) const
+      virtual Tensor<std::complex<double>, J>
+        rotate(const Tensor<std::complex<double>,J> &z_axis,
+            const rHandle<Tensor<double,2> > &R)
         {
-          HelicityPolarizationTensor<J> foo;
-          return foo(target,hel,mom_factor,left,right); 
+          Tensor<std::complex<double>,J> rot(z_axis); 
+          Tensor<std::complex<double>,2> Rloc;
+          Rloc = convertTensorUnderlyingType<std::complex<double>,double,2>(*R); 
+
+          // rotate all indicies 
+          for(int i = 0; i < J; ++i)
+            rot = contract(Rloc,rot,1,i); 
+         
+          // clean up 
+          typename Tensor<std::complex<double> , J>::iterator it;
+          for(it = rot.begin(); it != rot.end(); ++it)
+            *it = round_to_zero(*it); 
+
+          return rot; 
         }
 
 
@@ -131,15 +142,23 @@ namespace radmat
   template<idx_t J_left, int hel_left>
     struct leftPTensor
     {
+
       virtual ~leftPTensor() {}
 
       virtual Tensor<std::complex<double> , J_left > 
-        left_p_tensor(const Tensor<double,1> &p, 
-            const double mom_factor ,
-            const Tensor<double,1> &pp) const
+        left_p_tensor(const Tensor<double,1> &lefty, 
+            const Tensor<double,1> &righty, 
+            const double mom_factor) const
         {
           embedHelicityPolarizationTensor<J_left,hel_left> foo; 
-          return foo.conjugate( foo.ptensor(p,mom_factor,p,pp) ); 
+          Tensor<std::complex<double> , J_left> eps_z = foo.z_axis_helicity_tensor(lefty,hel_left,mom_factor); 
+          mom_t l = foo.int_based_mom(lefty,mom_factor);
+          mom_t r = foo.int_based_mom(righty,mom_factor); 
+        
+          rHandle<Tensor<double,2> > R = radmat::LatticeRotationEnv::get_left_rotation(l,r);      
+          Tensor<std::complex<double>, J_left> eps = foo.rotate(eps_z,R); 
+
+          return foo.conjugate( eps ); 
         }
     };
 
@@ -149,20 +168,26 @@ namespace radmat
   template<idx_t J_right, int hel_right>
     struct rightPTensor
     {
+
       virtual ~rightPTensor() {}
+
       virtual Tensor<std::complex<double> , J_right > 
-        right_p_tensor(const Tensor<double,1> &p, 
-            const double mom_factor,
-            const Tensor<double,1> &pp ) const
+        right_p_tensor(const Tensor<double,1> &lefty, 
+            const Tensor<double,1> &righty, 
+            const double mom_factor) const
         {
           embedHelicityPolarizationTensor<J_right,hel_right> foo; 
-          return foo.ptensor(p,mom_factor,pp,p); 
+          Tensor<std::complex<double> , J_right> eps_z = foo.z_axis_helicity_tensor(righty,hel_right,mom_factor); 
+          mom_t l = foo.int_based_mom(lefty,mom_factor);
+          mom_t r = foo.int_based_mom(righty,mom_factor); 
+        
+          rHandle<Tensor<double,2> > R = radmat::LatticeRotationEnv::get_right_rotation(l,r);      
+
+          return foo.rotate(eps_z,R); 
         }
     };
 
 }
-
-
 
 
 

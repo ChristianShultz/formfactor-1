@@ -6,7 +6,7 @@
 
  * Creation Date : 12-11-2013
 
- * Last Modified : Fri 15 Nov 2013 05:45:54 PM EST
+ * Last Modified : Tue 10 Dec 2013 07:15:05 PM EST
 
  * Created By : shultz
 
@@ -80,7 +80,6 @@ namespace radmat
       const std::string &path, 
       NPointXML &npt)
   {
-    radmat::TheRedstarAbstractXMLFactoryEnv::registerAll(); 
     ADATXML::XMLReader ptop(xml,path); 
     doXMLRead(ptop,"version",npt.version,__PRETTY_FUNCTION__); 
     doXMLRead(ptop,"ensemble",npt.ensemble,__PRETTY_FUNCTION__); 

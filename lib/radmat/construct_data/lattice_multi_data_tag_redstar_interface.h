@@ -2,8 +2,10 @@
 #define LATTICE_MULTI_DATA_TAG_REDSTAR_INTERFACE_H 
 
 #include "radmat/redstar_interface/redstar_interface.h"
+#include "radmat/ff/lorentzff_canonical_rotations.h"
 #include "lattice_multi_data_tag.h"
 #include <vector>
+#include <sstream>
 
 namespace radmat
 {
@@ -19,6 +21,15 @@ namespace radmat
     {  }
 
     double qsq_tag(void) const {return continuum_tag.get_qsq_label();}
+
+    std::string rot_qsq_tag(void) const
+    {
+      std::stringstream ss; 
+      ss << qsq_tag() << "_" 
+        << radmat::LatticeRotationEnv::rotation_group_label(
+            continuum_tag.p_f, continuum_tag.p_i);
+      return ss.str(); 
+    } 
 
     EnsemRedstarNPtBlock coeff_lattice_xml; 
     LatticeMultiDataTag continuum_tag; 

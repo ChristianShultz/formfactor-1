@@ -6,7 +6,7 @@
 
 * Creation Date : 12-11-2013
 
-* Last Modified : Tue 10 Dec 2013 11:21:49 AM EST
+* Last Modified : Tue 10 Dec 2013 07:14:07 PM EST
 
 * Created By : shultz
 
@@ -67,7 +67,6 @@ namespace radmat
     rHandle<AbsRedstarMergeNPt>
       callFactory(const std::string &id)
       {
-        POW2_ASSERT( FacEnv::registerAll() ); 
         AbsRedstarMergeNPt *foo; 
         try
         {

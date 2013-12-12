@@ -21,7 +21,9 @@ bin_PROGRAMS =   \
 								 radmat		\
 								 radmat_util		\
 								 single_plot		\
+								 test_levi_civita \
 								 test_redstar_ops		\
+								 test_rotations \
 								 test_tens		
 
 
@@ -36,7 +38,9 @@ mass_overlap_db_util_SOURCES = mass_overlap_db_util.cc
 radmat_SOURCES = radmat.cc
 radmat_util_SOURCES = radmat_util.cc
 single_plot_SOURCES = single_plot.cc
+test_levi_civita_SOURCES = test_levi_civita.cc
 test_redstar_ops_SOURCES = test_redstar_ops.cc
+test_rotations_SOURCES = test_rotations.cc
 test_tens_SOURCES = test_tens.cc
 #
 # The folow rule will always try to rebuild libadat.a when you 

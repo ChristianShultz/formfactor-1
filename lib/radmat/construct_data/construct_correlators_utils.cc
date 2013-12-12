@@ -6,7 +6,7 @@
 
  * Creation Date : 13-11-2013
 
- * Last Modified : Thu 05 Dec 2013 02:41:19 PM EST
+ * Last Modified : Wed 11 Dec 2013 04:15:24 PM EST
 
  * Created By : shultz
 
@@ -294,6 +294,43 @@ namespace radmat
       snoop.stop(); 
 
       std::map<double,std::vector<TaggedEnsemRedstarNPtBlock> >::const_iterator it1; 
+      int ct(0);
+      for(it1 = ret.begin(); it1 != ret.end(); ++it1)
+        ct += it1->second.size();
+
+      std::cout << __func__ << ": sorting, " << ct << " elems took " 
+        << snoop.getTimeInSeconds() << " seconds "  << std::endl; 
+#endif 
+      return ret;
+    }
+
+  ////////////////////////////////////////////////////////////////////
+  // brute force sort on qsq
+  std::map<std::string,std::vector<TaggedEnsemRedstarNPtBlock> > 
+    sort_tagged_corrs_by_Q2_and_rotation_group(const std::vector<TaggedEnsemRedstarNPtBlock> &unsorted)
+    {
+
+#ifdef DO_TIMING_SORT_MAT_ELEMS_BY_Q2
+      Util::StopWatch snoop;
+      snoop.start(); 
+#endif
+
+      std::map<std::string,std::vector<TaggedEnsemRedstarNPtBlock> > ret; 
+      std::vector<TaggedEnsemRedstarNPtBlock>::const_iterator it; 
+
+      // loop everything and toss it into a vector if it matches else make a new vector
+      for(it = unsorted.begin(); it != unsorted.end(); ++it)
+        if(ret.find(it->rot_qsq_tag()) != ret.end())
+          ret.find(it->rot_qsq_tag())->second.push_back(*it);
+        else
+          ret.insert(std::map<std::string,std::vector<TaggedEnsemRedstarNPtBlock> >::value_type(
+                it->rot_qsq_tag(),std::vector<TaggedEnsemRedstarNPtBlock>(1,*it))); 
+
+
+#ifdef DO_TIMING_SORT_MAT_ELEMS_BY_Q2
+      snoop.stop(); 
+
+      std::map<std::string,std::vector<TaggedEnsemRedstarNPtBlock> >::const_iterator it1; 
       int ct(0);
       for(it1 = ret.begin(); it1 != ret.end(); ++it1)
         ct += it1->second.size();

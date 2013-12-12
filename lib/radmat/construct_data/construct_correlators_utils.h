@@ -21,6 +21,8 @@ namespace radmat
   std::map<double,std::vector<TaggedEnsemRedstarNPtBlock> > 
     sort_tagged_corrs_by_Q2(const std::vector<TaggedEnsemRedstarNPtBlock> &); 
 
+  std::map<std::string,std::vector<TaggedEnsemRedstarNPtBlock> > 
+    sort_tagged_corrs_by_Q2_and_rotation_group(const std::vector<TaggedEnsemRedstarNPtBlock> &); 
 
   // the database type we will be using 
   typedef radmatAllConfDatabaseInterface< Hadron::KeyHadronNPartNPtCorr_t,

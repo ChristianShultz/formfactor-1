@@ -222,7 +222,6 @@ namespace radmat
     // interface between the factory and the outside world for ease of use
     rHandle<LLSQBaseSolver_t<std::complex<double> > > callFactory(const std::string &solnID)
     {
-      POW2_ASSERT(FacEnv::registerAll());
       LLSQBaseSolver_t<std::complex<double> > *foo;
       foo = NULL;
       try

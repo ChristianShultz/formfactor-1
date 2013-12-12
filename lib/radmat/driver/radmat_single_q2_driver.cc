@@ -6,7 +6,7 @@
 
  * Creation Date : 25-02-2013
 
- * Last Modified : Sat 07 Dec 2013 05:39:49 PM EST
+ * Last Modified : Wed 11 Dec 2013 05:00:45 PM EST
 
  * Created By : shultz
 
@@ -16,6 +16,7 @@
 
 #include "radmat/driver/radmat_single_q2_driver.h"
 #include "radmat/llsq/llsq_multi_data_serialize.h"
+#include "radmat/ff/lorentzff_canonical_rotations.h"
 #include "semble/semble_semble.h"
 #include "ensem/ensem.h"
 #include <sstream>
@@ -116,6 +117,10 @@ namespace radmat
         << "\nvalue is " << pole_mass_squared + SEMBLE::toScalar(ENSEM::mean(linear_system.Q2())) << std::endl;
       return false; 
     }
+
+    // append the label
+    append_rotation_group_label(rotation_group_label()); 
+    
 
     init_linear_system = true; 
 
@@ -281,6 +286,28 @@ namespace radmat
     return ss.str(); 
   }
 
+  std::string RadmatSingleQ2Driver::rotation_group_label(void) const
+  {
+    // check_exit_linear_system(); 
+    std::vector<LatticeMultiDataTag> tt = linear_system.peek_tags(); 
+    std::vector<LatticeMultiDataTag>::const_iterator it;
+  
+    if( tt.empty() )
+      return std::string(); 
+
+    it = tt.begin(); 
+    std::string chk = radmat::LatticeRotationEnv::rotation_group_label(it->p_f,it->p_i); 
+    for(it = tt.begin(); it != tt.end(); ++it)
+      if( chk != radmat::LatticeRotationEnv::rotation_group_label(it->p_f,it->p_i) )
+      {
+        std::cout << __func__ << ": returning empty string since more "
+          << " than one rotation group is present, unless one of the "
+          << "particles is spin zero this is rather problematic for you "
+          << std::endl;
+       return std::string();  
+      }
+    return chk; 
+  }
 
   void RadmatSingleQ2Driver::dump_fits(void) 
   {
@@ -325,7 +352,16 @@ namespace radmat
   std::string RadmatSingleQ2Driver::base_path(void) const
   {
     std::stringstream ss; 
-    ss << SEMBLE::SEMBLEIO::getPath() << "Q2_" << linear_system.qsq_sort() << "/";
+    ss << SEMBLE::SEMBLEIO::getPath() << "Q2_" << linear_system.qsq_sort();
+
+    // this is an ugly naming convention 
+    if( rot_id != std::string() )
+    {
+      SEMBLE::SEMBLEIO::makeDirectoryPath(ss.str());
+      ss << "/" << rot_id; 
+    }
+
+    ss << "/";
     SEMBLE::SEMBLEIO::makeDirectoryPath(ss.str());
     return ss.str(); 
   }

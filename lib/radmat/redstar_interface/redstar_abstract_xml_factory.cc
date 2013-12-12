@@ -6,7 +6,7 @@
 
 * Creation Date : 12-11-2013
 
-* Last Modified : Tue 10 Dec 2013 11:23:55 AM EST
+* Last Modified : Tue 10 Dec 2013 07:14:37 PM EST
 
 * Created By : shultz
 
@@ -78,7 +78,6 @@ namespace radmat
     rHandle<AbsRedstarXMLInterface_t>
       callFactory(const std::string &id)
       {
-        POW2_ASSERT( FacEnv::registerAll() ); 
         AbsRedstarXMLInterface_t *foo; 
         try
         {

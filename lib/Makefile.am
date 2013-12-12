@@ -48,8 +48,6 @@ nobase_include_HEADERS =   \
 													 radmat/ff/lorentzff_polarization_tensors.h		\
 													 radmat/ff/lorentzff_RhoPi.h		\
 													 radmat/ff/lorentzff_RhoRho.h		\
-													 radmat/ff/lorentzff_Zpolarization_tensors.h		\
-													 radmat/ff/rest_polarization_convention.h		\
 													 radmat/fitting/axis_plotter.h		\
 													 radmat/fitting/fit_tins.h		\
 													 radmat/llsq/llsq_chisq.h		\

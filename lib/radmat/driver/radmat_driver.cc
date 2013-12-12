@@ -6,7 +6,7 @@
 
  * Creation Date : 25-02-2013
 
- * Last Modified : Thu 05 Dec 2013 08:11:42 PM EST
+ * Last Modified : Wed 11 Dec 2013 04:51:22 PM EST
 
  * Created By : shultz
 
@@ -475,9 +475,11 @@ namespace radmat
 #endif 
     // POSSIBLE PARALLEL HERE
     for(idx =0; idx < sz; ++idx)
+    {
       good_qs[idx] =  linear_systems_of_Q2[idx].load_llsq(multi_lattice_data[idx],
           m_ini.poleMass,
           m_ini.tolerance);
+    }
     // END PARALLEL
 
 #pragma omp barrier
@@ -490,6 +492,8 @@ namespace radmat
     init_llsq = true;
 
     std::cout << __func__ << ": " << ngood << " good Q^2 points out of " << sz << std::endl;
+
+
 
     // print the list here in case the solver flakes we can easily determine where it went wrong
     print_Q2_list(); 

@@ -60,7 +60,6 @@ namespace radmat
     // call around the factory.createObj method
     rHandle<ffBase_t<std::complex<double> > > callFactory(const std::string &matElemID)
     {
-      POW2_ASSERT(FacEnv::registerAll());
       ffBase_t<std::complex<double> > *foo;
       foo = NULL;
       try

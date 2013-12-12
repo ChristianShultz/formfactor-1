@@ -6,7 +6,7 @@
 
  * Creation Date : 12-11-2013
 
- * Last Modified : Fri 22 Nov 2013 10:41:42 PM EST
+ * Last Modified : Wed 11 Dec 2013 03:55:07 PM EST
 
  * Created By : shultz
 
@@ -16,6 +16,7 @@
 #include "radmat/utils/handle.h"
 #include "radmat/utils/mink_qsq.h"
 #include "radmat/utils/pow2assert.h"
+#include "radmat/ff/lorentzff_canonical_rotations.h"
 #include <sstream>
 
 #define PARALLEL_TAG_REDSTAR_DATA

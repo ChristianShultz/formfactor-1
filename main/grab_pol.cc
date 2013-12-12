@@ -6,7 +6,7 @@
 
  * Creation Date : 22-04-2013
 
- * Last Modified : Tue 10 Dec 2013 11:46:34 AM EST
+ * Last Modified : Tue 10 Dec 2013 06:37:12 PM EST
 
  * Created By : shultz
 
@@ -29,25 +29,25 @@ void printTensor(const Tensor<double,1> &p, const int J, const int hel, const do
     case 1:
       {
         HelicityPolarizationTensor<1> foo;
-        std::cout << foo(p,hel,pfac,p,p) << std::endl;
+        std::cout << foo.z_axis_helicity_tensor(p,hel,pfac) << std::endl;
         break;
       }
     case 2:
       {
         HelicityPolarizationTensor<2> foo;
-        std::cout << foo(p,hel,pfac,p,p) << std::endl;
+        std::cout << foo.z_axis_helicity_tensor(p,hel,pfac) << std::endl;
         break;
       }
     case 3:
       {
         HelicityPolarizationTensor<3> foo;
-        std::cout << foo(p,hel,pfac,p,p) << std::endl;
+        std::cout << foo.z_axis_helicity_tensor(p,hel,pfac) << std::endl;
         break;
       }
     case 4:
       {
         HelicityPolarizationTensor<4> foo;
-        std::cout << foo(p,hel,pfac,p,p) << std::endl;
+        std::cout << foo.z_axis_helicity_tensor(p,hel,pfac) << std::endl;
         break;
       }
     default: 

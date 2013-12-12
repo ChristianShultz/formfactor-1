@@ -6,7 +6,7 @@
 
  * Creation Date : 01-08-2012
 
- * Last Modified : Fri 06 Dec 2013 12:32:32 PM EST
+ * Last Modified : Wed 11 Dec 2013 06:10:37 PM EST
 
  * Created By : shultz
 
@@ -73,9 +73,22 @@ namespace radmat
 
       fit_real.runAvgFit(); 
       fit_imag.runAvgFit(); 
-
       const_real = fit_real.getAvgFitParValue(0);
       const_imag = fit_imag.getAvgFitParValue(0);
+
+      // no on has time for this 
+      //   fit_real.runJackFit(); 
+      //   fit_imag.runJackFit(); 
+      //   const_real = fit_real.getAvgFitParValue(0);
+      //   const_imag = fit_imag.getAvgFitParValue(0);
+
+      double const_real_var = fit_real.getAvgFitParError(0);
+      double const_imag_var = fit_imag.getAvgFitParError(0);
+
+      if( fabs(const_real) - 3.*fabs(const_real_var) < 0.)
+        return imag; 
+      if( fabs(const_imag) - 3.*fabs(const_imag_var) < 0.)
+        return real; 
 
       // what if it is a longitudial factor or crossing 
       //    we are only getting about 2% precision, 
@@ -114,7 +127,7 @@ namespace radmat
         std::cout << "rl = " << const_real << " im = " << const_imag << std::endl;
         std::cout << "for Q2 = " << SEMBLE::toScalar(ENSEM::mean(fitter.getQ2())) << std::endl;  
         std::cout << "used tlow = " << tlow << " thigh = " << thigh << std::endl; 
-        SPLASH("check bad_corr.jack, bad_corr.ax for the correlator"); 
+        SPLASH("check bad_corr.jack, bad_corr.ax for the correlator, returning zero"); 
 
         AxisPlot plot; 
         plot.addEnsemData(ENSEM::real(in),"\\sq",1);
@@ -123,9 +136,9 @@ namespace radmat
 
         ENSEM::write("bad_corr.jack",in); 
 
-        SPLASH("An error occured while trying to pull the real/imag part of the solution vector,exiting.");
-        exit(1);
       }
+
+      return SEMBLE::toScalar( double(0.) ) * real; 
     }
 
 

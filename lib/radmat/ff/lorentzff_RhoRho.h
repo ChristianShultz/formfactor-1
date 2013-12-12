@@ -38,8 +38,8 @@ namespace radmat
           const double mom_fac) 
       {
         // polarization tensors (up indicies)
-        eps_left = this->left_p_tensor(p_f,mom_fac,p_i); 
-        eps_right = this->right_p_tensor(p_i,mom_fac,p_f); 
+        eps_left = this->left_p_tensor(p_f,p_i,mom_fac); 
+        eps_right = this->right_p_tensor(p_f,p_i,mom_fac); 
 
         // momentum tensors (up indicies) 
         p_left = convertTensorUnderlyingType<std::complex<double> , double, 1>(p_f);

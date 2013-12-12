@@ -31,7 +31,7 @@ namespace radmat
       {
 
         // come up with the ingredient list
-        Tensor<std::complex<double>, 1> epsilon = this->left_p_tensor(p_f,mom_fac,p_i);
+        Tensor<std::complex<double>, 1> epsilon = this->left_p_tensor(p_f,p_i,mom_fac);
         Tensor<std::complex<double>, 1> pplus, pminus;
         pplus = convertTensorUnderlyingType<std::complex<double>,double,1>( pPlus(p_f,p_i) );
         pminus = convertTensorUnderlyingType<std::complex<double>,double,1>( pMinus(p_f,p_i) );
@@ -48,6 +48,11 @@ namespace radmat
         pminus = applyMetric(pminus,gdd,0); 
         pplus = applyMetric(pplus,gdd,0); 
         epsilon = applyMetric(epsilon,gdd,0); 
+
+        std::cout << __func__ << ": pars " << std::endl;
+        std::cout << "pp " << pplus << "\npm" << pminus 
+          << "\neps" << epsilon << std::endl;
+
 
 #if 1
         Tensor<std::complex<double> , 0> inner_prod = contract( epsilon, p_f , 0 , 0 ) ; 

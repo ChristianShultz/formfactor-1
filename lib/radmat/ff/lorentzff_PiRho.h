@@ -30,7 +30,7 @@ namespace radmat
           const Tensor<double,1> &p_i, const double mom_fac) const
       {
         // come up with the ingredient list
-        Tensor<std::complex<double>, 1> epsilon = this->right_p_tensor(p_i,mom_fac,p_f); 
+        Tensor<std::complex<double>, 1> epsilon = this->right_p_tensor(p_f,p_i,mom_fac); 
         Tensor<std::complex<double>, 1> pplus, pminus;
         pplus = convertTensorUnderlyingType<std::complex<double>,double,1>( pPlus(p_f,p_i) );
         pminus = convertTensorUnderlyingType<std::complex<double>,double,1>( pMinus(p_f,p_i) );

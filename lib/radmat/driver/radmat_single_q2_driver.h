@@ -76,9 +76,12 @@ namespace radmat
     bool check_linear_system(void) const {return init_linear_system;}
     bool check_solved_llsq(void) const {return init_solved_llsq;}
     bool check_fits(void) const {return init_fits;}
-
+    
+    void append_rotation_group_label(const std::string &s) {rot_id = s;}
 
     private:
+    std::string rotation_group_label(void) const; 
+    std::string rot_id; 
     std::string base_path(void) const; 
     void init_false(); 
     void check_exit(const bool, const char *) const;    
