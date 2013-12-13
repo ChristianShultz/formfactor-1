@@ -1,5 +1,5 @@
-#ifndef LORENTZFF_POLARIZATION_EMBEDDING_H
-#define LORENTZFF_POLARIZATION_EMBEDDING_H
+#ifndef LORENTZFF_POLARIZATION_EMBEDDING_OLD_H
+#define LORENTZFF_POLARIZATION_EMBEDDING_OLD_H
 
 #include <complex>
 
@@ -130,8 +130,7 @@ namespace radmat
           Tensor<std::complex<double> , J_right> eps_z = foo.z_axis_helicity_tensor(righty,mom_factor); 
           mom_t l = get_space_mom(lefty,mom_factor);
           mom_t r = get_space_mom(righty,mom_factor); 
-          rHandle<Tensor<double,2> > Rcomposite(radmat::CanonicalRotationEnv::call_factory(l));
-          Tensor<std::complex<double>, J_left> eps = foo.rotate(eps_z,Rcomposite); 
+          rHandle<Tensor<double,2> > Rcomposite(radmat::CanonicalRotationEnv::call_factory(r));
 
           return foo.rotate(eps_z,Rcomposite); 
         }
@@ -141,4 +140,4 @@ namespace radmat
 
 
 
-#endif /* LORENTZFF_POLARIZATION_EMBEDDING_H */
+#endif /* LORENTZFF_POLARIZATION_EMBEDDING_OLD_H */

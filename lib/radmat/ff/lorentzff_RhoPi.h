@@ -44,6 +44,11 @@ namespace radmat
         epsilon = applyMetric(epsilon,gdd,0); 
 
 #if 1
+        std::cout << "pminus " << pminus << "pplus " << pplus << "eps " << epsilon << std::endl;
+#endif 
+  
+
+#if 1
         Tensor<std::complex<double> , 0> inner_prod = contract( epsilon, p_f , 0 , 0 ) ; 
         if ( std::norm ( inner_prod.value() ) >  1e-6 ) 
           std::cout << "mom dotted into polarization was " << inner_prod.value() << std::endl; 

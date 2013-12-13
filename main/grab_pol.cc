@@ -6,7 +6,7 @@
 
  * Creation Date : 22-04-2013
 
- * Last Modified : Thu 12 Dec 2013 04:39:40 PM EST
+ * Last Modified : Thu 12 Dec 2013 10:29:40 PM EST
 
  * Created By : shultz
 
@@ -16,6 +16,7 @@
 
 #include "radmat/register_all/register_all.h"
 #include "radmat/ff/lorentzff_polarization_embedding.h"
+#include "radmat/ff/lorentzff_polarization_embedding_old.h"
 #include "radmat/ff/lorentzff_formfac_utils.h"
 #include <iostream>
 #include <sstream>
@@ -23,26 +24,57 @@
 using namespace radmat;
 
 
+
+
+int local_flag = 0; 
+
+
 template<int J, int H>
 void print_tensor(const Tensor<double,1> &l, 
     const Tensor<double,1> &r, 
     const double &mom_kick)
 {
-  radmat::embedHelicityPolarizationTensor<J,H> z;
-  radmat::leftPTensor<J,H> lefty;
-  radmat::rightPTensor<J,H> righty;
 
-  std::cout << "lefty: " << l << "\nrighty:" << r << std::endl;
-  std::cout << "\nz-axis left: " << z.z_axis_helicity_tensor(l,mom_kick);
-  std::cout << "\nz-axis right: " << z.z_axis_helicity_tensor(r,mom_kick);
-  std::cout << "\nlefty: " << lefty.left_p_tensor(l,r,mom_kick); 
-  std::cout << "\nrighty: " << righty.right_p_tensor(l,r,mom_kick); 
+  if(local_flag == 1)
+  {
+    std::cout << "USING NEW PTENS" << std::endl;
+
+    radmat::embedHelicityPolarizationTensor<J,H> z;
+    radmat::leftPTensor<J,H> lefty;
+    radmat::rightPTensor<J,H> righty;
+
+    std::cout << "lefty: " << l << "\nrighty:" << r << std::endl;
+    std::cout << "\nz-axis left: " << z.z_axis_helicity_tensor(l,mom_kick);
+    std::cout << "\nz-axis right: " << z.z_axis_helicity_tensor(r,mom_kick);
+    std::cout << "\nlefty: " << lefty.left_p_tensor(l,r,mom_kick); 
+    std::cout << "\nrighty: " << righty.right_p_tensor(l,r,mom_kick); 
 
 
-  std::cout << "\ncanonical_frame: "
-    << radmat::LatticeRotationEnv::rotation_group_label(
-        radmat::get_space_mom(l,mom_kick),radmat::get_space_mom(r,mom_kick)) 
-    << std::endl;
+    std::cout << "\ncanonical_frame: "
+      << radmat::LatticeRotationEnv::rotation_group_label(
+          radmat::get_space_mom(l,mom_kick),radmat::get_space_mom(r,mom_kick)) 
+      << std::endl;
+  }
+  else
+  {
+    std::cout << "USING OLD PTENS" << std::endl;
+
+    radmat::embedHelicityPolarizationTensor_old<J,H> z;
+    radmat::leftPTensor_old<J,H> lefty;
+    radmat::rightPTensor_old<J,H> righty;
+
+    std::cout << "lefty: " << l << "\nrighty:" << r << std::endl;
+    std::cout << "\nz-axis left: " << z.z_axis_helicity_tensor(l,mom_kick);
+    std::cout << "\nz-axis right: " << z.z_axis_helicity_tensor(r,mom_kick);
+    std::cout << "\nlefty: " << lefty.left_p_tensor(l,r,mom_kick); 
+    std::cout << "\nrighty: " << righty.right_p_tensor(l,r,mom_kick); 
+
+
+    std::cout << "\ncanonical_frame: "
+      << radmat::LatticeRotationEnv::rotation_group_label(
+          radmat::get_space_mom(l,mom_kick),radmat::get_space_mom(r,mom_kick)) 
+      << std::endl;
+  }
 }
 
 
@@ -169,7 +201,7 @@ void print_tensor(const Tensor<double,1> &l,
 }
 
 
-Tensor<double,1>
+  Tensor<double,1>
 gen_t(const double m, const int x, const int y, const int z, const double kick)
 {
   Tensor<double,1> r( (TensorShape<1>())[4] ,0.);
@@ -182,7 +214,7 @@ gen_t(const double m, const int x, const int y, const int z, const double kick)
 
 
 template<typename T>
-void
+  void
 read_par(const int i, T &t, char *argv[])
 {
   std::istringstream val(argv[i]);
@@ -194,10 +226,10 @@ int main(int argc, char *argv[])
 {
   AllFactoryEnv::registerAll(); 
 
-  if( argc != 12 )
+  if( argc != 13 )
   {
     std::cout << "error: usage: <grab_pol> " 
-      << "m1 m2 p1 p2 p3 pp1 pp2 pp3 mom_kick J H"
+      << "m1 m2 p1 p2 p3 pp1 pp2 pp3 mom_kick J H (1->new)"
       << std::endl;
     exit(1);
   }
@@ -219,6 +251,7 @@ int main(int argc, char *argv[])
   read_par(9,kick,argv);
   read_par(10,J,argv);
   read_par(11,H,argv);
+  read_par(12,local_flag,argv);
 
   print_tensor(
       gen_t(m1,p1,p2,p3,kick),

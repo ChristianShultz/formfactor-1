@@ -46,9 +46,11 @@ nobase_include_HEADERS =   \
 													 radmat/ff/lorentzff_PiPiStar.h		\
 													 radmat/ff/lorentzff_PiRho.h		\
 													 radmat/ff/lorentzff_polarization_embedding.h		\
+													 radmat/ff/lorentzff_polarization_embedding_old.h		\
 													 radmat/ff/lorentzff_polarization_tensors.h		\
 													 radmat/ff/lorentzff_RhoPi.h		\
 													 radmat/ff/lorentzff_RhoRho.h		\
+													 radmat/ff/lorentzff_rotated_levi_civita_tensor.h		\
 													 radmat/fitting/axis_plotter.h		\
 													 radmat/fitting/fit_tins.h		\
 													 radmat/llsq/llsq_chisq.h		\
@@ -127,6 +129,7 @@ libradmat_a_SOURCES =	\
 											radmat/ff/lorentzff_canonical_rotations_utils.cc		\
 											radmat/ff/lorentzff_PiPi.cc		\
 											radmat/ff/lorentzff_PiPiStar.cc		\
+											radmat/ff/lorentzff_rotated_levi_civita_tensor.cc		\
 											radmat/fitting/axis_plotter.cc		\
 											radmat/fitting/fit_tins.cc		\
 											radmat/llsq/llsq_chisq.cc		\

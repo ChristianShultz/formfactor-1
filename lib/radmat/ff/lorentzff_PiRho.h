@@ -3,7 +3,7 @@
 
 #include "ff_gen_llsq_row.h"
 #include "lorentzff_polarization_embedding.h"
-#include "radmat/utils/levi_civita.h"
+#include "lorentzff_rotated_levi_civita_tensor.h"
 #include "radmat/utils/pow2assert.h"
 
 
@@ -34,7 +34,8 @@ namespace radmat
         Tensor<std::complex<double>, 1> pplus, pminus;
         pplus = convertTensorUnderlyingType<std::complex<double>,double,1>( pPlus(p_f,p_i) );
         pminus = convertTensorUnderlyingType<std::complex<double>,double,1>( pMinus(p_f,p_i) );
-        Tensor<std::complex<double>, 4>  levi = levi_civita<std::complex<double>,4>(); 
+        rHandle<Tensor<double, 4> >  levi_d = radmat::RotatedLeviCivitaTensorEnv::call_factory(p_f,p_i,mom_fac); 
+        Tensor<std::complex<double>,4> levi = convertTensorUnderlyingType<std::complex<double>,double,4>(*levi_d); 
         Tensor<std::complex<double>, 2> gdd;
         gdd = convertTensorUnderlyingType<std::complex<double>,double,2>(g_dd());
 
