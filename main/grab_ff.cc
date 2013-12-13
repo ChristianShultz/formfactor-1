@@ -6,7 +6,7 @@
 
 * Creation Date : 22-04-2013
 
-* Last Modified : Tue 10 Dec 2013 11:45:36 AM EST
+* Last Modified : Thu 12 Dec 2013 10:13:29 AM EST
 
 * Created By : shultz
 
@@ -17,6 +17,7 @@ _._._._._._._._._._._._._._._._._._._._._.*/
 #include <sstream>
 
 #include "radmat/ff/formfactor_factory.h"
+#include "radmat/ff/lorentzff_canonical_rotations.h"
 #include "radmat/utils/tensor.h"
 #include "radmat/register_all/register_all.h"
 
@@ -27,6 +28,7 @@ struct inp
 {
   string matElemID; 
   Tensor<double,1> pf,pi;
+  mom_t l,r; 
   double pfac;
   bool jmu;
   int mu; 
@@ -53,21 +55,36 @@ inp usage(int argc, char *argv[])
 
   { std::stringstream ss(argv[1]); ss >> foo.matElemID; }
   { std::stringstream z(argv[2]),o(argv[3]),t(argv[4]),th(argv[5]);
+    mom_t p; 
+    p.resize(3); 
     Tensor<double,1> fred((TensorShape<1>())[4],0.);
     z >> fred[0];
     o >> fred[1];
     t >> fred[2];
     th >> fred[3];
-     
+    
+    p[0] = fred[1]; 
+    p[1] = fred[2];
+    p[2] = fred[3];  
+
+    foo.l = p; 
     foo.pf = fred; }
 
     { std::stringstream z(argv[6]),o(argv[7]),t(argv[8]),th(argv[9]);
     Tensor<double,1> fred((TensorShape<1>())[4],0.);
+    mom_t p; 
+    p.resize(3); 
     z >> fred[0];
     o >> fred[1];
     t >> fred[2];
     th >> fred[3];
      
+    
+    p[0] = fred[1]; 
+    p[1] = fred[2];
+    p[2] = fred[3];  
+
+    foo.r = p; 
     foo.pi = fred; }
 
     {std::stringstream ss(argv[10]); ss >> foo.pfac;}
@@ -101,7 +118,8 @@ int main(int argc, char *argv[])
 
   inp fred = usage(argc, argv); 
 
-  FormFactorDecompositionFactoryEnv::registerAll(); 
+  std::cout << "the canonical frame is " <<
+    radmat::LatticeRotationEnv::TheRotationGroupGenerator::Instance().get_can_frame_string(fred.l,fred.r) << std::endl;
 
   rHandle<ffBase_t<std::complex<double> > > foo = FormFactorDecompositionFactoryEnv::callFactory(fred.matElemID); 
 

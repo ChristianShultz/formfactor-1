@@ -5,7 +5,7 @@
  * Purpose :
 
 
- * Last Modified : Wed 11 Dec 2013 07:57:19 PM EST
+ * Last Modified : Thu 12 Dec 2013 06:24:44 PM EST
 
  * Created By : shultz
 
@@ -48,6 +48,13 @@ namespace radmat
       }
 
 
+      std::string mom_string(const mom_t &p)
+      {
+        std::stringstream ss; 
+        ss << p[0] << p[1] << p[2]; 
+        return ss.str(); 
+      }
+
       bool
         check_rotation_invariant(const RotationMatrix_t *R,
             const mom_t &l)
@@ -77,84 +84,47 @@ namespace radmat
           return true; 
         } 
 
-      void clean_up(RotationMatrix_t *R)
-      {
-        for(int i = 1; i < 4; ++i)
-          for(int j = 1; j < 4; ++j)
-            if( fabs((*R)[i][j]) < 1e-6)
-              (*R)[i][j] = 0.;
-      }
-
-      //
-      //  This is where we pick how to rotate
-      //
-
-
-      // the canonical frame defines the z axis  
-      // everything follows as a rotaion from this frame
+      //  Apply the transformation to 
+      //  particle at rest to maintain a
+      //  consistent frame
       RotationMatrix_t *
-        rest_specialization(const mom_t &pc, const mom_t &p)
+        rest_specialization(const mom_t &cl, 
+            const mom_t &cr, 
+            const mom_t &l, 
+            const mom_t &r) 
         {
-          std::string LGc = Hadron::generateLittleGroup(pc);
-          check_exit_LG(p,LGc);
+          std::string LGl = Hadron::generateLittleGroup(cl);
+          std::string LGr = Hadron::generateLittleGroup(cr);
 
-          // if they are both at rest return identity
-          if( is_rest(p) )
+          check_exit_LG(l,LGl);
+          check_exit_LG(r,LGr); 
+
+          // if both are at rest return identity
+          if( is_rest(cr) && is_rest(cl) )
           {
-            Tensor<double,2> *I4; 
-            I4 = new Tensor<double,2>((TensorShape<2>())[4][4],0.);
-
+            RotationMatrix_t *I4= new Tensor<double,2>((TensorShape<2>())[4][4],0.);
+            I4->lower_index(1); 
             (*I4)[0][0] = 1.;
             (*I4)[1][1] = 1.;
             (*I4)[2][2] = 1.;
             (*I4)[3][3] = 1.;
-
-            I4->lower_index(1); 
-
-            return I4; 
           }
 
-          RotationMatrix_t *Ref = radmat::CanonicalRotationEnv::call_factory(LGc); 
-          RotationMatrix_t *Rc = radmat::CanonicalLatticeRotationEnv::call_factory(pc);
-          RotationMatrix_t *Rp = radmat::CanonicalLatticeRotationEnv::call_factory(p);
-          RotationMatrix_t *R= new Tensor<double,2>((TensorShape<2>())[4][4],0.);
-          RotationMatrix_t *Rtemp= new Tensor<double,2>((TensorShape<2>())[4][4],0.);
-          R->lower_index(1); 
+          RotationMatrix_t *R; 
+          if(is_rest(cr))
+            R = generate_frame_transformation(l,cl); 
+          if(is_rest(cl))
+            R = generate_frame_transformation(r,cr); 
 
-          //
-          // Rp takes me from ref to p
-          // Rc takes me from ref to c 
-          //
-          for(int i = 0; i < 4; ++i)
-            for(int j = 0; j < 4; ++j)
-            {
-              if( fabs( (*Rp)[i][j] ) < 1e-6 )
-                continue; 
-
-              for(int k = 0; k < 4; ++k)
-                (*Rtemp)[i][k] += (*Rp)[i][j] * (*Rc)[k][j]; 
-            }
-
-          // hit it with a ref rotation  
-          for(int i = 0; i < 4; ++i)
-            for(int j = 0; j < 4; ++j)
-            {
-              if( fabs( (*Rtemp)[i][j] ) < 1e-6 )
-                continue; 
-
-              for(int k = 0; k < 4; ++k)
-                (*R)[i][k] += (*Rtemp)[i][j] * (*Ref)[k][j]; 
-            }
-
-          delete Ref; 
-          delete Rc; 
-          delete Rp; 
-          delete Rtemp;
+          clean_up_rot_mat(R); 
 
           return R; 
         }
 
-
+      // generates the frame transformation between cr and r
+      // 
+      //  cr = R r
+      //
       RotationMatrix_t *
         generate_right_rotation(const mom_t &cl, 
             const mom_t &cr, 
@@ -167,20 +137,84 @@ namespace radmat
           check_exit_LG(l,LGl);
           check_exit_LG(r,LGr); 
 
-          // if righty is at rest then he needs 
-          // to follow lefty
-          if( is_rest(cr) ) 
-            return rest_specialization(cl,l); 
+          if( is_rest(cl) || is_rest(cr) )
+            return rest_specialization(cl,cr,l,r); 
 
-          // righty doesn't care if lefty is at rest, that
-          // is lefty's problem 
+          RotationMatrix_t *R = generate_frame_transformation(r,cr); 
+          clean_up_rot_mat(R); 
 
-          // return the normal rotations with the ref built in
-          return radmat::CanonicalRotationEnv::call_factory(r);
+          return R; 
         }
 
 
+      // generates the rotation about the momentum direction  
+      // and checks that this is a valid prescription 
+      //      -- eventually should be removed since it 
+      //         attaches the inverse of a different tform
+      RotationMatrix_t *
+        generate_check_left_phase_rotation(const mom_t &cl, 
+            const mom_t &cr, 
+            const mom_t &l, 
+            const mom_t &r) 
+        {
+          std::string LGl = Hadron::generateLittleGroup(cl);
+          std::string LGr = Hadron::generateLittleGroup(cr);
 
+          check_exit_LG(l,LGl);
+          check_exit_LG(r,LGr); 
+
+
+          // the rotation from cr to r
+          RotationMatrix_t *R_frame_r = generate_frame_transformation(r,cr); 
+
+          // the rotation from cl to l
+          RotationMatrix_t *R_frame_l = generate_frame_transformation(l,cl); 
+          RotationMatrix_t *R= new Tensor<double,2>((TensorShape<2>())[4][4],0.);
+          R->lower_index(1); 
+
+
+          // this is a rotation about the momentum direction 
+          // of lefty 
+          for(int i = 0; i < 4; ++i)
+            for(int j = 0; j < 4; ++j)
+            {
+              if( fabs( (*R_frame_r)[i][j] ) < 1e-6 )
+                continue;
+
+              for(int k = 0; k < 4; ++k)
+                (*R)[i][k] += (*R_frame_r)[i][j] * (*R_frame_l)[k][j];  
+            }
+
+          // all this can be is a rotation about the 
+          // momentum direction 
+          if( !!! check_rotation_invariant(R,l) )
+          {
+            clean_up_rot_mat(R_frame_r);
+            clean_up_rot_mat(R_frame_l);
+
+            std::cout << __func__ << ": error for \ncl: " << mom_string(cl)
+              << " cr " << mom_string(cr) << " --> l " << mom_string(l) 
+              << " r " << mom_string(r) << "\nR_r: " << *R_frame_r 
+              << "\nR_l: " << *R_frame_l; 
+
+            delete R_frame_r; 
+            delete R_frame_l; 
+            delete R; 
+
+            exit(1); 
+          } 
+
+          clean_up_rot_mat(R); 
+
+          delete R_frame_r; 
+          delete R_frame_l; 
+
+          return R; 
+        }
+
+
+      // attaches the phase to the transformation between 
+      // cl and l that respects cr to r
       RotationMatrix_t *
         generate_left_rotation(const mom_t &cl, 
             const mom_t &cr, 
@@ -193,136 +227,35 @@ namespace radmat
           check_exit_LG(l,LGl);
           check_exit_LG(r,LGr); 
 
-          // if righty is at rest then righty must 
-          // follow lefty 
-          if( is_rest(cr) )
-            return radmat::CanonicalRotationEnv::call_factory(l); 
+          if( is_rest(cl) || is_rest(cr) )
+            return rest_specialization(cl,cr,l,r); 
 
-          // if lefty is at rest then we need to follow righty 
-          if( is_rest(cl) )
-            return rest_specialization(cr,r); 
+          // the rotation from cr to r
+          RotationMatrix_t *Rphase = generate_check_left_phase_rotation(cl,cr,l,r); 
 
-          // need to be deleted
-          // 
-          //    These are lattice rotations 
-          //
-          RotationMatrix_t *Rcl = radmat::CanonicalLatticeRotationEnv::call_factory(cl);
-          RotationMatrix_t *Rcr = radmat::CanonicalLatticeRotationEnv::call_factory(cr);
-          RotationMatrix_t *Rl = radmat::CanonicalLatticeRotationEnv::call_factory(l);
-          RotationMatrix_t *Rr = radmat::CanonicalLatticeRotationEnv::call_factory(r);
-          RotationMatrix_t *Rtemp= new Tensor<double,2>((TensorShape<2>())[4][4],0.);
-          RotationMatrix_t *Rcr_r= new Tensor<double,2>((TensorShape<2>())[4][4],0.);
-          RotationMatrix_t *Rcl_l= new Tensor<double,2>((TensorShape<2>())[4][4],0.);
-          Rtemp->lower_index(1); 
-
-          // gets returned
+          // the rotation from cl to l
+          RotationMatrix_t *R_frame_l = generate_frame_transformation(l,cl); 
           RotationMatrix_t *R= new Tensor<double,2>((TensorShape<2>())[4][4],0.);
-          R->lower_index(1);
+          R->lower_index(1); 
 
-          clean_up(Rcl);
-          clean_up(Rcr); 
-          clean_up(Rl);
-          clean_up(Rr); 
 
-          // Rcr_r is the rotation that takes me from the 
-          // right reference frame to the right frame 
           for(int i = 0; i < 4; ++i)
             for(int j = 0; j < 4; ++j)
             {
-              if( fabs( (*Rr)[i][j] ) < 1e-6 )
-                continue; 
-
-              for(int k = 0; k < 4; ++k)
-                (*Rcr_r)[i][k] += (*Rr)[i][j] * (*Rcr)[k][j];   
-            }
-
-
-          // Rcl_l is the rotation that takes me from the 
-          // left reference frame to the left frame 
-          for(int i = 0; i < 4; ++i)
-            for(int j = 0; j < 4; ++j)
-            {
-              if( fabs( (*Rl)[i][j] ) < 1e-6 )
-                continue; 
-
-              for(int k = 0; k < 4; ++k)
-                (*Rcl_l)[i][k] += (*Rl)[i][j] * (*Rcl)[k][j];   
-            }
-
-          clean_up(Rcr_r); 
-          clean_up(Rcl_l); 
-
-          bool frame_tform = true; 
-          frame_tform &= check_frame_transformation(Rcr_r,cr,r);
-          frame_tform &= check_frame_transformation(Rcl_l,cl,l); 
-
-          if( !!! frame_tform )
-          {
-            std::cout << __func__ << ": frame_transformatio error"
-              << std::endl;
-            exit(1); 
-          }
-
-          // Rtemp is is the rotation that takes me from the 
-          //  left frame to the left reference frame 
-          //  followed by the rotation that takes me 
-          //  from the right reference frame to the right frame 
-          for(int i = 0; i < 4; ++i)
-            for(int j = 0; j < 4; ++j)
-            {
-              if( fabs( (*Rcr_r)[i][j] ) < 1e-6 )
+              if( fabs( (*Rphase)[i][j] ) < 1e-6 )
                 continue;
 
               for(int k = 0; k < 4; ++k)
-                (*Rtemp)[i][k] += (*Rcr_r)[i][j] * (*Rcl_l)[k][j];
+                (*R)[i][k] += (*Rphase)[i][j] * (*R_frame_l)[j][k];  
             }
 
+          clean_up_rot_mat(R); 
 
-          // this can only rotate about the momentum
-          if( !!! check_rotation_invariant(Rtemp,l))
-          {
-            std::cout << "\n\n" << __func__ << ": cl" << cl[0] << cl[1] << cl[2] 
-              << "  l" << l[0] << l[1] << l[2] 
-              << "  cr" << cr[0] << cr[1] << cr[2] 
-              << "  r" << r[0] << r[1] << r[2] 
-              << "\n*************************"
-              << std::endl;
-
-            clean_up(Rcl); 
-            clean_up(Rcr);
-            clean_up(Rl);
-            clean_up(Rr);
-
-            std::cout << "\nRcl:" << *Rcl << "\nRcr:" << *Rcr
-              << "\nRl:" << *Rl << "\nRr:" << *Rr 
-              << "\nRcr_r:" << *Rcr_r << "\nRcl_l:" << *Rcl_l 
-              << std::endl;
-
-            exit(1); 
-          } 
-
-          delete Rl;
-
-          // stick the left rotation (and ref) back in 
-          Rl = radmat::CanonicalRotationEnv::call_factory(l); 
-
-          // put the Rl back in 
-          for(int i = 0; i < 4; ++i)
-            for(int j = 0; j < 4; ++j)
-              for(int k = 0; k < 4; ++k)
-                (*R)[i][k] += (*Rtemp)[i][j] * (*Rl)[j][k]; 
-
-          clean_up(R); 
-
-          delete Rtemp;
-          delete Rcl;
-          delete Rcr;
-          delete Rl;
-          delete Rr; 
+          delete Rphase; 
+          delete R_frame_l; 
 
           return R; 
         }
-
 
     } // anonomyous
 
@@ -337,22 +270,22 @@ namespace radmat
     {
       bool local_registration = false; 
 
-      rHandle<RotationMatrix_t>
+      RotationMatrix_t *
         left_rotation(const mom_t &cl, 
             const mom_t &cr, 
             const mom_t &l, 
             const mom_t &r) 
         {
-          return rHandle<RotationMatrix_t>(generate_left_rotation(cl,cr,l,r)); 
+          return generate_left_rotation(cl,cr,l,r); 
         }
 
-      rHandle<RotationMatrix_t>
+      RotationMatrix_t *
         right_rotation(const mom_t &cl, 
             const mom_t &cr, 
             const mom_t &l, 
             const mom_t &r) 
         {
-          return rHandle<RotationMatrix_t>(generate_right_rotation(cl,cr,l,r)); 
+          return generate_right_rotation(cl,cr,l,r); 
         }
 
     } // anonomyous
@@ -387,7 +320,7 @@ namespace radmat
       {
         std::pair<mom_t,mom_t> can; 
         can = TheRotationGroupGenerator::Instance().get_can_frame(l,r); 
-        return left_rotation(can.first,can.second,l,r); 
+        return rHandle<RotationMatrix_t>(left_rotation(can.first,can.second,l,r)); 
       }
 
     rHandle<RotationMatrix_t> 
@@ -395,8 +328,43 @@ namespace radmat
       {
         std::pair<mom_t,mom_t> can; 
         can = TheRotationGroupGenerator::Instance().get_can_frame(l,r); 
-        return right_rotation(can.first,can.second,l,r); 
+        return rHandle<RotationMatrix_t>(right_rotation(can.first,can.second,l,r)); 
       }
+
+    rHandle<RotationMatrix_t> 
+      get_left_can_frame_rotation(const mom_t &l, const mom_t &r)
+      {
+        std::pair<mom_t,mom_t> can; 
+        can = TheRotationGroupGenerator::Instance().get_can_frame(l,r); 
+        return rHandle<RotationMatrix_t>(radmat::CanonicalRotationEnv::call_factory(can.first)); 
+      }
+
+    rHandle<RotationMatrix_t> 
+      get_right_can_frame_rotation(const mom_t &l, const mom_t &r)
+      {
+        std::pair<mom_t,mom_t> can; 
+        can = TheRotationGroupGenerator::Instance().get_can_frame(l,r); 
+        return rHandle<RotationMatrix_t>(radmat::CanonicalRotationEnv::call_factory(can.second)); 
+      }
+
+    RotationMatrix_t*
+      get_left_rotation(const mom_t &cl, 
+          const mom_t &cr, 
+          const mom_t &l, 
+          const mom_t &r) 
+      {
+        return left_rotation(cl,cr,l,r); 
+      }
+
+    RotationMatrix_t*
+      get_right_rotation(const mom_t &cl, 
+          const mom_t &cr, 
+          const mom_t &l, 
+          const mom_t &r) 
+      {
+        return right_rotation(cl,cr,l,r); 
+      }
+
 
   } // LatticeRotationEnv
 

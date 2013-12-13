@@ -93,6 +93,18 @@ namespace radmat
         return it->second; 
       }
 
+      std::pair<mom_t,mom_t> get_fame_momentum(const std::string &id) const
+      {
+        std::map<std::string,std::pair<mom_t,mom_t> >::const_iterator it; 
+        it = frame_label_map.find(id); 
+        if(it == frame_label_map.end())
+        {
+          std::cout << "error: frame " << id << "not present" << std::endl;
+          exit(1); 
+        }
+        return it->second; 
+      }
+
       std::vector<std::string> get_related_frames(const mom_t &l, const mom_t &r) const
       {
         std::string can = get_can_frame_string(l,r); 

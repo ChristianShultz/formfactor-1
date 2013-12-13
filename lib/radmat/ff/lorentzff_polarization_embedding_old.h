@@ -1,9 +1,6 @@
 #ifndef LORENTZFF_POLARIZATION_EMBEDDING_H
 #define LORENTZFF_POLARIZATION_EMBEDDING_H
 
-
-
-
 #include <complex>
 
 #include "lorentzff_polarization_tensors.h"
@@ -24,9 +21,9 @@ namespace radmat
   //
   ////////////////////////////////////////////////////////////////////////
   template<idx_t J, int hel>
-    struct embedHelicityPolarizationTensor
+    struct embedHelicityPolarizationTensor_old
     {
-      virtual ~embedHelicityPolarizationTensor() {}
+      virtual ~embedHelicityPolarizationTensor_old() {}
 
       // do work 
       Tensor<std::complex<double>, J> 
@@ -94,27 +91,21 @@ namespace radmat
   ////////////////////////////////////////////////////////////////////////
   //  left polarization tensors (final state, annih ops)
   template<idx_t J_left, int hel_left>
-    struct leftPTensor
+    struct leftPTensor_old
     {
 
-      virtual ~leftPTensor() {}
+      virtual ~leftPTensor_old() {}
 
       virtual Tensor<std::complex<double> , J_left > 
         left_p_tensor(const Tensor<double,1> &lefty, 
             const Tensor<double,1> &righty, 
             const double mom_factor) const
         {
-          embedHelicityPolarizationTensor<J_left,hel_left> foo; 
+          embedHelicityPolarizationTensor_old<J_left,hel_left> foo; 
           Tensor<std::complex<double> , J_left> eps_z = foo.z_axis_helicity_tensor(lefty,mom_factor); 
           mom_t l = get_space_mom(lefty,mom_factor);
           mom_t r = get_space_mom(righty,mom_factor); 
-
-          rHandle<Tensor<double,2> > Rframe = radmat::LatticeRotationEnv::get_left_rotation(l,r);      
-          rHandle<Tensor<double,2> > Rcan = radmat::LatticeRotationEnv::get_left_can_frame_rotation(l,r);      
-
-          rHandle<Tensor<double,2> > Rcomposite( new Tensor<double,2>() ); 
-          *Rcomposite = contract(*Rframe,*Rcan,1,0); 
-
+          rHandle<Tensor<double,2> > Rcomposite(radmat::CanonicalRotationEnv::call_factory(l));
           Tensor<std::complex<double>, J_left> eps = foo.rotate(eps_z,Rcomposite); 
 
           return foo.conjugate( eps ); 
@@ -125,25 +116,22 @@ namespace radmat
   ////////////////////////////////////////////////////////////////////////
   //  right polarization tensors (initial state, creation ops)
   template<idx_t J_right, int hel_right>
-    struct rightPTensor
+    struct rightPTensor_old
     {
 
-      virtual ~rightPTensor() {}
+      virtual ~rightPTensor_old() {}
 
       virtual Tensor<std::complex<double> , J_right > 
         right_p_tensor(const Tensor<double,1> &lefty, 
             const Tensor<double,1> &righty, 
             const double mom_factor) const
         {
-          embedHelicityPolarizationTensor<J_right,hel_right> foo; 
+          embedHelicityPolarizationTensor_old<J_right,hel_right> foo; 
           Tensor<std::complex<double> , J_right> eps_z = foo.z_axis_helicity_tensor(righty,mom_factor); 
           mom_t l = get_space_mom(lefty,mom_factor);
           mom_t r = get_space_mom(righty,mom_factor); 
-
-          rHandle<Tensor<double,2> > Rframe = radmat::LatticeRotationEnv::get_right_rotation(l,r);      
-          rHandle<Tensor<double,2> > Rcan = radmat::LatticeRotationEnv::get_right_can_frame_rotation(l,r);      
-          rHandle<Tensor<double,2> > Rcomposite( new Tensor<double,2>() ); 
-          *Rcomposite = contract(*Rframe,*Rcan,1,0); 
+          rHandle<Tensor<double,2> > Rcomposite(radmat::CanonicalRotationEnv::call_factory(l));
+          Tensor<std::complex<double>, J_left> eps = foo.rotate(eps_z,Rcomposite); 
 
           return foo.rotate(eps_z,Rcomposite); 
         }

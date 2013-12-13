@@ -6,7 +6,7 @@
 
  * Creation Date : 8-122013
 
- * Last Modified : Wed 11 Dec 2013 07:40:13 PM EST
+ * Last Modified : Thu 12 Dec 2013 05:48:35 PM EST
 
  * Created By : shultz
 
@@ -684,7 +684,6 @@ sum_out_polarization_righty(const radmat::Tensor<double,1> &p,
   sum += pad_out(eps,epsc); 
   check_ortho(eps,pp,"right-");
 
-
   return sum; 
 }
 
@@ -832,6 +831,9 @@ void radmat_test_polarization_ortho(int argc , char *argv[] )
                print_eps_righty(p4,pp4,mom_kick);  
               }
               ++nt; 
+
+              if(nb)
+                exit(1); 
 
             }
       }

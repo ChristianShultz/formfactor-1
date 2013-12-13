@@ -34,33 +34,26 @@ namespace radmat
         Tensor<std::complex<double>, 1> pplus, pminus;
         pplus = convertTensorUnderlyingType<std::complex<double>,double,1>( pPlus(p_f,p_i) );
         pminus = convertTensorUnderlyingType<std::complex<double>,double,1>( pMinus(p_f,p_i) );
-        Tensor<std::complex<double>, 4> levi = levi_civita<std::complex<double> , 4>(); 
+        Tensor<std::complex<double>, 4>  levi = levi_civita<std::complex<double>,4>(); 
         Tensor<std::complex<double>, 2> gdd;
         gdd = convertTensorUnderlyingType<std::complex<double>,double,2>(g_dd());
 
-        // the intermediary steps.. since we are contracting w/ vectors
-        // we go down by one rank at each step
-        Tensor<std::complex<double>, 3> foo;
-        Tensor<std::complex<double>, 2> bar;
-        Tensor<std::complex<double>, 1> baz; 
-
-        // do contractions 
-        foo = contract(levi,applyMetric(pminus,gdd,0),3,0);
-        bar = contract(foo,applyMetric(pplus,gdd,0),2,0);
-        baz = contract(bar,applyMetric(epsilon,gdd,0),1,0);
+        pminus = applyMetric(pminus,gdd,0); 
+        pplus = applyMetric(pplus,gdd,0); 
+        epsilon = applyMetric(epsilon,gdd,0); 
 
 #if 1
-        // sanity
-        Tensor<std::complex<double>, 0> inner_prod; 
-        inner_prod = contract(epsilon,applyMetric(p_i,gdd,0),0,0); 
-        std::stringstream ss; 
-        ss << "momentum dotted into polarization was " << inner_prod.value() << std::endl ;
-        if(std::norm(inner_prod.value()) > 0.000001 ) 
-          std::cout << ss.str() << std::endl;  
-
-#endif
-        // the kinematic factor carries one lorentz index
-        return baz;
+        Tensor<std::complex<double> , 0> inner_prod = contract( epsilon, p_i , 0 , 0 ) ; 
+        if ( std::norm ( inner_prod.value() ) >  1e-6 ) 
+          std::cout << "mom dotted into polarization was " << inner_prod.value() << std::endl; 
+#endif 
+        
+        return contract(
+            contract(
+                contract(levi,
+                    pminus , 3 , 0),
+                pplus , 2 , 0 ),
+            epsilon , 1 , 0 );
       }
     };
 

@@ -35,38 +35,26 @@ namespace radmat
         Tensor<std::complex<double>, 1> pplus, pminus;
         pplus = convertTensorUnderlyingType<std::complex<double>,double,1>( pPlus(p_f,p_i) );
         pminus = convertTensorUnderlyingType<std::complex<double>,double,1>( pMinus(p_f,p_i) );
-        Tensor<std::complex<double>, 4> levi = levi_civita<std::complex<double> , 4>(); 
+        Tensor<std::complex<double>, 4>  levi = levi_civita<std::complex<double>,4>(); 
         Tensor<std::complex<double>, 2> gdd;
         gdd = convertTensorUnderlyingType<std::complex<double>,double,2>(g_dd());
-
-        // the intermediary steps.. since we are contracting w/ 
-        // vectors we go down by one rank at each step
-        Tensor<std::complex<double>, 3> foo;
-        Tensor<std::complex<double>, 2> bar;
-        Tensor<std::complex<double>, 1> baz; 
 
         pminus = applyMetric(pminus,gdd,0); 
         pplus = applyMetric(pplus,gdd,0); 
         epsilon = applyMetric(epsilon,gdd,0); 
 
-        std::cout << __func__ << ": pars " << std::endl;
-        std::cout << "pp " << pplus << "\npm" << pminus 
-          << "\neps" << epsilon << std::endl;
-
-
 #if 1
         Tensor<std::complex<double> , 0> inner_prod = contract( epsilon, p_f , 0 , 0 ) ; 
-        if ( std::norm ( inner_prod.value() ) >  0.000001 ) 
+        if ( std::norm ( inner_prod.value() ) >  1e-6 ) 
           std::cout << "mom dotted into polarization was " << inner_prod.value() << std::endl; 
 #endif 
 
-        // do contractions 
-        foo = contract(levi,pminus,3,0);
-        bar = contract(foo,pplus,2,0);
-        baz = contract(bar,epsilon,1,0);
-
-        // the kinematic factor carries one lorentz index
-        return baz;
+        return contract(
+            contract(
+                contract(levi,
+                    pminus , 3 , 0),
+                pplus , 2 , 0 ),
+            epsilon , 1 , 0 );
       }
 
     };

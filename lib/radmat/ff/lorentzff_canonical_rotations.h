@@ -17,6 +17,8 @@ namespace radmat
 {
   namespace LatticeRotationEnv
   {
+
+    // string label of the canonical frame
     std::string 
       rotation_group_label(const mom_t &, 
           const mom_t &); 
@@ -27,12 +29,41 @@ namespace radmat
     bool registerAll();
 
 
+    // return the rotation back to the reference frame
+    //
+    //  v_ref = R * v_frame
+    //
     rHandle<RotationMatrix_t> 
       get_left_rotation(const mom_t &l, const mom_t &r);
 
     rHandle<RotationMatrix_t> 
       get_right_rotation(const mom_t &l, const mom_t &r);
 
+    // return the rotation to the canonical direction  
+    //
+    //  Pcan = R * p_z
+    //
+    rHandle<RotationMatrix_t>
+      get_left_can_frame_rotation(const mom_t &l, const mom_t &r); 
+      
+    rHandle<RotationMatrix_t>
+      get_right_can_frame_rotation(const mom_t &l, const mom_t &r); 
+
+    // for testing only
+    //    first pair is can frame
+    RotationMatrix_t*
+      get_left_rotation(const mom_t &cl, 
+        const mom_t &cr, 
+        const mom_t &l, 
+        const mom_t &r);
+
+    // for testing only
+    //    first pair is can frame
+    RotationMatrix_t* 
+      get_right_rotation(const mom_t &cl, 
+        const mom_t &cr, 
+        const mom_t &l, 
+        const mom_t &r);
 
   } // LatticeRotationEnv
 

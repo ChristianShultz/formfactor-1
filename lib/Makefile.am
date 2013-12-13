@@ -41,6 +41,7 @@ nobase_include_HEADERS =   \
 													 radmat/ff/lorentzff_canonical_rotations.h		\
 													 radmat/ff/lorentzff_canonical_rotation_groups.h		\
 													 radmat/ff/lorentzff_canonical_rotations_utils.h		\
+													 radmat/ff/lorentzff_formfac_utils.h		\
 													 radmat/ff/lorentzff_PiPi.h		\
 													 radmat/ff/lorentzff_PiPiStar.h		\
 													 radmat/ff/lorentzff_PiRho.h		\
@@ -121,6 +122,7 @@ libradmat_a_SOURCES =	\
 											radmat/fake_data/fake_spectrum.cc		\
 											radmat/ff/ff_gen_llsq_row.cc		\
 											radmat/ff/formfactor_factory.cc		\
+											radmat/ff/lorentzff_formfac_utils.cc		\
 											radmat/ff/lorentzff_canonical_rotations.cc		\
 											radmat/ff/lorentzff_canonical_rotations_utils.cc		\
 											radmat/ff/lorentzff_PiPi.cc		\

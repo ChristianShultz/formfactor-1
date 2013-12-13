@@ -6,7 +6,7 @@
 
  * Creation Date : 11-12-2013
 
- * Last Modified : Wed 11 Dec 2013 09:45:13 PM EST
+ * Last Modified : Thu 12 Dec 2013 04:00:31 PM EST
 
  * Created By : shultz
 
@@ -39,13 +39,11 @@ void check_exit( const radmat::Tensor<T,4> &t, int a, int b, int c, int d, T exp
 }
 
   template<typename T> 
-void test_levi(void)
+void test_levi(const radmat::Tensor<T,4> &l)
 {
   T p(1);
   T m(-1); 
   T z(0); 
-
-  radmat::Tensor<T,4> l = radmat::levi_civita<T,4>(); 
 
   //*
   check_exit(l,0,0,0,0,z); 
@@ -335,6 +333,15 @@ void test_levi(void)
   nchk = 0; 
   nonz = 0; 
 }
+
+
+template<typename T>
+void test_levi(void)
+{
+  radmat::Tensor<T,4> l = radmat::levi_civita<T,4>(); 
+  test_levi(l); 
+}
+
 
 int main(void)
 {

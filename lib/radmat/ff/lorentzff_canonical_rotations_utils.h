@@ -17,9 +17,12 @@ namespace radmat
 
   // return the transformation from pp to p
   //
-  // p = R * pp
+  // p = R * pcan
   RotationMatrix_t* 
-    generate_frame_trasformation(const mom_t &p, const mom_t &pp);
+    generate_frame_transformation(const mom_t &p, const mom_t &pcan);
+
+
+  void clean_up_rot_mat(RotationMatrix_t *);
 
 
   template<int X, int Y, int Z> 

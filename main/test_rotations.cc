@@ -6,7 +6,7 @@
 
 * Creation Date : 11-12-2013
 
-* Last Modified : Wed 11 Dec 2013 02:31:08 PM EST
+* Last Modified : Thu 12 Dec 2013 12:32:29 PM EST
 
 * Created By : shultz
 
@@ -19,6 +19,7 @@ _._._._._._._._._._._._._._._._._._._._._.*/
 #include "radmat/redstar_interface/redstar_canonical_rotations.h"
 #include "radmat/redstar_interface/redstar_canonical_lattice_rotations.h"
 #include "radmat/ff/lorentzff_canonical_rotations_utils.h"
+#include "radmat/ff/lorentzff_canonical_rotations.h"
 #include "hadron/irrep_util.h"
 #include "formfac/formfac_qsq.h"
 
@@ -248,6 +249,83 @@ void check_lattice_rotations_mom(int argc, char *argv[])
 //////////////////////////////////////////////////
 //////////////////////////////////////////////////
 
+void read_momentum(const int st, mom_t &p, char *argv[])
+{
+  for(int i = st; i < st+3; ++i)
+  {
+    std::istringstream val(argv[i]);
+    val >> p[i-st];
+  }
+}
+
+
+
+void get_lattice_rotation(int argc, char *argv[])
+{
+  if( argc != 8 )
+  {
+    std::cout << "error usage: test_rotations [" << __func__ << "] "
+      << "<mom1> <mom2> " << std::endl; 
+    exit(1);
+  }
+  
+  mom_t m1 = radmat::gen_mom<0,0,0>(); 
+  mom_t m2 = radmat::gen_mom<0,0,0>(); 
+
+  read_momentum(2,m1,argv);
+  read_momentum(5,m2,argv);
+
+  std::cout << "read m1 " << string_mom(m1) 
+    << " m2 " << string_mom(m2) << std::endl;
+
+
+  RotationMatrix_t *r = radmat::generate_frame_transformation(m1,m2);
+  std::cout << "R:" << *r << std::endl;
+
+  delete r; 
+}
+
+
+//////////////////////////////////////////////////
+//////////////////////////////////////////////////
+//////////////////////////////////////////////////
+
+
+void get_frame_rotation(int argc, char *argv[])
+{
+  if( argc != 14 )
+  {
+    std::cout << "error usage: test_rotations [" << __func__ << "] "
+      << "<mom1> <mom2> <mom_prime1> <mom_prime2>" << std::endl; 
+    exit(1);
+  }
+  
+  mom_t m1 = radmat::gen_mom<0,0,0>(); 
+  mom_t m2 = radmat::gen_mom<0,0,0>(); 
+  mom_t ma = radmat::gen_mom<0,0,0>(); 
+  mom_t mb = radmat::gen_mom<0,0,0>(); 
+
+  read_momentum(2,m1,argv);
+  read_momentum(5,m2,argv);
+  read_momentum(8,ma,argv);
+  read_momentum(11,mb,argv);
+
+  std::cout << "read m1 " << string_mom(m1) << " m2 " << string_mom(m2) 
+    << " m_prime1 " << string_mom(ma) << " m_prime2 " << string_mom(mb) << std::endl;
+
+  RotationMatrix_t *rl = radmat::LatticeRotationEnv::get_left_rotation(m1,m2,ma,mb);
+  RotationMatrix_t *rr = radmat::LatticeRotationEnv::get_right_rotation(m1,m2,ma,mb);
+  std::cout << "Rleft:" << *rl << std::endl;
+  std::cout << "Rright:" << *rr << std::endl;
+
+  delete rl; 
+  delete rr; 
+}
+
+//////////////////////////////////////////////////
+//////////////////////////////////////////////////
+//////////////////////////////////////////////////
+
 typedef void (*fptr)(int argc , char *argv[]); 
 std::map<std::string , fptr > options;
 
@@ -260,6 +338,8 @@ void init_options(void)
 {
   insert_op("check_rotations_mom",&check_rotations_mom); 
   insert_op("check_lattice_rotations_mom",&check_lattice_rotations_mom); 
+  insert_op("get_lattice_rotation",&get_lattice_rotation); 
+  insert_op("get_frame_rotation",&get_frame_rotation); 
 }
 
 

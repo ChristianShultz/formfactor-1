@@ -90,6 +90,7 @@ am_libradmat_a_OBJECTS =  \
 	fake_3pt_function_aux.$(OBJEXT) fake_data_ini.$(OBJEXT) \
 	fake_overlaps.$(OBJEXT) fake_spectrum.$(OBJEXT) \
 	ff_gen_llsq_row.$(OBJEXT) formfactor_factory.$(OBJEXT) \
+	lorentzff_formfac_utils.$(OBJEXT) \
 	lorentzff_canonical_rotations.$(OBJEXT) \
 	lorentzff_canonical_rotations_utils.$(OBJEXT) \
 	lorentzff_PiPi.$(OBJEXT) lorentzff_PiPiStar.$(OBJEXT) \
@@ -269,6 +270,7 @@ nobase_include_HEADERS = \
 													 radmat/ff/lorentzff_canonical_rotations.h		\
 													 radmat/ff/lorentzff_canonical_rotation_groups.h		\
 													 radmat/ff/lorentzff_canonical_rotations_utils.h		\
+													 radmat/ff/lorentzff_formfac_utils.h		\
 													 radmat/ff/lorentzff_PiPi.h		\
 													 radmat/ff/lorentzff_PiPiStar.h		\
 													 radmat/ff/lorentzff_PiRho.h		\
@@ -348,6 +350,7 @@ libradmat_a_SOURCES = \
 											radmat/fake_data/fake_spectrum.cc		\
 											radmat/ff/ff_gen_llsq_row.cc		\
 											radmat/ff/formfactor_factory.cc		\
+											radmat/ff/lorentzff_formfac_utils.cc		\
 											radmat/ff/lorentzff_canonical_rotations.cc		\
 											radmat/ff/lorentzff_canonical_rotations_utils.cc		\
 											radmat/ff/lorentzff_PiPi.cc		\
@@ -483,6 +486,7 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/lorentzff_PiPiStar.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/lorentzff_canonical_rotations.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/lorentzff_canonical_rotations_utils.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/lorentzff_formfac_utils.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/mink_qsq.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/polarization_tensors.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/pow2assert.Po@am__quote@
@@ -787,6 +791,20 @@ formfactor_factory.obj: radmat/ff/formfactor_factory.cc
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='radmat/ff/formfactor_factory.cc' object='formfactor_factory.obj' libtool=no @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCXX_FALSE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o formfactor_factory.obj `if test -f 'radmat/ff/formfactor_factory.cc'; then $(CYGPATH_W) 'radmat/ff/formfactor_factory.cc'; else $(CYGPATH_W) '$(srcdir)/radmat/ff/formfactor_factory.cc'; fi`
+
+lorentzff_formfac_utils.o: radmat/ff/lorentzff_formfac_utils.cc
+@am__fastdepCXX_TRUE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT lorentzff_formfac_utils.o -MD -MP -MF $(DEPDIR)/lorentzff_formfac_utils.Tpo -c -o lorentzff_formfac_utils.o `test -f 'radmat/ff/lorentzff_formfac_utils.cc' || echo '$(srcdir)/'`radmat/ff/lorentzff_formfac_utils.cc
+@am__fastdepCXX_TRUE@	$(am__mv) $(DEPDIR)/lorentzff_formfac_utils.Tpo $(DEPDIR)/lorentzff_formfac_utils.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='radmat/ff/lorentzff_formfac_utils.cc' object='lorentzff_formfac_utils.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o lorentzff_formfac_utils.o `test -f 'radmat/ff/lorentzff_formfac_utils.cc' || echo '$(srcdir)/'`radmat/ff/lorentzff_formfac_utils.cc
+
+lorentzff_formfac_utils.obj: radmat/ff/lorentzff_formfac_utils.cc
+@am__fastdepCXX_TRUE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT lorentzff_formfac_utils.obj -MD -MP -MF $(DEPDIR)/lorentzff_formfac_utils.Tpo -c -o lorentzff_formfac_utils.obj `if test -f 'radmat/ff/lorentzff_formfac_utils.cc'; then $(CYGPATH_W) 'radmat/ff/lorentzff_formfac_utils.cc'; else $(CYGPATH_W) '$(srcdir)/radmat/ff/lorentzff_formfac_utils.cc'; fi`
+@am__fastdepCXX_TRUE@	$(am__mv) $(DEPDIR)/lorentzff_formfac_utils.Tpo $(DEPDIR)/lorentzff_formfac_utils.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='radmat/ff/lorentzff_formfac_utils.cc' object='lorentzff_formfac_utils.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o lorentzff_formfac_utils.obj `if test -f 'radmat/ff/lorentzff_formfac_utils.cc'; then $(CYGPATH_W) 'radmat/ff/lorentzff_formfac_utils.cc'; else $(CYGPATH_W) '$(srcdir)/radmat/ff/lorentzff_formfac_utils.cc'; fi`
 
 lorentzff_canonical_rotations.o: radmat/ff/lorentzff_canonical_rotations.cc
 @am__fastdepCXX_TRUE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT lorentzff_canonical_rotations.o -MD -MP -MF $(DEPDIR)/lorentzff_canonical_rotations.Tpo -c -o lorentzff_canonical_rotations.o `test -f 'radmat/ff/lorentzff_canonical_rotations.cc' || echo '$(srcdir)/'`radmat/ff/lorentzff_canonical_rotations.cc

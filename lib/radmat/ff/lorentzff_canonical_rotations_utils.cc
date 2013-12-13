@@ -6,7 +6,7 @@
 
  * Creation Date : 10-12-2013
 
- * Last Modified : Thu 12 Dec 2013 09:10:41 AM EST
+ * Last Modified : Thu 12 Dec 2013 11:15:35 AM EST
 
  * Created By : shultz
 
@@ -18,6 +18,44 @@
 
 namespace radmat
 {
+
+  namespace
+  {
+    std::string string_mom(const mom_t &p)
+    {
+      std::stringstream ss;
+      ss << p[0] << p[1] << p[2];
+      return ss.str(); 
+    }
+
+    bool same_length(const mom_t &l, const mom_t &ll)
+    {
+      return ( dot_mom_t(l,l) == dot_mom_t(ll,ll) ); 
+    }
+
+    double cos_theta(const mom_t &l, const mom_t &ll)
+    {
+      if(is_rest(l) || is_rest(ll) )
+        return 0.;
+
+      return double(dot_mom_t(l,ll))/sqrt(double(dot_mom_t(l,l) * dot_mom_t(ll,ll))); 
+    }
+
+    int volume_element(const mom_t &l, const mom_t &r)
+    {
+      return ( dot_mom_t(l,cross_product(l,r)) ); 
+    }
+
+
+  bool related_by_Oh_rotation(const mom_t &left, const mom_t &lleft)
+  {
+    return (
+        (Hadron::generateLittleGroup(left) == Hadron::generateLittleGroup(lleft)) 
+        && (dot_mom_t(left,left) == dot_mom_t(lleft,lleft))
+        ); 
+  }
+
+  }
 
   // Ax = b
   bool
@@ -43,16 +81,8 @@ namespace radmat
       return true; 
     } 
 
-  namespace
-  {
-    std::string string_mom(const mom_t &p)
-    {
-      std::stringstream ss;
-      ss << p[0] << p[1] << p[2];
-      return ss.str(); 
-    }
-  }
-
+  //////////////////////////////////////////////
+  //////////////////////////////////////////////
 
   RotationMatrix_t*
     generate_frame_transformation(const mom_t &p, const mom_t &pp)
@@ -64,7 +94,7 @@ namespace radmat
           << std::endl;
         exit(1); 
       }
-     
+
       RotationMatrix_t *R = new Tensor<double,2>( (TensorShape<2>())[4][4], 0.); 
       RotationMatrix_t *Rp = radmat::CanonicalLatticeRotationEnv::call_factory(p);
       RotationMatrix_t *Rpp = radmat::CanonicalLatticeRotationEnv::call_factory(pp);
@@ -77,7 +107,7 @@ namespace radmat
             continue;
 
           for(int k = 0; k < 4; ++k)
-          (*R)[i][k] += (*Rp)[i][j] * (*Rpp)[k][j]; 
+            (*R)[i][k] += (*Rp)[i][j] * (*Rpp)[k][j]; 
         }
 
       delete Rp;
@@ -92,14 +122,32 @@ namespace radmat
         exit(1); 
       }
 
+      clean_up_rot_mat(R); 
+
       return R; 
     }
 
+  //////////////////////////////////////////////
+  //////////////////////////////////////////////
+
+  void clean_up_rot_mat(RotationMatrix_t *R)
+  {
+    for(int i = 1; i < 4; ++i)
+      for(int j = 1; j < 4; ++j)
+        if( fabs((*R)[i][j]) < 1e-6)
+          (*R)[i][j] = 0.;
+  }
+
+  //////////////////////////////////////////////
+  //////////////////////////////////////////////
 
   int dot_mom_t(const mom_t &left, const mom_t &right)
   {
     return left[0]*right[0] + left[1]*right[1] + left[2]*right[2]; 
   }
+
+  //////////////////////////////////////////////
+  //////////////////////////////////////////////
 
   mom_t cross_product(const mom_t &l, const mom_t &r)
   {
@@ -110,41 +158,16 @@ namespace radmat
     return c; 
   } 
 
+  //////////////////////////////////////////////
+  //////////////////////////////////////////////
+
   bool is_rest(const mom_t &p)
   {
     return (dot_mom_t(p,p) == 0);
   }
 
-  namespace
-  {
-    bool same_length(const mom_t &l, const mom_t &ll)
-    {
-      return ( dot_mom_t(l,l) == dot_mom_t(ll,ll) ); 
-    }
-
-    double cos_theta(const mom_t &l, const mom_t &ll)
-    {
-      if(is_rest(l) || is_rest(ll) )
-        return 0.;
-
-      return double(dot_mom_t(l,ll))/sqrt(double(dot_mom_t(l,l) * dot_mom_t(ll,ll))); 
-    }
-
-    int volume_element(const mom_t &l, const mom_t &r)
-    {
-      return ( dot_mom_t(l,cross_product(l,r)) ); 
-    }
-
-  }
-
-  bool related_by_Oh_rotation(const mom_t &left, const mom_t &lleft)
-  {
-    return (
-        (Hadron::generateLittleGroup(left) == Hadron::generateLittleGroup(lleft)) 
-        && (dot_mom_t(left,left) == dot_mom_t(lleft,lleft))
-        ); 
-  }
-
+  //////////////////////////////////////////////
+  //////////////////////////////////////////////
 
   // test the dot product and volume element are the same
   bool related_by_rotation(const mom_t &left, const mom_t &right, 
@@ -182,37 +205,17 @@ namespace radmat
     if( !!! success )
       return false; 
 
-
-    // this is a bit clunky 
-    RotationMatrix_t *Rr = radmat::CanonicalLatticeRotationEnv::call_factory(right);
-    RotationMatrix_t *Rrr = radmat::CanonicalLatticeRotationEnv::call_factory(rright);
-    RotationMatrix_t *R = new Tensor<double,2>((TensorShape<2>())[4][4],0.); 
-
-    //  Christopher was nice enough to program all of the euler 
-    //  angles, lets make use of them and test rather than search
-    //  for a possible rotation relating the two frames 
-    //
-    //  this rotation takes me from the frame defined by rright
-    //  to pref then from pref to right
-    // 
-    //  right = Rr * Rrr^T rright
-    // 
-    //  if they are related by a rotaion then 
-    //  we should get left from the same op on lleft
-    //
-    for(int i = 1; i < 4; ++i)
-      for(int j = 1; j < 4; ++j)
-        for(int k = 1; k < 4; ++k)
-          (*R)[i][k] += (*Rr)[i][j] * (*Rrr)[k][j] ; 
-
+    // right = R * rright
+    RotationMatrix_t *R = generate_frame_transformation(right,rright); 
     success &= check_frame_transformation(R,lleft,left); 
 
     delete R; 
-    delete Rr; 
-    delete Rrr; 
 
     return success;
   }
+
+  //////////////////////////////////////////////
+  //////////////////////////////////////////////
 
   itpp::Vec<double> normalize(const mom_t &m)
   {
