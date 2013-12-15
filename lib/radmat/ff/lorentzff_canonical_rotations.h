@@ -28,6 +28,7 @@ namespace radmat
 
     bool registerAll();
 
+    // these take momentum -- NOT orientations
 
     // return the rotation back to the reference frame
     //

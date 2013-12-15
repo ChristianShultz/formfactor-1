@@ -6,7 +6,7 @@
 
  * Creation Date : 10-12-2013
 
- * Last Modified : Fri 13 Dec 2013 08:15:23 AM EST
+ * Last Modified : Sat 14 Dec 2013 05:02:59 PM EST
 
  * Created By : shultz
 
@@ -16,6 +16,7 @@
 #include "radmat/ff/formfactor_factory.h"
 #include "radmat/ff/lorentzff_canonical_rotations.h"
 #include "radmat/ff/lorentzff_rotated_levi_civita_tensor.h"
+#include "radmat/ff/lorentzff_Wigner_D_matrix_factory.h"
 #include "radmat/llsq/llsq_solvers.h"
 #include "radmat/redstar_interface/redstar_abstract_merge_npoint_factory.h"
 #include "radmat/redstar_interface/redstar_abstract_xml_factory.h"
@@ -51,6 +52,7 @@ namespace radmat
           success &= radmat::CanonicalLatticeRotationEnv::registerAll(); 
           success &= radmat::LatticeRotationEnv::registerAll(); 
           success &= radmat::RotatedLeviCivitaTensorEnv::registerAll(); 
+          success &= radmat::WignerDMatrixEnv::registerAll(4); // up to J = 2 
           success &= radmat::TheRedstarAbstractXMLFactoryEnv::registerAll(); 
         }
         catch(std::exception &e)

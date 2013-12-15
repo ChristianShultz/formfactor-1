@@ -6,7 +6,7 @@
 
 * Creation Date : 11-12-2013
 
-* Last Modified : Thu 12 Dec 2013 12:32:29 PM EST
+* Last Modified : Sat 14 Dec 2013 05:10:33 PM EST
 
 * Created By : shultz
 
@@ -20,6 +20,8 @@ _._._._._._._._._._._._._._._._._._._._._.*/
 #include "radmat/redstar_interface/redstar_canonical_lattice_rotations.h"
 #include "radmat/ff/lorentzff_canonical_rotations_utils.h"
 #include "radmat/ff/lorentzff_canonical_rotations.h"
+#include "radmat/ff/lorentzff_Wigner_D_matrix_factory.h"
+#include "radmat/utils/levi_civita.h"
 #include "hadron/irrep_util.h"
 #include "formfac/formfac_qsq.h"
 
@@ -77,6 +79,19 @@ mom_t ref_mom(const mom_t &p)
 
 }
 
+/////////////////////////////////////////////
+double determinant(const RotationMatrix_t *R)
+{
+  double res(0.); 
+  radmat::Tensor<double,4> eps = radmat::levi_civita<double,4>(); 
+
+  for(int i = 0; i < 4; ++i)
+    for(int j = 0; j < 4; ++j)
+      for(int k = 0; k < 4; ++k)
+        for(int l = 0; l < 4; ++l)
+          res += eps[i][j][k][l]* (*R)[0][i] * (*R)[1][j] * (*R)[2][k] * (*R)[3][l]; 
+  return res; 
+}
 
 /////////////////////////////////////////////
   mom_t 
@@ -116,6 +131,9 @@ rotate_z_mom(const RotationMatrix_t *R,
   }
   return chk;
 } 
+
+
+
 
 //////////////////////////////////////////////////
 //////////////////////////////////////////////////
@@ -277,10 +295,19 @@ void get_lattice_rotation(int argc, char *argv[])
 
   std::cout << "read m1 " << string_mom(m1) 
     << " m2 " << string_mom(m2) << std::endl;
+  std::cout << " returning R_lat * m1 = m2 " << std::endl;
 
+  RotationMatrix_t *r = radmat::generate_frame_transformation(m2,m1);
 
-  RotationMatrix_t *r = radmat::generate_frame_transformation(m1,m2);
+  if( !!! radmat::check_frame_transformation(r, m1 , m2 ) )
+  {
+    std::cout << __func__ 
+      << ": WARNING -- lattice transformation failed " << std::endl;
+  }
+
   std::cout << "R:" << *r << std::endl;
+
+  std::cout << "det(R) = " << determinant(r) << std::endl;
 
   delete r; 
 }
@@ -322,6 +349,78 @@ void get_frame_rotation(int argc, char *argv[])
   delete rr; 
 }
 
+
+//////////////////////////////////////////////////
+//////////////////////////////////////////////////
+//////////////////////////////////////////////////
+
+void get_wigner_matrix(int argc, char *argv[])
+{
+  if( argc != 6 )
+  {
+    std::cout << "error usage: test_rotations [" << __func__ << "] "
+      << "<mom> <J> " << std::endl; 
+    exit(1);
+  }
+  
+  mom_t m1 = radmat::gen_mom<0,0,0>(); 
+  int J; 
+
+  std::istringstream val(argv[5]);
+  val >> J; 
+
+  read_momentum(2,m1,argv);
+
+  std::cout << "read p " << string_mom(m1) 
+    << " J " << J << std::endl;
+  std::cout << " Wigner_D(p,J) " << std::endl;
+
+  radmat::WignerMatrix_t *W = radmat::WignerDMatrixEnv::call_factory(m1,J);
+
+  std::cout << "W:" << *W << std::endl;
+
+  delete W; 
+}
+
+//////////////////////////////////////////////////
+//////////////////////////////////////////////////
+//////////////////////////////////////////////////
+
+void get_prod_wigner_matrix(int argc, char *argv[])
+{
+  if( argc != 9 )
+  {
+    std::cout << "error usage: test_rotations [" << __func__ << "] "
+      << "<mom> <mom> <J> " << std::endl; 
+    exit(1);
+  }
+  
+  mom_t m1 = radmat::gen_mom<0,0,0>(); 
+  mom_t m2 = radmat::gen_mom<0,0,0>(); 
+  int J; 
+
+  std::istringstream val(argv[8]);
+  val >> J; 
+
+  read_momentum(2,m1,argv);
+  read_momentum(5,m2,argv);
+
+  std::cout << "read p " << string_mom(m1) 
+    << " J " << J << std::endl;
+  std::cout << " Wigner_D(p,J) * Wigner_D(p2,J) " << std::endl;
+
+  radmat::WignerMatrix_t *W = radmat::WignerDMatrixEnv::call_factory(m1,J);
+  radmat::WignerMatrix_t *W2 = radmat::WignerDMatrixEnv::call_factory(m2,J);
+
+  W->lower_index(1); 
+  radmat::WignerMatrix_t WW = radmat::contract(*W,*W2,1,0); 
+
+  std::cout << "W:" << WW << std::endl;
+
+  delete W; 
+  delete W2; 
+}
+
 //////////////////////////////////////////////////
 //////////////////////////////////////////////////
 //////////////////////////////////////////////////
@@ -340,6 +439,8 @@ void init_options(void)
   insert_op("check_lattice_rotations_mom",&check_lattice_rotations_mom); 
   insert_op("get_lattice_rotation",&get_lattice_rotation); 
   insert_op("get_frame_rotation",&get_frame_rotation); 
+  insert_op("get_wigner_matrix",&get_wigner_matrix); 
+  insert_op("get_prod_wigner_matrix",&get_prod_wigner_matrix); 
 }
 
 

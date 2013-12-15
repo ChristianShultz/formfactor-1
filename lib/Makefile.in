@@ -95,6 +95,7 @@ am_libradmat_a_OBJECTS =  \
 	lorentzff_canonical_rotations_utils.$(OBJEXT) \
 	lorentzff_PiPi.$(OBJEXT) lorentzff_PiPiStar.$(OBJEXT) \
 	lorentzff_rotated_levi_civita_tensor.$(OBJEXT) \
+	lorentzff_Wigner_D_matrix_factory.$(OBJEXT) \
 	axis_plotter.$(OBJEXT) fit_tins.$(OBJEXT) llsq_chisq.$(OBJEXT) \
 	llsq_gen_system.$(OBJEXT) llsq_multi_driver.$(OBJEXT) \
 	llsq_q2_pack.$(OBJEXT) llsq_solvers.$(OBJEXT) \
@@ -271,6 +272,7 @@ nobase_include_HEADERS = \
 													 radmat/ff/lorentzff_canonical_rotations.h		\
 													 radmat/ff/lorentzff_canonical_rotation_groups.h		\
 													 radmat/ff/lorentzff_canonical_rotations_utils.h		\
+													 radmat/ff/lorentzff_cubic_reps.h			\
 													 radmat/ff/lorentzff_formfac_utils.h		\
 													 radmat/ff/lorentzff_PiPi.h		\
 													 radmat/ff/lorentzff_PiPiStar.h		\
@@ -281,6 +283,7 @@ nobase_include_HEADERS = \
 													 radmat/ff/lorentzff_RhoPi.h		\
 													 radmat/ff/lorentzff_RhoRho.h		\
 													 radmat/ff/lorentzff_rotated_levi_civita_tensor.h		\
+													 radmat/ff/lorentzff_Wigner_D_matrix_factory.h		\
 													 radmat/fitting/axis_plotter.h		\
 													 radmat/fitting/fit_tins.h		\
 													 radmat/llsq/llsq_chisq.h		\
@@ -359,6 +362,7 @@ libradmat_a_SOURCES = \
 											radmat/ff/lorentzff_PiPi.cc		\
 											radmat/ff/lorentzff_PiPiStar.cc		\
 											radmat/ff/lorentzff_rotated_levi_civita_tensor.cc		\
+											radmat/ff/lorentzff_Wigner_D_matrix_factory.cc		\
 											radmat/fitting/axis_plotter.cc		\
 											radmat/fitting/fit_tins.cc		\
 											radmat/llsq/llsq_chisq.cc		\
@@ -488,6 +492,7 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/llsq_solvers.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/lorentzff_PiPi.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/lorentzff_PiPiStar.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/lorentzff_Wigner_D_matrix_factory.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/lorentzff_canonical_rotations.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/lorentzff_canonical_rotations_utils.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/lorentzff_formfac_utils.Po@am__quote@
@@ -880,6 +885,20 @@ lorentzff_rotated_levi_civita_tensor.obj: radmat/ff/lorentzff_rotated_levi_civit
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='radmat/ff/lorentzff_rotated_levi_civita_tensor.cc' object='lorentzff_rotated_levi_civita_tensor.obj' libtool=no @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCXX_FALSE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o lorentzff_rotated_levi_civita_tensor.obj `if test -f 'radmat/ff/lorentzff_rotated_levi_civita_tensor.cc'; then $(CYGPATH_W) 'radmat/ff/lorentzff_rotated_levi_civita_tensor.cc'; else $(CYGPATH_W) '$(srcdir)/radmat/ff/lorentzff_rotated_levi_civita_tensor.cc'; fi`
+
+lorentzff_Wigner_D_matrix_factory.o: radmat/ff/lorentzff_Wigner_D_matrix_factory.cc
+@am__fastdepCXX_TRUE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT lorentzff_Wigner_D_matrix_factory.o -MD -MP -MF $(DEPDIR)/lorentzff_Wigner_D_matrix_factory.Tpo -c -o lorentzff_Wigner_D_matrix_factory.o `test -f 'radmat/ff/lorentzff_Wigner_D_matrix_factory.cc' || echo '$(srcdir)/'`radmat/ff/lorentzff_Wigner_D_matrix_factory.cc
+@am__fastdepCXX_TRUE@	$(am__mv) $(DEPDIR)/lorentzff_Wigner_D_matrix_factory.Tpo $(DEPDIR)/lorentzff_Wigner_D_matrix_factory.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='radmat/ff/lorentzff_Wigner_D_matrix_factory.cc' object='lorentzff_Wigner_D_matrix_factory.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o lorentzff_Wigner_D_matrix_factory.o `test -f 'radmat/ff/lorentzff_Wigner_D_matrix_factory.cc' || echo '$(srcdir)/'`radmat/ff/lorentzff_Wigner_D_matrix_factory.cc
+
+lorentzff_Wigner_D_matrix_factory.obj: radmat/ff/lorentzff_Wigner_D_matrix_factory.cc
+@am__fastdepCXX_TRUE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT lorentzff_Wigner_D_matrix_factory.obj -MD -MP -MF $(DEPDIR)/lorentzff_Wigner_D_matrix_factory.Tpo -c -o lorentzff_Wigner_D_matrix_factory.obj `if test -f 'radmat/ff/lorentzff_Wigner_D_matrix_factory.cc'; then $(CYGPATH_W) 'radmat/ff/lorentzff_Wigner_D_matrix_factory.cc'; else $(CYGPATH_W) '$(srcdir)/radmat/ff/lorentzff_Wigner_D_matrix_factory.cc'; fi`
+@am__fastdepCXX_TRUE@	$(am__mv) $(DEPDIR)/lorentzff_Wigner_D_matrix_factory.Tpo $(DEPDIR)/lorentzff_Wigner_D_matrix_factory.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='radmat/ff/lorentzff_Wigner_D_matrix_factory.cc' object='lorentzff_Wigner_D_matrix_factory.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o lorentzff_Wigner_D_matrix_factory.obj `if test -f 'radmat/ff/lorentzff_Wigner_D_matrix_factory.cc'; then $(CYGPATH_W) 'radmat/ff/lorentzff_Wigner_D_matrix_factory.cc'; else $(CYGPATH_W) '$(srcdir)/radmat/ff/lorentzff_Wigner_D_matrix_factory.cc'; fi`
 
 axis_plotter.o: radmat/fitting/axis_plotter.cc
 @am__fastdepCXX_TRUE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT axis_plotter.o -MD -MP -MF $(DEPDIR)/axis_plotter.Tpo -c -o axis_plotter.o `test -f 'radmat/fitting/axis_plotter.cc' || echo '$(srcdir)/'`radmat/fitting/axis_plotter.cc

@@ -6,7 +6,7 @@
 
  * Creation Date : 10-12-2013
 
- * Last Modified : Thu 12 Dec 2013 11:15:35 AM EST
+ * Last Modified : Fri 13 Dec 2013 12:58:10 PM EST
 
  * Created By : shultz
 
@@ -206,10 +206,15 @@ namespace radmat
       return false; 
 
     // right = R * rright
-    RotationMatrix_t *R = generate_frame_transformation(right,rright); 
-    success &= check_frame_transformation(R,lleft,left); 
+    RotationMatrix_t *Rr = generate_frame_transformation(right,rright); 
+    RotationMatrix_t *Rl = generate_frame_transformation(left,lleft); 
+    // allow for spinning about the momentum direction of one of the guys 
+    success &= ( 
+        check_frame_transformation(Rr,lleft,left) 
+        || check_frame_transformation(Rl,rright,right) ); 
 
-    delete R; 
+    delete Rr; 
+    delete Rl; 
 
     return success;
   }

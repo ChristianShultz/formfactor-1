@@ -17,9 +17,9 @@ namespace radmat
 
   // return the transformation from pp to p
   //
-  // p = R * pcan
+  // first = R * second
   RotationMatrix_t* 
-    generate_frame_transformation(const mom_t &p, const mom_t &pcan);
+    generate_frame_transformation(const mom_t &first, const mom_t &second);
 
 
   void clean_up_rot_mat(RotationMatrix_t *);
@@ -50,6 +50,10 @@ namespace radmat
       bool allow_flip=true);
 
   itpp::Vec<double> normalize(const mom_t &m); 
+
+
+
+
 
 }
 

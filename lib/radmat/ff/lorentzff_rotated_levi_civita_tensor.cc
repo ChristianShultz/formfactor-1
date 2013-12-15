@@ -6,7 +6,7 @@
 
  * Creation Date : 13-12-2013
 
- * Last Modified : Fri 13 Dec 2013 08:35:27 AM EST
+ * Last Modified : Fri 13 Dec 2013 02:27:07 PM EST
 
  * Created By : shultz
 
@@ -46,35 +46,41 @@ namespace radmat
       {
         rHandle<RotationMatrix_t> R = radmat::LatticeRotationEnv::get_right_rotation(l,r);
         return rotate(R); 
-//        rHandle<RotationMatrix_t> Rtran(new Tensor<double,2>( (TensorShape<2>())[4][4], 0. ) ); 
-//
-//        for(int i = 0; i < 4; ++i)
-//          for(int j = 0; j < 4; ++j)
-//            (*Rtran)[i][j] = (*R)[j][i];
-//      
-//        Rtran->lower_index(1); 
-//
-//        return rotate(Rtran); 
       }
 
-      // how we tag them 
+      // how we tag them -- use rotation group generator conventions 
+      //  
+      //  if we don't then Oh can mix up with D4 since we choose 
+      //  to use D4 along the z-axis to orient Oh frames
+      //
       std::string gen_id(const mom_t &l, const mom_t &r)
       {
-        std::stringstream ss; 
-        ss << "lefty" << l[0] << l[1] << l[2]
-          << ".righty" << r[0] << r[1] << r[2]; 
-
-        return ss.str(); 
+        typedef radmat::LatticeRotationEnv::TheRotationGroupGenerator G; 
+        return G::Instance().frame_label(l,r); 
       }
+
+      void dump_keys(void)
+      {
+        std::map<std::string,Tensor<double,4> >::const_iterator it; 
+        for (it = TheRotatedLeviCivitaTensorGenerator::Instance().begin();
+            it != TheRotatedLeviCivitaTensorGenerator::Instance().end();
+            ++it)
+          std::cout << it->first << std::endl;
+      }
+
 
       // reg function 
       bool do_reg(const mom_t &l, const mom_t &r)
       {
-        std::string id = gen_id(l,r); 
+        typedef radmat::LatticeRotationEnv::TheRotationGroupGenerator G; 
+        std::string id = gen_id(l,r);
+
         if( TheRotatedLeviCivitaTensorGenerator::Instance().find(id)
             != TheRotatedLeviCivitaTensorGenerator::Instance().end())
         {
-          std::cout << __func__ << " double reg error for levi civita" << std::endl;
+          std::cout << __func__ << " double reg error for levi civita" 
+           << "\nid: " << id <<  std::endl;
+          dump_keys(); 
           throw std::string("double reg error TheRotatedLeviCivitaTensorEnv"); 
         }
 
@@ -95,7 +101,6 @@ namespace radmat
       Tensor<double,4>* 
         query_factory(const mom_t &l, const mom_t &r)
         {
-
           std::string id = gen_id(l,r); 
           std::map<std::string,Tensor<double,4> >::const_iterator it; 
           it = TheRotatedLeviCivitaTensorGenerator::Instance().find(id);

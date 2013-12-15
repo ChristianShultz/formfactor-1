@@ -26,14 +26,23 @@
  *  the phase only appears when both paricles 
  *  are spin-1 or higher 
  *
+ *  NB: this picks out an orientation, in the case
+ *  of a particle at rest we use the convention 
+ *  in adat that helicity and J_z states overlap
+ *  (polarized along the z-axis) - this is done 
+ *  by pretending a particle at rest is in the 
+ *  LG D4 w/ one unit of momentum along the z-axis 
+ *  
  */
 
 
 
 #include "lorentzff_canonical_rotations_utils.h"
+#include "lorentzff_cubic_reps.h"
+#include "radmat/utils/handle.h"
 #include "radmat/utils/stringify.h"
 #include "io/adat_xmlio.h"
-#include "hadron/irrep_utils.h"
+#include "hadron/irrep_util.h"
 #include <exception>
 #include <sstream>
 #include <string>
@@ -42,70 +51,34 @@
 
 namespace radmat
 {
-
-  struct Rep_p
-  {
-    std::string id(void) const = 0; 
-  };
-
-  template<typename T> 
-    struct Rep 
-    : public Rep_p 
-    {
-      std::string id(void) {return Stringify<T>();} 
-    };
-
-  struct Oh : public Rep<Oh> {};
-  struct D2 : public Rep<D2> {};
-  struct D3 : public Rep<D3> {};
-  struct D4 : public Rep<D4> {};
-
-  REGISTER_STRINGIFY_TYPE(Oh);
-  REGISTER_STRINGIFY_TYPE(D2);
-  REGISTER_STRINGIFY_TYPE(D3);
-  REGISTER_STRINGIFY_TYPE(D4);
-
-  template<int MomMax, int InsMax>
+  template<int MOM_MAX, int INSERTION_MAX_SQ>
     struct RotationGroupGenerator
     {
-      struct RepPair
-      {
-        RepPair(const mom_t &left, const mom_t &right)
-          : l(left) , r(right), lefty(gen_rep(l)) , righty(gen_rep(r))
-        { }
 
-        mom_t l;
-        mom_t r; 
-        rHandle<Rep> lefty;
-        rHandle<Rep> righty; 
-      }; 
+      private:
 
-      // utility 
-      rHandle<Rep_p> gen_rep(const mom_t &p)
-      {
-        std::string LG = Hadron::generateLittleGroup(p); 
-        if(LG == "Oh")
-          return rHandle<Rep_p>(new Oh() ); 
-        else if (LG == "D2")
-          return rHandle<Rep_p>(new D2() ); 
-        else if (LG == "D3")
-          return rHandle<Rep_p>(new D3() ); 
-        else if (LG == "D4")
-          return rHandle<Rep_p>(new D4() ); 
-        else
-        {
-          std::cout << "LG " << LG << " not supported" << std::endl;
-          exit(1); 
-        }
-        exit(1); 
-      }
-
-      mom_t rest_specialization(void)
+      // how do we treat rest internally
+      mom_t rest_specialization(void) const
       {
         return gen_mom<0,0,1>(); 
       }
 
-      std::string label(const mom_t &p, const rHandle<Rep> &r)
+      // what do we check for before we talk to the world
+      mom_t invert_rest_specialization(const mom_t &p) const
+      {
+        mom_t f = rest_specialization(); 
+        if ((p[0] != f[0]) || (p[1] != f[1]) || (p[2] != f[2]) )
+        {
+          std::cout << __func__ << ": rot error - "
+           << p[0] << p[1] << p[2] << std::endl;
+          throw std::string("rest rotation error"); 
+          exit(1); 
+        }
+        return gen_mom<0,0,0>(); 
+      }
+
+      // half of a map label 
+      std::string label(const mom_t &p, const rHandle<Rep_p> &r) const
       {
         std::stringstream ss; 
         mom_t lab = p;
@@ -118,7 +91,7 @@ namespace radmat
 
 
       // specialize rest to have orientation z-axis
-      std::pair<mom_t,mom_t> frame(const RepPair &rep)
+      std::pair<mom_t,mom_t> frame(const RepPair &rep) const
       {
         std::pair<mom_t,mom_t> r;
         r.first = rep.l;
@@ -130,26 +103,17 @@ namespace radmat
         return r; 
       }
 
-      std::pair<mom_t,mom_t> momentum(const RepPair &rep)
+      // undo specialize rest to have orientation z-axis
+      std::pair<mom_t,mom_t> momentum(const RepPair &rep) const
       {
         std::pair<mom_t,mom_t> r;
         r.first = rep.l;
         r.second = rep.r; 
+        if( rep.lefty->id() == Stringify<Oh>())
+          r.first = invert_rest_specialization(rep.l);
+        if( rep.righty->id() == Stringify<Oh>())
+          r.second = invert_rest_specialization(rep.r); 
         return r; 
-      }
-
-      std::string frame_label(const RepPair &rep)
-      {
-        std::stringstream ss; 
-        ss << "lefty_" << label(rep.l,rep.lefty);
-        ss << ".righty_" << label(rep.r,rep.righty);
-        return ss.str(); 
-      }
-
-      bool registerAll(void)
-      {
-        initialize_frames(); 
-        return true; 
       }
 
       mom_t mmom(const int a, const int b, const int c) const
@@ -162,19 +126,30 @@ namespace radmat
         return foo; 
       }
 
-      int find_frame(const RepPair &r)
+      bool same_reps(const RepPair &r, const RepPair &rr) const
+      {
+        return ( (r.lefty->id() == rr.lefty->id()) 
+            && (r.righty->id() == rr.righty->id())); 
+      }
+
+      // frames in which one particle is at rest have the 
+      // z axis chosen as a canonical direction 
+      int find_frame(const RepPair &r) const
       {
         int pos(-1);
+
         std::pair<mom_t,mom_t> f = frame(r); 
 
         for(int i = 0; i < frames.size(); ++i)
         {
+          if(!!! same_reps(frames[i],r) )
+            continue; 
+
           std::pair<mom_t,mom_t> c = frame(frames[i]); 
-          if(related_by_rotation(c.first,c.second,f.first,f.second,false)i)
+          if(related_by_rotation(c.first,c.second,f.first,f.second,false))
             pos = i; 
         }
-
-        return i; 
+        return pos; 
       }
 
       void insert_can_frame(const RepPair &r)
@@ -201,16 +176,23 @@ namespace radmat
       }
 
 
-      void insert(const RepPair &r)
+      // inserted rest frames are polarized along the z-axis
+      void insert(const RepPair &actual)
       {
-        int pos = find_frame(r); 
+        RepPair sort(actual.l,actual.r); 
+        std::pair<mom_t,mom_t> p = frame(actual); 
+
+        sort.l = p.first;
+        sort.r = p.second; 
+
+        int pos = find_frame(sort); 
 
         if( pos == -1 ) 
-          insert_can_frame(r); 
+          insert_can_frame(sort); 
         else
-          insert_related_frame(pos,r); 
+          insert_related_frame(pos,sort); 
 
-        register_frame(r); 
+        register_frame(sort); 
       }
 
 
@@ -235,42 +217,82 @@ namespace radmat
                     insert( RepPair( mmom(i,j,k),mmom(l,m,n) ) ); 
                   }
       }
-  
+
       template<typename T> 
-        void do_exit(const std::string &s, const T &t)
+        void do_exit(const std::string &s, const T &t) const
         {
           std::cout << __PRETTY_FUNCTION__ << s << t << std::endl;
           exit(1); 
         }
 
+      // public access
+      public:
+
+      bool registerAll(void)
+      {
+        initialize_frames(); 
+        return true; 
+      }
+
       // Query
       /////////// 
 
-      std::string get_can_frame_string(const mom_t &l, const mom_t &r)
+      std::string frame_label(const RepPair &rep) const
+      {
+        std::stringstream ss; 
+        ss << "lefty_" << label(rep.l,rep.lefty);
+        ss << ".righty_" << label(rep.r,rep.righty);
+        return ss.str(); 
+      }
+
+      std::string frame_label(const mom_t &l, const mom_t &r) const
+      {
+        return frame_label(RepPair(l,r)); 
+      }
+
+      std::string get_can_frame_string(const mom_t &l, const mom_t &r) const
       {
         std::string lab = frame_label(RepPair(l,r)); 
         std::map<std::string,std::string>::const_iterator it = can_frame_map.find(lab); 
         if(it == can_frame_map.end())
           do_exit("missing label" , lab);
+
         return it->second; 
       }
 
-      std::pair<mom_t,mom_t> get_can_frame(const mom_t &l, const mom_t &r) const
+      std::pair<mom_t,mom_t> get_can_frame_orientation(const mom_t &l, const mom_t &r) const
       {
         std::string can_frame = get_can_frame_string(l,r); 
-        return get_frame_momentum(can_frame); 
+        return get_frame_orientation(can_frame); 
       }
 
-      std::pair<mom_t,mom_t> get_frame_momentum(const std::string &id) const
+      std::pair<mom_t,mom_t> get_frame_orientation(const std::string &id) const
       {
-        std::map<std::string,RepPair>::const_iterator it; 
+        typename std::map<std::string,RepPair>::const_iterator it; 
         it = frame_label_map.find(id); 
         if(it == frame_label_map.end())
           do_exit("missing label " , id);
+
+        return frame(it->second); 
+      }
+
+      std::pair<mom_t,mom_t> get_frame_orientation(const mom_t&l, const mom_t &r) const
+      {
+        return frame( RepPair(l,r) ); 
+      }
+
+      // in the case of rest this is not the same as the orientation!!!
+      std::pair<mom_t,mom_t> get_frame_momentum(const std::string &id) const
+      {
+        typename std::map<std::string,RepPair>::const_iterator it; 
+        it = frame_label_map.find(id); 
+        if(it == frame_label_map.end())
+          do_exit("missing label " , id);
+
         return momentum(it->second); 
       }
 
-      std::vector<std::string> RotationGroupGenerator_untemp::get_related_frames(const mom_t &l, const mom_t &r) const
+      std::vector<std::string> get_related_frames(const mom_t &l, const mom_t &r) const
       {
         std::string can = get_can_frame_string(l,r); 
         std::vector<std::string> ret; 
@@ -282,9 +304,9 @@ namespace radmat
         return ret; 
       }
 
-      std::vector<std::string> RotationGroupGenerator_untemp::unique_frames(void) const
+      std::vector<std::string> unique_frames(void) const
       {
-        std::vector<RepPair>::const_iterator it; 
+        typename std::vector<RepPair>::const_iterator it; 
         std::vector<std::string> ret; 
         for( it =  frames.begin(); it != frames.end(); ++it)
           ret.push_back(frame_label(*it)); 

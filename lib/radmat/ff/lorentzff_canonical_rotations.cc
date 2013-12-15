@@ -5,7 +5,7 @@
  * Purpose :
 
 
- * Last Modified : Thu 12 Dec 2013 06:24:44 PM EST
+ * Last Modified : Fri 13 Dec 2013 04:43:29 PM EST
 
  * Created By : shultz
 
@@ -84,15 +84,21 @@ namespace radmat
           return true; 
         } 
 
+
+
       //  Apply the transformation to 
       //  particle at rest to maintain a
       //  consistent frame
       RotationMatrix_t *
         rest_specialization(const mom_t &cl, 
             const mom_t &cr, 
-            const mom_t &l, 
-            const mom_t &r) 
+            const mom_t &il, 
+            const mom_t &ir) 
         {
+          // this kind of sucks..
+          mom_t l = TheRotationGroupGenerator::Instance().get_frame_orientation(il,ir).first;
+          mom_t r = TheRotationGroupGenerator::Instance().get_frame_orientation(il,ir).second;
+
           std::string LGl = Hadron::generateLittleGroup(cl);
           std::string LGr = Hadron::generateLittleGroup(cr);
 
@@ -111,9 +117,9 @@ namespace radmat
           }
 
           RotationMatrix_t *R; 
-          if(is_rest(cr))
+          if(is_rest(ir))
             R = generate_frame_transformation(l,cl); 
-          if(is_rest(cl))
+          if(is_rest(il))
             R = generate_frame_transformation(r,cr); 
 
           clean_up_rot_mat(R); 
@@ -164,14 +170,26 @@ namespace radmat
           check_exit_LG(r,LGr); 
 
 
-          // the rotation from cr to r
           RotationMatrix_t *R_frame_r = generate_frame_transformation(r,cr); 
-
-          // the rotation from cl to l
-          RotationMatrix_t *R_frame_l = generate_frame_transformation(l,cl); 
+          RotationMatrix_t *R_frame_l = generate_frame_transformation(cl,l); 
           RotationMatrix_t *R= new Tensor<double,2>((TensorShape<2>())[4][4],0.);
           R->lower_index(1); 
 
+          // rotation takes me from cr to r
+          if( !!! check_frame_transformation(R_frame_r, cr , r) )
+          {
+            std::cout << "check_frame_transformation_error, (righty) exiting" << std::endl;
+            throw std::string("frame rotation error"); 
+            exit(1);
+          }
+
+          // rotation takes me from l to cl
+          if( !!! check_frame_transformation(R_frame_l, l , cl) )
+          {
+            std::cout << "check_frame_transformation_error, (lefty) exiting" << std::endl;
+            throw std::string("frame rotation error"); 
+            exit(1);
+          }
 
           // this is a rotation about the momentum direction 
           // of lefty 
@@ -182,7 +200,7 @@ namespace radmat
                 continue;
 
               for(int k = 0; k < 4; ++k)
-                (*R)[i][k] += (*R_frame_r)[i][j] * (*R_frame_l)[k][j];  
+                (*R)[i][k] += (*R_frame_r)[i][j] * (*R_frame_l)[j][k];  
             }
 
           // all this can be is a rotation about the 
@@ -257,6 +275,29 @@ namespace radmat
           return R; 
         }
 
+
+      RotationMatrix_t * 
+        primitive_rotation(const mom_t &cl,
+            const mom_t &cr, 
+            const mom_t &l, 
+            const mom_t &r,
+            const std::string &id)
+        {
+          if( is_rest(l) || is_rest(r) )
+            return rest_specialization(cl,cr,l,r); 
+          else if( id == "lefty")
+            return generate_left_rotation(cl,cr,l,r); 
+          else if( id == "righty")
+            return generate_right_rotation(cl,cr,l,r); 
+          else
+          {
+            std::cout << __func__ << ": error " << std::endl;
+            exit(1); 
+          }
+          exit(1); 
+        }
+
+
     } // anonomyous
 
 
@@ -297,7 +338,7 @@ namespace radmat
 
       if ( !!! local_registration)
       {
-        success &= TheRotationGroupGenerator::Instance().BlastOff(); 
+        success &= TheRotationGroupGenerator::Instance().registerAll(); 
         local_registration = true; 
       }
 
@@ -312,6 +353,8 @@ namespace radmat
     std::string
       rotation_group_label(const mom_t &l, const mom_t &r)
       {
+        std::cout << __func__ << " in " << l[0] << l[1] << l[2] << " " 
+          << r[0] << r[1] << r[2] << std::endl;
         return TheRotationGroupGenerator::Instance().get_can_frame_string(l,r);  
       }
 
@@ -319,23 +362,23 @@ namespace radmat
       get_left_rotation(const mom_t &l, const mom_t &r)
       {
         std::pair<mom_t,mom_t> can; 
-        can = TheRotationGroupGenerator::Instance().get_can_frame(l,r); 
-        return rHandle<RotationMatrix_t>(left_rotation(can.first,can.second,l,r)); 
+        can = TheRotationGroupGenerator::Instance().get_can_frame_orientation(l,r); 
+        return rHandle<RotationMatrix_t>(primitive_rotation(can.first,can.second,l,r,"lefty")); 
       }
 
     rHandle<RotationMatrix_t> 
       get_right_rotation(const mom_t &l, const mom_t &r)
       {
         std::pair<mom_t,mom_t> can; 
-        can = TheRotationGroupGenerator::Instance().get_can_frame(l,r); 
-        return rHandle<RotationMatrix_t>(right_rotation(can.first,can.second,l,r)); 
+        can = TheRotationGroupGenerator::Instance().get_can_frame_orientation(l,r); 
+        return rHandle<RotationMatrix_t>(primitive_rotation(can.first,can.second,l,r,"righty")); 
       }
 
     rHandle<RotationMatrix_t> 
       get_left_can_frame_rotation(const mom_t &l, const mom_t &r)
       {
         std::pair<mom_t,mom_t> can; 
-        can = TheRotationGroupGenerator::Instance().get_can_frame(l,r); 
+        can = TheRotationGroupGenerator::Instance().get_can_frame_orientation(l,r); 
         return rHandle<RotationMatrix_t>(radmat::CanonicalRotationEnv::call_factory(can.first)); 
       }
 
@@ -343,7 +386,7 @@ namespace radmat
       get_right_can_frame_rotation(const mom_t &l, const mom_t &r)
       {
         std::pair<mom_t,mom_t> can; 
-        can = TheRotationGroupGenerator::Instance().get_can_frame(l,r); 
+        can = TheRotationGroupGenerator::Instance().get_can_frame_orientation(l,r); 
         return rHandle<RotationMatrix_t>(radmat::CanonicalRotationEnv::call_factory(can.second)); 
       }
 

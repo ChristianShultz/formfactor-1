@@ -43,7 +43,7 @@ namespace radmat
         pplus = applyMetric(pplus,gdd,0); 
         epsilon = applyMetric(epsilon,gdd,0); 
 
-#if 1
+#if 0
         std::cout << "pminus " << pminus << "pplus " << pplus << "eps " << epsilon << std::endl;
 #endif 
   
