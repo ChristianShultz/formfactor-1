@@ -28,6 +28,24 @@ namespace radmat
 
     bool registerAll();
 
+
+    struct FrameOrientation_t
+    {
+      FrameOrientation_t() {}
+      FrameOrientation_t(const mom_t &ccl, const mom_t &ccr, const mom_t &ll, const mom_t &rr)
+        : cl(ccl) , cr(ccr) , l(ll) , r(rr)
+      {  }
+      mom_t cl,cr,l,r; 
+    };
+
+
+    // takes momentum -- returns orientations 
+    FrameOrientation_t
+      get_frame_orientation(const mom_t &l, const mom_t &r); 
+
+
+
+
     // these take momentum -- NOT orientations
 
     // return the rotation back to the reference frame

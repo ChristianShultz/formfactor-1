@@ -6,7 +6,7 @@
 
  * Creation Date : 10-12-2013
 
- * Last Modified : Fri 13 Dec 2013 12:58:10 PM EST
+ * Last Modified : Sun 15 Dec 2013 12:57:54 PM EST
 
  * Created By : shultz
 
@@ -45,15 +45,6 @@ namespace radmat
     {
       return ( dot_mom_t(l,cross_product(l,r)) ); 
     }
-
-
-  bool related_by_Oh_rotation(const mom_t &left, const mom_t &lleft)
-  {
-    return (
-        (Hadron::generateLittleGroup(left) == Hadron::generateLittleGroup(lleft)) 
-        && (dot_mom_t(left,left) == dot_mom_t(lleft,lleft))
-        ); 
-  }
 
   }
 
@@ -174,15 +165,6 @@ namespace radmat
       const mom_t &lleft, const mom_t &rright,
       const bool allow_flip)
   {
-    // knock out left or right is at rest first 
-    if( is_rest(left) && is_rest(lleft) )
-      return related_by_Oh_rotation(right,rright); 
-
-    if( is_rest(right) && is_rest(rright) )
-      return related_by_Oh_rotation(left,lleft); 
-
-
-    // easy checks first
     bool success = true; 
     success &= (cos_theta(left,right) == cos_theta(lleft,rright));
     success &= (volume_element(left,right) == volume_element(lleft,rright));

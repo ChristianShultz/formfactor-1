@@ -6,7 +6,7 @@
 
 * Creation Date : 11-12-2013
 
-* Last Modified : Sat 14 Dec 2013 05:10:33 PM EST
+* Last Modified : Sun 15 Dec 2013 01:45:02 PM EST
 
 * Created By : shultz
 
@@ -21,6 +21,7 @@ _._._._._._._._._._._._._._._._._._._._._.*/
 #include "radmat/ff/lorentzff_canonical_rotations_utils.h"
 #include "radmat/ff/lorentzff_canonical_rotations.h"
 #include "radmat/ff/lorentzff_Wigner_D_matrix_factory.h"
+#include "radmat/ff/lorentzff_Wigner_D_matrix_embedding.h"
 #include "radmat/utils/levi_civita.h"
 #include "hadron/irrep_util.h"
 #include "formfac/formfac_qsq.h"
@@ -354,6 +355,77 @@ void get_frame_rotation(int argc, char *argv[])
 //////////////////////////////////////////////////
 //////////////////////////////////////////////////
 
+
+
+void get_wigner_phase(int argc, char *argv[])
+{
+  if( argc != 9 )
+  {
+    std::cout << "error usage: test_rotations [" << __func__ << "] "
+      << "<mom1> <mom2> <J> " << std::endl; 
+    exit(1);
+  }
+  
+  mom_t m1 = radmat::gen_mom<0,0,0>(); 
+  mom_t m2 = radmat::gen_mom<0,0,0>(); 
+  int J; 
+
+  read_momentum(2,m1,argv);
+  read_momentum(5,m2,argv);
+  std::istringstream val(argv[8]);
+  val >> J; 
+
+
+  radmat::LatticeRotationEnv::FrameOrientation_t frame; 
+
+  std::cout << "read m1 " << string_mom(m1) 
+    << " m2 " << string_mom(m2) << " J " << J <<std::endl;
+
+  radmat::WignerMatrix_t D; 
+  radmat::primitiveEmbededWignerDMatrix *W;  
+
+  if( J == 1 )
+    W = new radmat::embededWignerDMatrix<1>();  
+  else if (J == 2)
+    W = new radmat::embededWignerDMatrix<2>();  
+  else if (J == 3)
+    W = new radmat::embededWignerDMatrix<3>();  
+  else if (J == 4)
+    W = new radmat::embededWignerDMatrix<4>();  
+  else
+  {
+    std::cout << "J " << J << "is not supported" << std::endl;
+    exit(1); 
+  }
+
+  frame = W->get_frame(m1,m2);
+  std::cout << "canonical frame " << string_mom(frame.cl) << " " 
+    << string_mom(frame.cr) << std::endl;
+
+  D = W->composite_wigner_matrix(m1,m2); 
+
+  std::cout << "\nD:" << D << std::endl;
+
+  radmat::WignerMatrix_t I,Dstar = D;
+  W->conjugate(&Dstar); 
+  D.lower_index(1); 
+  I = radmat::contract(D,Dstar,1,1); 
+  W->clean_up(I); 
+
+  std::cout << "D Ddag = " << I << std::endl;
+
+
+  delete W; 
+}
+
+
+
+
+
+//////////////////////////////////////////////////
+//////////////////////////////////////////////////
+//////////////////////////////////////////////////
+
 void get_wigner_matrix(int argc, char *argv[])
 {
   if( argc != 6 )
@@ -441,6 +513,7 @@ void init_options(void)
   insert_op("get_frame_rotation",&get_frame_rotation); 
   insert_op("get_wigner_matrix",&get_wigner_matrix); 
   insert_op("get_prod_wigner_matrix",&get_prod_wigner_matrix); 
+  insert_op("get_wigner_phase",&get_wigner_phase); 
 }
 
 

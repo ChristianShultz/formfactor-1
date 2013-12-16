@@ -5,7 +5,7 @@
  * Purpose :
 
 
- * Last Modified : Fri 13 Dec 2013 04:43:29 PM EST
+ * Last Modified : Sun 15 Dec 2013 12:57:30 PM EST
 
  * Created By : shultz
 
@@ -330,6 +330,14 @@ namespace radmat
         }
 
     } // anonomyous
+    
+
+
+
+    //////////////////////////////////////////////////////////////////////
+    //////////////////////////////////////////////////////////////////////
+    //////////////////////////////////////////////////////////////////////
+    //////////////////////////////////////////////////////////////////////
 
 
     bool registerAll(void)
@@ -350,6 +358,8 @@ namespace radmat
       return success; 
     }
 
+    //////////////////////////////////////////////////////////////////////
+
     std::string
       rotation_group_label(const mom_t &l, const mom_t &r)
       {
@@ -357,6 +367,19 @@ namespace radmat
           << r[0] << r[1] << r[2] << std::endl;
         return TheRotationGroupGenerator::Instance().get_can_frame_string(l,r);  
       }
+  
+    //////////////////////////////////////////////////////////////////////
+
+    FrameOrientation_t 
+      get_frame_orientation(const mom_t &l, const mom_t &r)
+      {
+        std::pair<mom_t,mom_t> can = TheRotationGroupGenerator::Instance().get_can_frame_orientation(l,r); 
+        std::pair<mom_t,mom_t> f = TheRotationGroupGenerator::Instance().get_frame_orientation(l,r); 
+
+        return FrameOrientation_t(can.first,can.second,f.first,f.second); 
+      }
+
+    //////////////////////////////////////////////////////////////////////
 
     rHandle<RotationMatrix_t> 
       get_left_rotation(const mom_t &l, const mom_t &r)
@@ -366,6 +389,8 @@ namespace radmat
         return rHandle<RotationMatrix_t>(primitive_rotation(can.first,can.second,l,r,"lefty")); 
       }
 
+    //////////////////////////////////////////////////////////////////////
+
     rHandle<RotationMatrix_t> 
       get_right_rotation(const mom_t &l, const mom_t &r)
       {
@@ -374,6 +399,8 @@ namespace radmat
         return rHandle<RotationMatrix_t>(primitive_rotation(can.first,can.second,l,r,"righty")); 
       }
 
+    //////////////////////////////////////////////////////////////////////
+    
     rHandle<RotationMatrix_t> 
       get_left_can_frame_rotation(const mom_t &l, const mom_t &r)
       {
@@ -382,6 +409,8 @@ namespace radmat
         return rHandle<RotationMatrix_t>(radmat::CanonicalRotationEnv::call_factory(can.first)); 
       }
 
+    //////////////////////////////////////////////////////////////////////
+    
     rHandle<RotationMatrix_t> 
       get_right_can_frame_rotation(const mom_t &l, const mom_t &r)
       {
@@ -389,6 +418,8 @@ namespace radmat
         can = TheRotationGroupGenerator::Instance().get_can_frame_orientation(l,r); 
         return rHandle<RotationMatrix_t>(radmat::CanonicalRotationEnv::call_factory(can.second)); 
       }
+
+    //////////////////////////////////////////////////////////////////////
 
     RotationMatrix_t*
       get_left_rotation(const mom_t &cl, 
@@ -398,6 +429,8 @@ namespace radmat
       {
         return left_rotation(cl,cr,l,r); 
       }
+
+    //////////////////////////////////////////////////////////////////////
 
     RotationMatrix_t*
       get_right_rotation(const mom_t &cl, 
@@ -415,53 +448,4 @@ namespace radmat
 
 
 
-
-
-
-//      // this is exact, it basically cooks up an orthogonal transformation
-//      //
-//      //    -- we will get screwed and have to play a phase game 
-//      itpp::Mat<double> 
-//        triad_rotation_matrix(const mom_t &c_left, 
-//            const mom_t &c_right,
-//            const mom_t &left, 
-//            const mom_t &right)
-//        {
-//          itpp::Mat<double> A(3,3),B(3,3); 
-//
-//          A.set_row(0,normalize(c_left)); 
-//          A.set_row(1,normalize(c_right)); 
-//          A.set_row(3,normalize(cross_product(c_left,c_right))); 
-//
-//          B.set_row(0,normalize(left)); 
-//          B.set_row(1,normalize(right)); 
-//          B.set_row(2,normalize(cross_product(left,right))); 
-//
-//          return A * itpp::transpose(B); 
-//        }
-//
-//
-//      template<int A, int B, int C, int X, int Y, int Z> 
-//        RotationMatrix_t * 
-//        generate_rotation(const mom_t & left, const mom_t &right)
-//        {
-//          RotationMatrix_t * R;
-//          R = new RotationMatrix_t( (TensorShape<2>())[4][4] , 0. );  
-//
-//          mom_t cleft = gen_mom<A,B,C>(); 
-//          mom_t cright = gen_mom<X,Y,Z>();  
-//
-//          // sanity
-//          POW2_ASSERT( related_by_rotation(left,right,cleft,cright) );          
-//
-//          itpp::Mat<double> R3 = triad_rotation_matrix(cleft,cright,left,right); 
-//
-//          (*R)[0][0] = 1.;
-//
-//          for(int i = 0; i < 3; ++i)
-//            for(int j = 0; j < 3; ++j)
-//              (*R)[i+1][j+1] = R3(i,j); 
-//
-//          return R; 
-//        }
 
