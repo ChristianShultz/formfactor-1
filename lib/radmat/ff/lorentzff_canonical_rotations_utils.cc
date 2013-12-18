@@ -6,7 +6,7 @@
 
  * Creation Date : 10-12-2013
 
- * Last Modified : Sun 15 Dec 2013 12:57:54 PM EST
+ * Last Modified : Wed 18 Dec 2013 11:28:55 AM EST
 
  * Created By : shultz
 
@@ -14,6 +14,7 @@
 
 #include "lorentzff_canonical_rotations_utils.h"
 #include "radmat/redstar_interface/redstar_canonical_lattice_rotations.h"
+#include "radmat/utils/levi_civita.h"
 #include <sstream>
 
 namespace radmat
@@ -52,7 +53,8 @@ namespace radmat
   bool
     check_frame_transformation(const RotationMatrix_t *A,
         const mom_t &x, 
-        const mom_t &b)
+        const mom_t &b,
+        bool print_on_false)
     {
       mom_t chk = gen_mom<0,0,0>();
 
@@ -67,10 +69,43 @@ namespace radmat
       }
 
       if( (chk[0] != b[0]) || (chk[1] != b[1]) || (chk[2] != b[2]) )
+      {
+        if(print_on_false)
+        {
+        std::cout << __func__ << ": returning false Rp = pp\n"
+          << "p = " << string_mom(x) << " pp = " << string_mom(b)
+          << " Rp = " << string_mom(chk)
+          << " R:" << *A << std::endl; 
+        }
         return false; 
-
+      }
       return true; 
     } 
+
+  ///////////////////////////////////////////////
+  ///////////////////////////////////////////////
+  
+  bool
+    check_total_frame_transformation(const RotationMatrix_t *R,
+        const mom_t &l, 
+        const mom_t &r,
+        const mom_t &ll,
+        const mom_t &rr,
+        bool print_on_false)
+    {
+      bool success = check_frame_transformation(R,ll,l) ;
+      success &= check_frame_transformation(R,rr,r); 
+      if ( print_on_false && !!! success)
+      {
+        std::cout << __func__ << ": rotation failure "
+          << "\n l" << string_mom(l) << "  r " << string_mom(r)
+          << "\nll" << string_mom(ll) << " rr " << string_mom(rr)
+          << "R: " << *R << std::endl;
+      }
+      return success; 
+    } 
+
+
 
   //////////////////////////////////////////////
   //////////////////////////////////////////////
@@ -118,6 +153,115 @@ namespace radmat
       return R; 
     }
 
+  //////////////////////////////////////////
+  //////////////////////////////////////////
+
+  // generate an orthogonal transformation 
+  RotationMatrix_t*
+    generate_triad_rotation_matrix(const mom_t &l, 
+        const mom_t &r,
+        const mom_t &ll, 
+        const mom_t &rr)
+    {
+      RotationMatrix_t *R = new Tensor<double,2>( (TensorShape<2>())[4][4], 0.); 
+      (*R)[0][0] = 1.; 
+      R->lower_index(1); 
+
+      // if colinear then cross product is garbage
+      if( colinear_momentum(l,r) && colinear_momentum(ll,rr) )
+      {
+        delete R; 
+        return generate_frame_transformation(l,ll); 
+      }
+
+      // make some unit vectors
+      itpp::Vec<double> v1,v2,w1,w2; 
+      v1 = normalize(l);
+      v2 = normalize(r);
+
+      // make some unit vectors in the other frame
+      w1 = normalize(ll);
+      w2 = normalize(rr); 
+
+      // use a plus minus basis to do the mapping 
+      itpp::Vec<double> vp,vm,vv,vc,wp,wm,ww,wc; 
+      vp = (v1 + v2)/sqrt(itpp::sum_sqr(v1 + v2));
+      vm = (v1 - v2)/sqrt(itpp::sum_sqr(v1 - v2));
+      vc = itpp::cross(vp,vm);
+
+      wp = (w1 + w2)/sqrt(itpp::sum_sqr(w1 + w2));
+      wm = (w1 - w2)/sqrt(itpp::sum_sqr(w1 - w2));
+      wc = itpp::cross(wp,wm); 
+
+      // outter product produces an orthogonal transformation 
+      // that maps from one frame to the other (rotation matrix)
+      for(int i =0; i < 3; ++i)
+        for(int j = 0; j < 3; ++j)
+        {
+          (*R)[i+1][j+1] += vp(i)*wp(j);
+          (*R)[i+1][j+1] += vm(i)*wm(j);
+          (*R)[i+1][j+1] += vc(i)*wc(j);
+        }
+
+      // should be the solution 
+      //   R*l = ll;
+      //   R*r = rr; 
+
+      return R; 
+    }
+
+  //////////////////////////////////////////
+  //////////////////////////////////////////
+
+
+  // use zyz -- do some algebra 
+  //
+  //  Mathematica :
+  //      Rz[t_] := RotationMatrix[t,{0,0,1}]
+  //      Ry[t_] := RotationMatrix[t,{0,1,0}]
+  //
+  //      Eul[a_,b_,c_] := Rz[a] . Ry[b] . Rz[c]
+  //
+  //      Eul[a,b,c] // MatrixForm 
+  //
+  // NB: This is not unique 
+  Hadron::CubicCanonicalRotation_t
+    generate_euler_angles(const RotationMatrix_t *R)
+    {
+      double alpha,beta,gamma;
+
+      if( (*R)[3][3] != 0. ) // isolates cosine of beta
+      {
+        beta = acos( (*R)[3][3] ); 
+        if ( sin(beta) != 0. ) // can use the edge elements
+        {
+          double sb = sin(beta); 
+          alpha = atan2( (*R)[2][3]/sb , (*R)[1][3]/sb ); 
+          gamma = atan2( (*R)[3][2]/sb , -(*R)[3][1]/sb ); 
+        }
+        else // pick something that makes the edge elems zero and follow through
+        {    // gimble lock pick a choice of gamma = pi
+          gamma = acos(-1.); 
+          alpha = acos( (*R)[2][2]/cos(gamma) ); 
+        }
+      }
+      else
+      { 
+        // beta is pi/2 or 3pi/2 -- pick pi/2
+        beta = acos(-1) / 2.;
+        double sb = sin(beta); 
+        alpha = atan2( (*R)[2][3]/sb , (*R)[1][3]/sb ); 
+        gamma = atan2( (*R)[3][2]/sb , -(*R)[3][1]/sb ); 
+      }
+
+      Hadron::CubicCanonicalRotation_t e;
+      e.alpha = alpha;
+      e.beta = beta;
+      e.gamma = gamma;
+
+      return e; 
+    }
+
   //////////////////////////////////////////////
   //////////////////////////////////////////////
 
@@ -157,6 +301,16 @@ namespace radmat
     return (dot_mom_t(p,p) == 0);
   }
 
+
+  //////////////////////////////////////////////
+  //////////////////////////////////////////////
+
+  bool colinear_momentum(const mom_t &l, const mom_t &r)
+  {
+    itpp::Vec<double> nl(normalize(l)),nr(normalize(r));
+    return (nl == nr || nl == -nr ); 
+  }
+
   //////////////////////////////////////////////
   //////////////////////////////////////////////
 
@@ -165,39 +319,49 @@ namespace radmat
       const mom_t &lleft, const mom_t &rright,
       const bool allow_flip)
   {
+    if( is_rest(left) || is_rest(lleft) || is_rest(right) || is_rest(rright) )
+    {
+      std::cout << __func__ << ": passed in a rest momentum, throwing an error"
+        << std::endl;
+      throw std::string("related_by_rotation rest error"); 
+    }
+
     bool success = true; 
     success &= (cos_theta(left,right) == cos_theta(lleft,rright));
     success &= (volume_element(left,right) == volume_element(lleft,rright));
 
     if( allow_flip ) 
     {
-      if(dot_mom_t(left,left) == dot_mom_t(lleft,lleft))
-        success &= (dot_mom_t(right,right) == dot_mom_t(rright,rright));  
-      else if(dot_mom_t(left,left) == dot_mom_t(rright,rright)) 
-        success &= (dot_mom_t(right,right) == dot_mom_t(lleft,lleft));  
+      if(same_length(left,lleft))
+        success &= same_length(right,rright);  
+      else if(same_length(left,rright)) 
+        success &= same_length(lleft,right);  
       else
         return false; 
     }
     else
     {
-      success &= (dot_mom_t(left,left) == dot_mom_t(lleft,lleft)); 
-      success &= (dot_mom_t(right,right) == dot_mom_t(rright,rright));  
+      success &= same_length(left,lleft); 
+      success &= same_length(right,rright);  
     }
 
     if( !!! success )
       return false; 
 
-    // right = R * rright
-    RotationMatrix_t *Rr = generate_frame_transformation(right,rright); 
-    RotationMatrix_t *Rl = generate_frame_transformation(left,lleft); 
-    // allow for spinning about the momentum direction of one of the guys 
-    success &= ( 
-        check_frame_transformation(Rr,lleft,left) 
-        || check_frame_transformation(Rl,rright,right) ); 
+    // R *ll = l && R *rr = r -- doesnt work for rest
+    RotationMatrix_t *Rtriad = generate_triad_rotation_matrix(left,right,lleft,rright); 
+    // check that the frame transformation actually works
+    success &= check_total_frame_transformation(Rtriad,left,right,lleft,rright,true); 
 
-    delete Rr; 
-    delete Rl; 
+    // not a proper rotation 
+    if( fabs( determinant(Rtriad) - 1. ) > 1e-6 )
+    {
+      std::cout << __func__ << ": triad had det " << determinant(Rtriad) 
+        << ": which was not 1, confused Rtriad:" << *Rtriad << std::endl;
+      success = false; 
+    }
 
+    delete Rtriad; 
     return success;
   }
 
@@ -207,12 +371,39 @@ namespace radmat
   itpp::Vec<double> normalize(const mom_t &m)
   {
     itpp::Vec<double> r(3); 
-    double norm = double(dot_mom_t(m,m)); 
+    double norm = sqrt( double(dot_mom_t(m,m)) ); 
     r[0] = double(m[0])/norm;
     r[1] = double(m[1])/norm;
     r[2] = double(m[2])/norm;
     return r; 
   }
 
+
+  // use the levi civita symbol to compute a determinant
+  double determinant(const RotationMatrix_t * R)
+  {
+    Tensor<double,4> levi = levi_civita<double,4>(); 
+    double sum; 
+
+    for(int i = 0; i < 4; ++i)
+      for(int j = 0; j < 4; ++j)
+      {
+        if( i == j )
+          continue; 
+        for(int k = 0; k < 4; ++k)
+        {
+          if( i == k || j == k )
+            continue; 
+
+          for(int l = 0; l < 4; ++l)
+            sum += (levi[i][j][k][l] 
+                * (*R)[0][i] 
+                * (*R)[1][j] 
+                * (*R)[2][k] 
+                * (*R)[3][l]);
+        } // k 
+      } // j 
+    return sum; 
+  }
 
 }

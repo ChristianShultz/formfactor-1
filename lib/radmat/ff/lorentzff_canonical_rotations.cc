@@ -5,7 +5,7 @@
  * Purpose :
 
 
- * Last Modified : Sun 15 Dec 2013 12:57:30 PM EST
+ * Last Modified : Wed 18 Dec 2013 11:37:25 AM EST
 
  * Created By : shultz
 
@@ -119,9 +119,15 @@ namespace radmat
           RotationMatrix_t *R; 
           if(is_rest(ir))
             R = generate_frame_transformation(l,cl); 
-          if(is_rest(il))
+          else if(is_rest(il))
             R = generate_frame_transformation(r,cr); 
+          else
+          {
+            throw std::string("rotation error"); 
+            exit(1); 
+          }
 
+          R->lower_index(1); 
           clean_up_rot_mat(R); 
 
           return R; 
@@ -147,85 +153,15 @@ namespace radmat
             return rest_specialization(cl,cr,l,r); 
 
           RotationMatrix_t *R = generate_frame_transformation(r,cr); 
-          clean_up_rot_mat(R); 
-
-          return R; 
-        }
-
-
-      // generates the rotation about the momentum direction  
-      // and checks that this is a valid prescription 
-      //      -- eventually should be removed since it 
-      //         attaches the inverse of a different tform
-      RotationMatrix_t *
-        generate_check_left_phase_rotation(const mom_t &cl, 
-            const mom_t &cr, 
-            const mom_t &l, 
-            const mom_t &r) 
-        {
-          std::string LGl = Hadron::generateLittleGroup(cl);
-          std::string LGr = Hadron::generateLittleGroup(cr);
-
-          check_exit_LG(l,LGl);
-          check_exit_LG(r,LGr); 
-
-
-          RotationMatrix_t *R_frame_r = generate_frame_transformation(r,cr); 
-          RotationMatrix_t *R_frame_l = generate_frame_transformation(cl,l); 
-          RotationMatrix_t *R= new Tensor<double,2>((TensorShape<2>())[4][4],0.);
           R->lower_index(1); 
-
-          // rotation takes me from cr to r
-          if( !!! check_frame_transformation(R_frame_r, cr , r) )
-          {
-            std::cout << "check_frame_transformation_error, (righty) exiting" << std::endl;
-            throw std::string("frame rotation error"); 
-            exit(1);
-          }
-
-          // rotation takes me from l to cl
-          if( !!! check_frame_transformation(R_frame_l, l , cl) )
-          {
-            std::cout << "check_frame_transformation_error, (lefty) exiting" << std::endl;
-            throw std::string("frame rotation error"); 
-            exit(1);
-          }
-
-          // this is a rotation about the momentum direction 
-          // of lefty 
-          for(int i = 0; i < 4; ++i)
-            for(int j = 0; j < 4; ++j)
-            {
-              if( fabs( (*R_frame_r)[i][j] ) < 1e-6 )
-                continue;
-
-              for(int k = 0; k < 4; ++k)
-                (*R)[i][k] += (*R_frame_r)[i][j] * (*R_frame_l)[j][k];  
-            }
-
-          // all this can be is a rotation about the 
-          // momentum direction 
-          if( !!! check_rotation_invariant(R,l) )
-          {
-            clean_up_rot_mat(R_frame_r);
-            clean_up_rot_mat(R_frame_l);
-
-            std::cout << __func__ << ": error for \ncl: " << mom_string(cl)
-              << " cr " << mom_string(cr) << " --> l " << mom_string(l) 
-              << " r " << mom_string(r) << "\nR_r: " << *R_frame_r 
-              << "\nR_l: " << *R_frame_l; 
-
-            delete R_frame_r; 
-            delete R_frame_l; 
-            delete R; 
-
-            exit(1); 
-          } 
-
           clean_up_rot_mat(R); 
 
-          delete R_frame_r; 
-          delete R_frame_l; 
+          if( !!! check_total_frame_transformation(R,l,r,cl,cr,true) )
+          {
+            std::cout << __func__ << ": error rotating frame " 
+              << std::endl;
+            throw std::string("right rotation error"); 
+          }
 
           return R; 
         }
@@ -248,29 +184,18 @@ namespace radmat
           if( is_rest(cl) || is_rest(cr) )
             return rest_specialization(cl,cr,l,r); 
 
-          // the rotation from cr to r
-          RotationMatrix_t *Rphase = generate_check_left_phase_rotation(cl,cr,l,r); 
 
           // the rotation from cl to l
-          RotationMatrix_t *R_frame_l = generate_frame_transformation(l,cl); 
-          RotationMatrix_t *R= new Tensor<double,2>((TensorShape<2>())[4][4],0.);
+          RotationMatrix_t *R = generate_frame_transformation(l,cl); 
           R->lower_index(1); 
-
-
-          for(int i = 0; i < 4; ++i)
-            for(int j = 0; j < 4; ++j)
-            {
-              if( fabs( (*Rphase)[i][j] ) < 1e-6 )
-                continue;
-
-              for(int k = 0; k < 4; ++k)
-                (*R)[i][k] += (*Rphase)[i][j] * (*R_frame_l)[j][k];  
-            }
-
           clean_up_rot_mat(R); 
 
-          delete Rphase; 
-          delete R_frame_l; 
+          if( !!! check_total_frame_transformation(R,l,r,cl,cr,true) )
+          {
+            std::cout << __func__ << ": error rotating frame " 
+              << std::endl;
+            throw std::string("right rotation error"); 
+          }
 
           return R; 
         }
@@ -363,8 +288,6 @@ namespace radmat
     std::string
       rotation_group_label(const mom_t &l, const mom_t &r)
       {
-        std::cout << __func__ << " in " << l[0] << l[1] << l[2] << " " 
-          << r[0] << r[1] << r[2] << std::endl;
         return TheRotationGroupGenerator::Instance().get_can_frame_string(l,r);  
       }
   

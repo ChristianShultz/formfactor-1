@@ -6,7 +6,7 @@
 
 * Creation Date : 11-12-2013
 
-* Last Modified : Sun 15 Dec 2013 01:45:02 PM EST
+* Last Modified : Wed 18 Dec 2013 09:57:37 AM EST
 
 * Created By : shultz
 
@@ -80,19 +80,6 @@ mom_t ref_mom(const mom_t &p)
 
 }
 
-/////////////////////////////////////////////
-double determinant(const RotationMatrix_t *R)
-{
-  double res(0.); 
-  radmat::Tensor<double,4> eps = radmat::levi_civita<double,4>(); 
-
-  for(int i = 0; i < 4; ++i)
-    for(int j = 0; j < 4; ++j)
-      for(int k = 0; k < 4; ++k)
-        for(int l = 0; l < 4; ++l)
-          res += eps[i][j][k][l]* (*R)[0][i] * (*R)[1][j] * (*R)[2][k] * (*R)[3][l]; 
-  return res; 
-}
 
 /////////////////////////////////////////////
   mom_t 

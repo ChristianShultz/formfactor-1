@@ -6,7 +6,7 @@
 
  * Creation Date : 14-12-2013
 
- * Last Modified : Sat 14 Dec 2013 05:04:50 PM EST
+ * Last Modified : Wed 18 Dec 2013 03:06:37 PM EST
 
  * Created By : shultz
 
@@ -153,7 +153,7 @@ namespace radmat
 
       if(!!! local_registration)
       {
-        for(int J =1 ; J <= Jmax; ++J)
+        for(int J =0 ; J <= Jmax; ++J)
          success &= do_mom_reg(J);  
 
         local_registration = true; 

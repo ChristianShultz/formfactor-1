@@ -44,13 +44,13 @@ namespace radmat
       get_frame_orientation(const mom_t &l, const mom_t &r); 
 
 
-
-
     // these take momentum -- NOT orientations
 
     // return the rotation back to the reference frame
     //
     //  v_ref = R * v_frame
+    //
+    //  these don't have to be the same rotation!!!
     //
     rHandle<RotationMatrix_t> 
       get_left_rotation(const mom_t &l, const mom_t &r);

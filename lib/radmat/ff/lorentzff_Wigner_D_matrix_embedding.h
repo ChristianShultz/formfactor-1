@@ -18,6 +18,18 @@ namespace radmat
         return  radmat::LatticeRotationEnv::get_frame_orientation(l,r); 
       }
 
+    virtual void
+      check_frame(const radmat::LatticeRotationEnv::FrameOrientation_t &f) const
+      {
+        // check that the delta function in the derivation is satisfied 
+        rHandle<RotationMatrix_t> R = radmat::LatticeRotationEnv::get_right_rotation(f.l,f.r); 
+        if( !!! check_total_frame_transformation(&*R,f.l,f.r,f.cl,f.cr,true) )
+        {
+          std::cout << __func__ << ": rotation error " << std::endl;
+          throw std::string("rotation error"); 
+        }
+      }
+
     virtual void 
       conjugate(WignerMatrix_t* W) const
       {
@@ -44,7 +56,6 @@ namespace radmat
     struct embededWignerDMatrix
     :  public primitiveEmbededWignerDMatrix 
     {
-
       virtual ~embededWignerDMatrix() {}
 
       virtual  WignerMatrix_t
@@ -52,6 +63,7 @@ namespace radmat
         {
           radmat::LatticeRotationEnv::FrameOrientation_t frame;
           frame = get_frame(l,r); 
+          check_frame(frame); 
 
           WignerMatrix_t *Dcl,*Dcr,*Dl,*Dr;
           WignerMatrix_t D( (TensorShape<2>())[2*J+1][2*J+1], std::complex<double>(0.,0.) ); 

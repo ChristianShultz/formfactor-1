@@ -6,7 +6,7 @@
 
  * Creation Date : 25-02-2013
 
- * Last Modified : Wed 11 Dec 2013 05:00:45 PM EST
+ * Last Modified : Tue 17 Dec 2013 09:24:09 AM EST
 
  * Created By : shultz
 
@@ -81,7 +81,7 @@ namespace radmat
   RadmatSingleQ2Driver::RadmatSingleQ2Driver(const RadmatSingleQ2Driver &o)
     : init_linear_system(o.init_linear_system) , init_fits(o.init_fits) ,
     linear_system(o.linear_system) , fit_across_time(o.fit_across_time)
-  {  }
+  { rot_id = std::string(""); }
 
 
   RadmatSingleQ2Driver& RadmatSingleQ2Driver::operator=(const RadmatSingleQ2Driver &o)
@@ -92,6 +92,7 @@ namespace radmat
       init_fits = o.init_fits;
       linear_system = o.linear_system;
       fit_across_time = o.fit_across_time;
+      rot_id = o.rot_id; 
     }
     return *this; 
   }
@@ -346,6 +347,7 @@ namespace radmat
   { 
     init_linear_system = false;
     init_fits = false;
+    rot_id = std::string(""); 
   }
 
 
@@ -355,7 +357,7 @@ namespace radmat
     ss << SEMBLE::SEMBLEIO::getPath() << "Q2_" << linear_system.qsq_sort();
 
     // this is an ugly naming convention 
-    if( rot_id != std::string() )
+    if( rot_id != std::string("") )
     {
       SEMBLE::SEMBLEIO::makeDirectoryPath(ss.str());
       ss << "/" << rot_id; 

@@ -3,11 +3,13 @@
 
 #include "ff_gen_llsq_row.h"
 #include "lorentzff_polarization_embedding.h"
+#include "lorentzff_canonical_frame_formfacs.h"
 #include "radmat/utils/levi_civita.h"
 #include "radmat/utils/pow2assert.h"
 #include <exception>
 #include <sstream>
 
+#if 0
 namespace radmat
 {
 
@@ -25,21 +27,22 @@ namespace radmat
       }
 
 
-    template<int lambda_left, int lambda_right>
       struct Ingredients
-      : public leftPTensor<1,lambda_left>, 
-      public rightPTensor<1,lambda_right>
+      : public leftSpinPTensor<1>, 
+      public rightSpinPTensor<1>
     {
       Ingredients() {}
 
       // ingredient list
       Ingredients(const Tensor<double,1> &p_f, 
           const Tensor<double,1> &p_i, 
-          const double mom_fac) 
+          const double mom_fac,
+          const int lambda_left,
+          const int lambda_right) 
       {
         // polarization tensors (up indicies)
-        eps_left = this->left_p_tensor(p_f,p_i,mom_fac); 
-        eps_right = this->right_p_tensor(p_f,p_i,mom_fac); 
+        eps_left = this->left_p_tensor(p_f,p_i,mom_fac,lambda_left); 
+        eps_right = this->right_p_tensor(p_f,p_i,mom_fac,lambda_right); 
 
         // momentum tensors (up indicies) 
         p_left = convertTensorUnderlyingType<std::complex<double> , double, 1>(p_f);
@@ -146,25 +149,27 @@ namespace radmat
 
 
 
-
     //////////////////////////////////////////////////////////////////
     //////////////////////////////////////////////////////////////////
     template<int lambda_left, int lambda_right>
-      struct G1 : public ffBlockBase_t<std::complex<double> >  
+      struct G1 : public CanonicalFrameFormFactor<1,lambda_left,lambda_right, G1 >
     {
-      std::string
+      virtual ~G1() {}
+      virtual std::string
         ff() const
         {
           return "-G_1(Q^2)(p_f + p_i)^\\mu \\epsilon^*_\\nu(p_f,\\lambda_f)\\epsilon^\\nu(p_i,\\lambda_i) \\\\";
         }
 
 
-      Tensor<std::complex<double> , 1> 
-        operator()(const Tensor<double,1> &p_f, 
+      virtual Tensor<std::complex<double> , 1> 
+        impl(const Tensor<double,1> &p_f, 
             const Tensor<double,1> &p_i, 
-            const double mom_fac)  const
+            const double mom_fac,
+            const int l,
+            const int r)  const
         {
-          Ingredients<lambda_left,lambda_right> i(p_f,p_i,mom_fac); 
+          Ingredients i(p_f,p_i,mom_fac,l,r); 
           return  -i.pplus * i.eps_left_dot_eps_right(); 
         }
     };
@@ -175,9 +180,10 @@ namespace radmat
     //////////////////////////////////////////////////////////////////
     //////////////////////////////////////////////////////////////////
     template<int lambda_left, int lambda_right>
-      struct G2 : public ffBlockBase_t<std::complex<double> >  
+      struct G2 : public CanonicalFrameFormFactor<1,lambda_left, lambda_right, G2 >
     {
-      std::string 
+      virtual ~G2() {}
+      virtual std::string 
         ff() const
         {
           std::string s = "G_2(Q^2)\\left[ \\epsilon^\\mu(p_i,\\lambda_i)\\epsilon^*_\\nu(p_f,\\lambda_f)p_i^\\nu";
@@ -185,11 +191,14 @@ namespace radmat
           return s;
         }
 
-      Tensor<std::complex<double> , 1> operator()(const Tensor<double,1> &p_f, 
+      virtual Tensor<std::complex<double> , 1> 
+        impl(const Tensor<double,1> &p_f, 
           const Tensor<double,1> &p_i, 
-          const double mom_fac)  const
+          const double mom_fac,
+          const int l, 
+          const int r)  const
       {
-        Ingredients<lambda_left,lambda_right> i(p_f,p_i,mom_fac); 
+        Ingredients i(p_f,p_i,mom_fac,l,r); 
         Tensor<std::complex<double> , 1> ret(i.init_4_tens()); 
 
         ret = i.eps_right * i.eps_left_dot_p_right(); 
@@ -203,9 +212,10 @@ namespace radmat
     //////////////////////////////////////////////////////////////////
     //////////////////////////////////////////////////////////////////
     template<int lambda_left, int lambda_right>
-      struct G3 : public ffBlockBase_t<std::complex<double> >  
+      struct G3 : public CanonicalFrameFormFactor<1, lambda_left, lambda_right, G3 >
     {
-      std::string
+      virtual ~G3() {}
+      virtual std::string
         ff() const
         {
           std::string s =  "-\\frac{G_3(Q^2)}{2m_v^2}(p_f + p_i)^\\mu";
@@ -213,11 +223,14 @@ namespace radmat
           s += " \\epsilon_\\alpha(p_i,\\lambda_f)p_f^\\alpha \\\\ ";
           return s; 
         }
-      Tensor<std::complex<double> , 1> operator()(const Tensor<double,1> &p_f, 
+      virtual Tensor<std::complex<double> , 1> 
+        impl(const Tensor<double,1> &p_f, 
           const Tensor<double,1> &p_i, 
-          const double mom_fac)  const
+          const double mom_fac,
+          const int l,
+          const int r)  const
       {
-        Ingredients<lambda_left,lambda_right> i(p_f,p_i,mom_fac); 
+        Ingredients i(p_f,p_i,mom_fac,l,r); 
         return - i.pplus * ( i.eps_left_dot_p_right() * i.eps_right_dot_p_left() / (2. * i.mm_left)); 
       }
     };
@@ -293,11 +306,10 @@ namespace radmat
     //////////////////////////////////////////////////////////////////
     //////////////////////////////////////////////////////////////////
     template<int lambda_left, int lambda_right>
-      struct Gc : public ffBlockBase_t<std::complex<double> > , 
-      public leftPTensor<1,lambda_left>, 
-      public rightPTensor<1,lambda_right>
+      struct Gc : public CanonicalFrameFormFactor<1,lambda_left,lambda_right,Gc>
     {
-      std::string
+      virtual ~Gc() {}
+      virtual std::string
         ff() const
         {
           std::string s;
@@ -307,23 +319,26 @@ namespace radmat
           return  std::string("\\\\") + s + std::string(" \\\\ "); 
         }
 
-      double eta(const radmat::RhoRho::Ingredients<lambda_left,lambda_right> &i ) const
+      virtual double eta(const radmat::RhoRho::Ingredients &i ) const
       {
         return (i.Q2 / (4. * i.mm_left ) ); 
       }
 
-      Tensor<std::complex<double> , 1> operator()(const Tensor<double,1> &p_f, 
+      virtual Tensor<std::complex<double> , 1> 
+        impl(const Tensor<double,1> &p_f, 
           const Tensor<double,1> &p_i, 
-          const double mom_fac)  const
+          const double mom_fac,
+          const int l, 
+          const int r)  const
       {
-        radmat::RhoRho::Ingredients<lambda_left,lambda_right> i(p_f,p_i,mom_fac); 
+        radmat::RhoRho::Ingredients i(p_f,p_i,mom_fac,l,r); 
 
         double m_eta = eta(i); 
         double two_thirds_eta = m_eta * (2./3.);
 
-        return ( (1. + two_thirds_eta) * g1(p_f,p_i,mom_fac) 
-            - two_thirds_eta * g2(p_f,p_i,mom_fac) 
-            + two_thirds_eta * ( 1. + m_eta ) * g3(p_f,p_i,mom_fac)
+        return ( (1. + two_thirds_eta) * g1.impl(p_f,p_i,mom_fac,l,r) 
+            - two_thirds_eta * g2.impl(p_f,p_i,mom_fac,l,r) 
+            + two_thirds_eta * ( 1. + m_eta ) * g3.impl(p_f,p_i,mom_fac,l,r)
             ); 
       }
 
@@ -336,11 +351,10 @@ namespace radmat
     //////////////////////////////////////////////////////////////////
     //////////////////////////////////////////////////////////////////
     template<int lambda_left, int lambda_right>
-      struct Gm : public ffBlockBase_t<std::complex<double> > , 
-      public leftPTensor<1,lambda_left>, 
-      public rightPTensor<1,lambda_right>
+      struct Gm : public CanonicalFrameFormFactor<1,lambda_left,lambda_right, Gm>
     {
-      std::string
+      virtual ~Gm() {}
+      virtual std::string
         ff() const
         {
           std::string s; 
@@ -349,11 +363,14 @@ namespace radmat
         }
 
 
-      Tensor<std::complex<double> , 1> operator()(const Tensor<double,1> &p_f, 
+      virtual Tensor<std::complex<double> , 1> 
+        impl(const Tensor<double,1> &p_f, 
           const Tensor<double,1> &p_i, 
-          const double mom_fac)  const
+          const double mom_fac,
+          const int l,
+          const int r)  const
       {
-        return  (-1. * g2(p_f,p_i,mom_fac)); 
+        return  (-1. * g2.impl(p_f,p_i,mom_fac,l,r)); 
       }
 
       radmat::RhoRho::G2<lambda_left,lambda_right> g2; 
@@ -362,11 +379,10 @@ namespace radmat
     //////////////////////////////////////////////////////////////////
     //////////////////////////////////////////////////////////////////
     template<int lambda_left, int lambda_right>
-      struct Gq : public ffBlockBase_t<std::complex<double> > , 
-      public leftPTensor<1,lambda_left>, 
-      public rightPTensor<1,lambda_right>
+      struct Gq : public CanonicalFrameFormFactor<1,lambda_left,lambda_right,Gq>
     {
-      std::string
+      virtual ~Gq() {}
+      virtual std::string
         ff() const
         {
           std::string s; 
@@ -376,22 +392,25 @@ namespace radmat
           return  std::string("\\\\") + s + std::string(" \\\\ "); 
         }
 
-      double eta(const radmat::RhoRho::Ingredients<lambda_left,lambda_right> &i ) const
+      virtual double eta(const radmat::RhoRho::Ingredients &i ) const
       {
         return (i.Q2 / (4. * i.mm_left ) ); 
       }
 
-      Tensor<std::complex<double> , 1> operator()(const Tensor<double,1> &p_f, 
+      virtual Tensor<std::complex<double> , 1> 
+        impl(const Tensor<double,1> &p_f, 
           const Tensor<double,1> &p_i, 
-          const double mom_fac)  const
+          const double mom_fac,
+          const int l,
+          const int r)  const
       {
-        radmat::RhoRho::Ingredients<lambda_left,lambda_right> i(p_f,p_i,mom_fac); 
+        radmat::RhoRho::Ingredients i(p_f,p_i,mom_fac,l,r); 
 
         double m_eta = eta(i); 
 
-        return ( g1(p_f,p_i,mom_fac) 
-            - g2(p_f,p_i,mom_fac) 
-            + ( 1. + m_eta ) * g3(p_f,p_i,mom_fac)
+        return ( g1.impl(p_f,p_i,mom_fac,l,r) 
+            - g2.impl(p_f,p_i,mom_fac,l,r) 
+            + ( 1. + m_eta ) * g3.impl(p_f,p_i,mom_fac,l,r)
             ); 
       }
 
@@ -467,7 +486,7 @@ namespace radmat
 
 
 
-
+#endif
 
 
 #endif /* LORENTZFF_RHORHO_H */

@@ -16,6 +16,7 @@
 #include "lorentzff_PiRho.h"
 #include "lorentzff_RhoPi.h"
 #include "lorentzff_RhoRho.h"
+#include "lorentzff_canonical_RhoPi.h"
 
 #include <omp.h>
 
@@ -113,7 +114,12 @@ namespace radmat
         success &= do_reg(std::string("RhoPi_-1_0"),FacEnv::upCast<ffBase_t<std::complex<double> >, radmat::RhoPi::RhoPi<-1> >);
         success &= do_reg(std::string("RhoPi_0_0"),FacEnv::upCast<ffBase_t<std::complex<double> >, radmat::RhoPi::RhoPi<0> >);
         success &= do_reg(std::string("RhoPi_1_0"),FacEnv::upCast<ffBase_t<std::complex<double> >, radmat::RhoPi::RhoPi<1> >);
+        // <Rho | jmu | Pi> 
+        success &= do_reg(std::string("CanonicalRhoPi_-1_0"),FacEnv::upCast<ffBase_t<std::complex<double> >, radmat::CanonicalRhoPi::CanonicalRhoPi<-1> >);
+        success &= do_reg(std::string("CanonicalRhoPi_0_0"),FacEnv::upCast<ffBase_t<std::complex<double> >, radmat::CanonicalRhoPi::CanonicalRhoPi<0> >);
+        success &= do_reg(std::string("CanonicalRhoPi_1_0"),FacEnv::upCast<ffBase_t<std::complex<double> >, radmat::CanonicalRhoPi::CanonicalRhoPi<1> >);
 
+#if 0 
         // <Rho | jum | Rho> 
         success &= do_reg(std::string("RhoRho_1_-1"),FacEnv::upCast<ffBase_t<std::complex<double> >, radmat::RhoRho::RhoRho<1,-1> >);
         success &= do_reg(std::string("RhoRho_1_0"),FacEnv::upCast<ffBase_t<std::complex<double> >, radmat::RhoRho::RhoRho<1,0> >);
@@ -148,7 +154,7 @@ namespace radmat
             FacEnv::upCast<ffBase_t<std::complex<double> >, radmat::VectorMultipole::RhoRho<-1,0> >);
         success &= do_reg(std::string("VectorMultipole_-1_1"),
             FacEnv::upCast<ffBase_t<std::complex<double> >, radmat::VectorMultipole::RhoRho<-1,1> >);
-
+#endif
 
         registered = true;
       }

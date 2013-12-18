@@ -28,18 +28,6 @@ namespace radmat
       ss << qsq_tag() << "_" 
         << radmat::LatticeRotationEnv::rotation_group_label(
             continuum_tag.p_f, continuum_tag.p_i);
-  
-      std::cout << continuum_tag.p_f[0] 
-        << continuum_tag.p_f[1]
-        << continuum_tag.p_f[2]
-        << continuum_tag.p_i[0]
-        << continuum_tag.p_i[1]
-        << continuum_tag.p_i[2]
-        << std::endl;
-
-      std::string s = ss.str(); 
-      std::cout << __PRETTY_FUNCTION__ << ": " << s << std::endl;
-
       return ss.str(); 
     } 
 
