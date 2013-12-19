@@ -3,6 +3,7 @@
 
 
 #include "lorentzff_canonical_frame_formfactor.h"
+#include "lorentzff_canonical_frame_formfacs_rotation_manager.h"
 #include "lorentzff_polarization_embedding.h"
 #include "radmat/utils/levi_civita.h"
 #include "radmat/utils/pow2assert.h"
@@ -152,7 +153,7 @@ namespace radmat
     //////////////////////////////////////////////////////////////////
     
     struct G1impl
-      : public FormFactorRotationManager<G1impl>
+      : public FormFacRotationManager<G1impl>
     {
       virtual ~G1impl() {}
 
@@ -183,7 +184,7 @@ namespace radmat
 
     //////////////////////////////////////////////////////////////////
     //////////////////////////////////////////////////////////////////
-      struct G2impl : public FormFactorRotationManager<G2impl>
+      struct G2impl : public FormFacRotationManager<G2impl>
     {
       virtual ~G2impl() {}
       virtual std::string 
@@ -215,12 +216,12 @@ namespace radmat
     template<int lambda_left, int lambda_right>
       struct G2 : public canonicalFrameFormFactor<1,1,lambda_left,lambda_right, G2impl >
     {
-      virtual G2() {}
+      virtual ~G2() {}
     };
 
     //////////////////////////////////////////////////////////////////
     //////////////////////////////////////////////////////////////////
-      struct G3impl : public FormFactorRotationManager<G3impl>
+      struct G3impl : public FormFacRotationManager<G3impl>
     {
       virtual ~G3impl() {}
       virtual std::string
@@ -243,11 +244,11 @@ namespace radmat
         }
     };
 
-    template<lambda_left,lambda_right>
+    template<int lambda_left, int lambda_right>
       struct G3 : public canonicalFrameFormFactor<1,1,lambda_left,lambda_right,G3impl>
     {
       virtual ~G3() {}
-    }
+    };
 
 
     //////////////////////////////////////////////////////////////////

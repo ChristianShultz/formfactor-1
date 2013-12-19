@@ -15,6 +15,7 @@
 #include "lorentzff_PiPiStar.h"
 #include "lorentzff_PiRho.h"
 #include "lorentzff_RhoPi.h"
+#include "lorentzff_canonical_PiRho.h"
 #include "lorentzff_canonical_RhoPi.h"
 #include "lorentzff_canonical_RhoRho.h"
 
@@ -109,6 +110,11 @@ namespace radmat
         success &= do_reg(std::string("PiRho_0_-1"),FacEnv::upCast<ffBase_t<std::complex<double> >, radmat::PiRho::PiRho<-1> >);
         success &= do_reg(std::string("PiRho_0_0"),FacEnv::upCast<ffBase_t<std::complex<double> >, radmat::PiRho::PiRho<0> >);
         success &= do_reg(std::string("PiRho_0_1"),FacEnv::upCast<ffBase_t<std::complex<double> >, radmat::PiRho::PiRho<1> >);
+        // <Pi | jmu | Rho>
+        success &= do_reg(std::string("CanonicalPiRho_0_-1"),FacEnv::upCast<ffBase_t<std::complex<double> >, radmat::CanonicalPiRho::CanonicalPiRho<-1> >);
+        success &= do_reg(std::string("CanonicalPiRho_0_0"),FacEnv::upCast<ffBase_t<std::complex<double> >, radmat::CanonicalPiRho::CanonicalPiRho<0> >);
+        success &= do_reg(std::string("CanonicalPiRho_0_1"),FacEnv::upCast<ffBase_t<std::complex<double> >, radmat::CanonicalPiRho::CanonicalPiRho<1> >);
+
 
         // <Rho | jmu | Pi> 
         success &= do_reg(std::string("RhoPi_-1_0"),FacEnv::upCast<ffBase_t<std::complex<double> >, radmat::RhoPi::RhoPi<-1> >);

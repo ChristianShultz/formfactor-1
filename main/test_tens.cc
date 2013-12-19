@@ -6,7 +6,7 @@
 
 * Creation Date : 22-11-2013
 
-* Last Modified : Wed 18 Dec 2013 03:37:56 PM EST
+* Last Modified : Thu 19 Dec 2013 12:42:52 PM EST
 
 * Created By : shultz
 
@@ -16,7 +16,6 @@ _._._._._._._._._._._._._._._._._._._._._.*/
 
 #include "radmat/utils/tensor.h"
 #include "radmat/utils/handle.h"
-#include "radmat/ff/lorentzff_RhoRho.h"
 #include "radmat/ff/formfactor_factory.h"
 #include <iostream>
 

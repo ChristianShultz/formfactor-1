@@ -40,6 +40,7 @@ nobase_include_HEADERS =   \
 													 radmat/ff/formfactor_factory.h		\
 													 radmat/ff/lorentzff_canonical_frame_formfacs_rotation_manager.h		\
 													 radmat/ff/lorentzff_canonical_frame_formfactor.h		\
+													 radmat/ff/lorentzff_canonical_PiRho.h		\
 													 radmat/ff/lorentzff_canonical_RhoPi.h		\
 													 radmat/ff/lorentzff_canonical_RhoRho.h		\
 													 radmat/ff/lorentzff_canonical_rotation_groups.h		\

@@ -14,7 +14,7 @@ namespace radmat
   {
     typedef Tensor<double,1> p4_t; 
 
-    virtual ~embedRotationManager() {}
+    virtual ~canonicalFrameFormFactor() {}
 
     virtual Tensor<std::complex<double>,1>
       operator()(const p4_t &l, const p4_t &r, const double kick) const 
