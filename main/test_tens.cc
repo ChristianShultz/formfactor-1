@@ -6,7 +6,7 @@
 
 * Creation Date : 22-11-2013
 
-* Last Modified : Mon 25 Nov 2013 10:08:49 PM EST
+* Last Modified : Wed 18 Dec 2013 03:37:56 PM EST
 
 * Created By : shultz
 
@@ -35,8 +35,8 @@ main(void)
   
   radmat::FormFactorDecompositionFactoryEnv::registerAll();
 
-  radmat::RhoRho::RhoRho<-1,-1> rho;
-  std::cout << rho.ff() << std::endl;
+  // radmat::RhoRho::RhoRho<-1,-1> rho;
+  // std::cout << rho.ff() << std::endl;
 
   delete pp;
 

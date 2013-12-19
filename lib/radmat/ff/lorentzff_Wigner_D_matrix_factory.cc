@@ -6,7 +6,7 @@
 
  * Creation Date : 14-12-2013
 
- * Last Modified : Wed 18 Dec 2013 03:06:37 PM EST
+ * Last Modified : Wed 18 Dec 2013 03:44:18 PM EST
 
  * Created By : shultz
 
@@ -31,6 +31,7 @@ namespace radmat
     WignerMatrix_t gen_wigner_matrix(const mom_t &p, const int J)
     {
       int bound = 2*J + 1; 
+
       WignerMatrix_t W( (TensorShape<2>())[bound][bound] , std::complex<double>(0.,0.) ); 
       Hadron::CubicCanonicalRotation_t eul = Hadron::cubicCanonicalRotation(p); 
 

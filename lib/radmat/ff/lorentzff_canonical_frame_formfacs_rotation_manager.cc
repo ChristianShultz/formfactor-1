@@ -6,7 +6,7 @@
 
  * Creation Date : 18-12-2013
 
- * Last Modified : Wed 18 Dec 2013 02:13:49 PM EST
+ * Last Modified : Thu 19 Dec 2013 12:02:13 PM EST
 
  * Created By : shultz
 
@@ -15,6 +15,7 @@
 #include "lorentzff_canonical_frame_formfacs_rotation_manager.h"
 #include "lorentzff_formfac_utils.h"
 #include "hadron/clebsch.h"
+#include "radmat/utils/pow2assert.h"
 
 
 
@@ -22,7 +23,7 @@ namespace radmat
 {
 
   DMatrixManager::FrameOrientation_t 
-    DMatrixManager::get_frame(const mom_t &l, const mom_t &r)
+    DMatrixManager::get_frame(const mom_t &l, const mom_t &r) const
     {
       return radmat::LatticeRotationEnv::get_frame_orientation(l,r); 
     }
@@ -31,7 +32,7 @@ namespace radmat
   void 
     DMatrixManager::check_throw_frame_err(const RotationMatrix_t *R, const FrameOrientation_t &f) const
     {
-      if( !!! check_total_frame_transformation(R,f.l,f.r,f.ll,f.rr,true) )
+      if( !!! check_total_frame_transformation(R,f.l,f.r,f.cl,f.cr,true) )
       {
         std::cout << __func__ << ": throwing string " << std::endl;
         throw std::string("triad wigner rotation error"); 
@@ -39,13 +40,13 @@ namespace radmat
     }
 
   WignerMatrix_t* 
-    DMatrixManager::get_can_mat(const mom_t &p, const int J)
+    DMatrixManager::get_can_mat(const mom_t &p, const int J) const
     {
-      return radmat::WignerDMatrixEnv::call_factor(p,J); 
+      return radmat::WignerDMatrixEnv::call_factory(p,J); 
     }  
 
   void 
-    DMatrixManager::conjugate(WignerMatrix_t * D)
+    DMatrixManager::conjugate(WignerMatrix_t * D) const
     {
       WignerMatrix_t::iterator it;
       for(it = D->begin(); it != D->end(); ++it)
@@ -53,7 +54,28 @@ namespace radmat
     }
 
   void 
-    DMatrixManager::clean(WignerMatrix_t *D, const double thresh)
+    DMatrixManager::transpose(WignerMatrix_t *D) const
+    {
+      WignerMatrix_t foo(*D); 
+      std::vector<idx_t> dimensions = D->getDim(); 
+      POW2_ASSERT( dimensions.size() == 2 );
+      POW2_ASSERT( dimensions[0] == dimensions[1] );
+      int bound = dimensions[0]; 
+      for(int i = 0; i < bound; ++i)
+        for(int j =0; j < bound; ++j)
+          (*D)[i][j] = foo[j][i]; 
+    }
+
+  void 
+    DMatrixManager::dagger(WignerMatrix_t *D) const
+    {
+      conjugate( D ); 
+      transpose( D ); 
+    }
+
+
+  void 
+    DMatrixManager::clean(WignerMatrix_t *D, const double thresh) const
     {
       WignerMatrix_t::iterator it; 
       for(it = D->begin(); it != D->end(); ++it)
@@ -64,11 +86,14 @@ namespace radmat
     DMatrixManager::triad_rotation_matrix(const mom_t &l, const mom_t &r) const
     {
       FrameOrientation_t f = get_frame(l,r); 
-      return generate_triad_rotation_matrix(f.l,f.r,f.ll,f.rr); 
+      return generate_triad_rotation_matrix(f.l,f.r,f.cl,f.cr); 
     }
 
   WignerMatrix_t*
-    DMatrixManager::triad_rotation_wigner_matrix(const RotationMatrix_t *R, const mom_t &l, const mom_t &r, const int J)
+    DMatrixManager::triad_rotation_wigner_matrix(const RotationMatrix_t *R,
+        const mom_t &l,
+        const mom_t &r,
+        const int J) const
     {
       FrameOrientation_t f = get_frame(l,r); 
       check_throw_frame_err(R,f); 
@@ -92,7 +117,11 @@ namespace radmat
 
   // notation follows notes
   WignerMatrix_t* 
-    DMatrixManager::left_wigner_matrix(const RotationMatrix_t *R, const mom_t &l, const mom_t &r, const int J) const
+    DMatrixManager::left_wigner_matrix(const RotationMatrix_t *R,
+        const mom_t &l,
+        const mom_t &r, 
+        const int J,
+        bool print) const
     {
       FrameOrientation_t f = get_frame(l,r); 
       int bound = 2*J+1; 
@@ -104,7 +133,7 @@ namespace radmat
       Wn = radmat::WignerDMatrixEnv::call_factory(f.l,J);
       Wi = radmat::WignerDMatrixEnv::call_factory(f.cl,J);
 
-      conjugate(Wn); 
+      dagger( Wn ); 
 
       for(int i = 0; i < bound; ++i)
         for(int j = 0; j < bound; ++j)
@@ -113,6 +142,23 @@ namespace radmat
               (*W)[i][l] += (*Wn)[i][j] * (*Wt)[j][k] * (*Wi)[k][l];
 
       clean(W); 
+
+      if( print ) 
+      {
+          std::cout << __func__ << ": moms " << "f.l" << string_mom(f.l)
+            << " f.r " << string_mom(f.r) << " f.cl " << string_mom(f.cl)
+            << " f.cr " << string_mom(f.cr) << std::endl;
+
+          clean(Wn); 
+          clean(Wt);
+          clean(Wi); 
+
+          std::cout << __func__ << ": ingredients "  
+            << "Wn:" <<  *Wn << "\nWt:" << *Wt << "\nWi:" << *Wi
+            << std::endl;
+      }
+
+
 
       delete Wt;
       delete Wn;
@@ -123,7 +169,11 @@ namespace radmat
 
   // notation follows notes
   WignerMatrix_t*
-    DMatrixManager::right_wigner_matrix(const RotationMatrix_t *R, const mom_t &l, const mom_t &r, const int J) const
+    DMatrixManager::right_wigner_matrix(const RotationMatrix_t *R, 
+        const mom_t &l, 
+        const mom_t &r, 
+        const int J,
+        bool print) const
     {
       FrameOrientation_t f = get_frame(l,r); 
       int bound = 2*J+1; 
@@ -135,8 +185,8 @@ namespace radmat
       Wl = radmat::WignerDMatrixEnv::call_factory(f.r,J);
       Wk = radmat::WignerDMatrixEnv::call_factory(f.cr,J);
 
-      conjugate(Wk);
-      conjugate(Wt); 
+      dagger(Wk);
+      dagger(Wt); 
 
       for(int i = 0; i < bound; ++i)
         for(int j = 0; j < bound; ++j)
@@ -145,6 +195,23 @@ namespace radmat
               (*W)[i][l] += (*Wk)[i][j] * (*Wt)[j][k] * (*Wl)[k][l];
 
       clean(W); 
+
+
+      if( print ) 
+      {
+          std::cout << __func__ << ": moms " << "f.l" << string_mom(f.l)
+            << " f.r " << string_mom(f.r) << " f.cl " << string_mom(f.cl)
+            << " f.cr " << string_mom(f.cr) << std::endl;
+
+          clean(Wk); 
+          clean(Wt);
+          clean(Wl); 
+
+          std::cout << __func__ << ": ingredients "  
+            << "Wk:" <<  *Wk << "\nWt:" << *Wt << "\nWl:" << *Wl
+            << std::endl;
+      }
+
 
       delete Wt;
       delete Wl;

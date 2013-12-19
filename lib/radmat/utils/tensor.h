@@ -552,8 +552,8 @@ namespace radmat
 
       for(idx_t i = 0; i < N; ++i)
       {
-        if(_Dimensions[i] <= 1)    // 1 is possible in our framework but doesn't make practical sense
-          POW2_ASSERT(false);
+        // if(_Dimensions[i] <= 1)    // 1 is possible in our framework but doesn't make practical sense
+        //   POW2_ASSERT(false);
 
         tmp.numElems *= _Dimensions[i];
         tmp.Dimensions[i] = _Dimensions[i];
@@ -631,7 +631,7 @@ namespace radmat
       return foo;
     }
 
-// use everything below this at your own risk..
+    // use everything below this at your own risk..
 
 
     //! get elements via pointers, useful for contracting things
@@ -735,7 +735,7 @@ namespace radmat
     @details the 1-dimensional array type, Tensor will derive from this to implement added tensor functions.
     This is basically on the top of the sub_t stack and is the container for all elements. Note that sub_t
     doesn't work in this case.
-   */
+    */
 
 
   template<typename T>
@@ -1018,7 +1018,7 @@ namespace radmat
     @details the 0-dimensional array type, Tensor will derive from this to implement added tensor functions.
     This is basically on the top of the sub_t stack and is the container for all elements. Note that sub_t
     doesn't work in this case.
-   */
+    */
 
   template<typename T>
     struct PrimitiveTensor<T,0> : public TensorBase
@@ -1414,7 +1414,7 @@ namespace radmat
       @brief primitive contraction that ignores indicies -- do not use
       @details useful to piggyback and make other work shorter, specialized
       for M = MM = 1
-     */
+      */
     template<typename U, typename UU, idx_t M, idx_t MM>
       friend
       Tensor < typename Promote<U, UU>::Type_t, M + MM - 2 >
@@ -1427,7 +1427,7 @@ namespace radmat
 
       @ details ignores indicies on the metric and raises (lowers)
       the index of the return tensor after contracting
-     */
+      */
     template<typename U, typename UU, idx_t M>
       friend
       Tensor<typename Promote<U, UU>::Type_t, M>
@@ -1484,7 +1484,7 @@ namespace radmat
     /**
       @brief basic asymmetric algebraic operation
       @details indicies of lhs and rhs must be in same positions for this operation to make sense
-     */
+      */
     template<typename U, typename UU, idx_t M>
       friend
       Tensor<typename Promote<U, UU>::Type_t, M>
@@ -1493,7 +1493,7 @@ namespace radmat
     /**
       @brief basic asymmetric algebraic operation
       @details indicies of lhs and rhs must be in same positions for this operation to make sense
-     */
+      */
     template<typename U, typename UU, idx_t M>
       friend
       Tensor<typename Promote<U, UU>::Type_t, M>
@@ -1676,7 +1676,7 @@ namespace radmat
       /**
         @brief basic asymmetric algebraic operation
         @details indicies of lhs and rhs must be in same positions for this operation to make sense
-       */
+        */
       template<typename U, typename UU, idx_t M>
         friend
         Tensor<typename Promote<U, UU>::Type_t, M>
@@ -1685,7 +1685,7 @@ namespace radmat
       /**
         @brief basic asymmetric algebraic operation
         @details indicies of lhs and rhs must be in same positions for this operation to make sense
-       */
+        */
       template<typename U, typename UU, idx_t M>
         friend
         Tensor<typename Promote<U, UU>::Type_t, M>
@@ -2089,8 +2089,8 @@ namespace radmat
     applyMetric(const Tensor<T, N> &tensor, const Tensor<U, 2> &metric, const idx_t idx)
     {
 
-  //    std::cout << __func__ << " T in \n" << tensor << std::endl;
-  //    std::cout << __func__ << " metric \n" << metric << std::endl;
+      //    std::cout << __func__ << " T in \n" << tensor << std::endl;
+      //    std::cout << __func__ << " metric \n" << metric << std::endl;
 
       POW2_ASSERT((tensor.Dimensions[idx] == metric.Dimensions[0])
           && (metric.Dimensions[0] == metric.Dimensions[1])
@@ -2156,7 +2156,7 @@ namespace radmat
       else
         ret.raise_index(idx);
 
-   //   std::cout << "T out \n" << ret << std::endl;
+      //   std::cout << "T out \n" << ret << std::endl;
 
       return ret;
     }
@@ -2724,7 +2724,7 @@ namespace radmat
       {
       return contract(a, b, 0, 0);
       }
-   */
+      */
 
   //! overload wedge to tensor product
   template<typename T, typename U, idx_t N, idx_t M>

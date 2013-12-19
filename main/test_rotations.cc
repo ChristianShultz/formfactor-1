@@ -6,7 +6,7 @@
 
 * Creation Date : 11-12-2013
 
-* Last Modified : Wed 18 Dec 2013 09:57:37 AM EST
+* Last Modified : Thu 19 Dec 2013 09:57:43 AM EST
 
 * Created By : shultz
 
@@ -19,6 +19,7 @@ _._._._._._._._._._._._._._._._._._._._._.*/
 #include "radmat/redstar_interface/redstar_canonical_rotations.h"
 #include "radmat/redstar_interface/redstar_canonical_lattice_rotations.h"
 #include "radmat/ff/lorentzff_canonical_rotations_utils.h"
+#include "radmat/ff/lorentzff_canonical_frame_formfacs_rotation_manager.h"
 #include "radmat/ff/lorentzff_canonical_rotations.h"
 #include "radmat/ff/lorentzff_Wigner_D_matrix_factory.h"
 #include "radmat/ff/lorentzff_Wigner_D_matrix_embedding.h"
@@ -408,6 +409,88 @@ void get_wigner_phase(int argc, char *argv[])
 
 
 
+//////////////////////////////////////////////////
+//////////////////////////////////////////////////
+//////////////////////////////////////////////////
+
+void get_left_triad_wigner(int argc, char *argv[])
+{
+  if( argc != 9 )
+  {
+    std::cout << "error usage: test_rotations [" << __func__ << "] "
+      << "<mom1> <mom2> <J> " << std::endl; 
+    exit(1);
+  }
+  
+  mom_t l = radmat::gen_mom<0,0,0>(); 
+  mom_t r = radmat::gen_mom<0,0,0>(); 
+  int J; 
+
+  read_momentum(2,l,argv);
+  read_momentum(5,r,argv);
+  std::istringstream val(argv[8]);
+  val >> J; 
+
+  radmat::DMatrixManager Wig; 
+  radmat::RotationMatrix_t * Rtriad; 
+  Rtriad = Wig.triad_rotation_matrix(l,r);
+  radmat::WignerMatrix_t *D,*Dtriad; 
+  D = Wig.left_wigner_matrix(Rtriad,l,r,J,true); 
+
+  clean_up_rot_mat(Rtriad);
+  Wig.clean(D); 
+
+  std::cout << "l " << string_mom(l) << " r " << string_mom(r)
+    << "\nD_left: " << *D << "\nRtriad:" << *Rtriad << std::endl;  
+
+  delete D; 
+  delete Rtriad; 
+}
+
+
+
+//////////////////////////////////////////////////
+//////////////////////////////////////////////////
+//////////////////////////////////////////////////
+
+void get_right_triad_wigner(int argc, char *argv[])
+{
+  if( argc != 9 )
+  {
+    std::cout << "error usage: test_rotations [" << __func__ << "] "
+      << "<mom1> <mom2> <J> " << std::endl; 
+    exit(1);
+  }
+  
+  mom_t l = radmat::gen_mom<0,0,0>(); 
+  mom_t r = radmat::gen_mom<0,0,0>(); 
+  int J; 
+
+  read_momentum(2,l,argv);
+  read_momentum(5,r,argv);
+  std::istringstream val(argv[8]);
+  val >> J; 
+
+
+  radmat::DMatrixManager Wig; 
+  radmat::RotationMatrix_t * Rtriad; 
+  Rtriad = Wig.triad_rotation_matrix(l,r);
+  radmat::WignerMatrix_t *D,*Dtriad; 
+  D = Wig.right_wigner_matrix(Rtriad,l,r,J,true); 
+
+  clean_up_rot_mat(Rtriad);
+  Wig.clean(D); 
+
+  std::cout << "l " << string_mom(l) << " r " << string_mom(r)
+    << "\nD_left: " << *D << "\nRtriad:" << *Rtriad << std::endl;  
+
+  delete D; 
+  delete Rtriad; 
+}
+
+
+
+
 
 //////////////////////////////////////////////////
 //////////////////////////////////////////////////
@@ -480,6 +563,8 @@ void get_prod_wigner_matrix(int argc, char *argv[])
   delete W2; 
 }
 
+
+
 //////////////////////////////////////////////////
 //////////////////////////////////////////////////
 //////////////////////////////////////////////////
@@ -494,6 +579,8 @@ void insert_op(const std::string &s, const fptr &f)
 
 void init_options(void)
 {
+  insert_op("get_left_triad_wigner",&get_left_triad_wigner);
+  insert_op("get_right_triad_wigner",&get_right_triad_wigner);
   insert_op("check_rotations_mom",&check_rotations_mom); 
   insert_op("check_lattice_rotations_mom",&check_lattice_rotations_mom); 
   insert_op("get_lattice_rotation",&get_lattice_rotation); 

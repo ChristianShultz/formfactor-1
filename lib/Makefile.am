@@ -39,11 +39,13 @@ nobase_include_HEADERS =   \
 													 radmat/ff/ff.h		\
 													 radmat/ff/formfactor_factory.h		\
 													 radmat/ff/lorentzff_canonical_frame_formfacs_rotation_manager.h		\
+													 radmat/ff/lorentzff_canonical_frame_formfactor.h		\
 													 radmat/ff/lorentzff_canonical_RhoPi.h		\
-													 radmat/ff/lorentzff_canonical_rotations.h		\
+													 radmat/ff/lorentzff_canonical_RhoRho.h		\
 													 radmat/ff/lorentzff_canonical_rotation_groups.h		\
+													 radmat/ff/lorentzff_canonical_rotations.h		\
 													 radmat/ff/lorentzff_canonical_rotations_utils.h		\
-													 radmat/ff/lorentzff_cubic_reps.h			\
+													 radmat/ff/lorentzff_cubic_reps.h		\
 													 radmat/ff/lorentzff_formfac_utils.h		\
 													 radmat/ff/lorentzff_PiPi.h		\
 													 radmat/ff/lorentzff_PiPiStar.h		\
@@ -52,7 +54,6 @@ nobase_include_HEADERS =   \
 													 radmat/ff/lorentzff_polarization_embedding_old.h		\
 													 radmat/ff/lorentzff_polarization_tensors.h		\
 													 radmat/ff/lorentzff_RhoPi.h		\
-													 radmat/ff/lorentzff_RhoRho.h		\
 													 radmat/ff/lorentzff_Wigner_D_matrix_embedding.h		\
 													 radmat/ff/lorentzff_Wigner_D_matrix_factory.h		\
 													 radmat/fitting/axis_plotter.h		\
@@ -102,7 +103,7 @@ nobase_include_HEADERS =   \
 													 radmat/utils/stringify.h		\
 													 radmat/utils/tensor.h		\
 													 radmat/utils/type_computations.h		\
-													 radmat/utils/utils.h		
+													 radmat/utils/utils.h	
 
 # the lib
 lib_LIBRARIES = libradmat.a
@@ -128,10 +129,10 @@ libradmat_a_SOURCES =	\
 											radmat/fake_data/fake_spectrum.cc		\
 											radmat/ff/ff_gen_llsq_row.cc		\
 											radmat/ff/formfactor_factory.cc		\
-											radmat/ff/lorentzff_formfac_utils.cc		\
 											radmat/ff/lorentzff_canonical_frame_formfacs_rotation_manager.cc		\
 											radmat/ff/lorentzff_canonical_rotations.cc		\
 											radmat/ff/lorentzff_canonical_rotations_utils.cc		\
+											radmat/ff/lorentzff_formfac_utils.cc		\
 											radmat/ff/lorentzff_PiPi.cc		\
 											radmat/ff/lorentzff_PiPiStar.cc		\
 											radmat/ff/lorentzff_Wigner_D_matrix_factory.cc		\

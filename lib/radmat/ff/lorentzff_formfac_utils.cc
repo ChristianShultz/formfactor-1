@@ -6,7 +6,7 @@
 
 * Creation Date : 12-12-2013
 
-* Last Modified : Thu 12 Dec 2013 03:59:36 PM EST
+* Last Modified : Wed 18 Dec 2013 08:15:47 PM EST
 
 * Created By : shultz
 
@@ -42,9 +42,9 @@ namespace radmat
     get_space_mom(const Tensor<double, 1> &p, const double mom_kick)
     {
       mom_t r = gen_mom<0,0,0>(); 
-      r[0] = round_to_zero(p[1]/mom_kick); 
-      r[1] = round_to_zero(p[2]/mom_kick); 
-      r[2] = round_to_zero(p[3]/mom_kick); 
+      r[0] = round_double_nearest_int(p[1]/mom_kick); 
+      r[1] = round_double_nearest_int(p[2]/mom_kick); 
+      r[2] = round_double_nearest_int(p[3]/mom_kick); 
       return r; 
     }
 

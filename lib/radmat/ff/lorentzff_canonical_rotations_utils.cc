@@ -6,7 +6,7 @@
 
  * Creation Date : 10-12-2013
 
- * Last Modified : Wed 18 Dec 2013 11:28:55 AM EST
+ * Last Modified : Wed 18 Dec 2013 08:06:48 PM EST
 
  * Created By : shultz
 
@@ -15,6 +15,7 @@
 #include "lorentzff_canonical_rotations_utils.h"
 #include "radmat/redstar_interface/redstar_canonical_lattice_rotations.h"
 #include "radmat/utils/levi_civita.h"
+#include "radmat/utils/tensor.h"
 #include <sstream>
 
 namespace radmat
@@ -98,8 +99,8 @@ namespace radmat
       if ( print_on_false && !!! success)
       {
         std::cout << __func__ << ": rotation failure "
-          << "\n l" << string_mom(l) << "  r " << string_mom(r)
-          << "\nll" << string_mom(ll) << " rr " << string_mom(rr)
+          << "\n l " << string_mom(l) << "  r " << string_mom(r)
+          << "\nll " << string_mom(ll) << " rr " << string_mom(rr)
           << "R: " << *R << std::endl;
       }
       return success; 
@@ -230,34 +231,55 @@ namespace radmat
     {
       double alpha,beta,gamma;
 
-      if( (*R)[3][3] != 0. ) // isolates cosine of beta
+      // this blows 
+      
+      // R < 1
+      if( fabs( (*R)[3][3] - 1.) > 1e-6 )
       {
-        beta = acos( (*R)[3][3] ); 
-        if ( sin(beta) != 0. ) // can use the edge elements
+        // R > -1
+        if( fabs( (*R)[3][3] + 1.) > 1e-6)
         {
-          double sb = sin(beta); 
-          alpha = atan2( (*R)[2][3]/sb , (*R)[1][3]/sb ); 
-          gamma = atan2( (*R)[3][2]/sb , -(*R)[3][1]/sb ); 
+          beta = acos( (*R)[3][3] ); 
+          alpha = atan2( (*R)[2][3] , (*R)[1][3] ); 
+          gamma = atan2( (*R)[3][2] , -(*R)[3][1] ); 
         }
-        else // pick something that makes the edge elems zero and follow through
-        {    // gimble lock pick a choice of gamma = pi
-          gamma = acos(-1.); 
-          alpha = acos( (*R)[2][2]/cos(gamma) ); 
+        else
+        {
+          beta = acos(-1); 
+          alpha = -atan2( (*R)[2][1] , (*R)[2][2] ); 
+          gamma = 0; 
         }
       }
       else
-      { 
-        // beta is pi/2 or 3pi/2 -- pick pi/2
-        beta = acos(-1) / 2.;
-        double sb = sin(beta); 
-        alpha = atan2( (*R)[2][3]/sb , (*R)[1][3]/sb ); 
-        gamma = atan2( (*R)[3][2]/sb , -(*R)[3][1]/sb ); 
-      }
+      {
+        beta = 0; 
+        alpha = atan2( (*R)[2][1] , (*R)[2][2] ); 
+        gamma = 0; 
+      }      
 
       Hadron::CubicCanonicalRotation_t e;
       e.alpha = alpha;
       e.beta = beta;
       e.gamma = gamma;
+
+      Tensor<double,2> Re = genRotationMatrix(e); 
+      for(int i = 0; i < 4; ++i)
+        for(int j = 0; j < 4; ++j)
+        {
+          if( fabs( Re[i][j] - (*R)[i][j] ) > 1e-6)
+          {
+            clean_up_rot_mat(&Re); 
+            RotationMatrix_t foo = *R;
+            clean_up_rot_mat(&foo); 
+            std::cout << __func__ << ": failed to extract the"
+              << " correct euler angles Rtarget = " << foo
+              << "\nR_eul = " << Re << "\n euler angles: "
+              << "alpha " << e.alpha << " beta " << e.beta 
+              << " gamma " << e.gamma << std::endl;
+            throw std::string("incorrect euler angles error"); 
+            exit(1);  
+          }
+        }
 
       return e; 
     }
