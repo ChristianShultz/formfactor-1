@@ -82,7 +82,7 @@ namespace radmat
 
 
 
-  template<class DerivedFF>
+  template<class DerivedFF, typename Data_t>
     struct FormFacRotationManager
     : public DMatrixManager
   {
@@ -134,20 +134,20 @@ namespace radmat
         return std::pair<p4_t,p4_t>(ll,rr); 
       }
 
-    virtual Tensor<std::complex<double> , 1> 
+    virtual Tensor<Data_t , 1> 
       rotate(const RotationMatrix_t *R, 
-          const Tensor<std::complex<double>,1> &in) const
+          const Tensor<Data_t,1> &in) const
       {
-        Tensor<std::complex<double>,1> out( (TensorShape<1>())[4] , std::complex<double>(0.,0.) ); 
+        Tensor<Data_t,1> out( (TensorShape<1>())[4] , Data_t() ); 
 
         for(int i = 0; i < 4; ++i)
           for(int j = 0; j < 4; ++j)
-            out[i] += (*R)[i][j] * in[j];
+            out[i] = out[i] +  (*R)[i][j] * in[j];
 
         return out; 
       }
 
-    virtual Tensor<std::complex<double>,1>
+    virtual Tensor<Data_t,1>
       operator()(const p4_t &l, 
           const p4_t &r, 
           const double kick, 
@@ -162,7 +162,7 @@ namespace radmat
         WignerMatrix_t * Wl = left_wigner_matrix(R,moms.first,moms.second,Jl);
         WignerMatrix_t * Wr = right_wigner_matrix(R,moms.first,moms.second,Jr);
 
-        Tensor<std::complex<double>,1> sum( (TensorShape<1>())[4] , std::complex<double>(0.,0.) ); 
+        Tensor<Data_t,1> sum( (TensorShape<1>())[4] , Data_t() ); 
 
         int left_h = Jl - hl; 
         int right_h = Jr - hr; 
@@ -171,11 +171,17 @@ namespace radmat
 
         for(int lh = 0; lh < left_bound; ++lh)
           for(int rh = 0; rh < right_bound; ++rh)
-            sum += (
-                ( (*Wl)[left_h][lh] * (*Wr)[rh][right_h] ) // D matrix phase
-                * impl(can_moms.first,can_moms.second,kick,Jl-lh,Jr-rh) ); // impl in the canonical frame
+          {
+            std::complex<double> weight = ( (*Wl)[left_h][lh] * (*Wr)[rh][right_h] ); // D matrix phase
+            if( std::norm(weight) > 1e-6) 
+            {
+              Tensor<Data_t, 1> tmp = impl(can_moms.first,can_moms.second,kick,Jl-lh,Jr-rh); 
+              for(int i = 0; i < 4; ++i)
+                sum[i] = sum[i] + weight * tmp[i] ; // do by hand for overloads
+            }
+          }
 
-        Tensor<std::complex<double>,1> ret = rotate(R,sum); 
+        Tensor<Data_t,1> ret = rotate(R,sum); 
 
         delete Wl;
         delete Wr; 
@@ -185,7 +191,7 @@ namespace radmat
       }
 
     // derived classes implement impl 
-    virtual Tensor<std::complex<double>, 1> 
+    virtual Tensor<Data_t, 1> 
       impl(const p4_t &l, const p4_t &r, const double kick, const int hl, const int hr) const
       {
         return static_cast<const DerivedFF*>(this)->impl(l,r,kick,hl,hr); 

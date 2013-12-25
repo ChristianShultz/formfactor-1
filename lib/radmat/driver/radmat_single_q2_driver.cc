@@ -6,7 +6,7 @@
 
  * Creation Date : 25-02-2013
 
- * Last Modified : Tue 17 Dec 2013 09:24:09 AM EST
+ * Last Modified : Mon 23 Dec 2013 09:29:37 AM EST
 
  * Created By : shultz
 
@@ -158,10 +158,31 @@ namespace radmat
       << "  " << linear_system.peek_tags().begin()->mom_string() << std::endl;
 
     linear_system.solve_llsq(soln_ID);
-    linear_system.save_ff_state( base_path() ); 
     init_solved_llsq = true; 
   }
 
+  void RadmatSingleQ2Driver::save_llsq_state(void) const
+  {
+    check_exit_solved_llsq(); 
+    linear_system.save_ff_state( base_path() ); 
+  }
+
+  void RadmatSingleQ2Driver::save_ff_of_t(void) const
+  {
+    check_exit_solved_llsq(); 
+    SEMBLE::SembleMatrix<std::complex<double> > FF_of_t = linear_system.peek_FF(); 
+    std::string path;
+    path = base_path() + std::string("ff_of_t/");
+    SEMBLE::SEMBLEIO::makeDirectoryPath( path ); 
+
+    for(int row = 0; row < FF_of_t.getN(); ++row)
+    {
+      std::stringstream id;
+      id << path << "unphasedFF_" << row << ".jack"; 
+      ENSEM::write( id.str() , get_ensem_row(row,FF_of_t)); 
+    }
+
+  }
 
   void RadmatSingleQ2Driver::fit_data(const ThreePointComparatorProps_t &fit_props, 
       const int tsrc,

@@ -6,7 +6,7 @@
 
  * Creation Date : 18-12-2013
 
- * Last Modified : Thu 19 Dec 2013 12:02:13 PM EST
+ * Last Modified : Fri 20 Dec 2013 04:41:44 PM EST
 
  * Created By : shultz
 
@@ -133,14 +133,16 @@ namespace radmat
       Wn = radmat::WignerDMatrixEnv::call_factory(f.l,J);
       Wi = radmat::WignerDMatrixEnv::call_factory(f.cl,J);
 
-      dagger( Wn ); 
+      dagger(Wi); 
+      dagger(Wt); 
 
       for(int i = 0; i < bound; ++i)
         for(int j = 0; j < bound; ++j)
           for(int k = 0; k < bound; ++k)
             for(int l = 0; l < bound; ++l)
-              (*W)[i][l] += (*Wn)[i][j] * (*Wt)[j][k] * (*Wi)[k][l];
+              (*W)[i][l] += (*Wi)[i][j] * (*Wt)[j][k] * (*Wn)[k][l];
 
+      dagger(W); 
       clean(W); 
 
       if( print ) 
@@ -185,15 +187,15 @@ namespace radmat
       Wl = radmat::WignerDMatrixEnv::call_factory(f.r,J);
       Wk = radmat::WignerDMatrixEnv::call_factory(f.cr,J);
 
-      dagger(Wk);
-      dagger(Wt); 
+      dagger(Wl); 
 
       for(int i = 0; i < bound; ++i)
         for(int j = 0; j < bound; ++j)
           for(int k = 0; k < bound; ++k)
             for(int l = 0; l < bound; ++l)
-              (*W)[i][l] += (*Wk)[i][j] * (*Wt)[j][k] * (*Wl)[k][l];
+              (*W)[i][l] += (*Wl)[i][j] * (*Wt)[j][k] * (*Wk)[k][l];
 
+      dagger(W); 
       clean(W); 
 
 

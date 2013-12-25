@@ -28,6 +28,10 @@ namespace radmat
         const double tolerance);
 
     void solve_llsq(const std::string &soln_ID);
+
+    void save_llsq_state(void) const;
+    void save_ff_of_t(void) const; 
+
     void fit_data(const ThreePointComparatorProps_t &fitProps, 
         const int tsrc,
         const int tsnk);

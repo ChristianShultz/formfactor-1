@@ -6,7 +6,7 @@
 
 * Creation Date : 25-02-2013
 
-* Last Modified : Tue 10 Dec 2013 12:44:39 PM EST
+* Last Modified : Tue 24 Dec 2013 03:23:04 PM EST
 
 * Created By : shultz
 
@@ -21,7 +21,15 @@ _._._._._._._._._._._._._._._._._._._._._.*/
 
 int main(int argc, char *argv[])
 {
+  try
+  {
   radmat::AllFactoryEnv::registerAll(); 
+  }
+  catch(...)
+  {
+    std::cout << __func__ << ": reg err " << std::endl;
+    exit(1); 
+  }
 
   if(argc != 2)
   {

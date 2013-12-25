@@ -15,9 +15,11 @@ namespace radmat
   namespace CanonicalRhoPi
   {
     struct F1impl
-      : public FormFacRotationManager<F1impl>,
+      : public FormFacRotationManager<F1impl,std::complex<double> >,
       public leftSpinPTensor<1>
     {
+      typedef std::complex<double> Data_t; 
+
       virtual ~F1impl() {}
 
       virtual std::string ff_impl(void) const

@@ -6,7 +6,7 @@
 
  * Creation Date : 25-02-2013
 
- * Last Modified : Tue 10 Dec 2013 12:45:33 PM EST
+ * Last Modified : Tue 24 Dec 2013 11:07:28 AM EST
 
  * Created By : shultz
 
@@ -22,6 +22,7 @@
 #include <exception>
 #include <iostream>
 
+#include "radmat/ff/lorentzff_canonical_rotations_checker.h"
 #include "radmat/register_all/register_all.h"
 #include "radmat/driver/radmat_driver.h"
 #include "radmat/construct_data/lattice_multi_data_object.h"
@@ -152,6 +153,87 @@ void gen_xml(int argc , char *argv[] )
   radmat::RadmatDriver d; 
   d.xml_handler(ini,mode); 
 }
+
+
+//    use a statedatabase to check the rotation 
+//    properties of the data 
+//
+/////////////////////////////////////////////////////
+void rot_llsq(int argc, char *argv[])
+{
+  if(argc != 5)
+  {
+    std::cerr << "usage: radmat_util: rot_llsq <xmlinifile> <Jl> <Jr> " << std::endl;
+    exit(1); 
+  }
+
+
+  // read the name of the ini file 
+  std::string xmlini;
+  std::istringstream val(argv[2]);
+  val >> xmlini;
+
+  int Jl; 
+  std::istringstream val1(argv[3]); 
+  val1 >> Jl; 
+
+  int Jr; 
+  std::istringstream val2(argv[4]); 
+  val2 >> Jr; 
+
+  // read the xml array of ffs that we want to refit
+  ArrSingleQ2Prop_t arr_ini; 
+
+  try
+  {
+    std::cout << "reading " << xmlini << std::endl;
+    ADATXML::XMLReader xml(xmlini); 
+    read(xml,"/props",arr_ini); 
+  }
+  catch( std::string &str) 
+  {
+    std::cout << "Error: " << str << std::endl; 
+    exit(1); 
+  }
+  catch ( ... ) 
+  {
+    SPLASH("An error occurred reading the inifile") ; 
+    exit(1); 
+  }
+
+  radmat::rHandle< radmat::LLSQLatticeMultiData > foo( new radmat::LLSQLatticeMultiData() ); 
+  POW2_ASSERT( &*foo ) ; 
+
+  try
+  {
+    ADATIO::BinaryFileReader bread(arr_ini.dbfile); 
+    radmat::read(bread,*foo); 
+  }
+  catch ( ... ) 
+  {
+    SPLASH("An error occurred reading the state database");
+    exit(1);
+  }
+
+
+  // get the lattice elems as a function of insertion time from 
+  // the database that was saved in the orig run 
+  pull_elems(foo,arr_ini); 
+
+  radmat::LatticeRotationRelationChecker bar;
+
+  try
+  {
+  bar.check(foo,Jl,Jr); 
+  }
+  catch (std::string &s)
+  {
+    std::cout << __func__ << ": caught " << s << std::endl;
+  }
+
+}
+
+
 
 
 //    use a statedatabase to resolve a llsq 
@@ -338,6 +420,7 @@ std::map<std::string , fptr> options;
 void init_options(void)
 {
   options.insert(std::pair<std::string,fptr>("gen_xml",&gen_xml)); 
+  options.insert(std::pair<std::string,fptr>("rot_llsq",&rot_llsq)); 
   options.insert(std::pair<std::string,fptr>("Q2_llsq",&Q2_llsq)); 
   options.insert(std::pair<std::string,fptr>("refit_ffs",&refit_ffs)); 
 }

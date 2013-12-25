@@ -6,7 +6,7 @@
 
  * Creation Date : 14-12-2013
 
- * Last Modified : Wed 18 Dec 2013 03:44:18 PM EST
+ * Last Modified : Tue 24 Dec 2013 03:58:18 PM EST
 
  * Created By : shultz
 
@@ -73,6 +73,13 @@ namespace radmat
       if( it == WDFac::Instance().end())
       {
         std::cout << __func__ << ": WignerDMatrixEnv, missing id " << id; 
+
+#pragma omp critical
+        {
+          std::cout << "avail keys " << std::endl;
+          for(it = WDFac::Instance().begin(); it != WDFac::Instance().end(); ++it)
+            std::cout << it->first << std::endl;
+        }
         throw std::string("WignerDMatrixEnv missed key"); 
       }
 
@@ -155,18 +162,18 @@ namespace radmat
       if(!!! local_registration)
       {
         for(int J =0 ; J <= Jmax; ++J)
-         success &= do_mom_reg(J);  
+          success &= do_mom_reg(J);  
 
         local_registration = true; 
       }
       return success; 
     }
 
-  WignerMatrix_t* 
-    call_factory(const mom_t &p, const int J)
-    {
-      return query_factory(p,J); 
-    }
+    WignerMatrix_t* 
+      call_factory(const mom_t &p, const int J)
+      {
+        return query_factory(p,J); 
+      }
 
   } // WignerDMatrixEnv
 

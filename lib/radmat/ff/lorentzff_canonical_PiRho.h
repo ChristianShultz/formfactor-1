@@ -15,9 +15,10 @@ namespace radmat
   namespace CanonicalPiRho
   {
       struct F1impl
-      : public FormFacRotationManager<F1impl> , 
+      : public FormFacRotationManager<F1impl, std::complex<double> > , 
       public rightSpinPTensor<1>
     {
+      typedef std::complex<double> Data_t; 
       virtual ~F1impl() {}
 
       virtual std::string
@@ -32,7 +33,7 @@ namespace radmat
       virtual Tensor<std::complex<double> , 1> 
         impl(const Tensor<double,1> &p_f, 
           const Tensor<double,1> &p_i, 
-          const double mom_fac
+          const double mom_fac,
           int pihel,
           int rhohel) const
       {

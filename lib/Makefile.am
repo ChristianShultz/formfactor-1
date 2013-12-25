@@ -40,12 +40,14 @@ nobase_include_HEADERS =   \
 													 radmat/ff/formfactor_factory.h		\
 													 radmat/ff/lorentzff_canonical_frame_formfacs_rotation_manager.h		\
 													 radmat/ff/lorentzff_canonical_frame_formfactor.h		\
+													 radmat/ff/lorentzff_canonical_JJlist_ff.h \
 													 radmat/ff/lorentzff_canonical_PiRho.h		\
 													 radmat/ff/lorentzff_canonical_RhoPi.h		\
 													 radmat/ff/lorentzff_canonical_RhoRho.h		\
 													 radmat/ff/lorentzff_canonical_rotation_groups.h		\
 													 radmat/ff/lorentzff_canonical_rotations.h		\
 													 radmat/ff/lorentzff_canonical_rotations_utils.h		\
+													 radmat/ff/lorentzff_canonical_rotations_checker.h		\
 													 radmat/ff/lorentzff_cubic_reps.h		\
 													 radmat/ff/lorentzff_formfac_utils.h		\
 													 radmat/ff/lorentzff_PiPi.h		\
@@ -132,6 +134,7 @@ libradmat_a_SOURCES =	\
 											radmat/ff/formfactor_factory.cc		\
 											radmat/ff/lorentzff_canonical_frame_formfacs_rotation_manager.cc		\
 											radmat/ff/lorentzff_canonical_rotations.cc		\
+											radmat/ff/lorentzff_canonical_rotations_checker.cc		\
 											radmat/ff/lorentzff_canonical_rotations_utils.cc		\
 											radmat/ff/lorentzff_formfac_utils.cc		\
 											radmat/ff/lorentzff_PiPi.cc		\

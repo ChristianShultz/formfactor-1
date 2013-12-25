@@ -11,7 +11,6 @@
 #include "adat/objfactory.h"
 #include "radmat/utils/pow2assert.h"
 #include "semble/semble_linear_algebra.h"
-#include <omp.h>
 
 namespace FacEnv = radmat::LLSQSolverFactoryEnv;
 typedef radmat::TheLLSQSolverFactory Factory;

@@ -6,7 +6,7 @@
 
 * Creation Date : 11-12-2013
 
-* Last Modified : Thu 19 Dec 2013 09:57:43 AM EST
+* Last Modified : Tue 24 Dec 2013 12:41:30 AM EST
 
 * Created By : shultz
 
@@ -23,6 +23,7 @@ _._._._._._._._._._._._._._._._._._._._._.*/
 #include "radmat/ff/lorentzff_canonical_rotations.h"
 #include "radmat/ff/lorentzff_Wigner_D_matrix_factory.h"
 #include "radmat/ff/lorentzff_Wigner_D_matrix_embedding.h"
+#include "radmat/ff/lorentzff_canonical_JJlist_ff.h"
 #include "radmat/utils/levi_civita.h"
 #include "hadron/irrep_util.h"
 #include "formfac/formfac_qsq.h"
@@ -39,6 +40,20 @@ struct KeyRetriever
       return KeyValPair.first; 
     }
 };
+
+/////////////////////////////////////////////
+radmat::Tensor<double,1> init_4tens(const double m, 
+    int x, int y, int z, double kick)
+{
+  radmat::Tensor<double,1> foo( (radmat::TensorShape<1>())[4] , 0.); 
+
+  foo[0] = sqrt( m*m + kick*kick*(x*x + y*y + z*z) ); 
+  foo[1] = kick * x; 
+  foo[2] = kick * y; 
+  foo[3] = kick * z; 
+
+  return foo; 
+}
 
 /////////////////////////////////////////////
 std::string string_mom(const mom_t &p)
@@ -407,6 +422,59 @@ void get_wigner_phase(int argc, char *argv[])
 }
 
 
+//////////////////////////////////////////////////
+//////////////////////////////////////////////////
+//////////////////////////////////////////////////
+
+
+void get_JJ11_ff_sum(int argc, char *argv[])
+{
+  if( argc != 10 )
+  {
+    std::cout << "error usage: test_rotations [" << __func__ << "] "
+      << "<moml> <momr> <hl> <hr>" << std::endl; 
+    exit(1);
+  }
+  
+  mom_t m1 = radmat::gen_mom<0,0,0>(); 
+  mom_t m2 = radmat::gen_mom<0,0,0>(); 
+
+  read_momentum(2,m1,argv);
+  read_momentum(5,m2,argv);
+
+  std::stringstream v1(argv[8]);
+  std::stringstream v2(argv[9]);
+  int hl, hr; 
+  v1 >> hl;
+  v2 >> hr; 
+
+
+  radmat::LatticeRotationEnv::FrameOrientation_t frame; 
+
+  std::cout << "read m1 " << string_mom(m1) 
+    << " m2 " << string_mom(m2) 
+    << " hl " << hl << " hr " << hr <<std::endl;
+
+  radmat::WignerMatrix_t D; 
+  radmat::primitiveEmbededWignerDMatrix *W;  
+
+  W = new radmat::embededWignerDMatrix<1>();  
+
+  frame = W->get_frame(m1,m2);
+  std::cout << "canonical frame " << string_mom(frame.cl) << " " 
+    << string_mom(frame.cr) << std::endl;
+  delete W; 
+
+
+
+  radmat::JJFFimpl foo;
+
+  double kick = 0.11;
+  radmat::Tensor<double,1> pf = init_4tens(0.216,m1[0],m1[1],m1[2],kick); 
+  radmat::Tensor<double,1> pi = init_4tens(0.216,m2[0],m2[1],m2[2],kick); 
+  std::cout << foo(pf,pi,kick,1,1,hl,hr) << std::endl; 
+
+}
 
 
 //////////////////////////////////////////////////
@@ -421,7 +489,7 @@ void get_left_triad_wigner(int argc, char *argv[])
       << "<mom1> <mom2> <J> " << std::endl; 
     exit(1);
   }
-  
+
   mom_t l = radmat::gen_mom<0,0,0>(); 
   mom_t r = radmat::gen_mom<0,0,0>(); 
   int J; 
@@ -461,7 +529,7 @@ void get_right_triad_wigner(int argc, char *argv[])
       << "<mom1> <mom2> <J> " << std::endl; 
     exit(1);
   }
-  
+
   mom_t l = radmat::gen_mom<0,0,0>(); 
   mom_t r = radmat::gen_mom<0,0,0>(); 
   int J; 
@@ -482,7 +550,7 @@ void get_right_triad_wigner(int argc, char *argv[])
   Wig.clean(D); 
 
   std::cout << "l " << string_mom(l) << " r " << string_mom(r)
-    << "\nD_left: " << *D << "\nRtriad:" << *Rtriad << std::endl;  
+    << "\nD_right: " << *D << "\nRtriad:" << *Rtriad << std::endl;  
 
   delete D; 
   delete Rtriad; 
@@ -504,7 +572,7 @@ void get_wigner_matrix(int argc, char *argv[])
       << "<mom> <J> " << std::endl; 
     exit(1);
   }
-  
+
   mom_t m1 = radmat::gen_mom<0,0,0>(); 
   int J; 
 
@@ -536,7 +604,7 @@ void get_prod_wigner_matrix(int argc, char *argv[])
       << "<mom> <mom> <J> " << std::endl; 
     exit(1);
   }
-  
+
   mom_t m1 = radmat::gen_mom<0,0,0>(); 
   mom_t m2 = radmat::gen_mom<0,0,0>(); 
   int J; 
@@ -579,6 +647,7 @@ void insert_op(const std::string &s, const fptr &f)
 
 void init_options(void)
 {
+  insert_op("get_JJ11_ff_sum",&get_JJ11_ff_sum);
   insert_op("get_left_triad_wigner",&get_left_triad_wigner);
   insert_op("get_right_triad_wigner",&get_right_triad_wigner);
   insert_op("check_rotations_mom",&check_rotations_mom); 

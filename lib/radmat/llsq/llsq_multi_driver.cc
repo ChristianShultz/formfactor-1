@@ -6,7 +6,7 @@
 
  * Creation Date : 22-02-2013
 
- * Last Modified : Fri 06 Dec 2013 04:12:54 PM EST
+ * Last Modified : Tue 24 Dec 2013 04:15:10 PM EST
 
  * Created By : shultz
 
@@ -28,7 +28,12 @@
 #include <vector>
 #include <utility>
 
-
+#include "adat/handle.h"
+#include "jackFitter/ensem_data.h"
+#include "jackFitter/jackknife_fitter.h"
+#include "jackFitter/ensem_data.h"
+#include "jackFitter/three_point_fit_forms.h"
+#include "jackFitter/plot.h"
 // #define DEBUG_AT_MAKE_MOM_INV_TAGS
 
 
@@ -38,6 +43,23 @@ namespace radmat
 
   namespace 
   {
+    bool is_singular(const SEMBLE::SembleMatrix<std::complex<double> > &M)
+    {
+      itpp::Mat<std::complex<double> > mm( M.mean() ); 
+      int bound = mm.cols();
+      itpp::Vec<double> s = itpp::svd(mm * itpp::hermitian_transpose(mm));
+      if ( s(bound - 1) / s(0) < 1e-4 )
+      {
+        std::cout << __func__ << bound << std::endl;
+        std::cout << __func__ << ": M is singular, sings " << s << std::endl;
+        std::cout << __func__ << ": M \n" << mm << std::endl;
+        return true; 
+      }
+      return false; 
+    }
+
+
+
     void init_dim(SEMBLE::SembleMatrix<std::complex<double> > &to_init, 
         const SEMBLE::SembleVector<std::complex<double> > &first_row)
     {
@@ -46,10 +68,6 @@ namespace radmat
       for(int elem = 0; elem < first_row.getN(); ++elem)
         foo.loadEnsemElement(0,elem,first_row.getEnsemElement(elem)); 
 
-      /*  std::cout << __FILE__ << __func__ 
-          << "to_init " << foo.mean() 
-          << "\nfirst_row" << first_row.mean() << std::endl;  
-          */
       to_init = foo; 
     }
 
@@ -70,8 +88,6 @@ namespace radmat
 
     SemblePInv makeMomInvariants(const LatticeMultiDataTag &t)
     {
-
-
 #ifdef DEBUG_AT_MAKE_MOM_INV_TAGS 
 
       std::cout << __func__ << ": debuggin on" << std::endl;
@@ -316,6 +332,7 @@ namespace radmat
     // splash_tags();
 
     rHandle<LLSQLatticeMultiData> non_zero_data(new LLSQLatticeMultiData);
+    rHandle<LLSQLatticeMultiData> check_singular( new LLSQLatticeMultiData); 
     std::vector<LatticeMultiDataTag> old_tags;
     SEMBLE::SembleMatrix<std::complex<double> > Junk; 
     SEMBLE::SembleVector<std::complex<double> > Zero; 
@@ -330,10 +347,9 @@ namespace radmat
     }
 
 
-    // std::cout << __func__ << "trying to call " << old_tags.begin()->mat_elem_id << std::endl;
-
     ffKinematicFactors_t<std::complex<double> >
-      KJunk(FormFactorDecompositionFactoryEnv::callFactory(old_tags.begin()->mat_elem_id)); 
+      KJunk(FormFactorDecompositionFactoryEnv::callFactory(
+            old_tags.begin()->mat_elem_id)); 
 
     Junk = KJunk.genFactors(makeMomInvariants(*old_tags.begin())); 
     Zero = Junk.getRow(0);
@@ -354,22 +370,18 @@ namespace radmat
 
       if(workV == Zero)
       {
-        zeroed_data.append_row_semble(lattice_data->get_row_semble(elem),old_tags[elem]);    
+        zeroed_data.append_row_semble(
+            lattice_data->get_row_semble(elem),
+            old_tags[elem]);    
       }  
       else
       {
-        non_zero_data->append_row_semble(lattice_data->get_row_semble(elem),old_tags[elem]);
+        non_zero_data->append_row_semble(
+            lattice_data->get_row_semble(elem),
+            old_tags[elem]);
+        check_singular->append_row_semble(workV, old_tags[elem]); 
       }
     }
-
-#if 0
-       std::cout << __func__ << ": old_Lat(t)" << std::endl;
-       std::cout << SEMBLE::mean(lattice_data->data()) << std::endl;
-       std::cout << "\n\nnew_Lat(t)" << std::endl;
-       std::cout << SEMBLE::mean(non_zero_data->data()) << std::endl;
-       std::cout << "old_tags.size() = " << sz 
-       << " zeroed_elems.size() = " << zeroed_data.nrows() << std::endl;
-#endif  
 
     lattice_data = non_zero_data;
 
@@ -381,6 +393,11 @@ namespace radmat
         << " failed the zero test, needed " << KJunk.nFacs() << " elems, had " 
         << non_zero_data->nrows() << "elements " << std::endl;
     }
+
+    // check if the matrix is singular 
+    if( lattice_data->nrows() >= KJunk.nFacs() )
+      if ( is_singular( check_singular->data() ) )
+        return false; 
 
     return (non_zero_data->nrows() >= KJunk.nFacs());
   }
@@ -394,9 +411,6 @@ namespace radmat
 
     rHandle<LLSQBaseSolver_t<std::complex<double> > >
       foo = LLSQSolverFactoryEnv::callFactory(soln_ID);
-
-
-    //  POW2_ASSERT(&*foo);  -- can't do this b/c of pure virtual .. need to downcast first
 
     bool success(true); 
 
@@ -478,13 +492,16 @@ namespace radmat
 
 
     std::stringstream ss, A,Ainv, x; 
+    std::stringstream unity; 
     ss << path;
     A << ss.str() << "K.mean";
     Ainv << ss.str() << "Kinv.mean"; 
+    unity << ss.str() <<  "Kinv_x_K.mean"; 
     x << ss.str() << "ff_";
 
     my_writer_mean(A.str(),K);
     my_writer_mean(Ainv.str(),Kinv);
+    my_writer_mean(unity.str(),Kinv*K); 
     my_writer_rows(x.str(), FF_t); 
 
     std::ofstream out( path + std::string("solver.log") ); 
@@ -513,13 +530,65 @@ namespace radmat
     std::stringstream ss; 
     ss << path << "ff_database.rad"; 
     ADATIO::BinaryFileWriter bin(ss.str());
-    
+
     FormFacSolutions<std::complex<double> >
       ff(peek_FF(),peek_tags()); 
 
     write(bin,ff); 
     bin.close();
   }
+
+  SEMBLE::SembleMatrix<std::complex<double> > 
+    LLSQMultiDriver_t::get_rephase_FF(void) const
+    {
+      typedef std::complex<double> T; 
+      SEMBLE::SembleMatrix<T> un = peek_FF(); 
+      ENSEM::EnsemVectorComplex in; 
+      in = get_ensem_row(0,un); 
+
+      ENSEM::EnsemVectorReal real, imag;
+
+      double const_real, const_imag; 
+
+      real = ENSEM::real(in);
+      imag = ENSEM::imag(in);
+
+      std::vector<double> t;
+      for(int i = 0; i < in.numElem(); ++i)
+        t.push_back(double(i)); 
+
+      // take the middle 70 %
+      int thigh = int( double(t.size()) * .85); 
+      int tlow = int( double(t.size()) *.15);  
+      EnsemData ereal(t,real),eimag(t,imag); 
+      ereal.hideDataAboveX(thigh - 0.1); 
+      eimag.hideDataBelowX(tlow -0.1); 
+
+      ADAT::Handle<FitFunction> freal(new ThreePointConstant), fimag(new ThreePointConstant);  
+      JackFit fit_real(ereal,freal), fit_imag(eimag,fimag); 
+
+      fit_real.runAvgFit(); 
+      fit_imag.runAvgFit(); 
+      const_real = fit_real.getAvgFitParValue(0);
+      const_imag = fit_imag.getAvgFitParValue(0);
+
+      // apparently this guy is zero, just dump the whole thing 
+      if( (const_real < 2e-2) && (const_imag < 2e-2) ) 
+        return un;
+
+      // something went wrong, deal with it higher up 
+      if ( isnan(const_real) && isnan(const_imag))
+        return un; 
+
+      double fit_phase = std::arg(std::complex<double>(const_real,const_imag)); 
+      double apply_phase = -fit_phase; 
+
+      // apply this phase to everyone!
+      std::complex<double> phase(cos(apply_phase),sin(apply_phase));  
+      un *= phase; 
+
+      return un; 
+    }
 
 
   bool LLSQMultiDriver_t::solve_fast(const std::string &soln_ID)

@@ -6,7 +6,7 @@
 
  * Creation Date : 12-11-2013
 
- * Last Modified : Wed 11 Dec 2013 03:55:07 PM EST
+ * Last Modified : Tue 24 Dec 2013 08:46:24 AM EST
 
  * Created By : shultz
 
@@ -36,6 +36,7 @@ namespace radmat
       {
         std::string file_id;
         int jmu; 
+        int hf,hi; 
         std::string mat_elem_id; 
         ADATXML::Array<int> p_f;
         ADATXML::Array<int> p_i; 
@@ -52,6 +53,8 @@ namespace radmat
 
         ret.file_id = d.file_id; 
         ret.jmu = d.jmu; 
+        ret.hf = d.hf; 
+        ret.hi = d.hi; 
         ret.mat_elem_id = d.mat_elem_id; 
         ret.p_f = d.p_f;
         ret.p_i = d.p_i; 
@@ -116,6 +119,8 @@ namespace radmat
 
         ret.file_id = ss.str(); 
         ret.jmu = ins->lorentz;
+        ret.hf = snk->H; 
+        ret.hi = src->H; 
         ret.p_f = snk->mom;
         ret.p_i = src->mom; 
         ret.mat_elem_id = mat_elem.str(); 
@@ -148,6 +153,8 @@ namespace radmat
 
         ret.file_id = ss.str(); 
         ret.jmu = ins->lorentz;
+        ret.hf = snk->H; 
+        ret.hi = src->H; 
         ret.p_f = snk->mom;
         ret.p_i = src->mom; 
         ret.mat_elem_id = mat_elem.str(); 

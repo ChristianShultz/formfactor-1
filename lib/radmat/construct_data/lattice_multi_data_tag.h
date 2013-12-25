@@ -52,7 +52,7 @@ namespace radmat
 
     // for llsq system
     double qsq_label;        
-    int jmu;                 
+    int jmu,hf,hi;                 
     std::string mat_elem_id; 
     ADATXML::Array<int> p_f;
     ADATXML::Array<int> p_i;

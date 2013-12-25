@@ -6,7 +6,7 @@
 
  * Creation Date : 25-02-2013
 
- * Last Modified : Wed 11 Dec 2013 04:51:22 PM EST
+ * Last Modified : Mon 23 Dec 2013 05:38:55 PM EST
 
  * Created By : shultz
 
@@ -447,7 +447,10 @@ namespace radmat
     check_exit_corrs(); 
 
     int idx, sz = multi_lattice_data.size(); 
-    std::string soln_ID = std::string ("SVDNonSquareThreadCfg");
+    // std::string soln_ID = std::string ("SVDNonSquareThreadCfg");
+    std::string threaded_ID = std::string ("SVDNonSquareThreadCfg");
+   // std::string soln_ID = std::string ("SVDNonSquare");
+    std::string soln_ID = std::string ("SVDMakeSquare");
 
     if(sz == 0)
     {
@@ -498,19 +501,27 @@ namespace radmat
     // print the list here in case the solver flakes we can easily determine where it went wrong
     print_Q2_list(); 
 
-#if 0    // thread this section over cfgs for better memory management
-#ifdef LOAD_LLSQ_PARALLEL 
 
-#pragma omp parallel for shared(idx)  schedule(dynamic,1)
-
-#endif    
-#endif   
-    for(idx = 0; idx < sz; ++idx)
-      if(good_qs[idx])
-        linear_systems_of_Q2[idx].solve_llsq(soln_ID); 
-
-    // leave a barrier since to prevent any possibility of a jump out from below
+    if( soln_ID == threaded_ID )
+    {
+      // threading over cfgs
+      for(idx = 0; idx < sz; ++idx)
+        if(good_qs[idx])
+          linear_systems_of_Q2[idx].solve_llsq(soln_ID); 
+      // leave a barrier since to prevent any possibility of a jump out from below
 #pragma omp barrier
+    }
+    else
+    {
+      // threading over q2
+#ifdef LOAD_LLSQ_PARALLEL 
+#pragma omp parallel for shared(idx)  schedule(dynamic,1)
+#endif   
+      for(idx = 0; idx < sz; ++idx)
+        if(good_qs[idx])
+          linear_systems_of_Q2[idx].solve_llsq(soln_ID); 
+#pragma omp barrier
+    }
 
     my_stopwatch.stop();
     std::cout << "Solving LLSQ took "     
@@ -518,10 +529,37 @@ namespace radmat
 
     solved_llsq = true;
 
-    // probably shouldn't parallel here since the file system will get pissed off
+
+    // save the llsq state into a database
+#ifdef LOAD_LLSQ_PARALLEL // thread this  
+#pragma omp parallel for shared(idx)  schedule(dynamic,1)
+#endif 
+    for(idx = 0; idx < sz; ++idx)
+      if(good_qs[idx])
+        linear_systems_of_Q2[idx].save_llsq_state(); 
+
+    // leave a barrier since to prevent any possibility of a jump out from below
+#pragma omp barrier
+
+    // save the ff_of_t
+#ifdef LOAD_LLSQ_PARALLEL // thread this  
+#pragma omp parallel for shared(idx)  schedule(dynamic,1)
+#endif 
+    for(idx = 0; idx < sz; ++idx)
+      if(good_qs[idx])
+        linear_systems_of_Q2[idx].save_ff_of_t(); 
+
+    // leave a barrier since to prevent any possibility of a jump out from below
+#pragma omp barrier
+
+    // save the result 
+#ifdef LOAD_LLSQ_PARALLEL // thread this  
+#pragma omp parallel for shared(idx)  schedule(dynamic,1)
+#endif 
     for(idx = 0; idx < sz; ++idx)
       if(good_qs[idx])                        // can only print the successful guys
         linear_systems_of_Q2[idx].dump_llsq(); 
+#pragma omp barrier
 
     return solved_llsq;
   }
@@ -548,9 +586,7 @@ namespace radmat
     POW2_ASSERT(tsrc < tsnk); 
 
 #ifdef FIT_LLSQ_PARALLEL
-
 #pragma omp parallel for shared(idx,tsrc,tsnk)  schedule(dynamic,1)
-
 #endif 
     // POSSIBLE PARALLEL HERE
     for(idx = 0; idx < sz; ++idx)

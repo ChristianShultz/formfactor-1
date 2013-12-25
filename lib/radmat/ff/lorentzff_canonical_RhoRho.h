@@ -153,8 +153,9 @@ namespace radmat
     //////////////////////////////////////////////////////////////////
     
     struct G1impl
-      : public FormFacRotationManager<G1impl>
+      : public FormFacRotationManager<G1impl, std::complex<double> >
     {
+      typedef std::complex<double> Data_t;
       virtual ~G1impl() {}
 
       virtual std::string
@@ -184,8 +185,9 @@ namespace radmat
 
     //////////////////////////////////////////////////////////////////
     //////////////////////////////////////////////////////////////////
-      struct G2impl : public FormFacRotationManager<G2impl>
+    struct G2impl : public FormFacRotationManager<G2impl, std::complex<double> >
     {
+      typedef std::complex<double> Data_t;
       virtual ~G2impl() {}
       virtual std::string 
         ff_impl() const
@@ -212,7 +214,7 @@ namespace radmat
         }
     };
 
-  
+
     template<int lambda_left, int lambda_right>
       struct G2 : public canonicalFrameFormFactor<1,1,lambda_left,lambda_right, G2impl >
     {
@@ -221,8 +223,9 @@ namespace radmat
 
     //////////////////////////////////////////////////////////////////
     //////////////////////////////////////////////////////////////////
-      struct G3impl : public FormFacRotationManager<G3impl>
+    struct G3impl : public FormFacRotationManager<G3impl, std::complex<double> >
     {
+      typedef std::complex<double> Data_t;
       virtual ~G3impl() {}
       virtual std::string
         ff_impl() const

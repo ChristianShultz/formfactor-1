@@ -2127,7 +2127,7 @@ namespace radmat
         ret.getElem(cycle) = 0.;
 
         for(contract = 0; contract < cdim; ++contract)
-          ret.getElem(cycle) += tensor.getElem(a) * metric.getElem(b);
+          ret.getElem(cycle) = ret.getElem(cycle) +  tensor.getElem(a) * metric.getElem(b);
 
         idx_t j;
 

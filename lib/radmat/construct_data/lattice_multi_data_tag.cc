@@ -6,7 +6,7 @@
 
 * Creation Date : 01-10-2013
 
-* Last Modified : Tue 10 Dec 2013 11:53:31 AM EST
+* Last Modified : Tue 24 Dec 2013 08:43:09 AM EST
 
 * Created By : shultz
 
@@ -53,6 +53,8 @@ namespace radmat
     {
       qsq_label = o.qsq_label; 
       jmu = o.jmu;
+      hf = o.hf;
+      hi = o.hi; 
       mat_elem_id = o.mat_elem_id;
       p_f = o.p_f;
       p_i = o.p_i;
@@ -122,6 +124,8 @@ namespace radmat
 
     ADATIO::write(bin,t.qsq_label);
     ADATIO::write(bin,t.jmu); 
+    ADATIO::write(bin,t.hf); 
+    ADATIO::write(bin,t.hi); 
     ADATIO::writeDesc(bin,t.mat_elem_id);
     ADATIO::write(bin,t.p_f);
     ADATIO::write(bin,t.p_i);
@@ -135,6 +139,8 @@ namespace radmat
   {
     ADATIO::read(bin,t.qsq_label);
     ADATIO::read(bin,t.jmu); 
+    ADATIO::read(bin,t.hf); 
+    ADATIO::read(bin,t.hi); 
     ADATIO::readDesc(bin,t.mat_elem_id);
     ADATIO::read(bin,t.p_f);
     ADATIO::read(bin,t.p_i);
