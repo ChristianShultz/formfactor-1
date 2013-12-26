@@ -6,7 +6,7 @@
 
  * Creation Date : 25-02-2013
 
- * Last Modified : Mon 23 Dec 2013 05:38:55 PM EST
+ * Last Modified : Tue 24 Dec 2013 10:04:47 PM EST
 
  * Created By : shultz
 
@@ -447,10 +447,7 @@ namespace radmat
     check_exit_corrs(); 
 
     int idx, sz = multi_lattice_data.size(); 
-    // std::string soln_ID = std::string ("SVDNonSquareThreadCfg");
-    std::string threaded_ID = std::string ("SVDNonSquareThreadCfg");
-   // std::string soln_ID = std::string ("SVDNonSquare");
-    std::string soln_ID = std::string ("SVDMakeSquare");
+  std::string soln_ID = std::string ("SVDNonSquare");
 
     if(sz == 0)
     {
@@ -502,17 +499,6 @@ namespace radmat
     print_Q2_list(); 
 
 
-    if( soln_ID == threaded_ID )
-    {
-      // threading over cfgs
-      for(idx = 0; idx < sz; ++idx)
-        if(good_qs[idx])
-          linear_systems_of_Q2[idx].solve_llsq(soln_ID); 
-      // leave a barrier since to prevent any possibility of a jump out from below
-#pragma omp barrier
-    }
-    else
-    {
       // threading over q2
 #ifdef LOAD_LLSQ_PARALLEL 
 #pragma omp parallel for shared(idx)  schedule(dynamic,1)
@@ -521,7 +507,6 @@ namespace radmat
         if(good_qs[idx])
           linear_systems_of_Q2[idx].solve_llsq(soln_ID); 
 #pragma omp barrier
-    }
 
     my_stopwatch.stop();
     std::cout << "Solving LLSQ took "     

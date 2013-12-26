@@ -134,6 +134,12 @@ namespace radmat
           return dot_out(eps_left, applyMetric(eps_right,gdd,0)); 
         }
 
+      std::complex<double> 
+        p_left_dot_p_right() const
+        {
+          return dot_out(p_left, applyMetric(p_right,gdd,0)); 
+        }
+
       Tensor<std::complex<double>,1> eps_left; 
       Tensor<std::complex<double>,1> eps_right; 
       Tensor<std::complex<double>,1> pplus; 
@@ -314,6 +320,165 @@ namespace radmat
 
   } // namespace RhoRho
 
+
+  namespace VecVec
+  {
+    using radmat::RhoRho::Ingredients;
+
+
+    //////////////////////////////////////////////////////////////////
+    struct Apimpl : public FormFacRotationManager<Apimpl, std::complex<double> >
+    {
+      typedef std::complex<double> Data_t;
+      virtual ~Apimpl() {}
+      virtual std::string
+        ff_impl() const
+        {
+          std::string s =  "stub";
+          return s; 
+        }
+      virtual Tensor<std::complex<double> , 1> 
+        impl(const Tensor<double,1> &p_f, 
+            const Tensor<double,1> &p_i, 
+            const double mom_fac,
+            const int l,
+            const int r)  const
+        {
+          Ingredients i(p_f,p_i,mom_fac,l,r); 
+          return  i.pplus * ( i.eps_left_dot_eps_right() ); 
+        }
+    };
+
+    template<int lambda_left, int lambda_right>
+      struct Ap : public canonicalFrameFormFactor<1,1,lambda_left,lambda_right,Apimpl>
+    {
+      virtual ~Ap() {}
+    };
+
+    //////////////////////////////////////////////////////////////////
+    struct Bpimpl : public FormFacRotationManager<Bpimpl, std::complex<double> >
+    {
+      typedef std::complex<double> Data_t;
+      virtual ~Bpimpl() {}
+      virtual std::string
+        ff_impl() const
+        {
+          std::string s =  "stub";
+          return s; 
+        }
+      virtual Tensor<std::complex<double> , 1> 
+        impl(const Tensor<double,1> &p_f, 
+            const Tensor<double,1> &p_i, 
+            const double mom_fac,
+            const int l,
+            const int r)  const
+        {
+          Ingredients i(p_f,p_i,mom_fac,l,r); 
+          return (  ( i.eps_left_dot_p_right() * i.eps_right) + (i.eps_right_dot_p_left() * i.eps_left) ); 
+        }
+    };
+
+    template<int lambda_left, int lambda_right>
+      struct Bp : public canonicalFrameFormFactor<1,1,lambda_left,lambda_right,Bpimpl>
+    {
+      virtual ~Bp() {}
+    };
+
+
+    //////////////////////////////////////////////////////////////////
+    struct Bmimpl : public FormFacRotationManager<Bmimpl, std::complex<double> >
+    {
+      typedef std::complex<double> Data_t;
+      virtual ~Bmimpl() {}
+      virtual std::string
+        ff_impl() const
+        {
+          std::string s =  "stub";
+          return s; 
+        }
+      virtual Tensor<std::complex<double> , 1> 
+        impl(const Tensor<double,1> &p_f, 
+            const Tensor<double,1> &p_i, 
+            const double mom_fac,
+            const int l,
+            const int r)  const
+        {
+          Ingredients i(p_f,p_i,mom_fac,l,r); 
+          Tensor<std::complex<double>,1> ret = i.eps_left_dot_p_right() * i.eps_right_dot_p_left() * i.pminus; 
+          std::complex<double> fac = i.mm_left - i.p_left_dot_p_right(); 
+          ret += fac * i.eps_left_dot_p_right() * i.eps_right; 
+          ret += -fac * i.eps_right_dot_p_left() * i.eps_left; 
+          return ret; 
+        }
+    };
+
+    template<int lambda_left, int lambda_right>
+      struct Bm : public canonicalFrameFormFactor<1,1,lambda_left,lambda_right,Bmimpl>
+    {
+      virtual ~Bm() {}
+    };
+
+
+
+    //////////////////////////////////////////////////////////////////
+    //////////////////////////////////////////////////////////////////
+    template<int lambda_left, int lambda_right> 
+      ffBase_t<std::complex<double> >::ff_list genList(void)
+      {
+        ffBase_t<std::complex<double> >::ff_list ret; 
+        ffBase_t<std::complex<double> >::BBType *ap , *bp, *bm; 
+
+        try
+        {
+          ap = new radmat::VecVec::Ap<lambda_left,lambda_right>();
+          bp = new radmat::VecVec::Bp<lambda_left,lambda_right>();
+          bm = new radmat::VecVec::Bm<lambda_left,lambda_right>();
+
+          // POW2_ASSERT(g1 && g2 && g3);
+          POW2_ASSERT( ap );
+          POW2_ASSERT( bp );
+          POW2_ASSERT( bm );
+
+          ret.push_back(ffBase_t<std::complex<double> >::BBHandle_t(ap)); 
+          ret.push_back(ffBase_t<std::complex<double> >::BBHandle_t(bp)); 
+          ret.push_back(ffBase_t<std::complex<double> >::BBHandle_t(bm)); 
+        }
+        catch(...)
+        {
+          POW2_ASSERT(false); 
+        } 
+
+        return ret;
+      }
+
+
+    //////////////////////////////////////////////////////////////////
+    //////////////////////////////////////////////////////////////////
+    template<int lambda_left, int lambda_right>
+      struct VecVec : public ffBase_t<std::complex<double> >
+    {
+      VecVec(void)
+        : ffBase_t<std::complex<double> >(radmat::VecVec::genList<lambda_left,lambda_right>())
+      { }
+
+      VecVec& operator=(const VecVec &o)
+      {
+        if (this != &o)
+          ffBase_t<std::complex<double> >::operator=(o);
+
+        return *this; 
+      }
+
+      VecVec(const VecVec &o)
+        : ffBase_t<std::complex<double> >(o)
+      {  }
+
+      private: 
+      VecVec(const ffBase_t<std::complex<double> >::ff_list &); 
+      VecVec(const ffBase_t<std::complex<double> >::ff_list ); 
+    };
+
+  } // namespace VecVec
 
 
 } // namespace radmat
