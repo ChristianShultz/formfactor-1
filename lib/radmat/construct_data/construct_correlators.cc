@@ -6,7 +6,7 @@
 
  * Creation Date : 04-12-2012
 
- * Last Modified : Wed 11 Dec 2013 04:45:50 PM EST
+ * Last Modified : Fri Dec 27 19:19:59 2013
 
  * Created By : shultz
 
@@ -345,7 +345,6 @@ namespace radmat
 
       double p_factor = mom_factor(m_ini.xi,m_ini.L_s); 
       std::string elem_id = m_ini.matElemID; 
-      const radmatDBProp_t *db_prop = &m_ini.radmatDBProp; 
       const ThreePointCorrXMLIni_t *three_pt = &m_ini.threePointCorrXMLIni; 
 
       std::vector<TaggedEnsemRedstarNPtBlock> unsorted_elems; 

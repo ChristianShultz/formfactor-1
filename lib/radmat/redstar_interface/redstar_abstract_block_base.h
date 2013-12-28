@@ -70,7 +70,7 @@ namespace radmat
     virtual const_iterator end(void) const {return inputList.end();}
 
     // a nice way of storing information and then getting out the continuum version
-    virtual EnsemRedstarBlock operator()(const AbsRedstarInput_t *inp) { (*objFunctorPtr)(inp); }
+    virtual EnsemRedstarBlock operator()(const AbsRedstarInput_t *inp) { return (*objFunctorPtr)(inp); }
 
     rHandle< AbsRedstarBlock_t > objFunctorPtr; 
     std::vector< rHandle< AbsRedstarInput_t > > inputList; 

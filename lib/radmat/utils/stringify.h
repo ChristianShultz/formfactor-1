@@ -45,33 +45,5 @@ namespace radmat
       return f.name(); 
     }
 
-
-//  template<typename T>
-//    struct TypeName
-//    {
-//      static const char *name;
-//    };
-//
-//  template<typename T>
-//    const char *TypeName<T>::name = "unknown";
-//
-//  template<typename T>
-//   inline const char *Stringify(void)
-//    {
-//      return TypeName<T>::name;
-//    }
-//
-//  // macro template specialization expansion
-//#define REGISTER_STRINGIFY_TYPE(X) template<>	\
-//  const char *TypeName<X>::name = #X
-//
-//  // types must be registered before use otherwise it will default to
-//  // the unknown type
-//  REGISTER_STRINGIFY_TYPE(int);
-//  REGISTER_STRINGIFY_TYPE(float);
-//  REGISTER_STRINGIFY_TYPE(double);
-//  REGISTER_STRINGIFY_TYPE(double);
-//  REGISTER_STRINGIFY_TYPE(std::complex<double>);
-
 }
 #endif

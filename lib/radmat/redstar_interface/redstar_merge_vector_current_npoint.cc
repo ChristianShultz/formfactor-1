@@ -6,7 +6,7 @@
 
  * Creation Date : 12-11-2013
 
- * Last Modified : Fri 22 Nov 2013 03:39:56 PM EST
+ * Last Modified : Fri Dec 27 19:32:39 2013
 
  * Created By : shultz
 
@@ -22,6 +22,7 @@
 #include "adat/adat_stopwatch.h"
 #include "hadron/irrep_util.h"
 #include "hadron/ensem_filenames.h"
+#include <map>
 
 
 #define  DEBUG_MSG_OFF

@@ -6,7 +6,7 @@
 
  * Creation Date : 22-02-2013
 
- * Last Modified : Tue 24 Dec 2013 04:15:10 PM EST
+ * Last Modified : Fri Dec 27 19:31:06 2013
 
  * Created By : shultz
 
@@ -504,7 +504,8 @@ namespace radmat
     my_writer_mean(unity.str(),Kinv*K); 
     my_writer_rows(x.str(), FF_t); 
 
-    std::ofstream out( path + std::string("solver.log") ); 
+    std::string pth = path + std::string("solver.log"); 
+    std::ofstream out( pth.c_str() ); 
     out << solver_log; 
     out.close(); 
   }
