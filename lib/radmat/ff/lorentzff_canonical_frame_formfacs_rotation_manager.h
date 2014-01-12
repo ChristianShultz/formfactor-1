@@ -104,27 +104,41 @@ namespace radmat
           const p4_t &r,
           const double kick) const
       {
+        typedef radmat::LatticeRotationEnv::TheRotationGroupGenerator RG; 
         Tensor<double,1> ll( (TensorShape<1>())[4], 0.);
         Tensor<double,1> rr( (TensorShape<1>())[4], 0.);
-
-        // rotate by the transpose
-        for( int i = 0; i < 4; ++i)
-          for(int j = 0; j < 4; ++j)
-          {
-            ll[j] += (*R)[i][j] * l[i]; 
-            rr[j] += (*R)[i][j] * r[i];
-          }
-
-        std::pair<mom_t,mom_t> chk = pair_mom(ll,rr,kick); 
         std::pair<mom_t,mom_t> fmom = pair_mom(l,r,kick); 
+        std::string clab = RG::Instance().get_can_frame_string(fmom.first,fmom.second); 
+        std::pair<mom_t,mom_t> cmom = RG::Instance().get_frame_momentum(clab);
+        mom_t cl = cmom.first; 
+        mom_t cr = cmom.second; 
+
+        ll[0] = l[0];
+        ll[1] = cl[0]*kick;
+        ll[2] = cl[1]*kick;
+        ll[3] = cl[2]*kick;
+
+        rr[0] = r[0];
+        rr[1] = cr[0]*kick;
+        rr[2] = cr[1]*kick;
+        rr[3] = cr[2]*kick;
+
+        //  // rotate by the transpose
+        //  for( int i = 0; i < 4; ++i)
+        //    for(int j = 0; j < 4; ++j)
+        //    {
+        //      ll[j] += (*R)[i][j] * l[i]; 
+        //      rr[j] += (*R)[i][j] * r[i];
+        //    }
+        
 
         // are these the momentum i think that they are? 
-        if ( !!! check_total_frame_transformation( R, fmom.first,fmom.second,chk.first,chk.second,true ) )
+        if ( !!! check_total_frame_transformation( R, fmom.first,fmom.second,cl,cr,true ) )
         {
           std::cout << __func__ << ": frame transformation error" << std::endl;
-          
+
           std::cout << "int moms l" << string_mom(fmom.first) << " r " << string_mom(fmom.second)
-            << " ll " << string_mom(chk.first) << " rr " << string_mom(chk.second) << std::endl;
+            << " ll " << string_mom(cl) << " rr " << string_mom(cr) << std::endl;
 
           std::cout << "pl " << l << " pll " << ll << " pr " << r << " prr "
             << rr << " R " << *R << std::endl;

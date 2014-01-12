@@ -6,20 +6,22 @@
 
 * Creation Date : 12-12-2013
 
-* Last Modified : Wed 18 Dec 2013 08:15:47 PM EST
+* Last Modified : Thu 09 Jan 2014 05:22:42 PM EST
 
 * Created By : shultz
 
 _._._._._._._._._._._._._._._._._._._._._.*/
 
 #include "lorentzff_formfac_utils.h"
+#include <cmath>
 
 namespace radmat
 {
   int 
     round_double_nearest_int(const double &d)
     {
-      return d < 0 ? -1*int(fabs(d) + 0.5 ) : int(fabs(d) +0.5); 
+     // return d < 0 ? -1*int(fabs(d) + 0.5 ) : int(fabs(d) +0.5); 
+     return floor( d + 0.5 ) ; 
     }
 
   double 

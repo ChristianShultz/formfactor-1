@@ -67,7 +67,7 @@ namespace radmat
 
     template<int lambda_r>
       struct F1
-      : public canonicalFrameFormFactor<0,1,0,lambda_r,F1impl>
+      : public canonicalFrameFormFactor<0,1,0,lambda_r,F1impl,false>
       {
         virtual ~F1() {}
       };

@@ -6,7 +6,7 @@
 
  * Creation Date : 10-12-2013
 
- * Last Modified : Wed 18 Dec 2013 08:06:48 PM EST
+ * Last Modified : Fri 10 Jan 2014 12:04:57 AM EST
 
  * Created By : shultz
 
@@ -394,6 +394,9 @@ namespace radmat
   {
     itpp::Vec<double> r(3); 
     double norm = sqrt( double(dot_mom_t(m,m)) ); 
+    if ( norm == 0. ) 
+      norm = 1.; 
+
     r[0] = double(m[0])/norm;
     r[1] = double(m[1])/norm;
     r[2] = double(m[2])/norm;

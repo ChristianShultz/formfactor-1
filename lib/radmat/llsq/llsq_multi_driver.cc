@@ -6,7 +6,7 @@
 
  * Creation Date : 22-02-2013
 
- * Last Modified : Fri Dec 27 19:31:06 2013
+ * Last Modified : Wed 08 Jan 2014 04:58:58 PM EST
 
  * Created By : shultz
 
@@ -363,10 +363,14 @@ namespace radmat
       SEMBLE::SembleVector<std::complex<double> > workV;
 
       workM = KK.genFactors(makeMomInvariants(old_tags[elem]));
-     // std::cout << __FILE__ << __func__ << workM.mean() << std::endl;
       workV = SEMBLE::round_to_zero(
           workM.getRow(
             remap_jmu_4_to_0(old_tags[elem].jmu)), tolerance);
+#if 0
+      std::cout << __FILE__ << __func__ << "\n" << workM.mean() << std::endl;
+      std::cout << __func__ << ": " << old_tags[elem].mat_elem_id
+        << sort_string(old_tags[elem]) << "\n" << workV.mean() << std::endl;
+#endif
 
       if(workV == Zero)
       {
@@ -395,10 +399,10 @@ namespace radmat
     }
 
     // check if the matrix is singular 
-    if( lattice_data->nrows() >= KJunk.nFacs() )
-      if ( is_singular( check_singular->data() ) )
-        return false; 
-
+//    if( lattice_data->nrows() >= KJunk.nFacs() )
+//      if ( is_singular( check_singular->data() ) )
+//        return false; 
+//
     return (non_zero_data->nrows() >= KJunk.nFacs());
   }
 

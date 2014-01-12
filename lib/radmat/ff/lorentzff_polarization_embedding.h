@@ -69,6 +69,30 @@ namespace radmat
           return rot; 
         }
 
+      virtual void 
+        check_exit_ortho(const Tensor<std::complex<double> , J > &eps, 
+            const Tensor<double,1> &p)
+        {
+          Tensor<std::complex<double> , J - 1 > c; 
+          Tensor<std::complex<double> , 1> mom;
+          // apply a metric and flip the type to complex 
+          mom = convertTensorUnderlyingType<std::complex<double>,double,1>(contract(g_dd(),p,1,0));  
+
+          // contract
+          c = contract(eps,mom,0,0); 
+          std::complex<double> zero(0.,0.);
+
+          // check all entries are compatible with zero (1e-6)
+          typename Tensor<std::complex<double> , J - 1 >::iterator it;
+          for(it = c.begin(); it != c.end(); ++it)
+            if ( round_to_zero(*it) != zero ) 
+            {
+              // blow up 
+              std::cout << __func__ << ": ortho err" << std::endl;
+              std::cout << "eps " << eps << "mom " << mom << std::endl;
+              exit(1); 
+            } 
+        }
 
       virtual Tensor<std::complex<double> , J> 
         conjugate(const Tensor<std::complex<double> , J> &inp) const
@@ -135,7 +159,10 @@ namespace radmat
           RotationMatrix_t *R = radmat::CanonicalRotationEnv::call_factory(l); 
           Tensor<std::complex<double>, J_left> eps = foo.rotate(eps_z,R); 
           delete R; 
-          return foo.conjugate( eps ); 
+          
+          eps = foo.conjugate(eps); 
+          foo.check_exit_ortho(eps,lefty); 
+          return eps; 
         }
     };
 
@@ -178,6 +205,7 @@ namespace radmat
           RotationMatrix_t *R = radmat::CanonicalRotationEnv::call_factory(r); 
           Tensor<std::complex<double> , J_right> eps = foo.rotate(eps_z,R); 
           delete R; 
+          foo.check_exit_ortho(eps,righty); 
           return eps; 
         }
     };

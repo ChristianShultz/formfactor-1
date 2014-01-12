@@ -6,7 +6,7 @@
 
  * Creation Date : 20-11-2013
 
- * Last Modified : Tue 10 Dec 2013 11:27:05 AM EST
+ * Last Modified : Thu 09 Jan 2014 10:37:23 PM EST
 
  * Created By : shultz
 
@@ -231,8 +231,8 @@ namespace radmat
 
         DEBUG_MSG(exiting); 
 
-        for(int i = 0; i < ret.size(); ++i)
-          screen_dump(ret[i]); 
+       //  for(int i = 0; i < ret.size(); ++i)
+       //   screen_dump(ret[i]); 
 
         return ret; 
       }

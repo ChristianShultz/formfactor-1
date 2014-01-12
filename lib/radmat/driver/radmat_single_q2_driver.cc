@@ -6,7 +6,7 @@
 
  * Creation Date : 25-02-2013
 
- * Last Modified : Mon 23 Dec 2013 09:29:37 AM EST
+ * Last Modified : Wed 08 Jan 2014 01:36:40 AM EST
 
  * Created By : shultz
 
@@ -101,7 +101,6 @@ namespace radmat
       const double pole_mass_squared,
       const double tolerance)
   {
-
     if(!!!linear_system.load_data(d,tolerance))
       return false;
 
@@ -134,7 +133,6 @@ namespace radmat
   bool RadmatSingleQ2Driver::load_llsq(const rHandle<LLSQLatticeMultiData> &d, 
       const double tolerance)
   {
-
     if(!!!linear_system.load_data(d,tolerance))
       return false;
 

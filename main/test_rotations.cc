@@ -6,7 +6,7 @@
 
 * Creation Date : 11-12-2013
 
-* Last Modified : Tue 24 Dec 2013 12:41:30 AM EST
+* Last Modified : Thu 09 Jan 2014 08:56:14 PM EST
 
 * Created By : shultz
 
@@ -556,6 +556,43 @@ void get_right_triad_wigner(int argc, char *argv[])
   delete Rtriad; 
 }
 
+///////////////////////////////////////////////
+///////////////////////////////////////////////
+///////////////////////////////////////////////
+void get_triad_rotation(int argc, char *argv[])
+{
+  if( argc != 8 )
+  {
+    std::cout << "error usage: test_rotations [" << __func__ << "] "
+      << "<mom1> <mom2> " << std::endl; 
+    exit(1);
+  }
+
+  mom_t l = radmat::gen_mom<0,0,0>(); 
+  mom_t r = radmat::gen_mom<0,0,0>(); 
+
+  read_momentum(2,l,argv);
+  read_momentum(5,r,argv);
+
+  radmat::DMatrixManager Wig; 
+  radmat::RotationMatrix_t * Rtriad; 
+  Rtriad = Wig.triad_rotation_matrix(l,r);
+  radmat::LatticeRotationEnv::FrameOrientation_t frame; 
+  frame = Wig.get_frame(l,r);
+  std::cout << "canonical frame " << string_mom(frame.cl) << " " 
+    << string_mom(frame.cr) << std::endl;
+
+  clean_up_rot_mat(Rtriad);
+
+  std::cout << "l " << string_mom(l) << " r " << string_mom(r)
+    << "\nRtriad:" << *Rtriad << std::endl;  
+  std::cout << "R*cl " << string_mom(rotate_int_mom(Rtriad,frame.cl)) 
+    << "\nR*cr " << string_mom(rotate_int_mom(Rtriad,frame.cr)) << std::endl;
+  std::cout << "det(R) = " << determinant(Rtriad) << std::endl;
+
+  delete Rtriad; 
+}
+
 
 
 
@@ -647,6 +684,7 @@ void insert_op(const std::string &s, const fptr &f)
 
 void init_options(void)
 {
+  insert_op("get_triad_rotation",&get_triad_rotation);
   insert_op("get_JJ11_ff_sum",&get_JJ11_ff_sum);
   insert_op("get_left_triad_wigner",&get_left_triad_wigner);
   insert_op("get_right_triad_wigner",&get_right_triad_wigner);

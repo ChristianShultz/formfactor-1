@@ -6,7 +6,7 @@
 
  * Creation Date : 25-02-2013
 
- * Last Modified : Tue 24 Dec 2013 11:07:28 AM EST
+ * Last Modified : Sat 11 Jan 2014 06:07:52 PM EST
 
  * Created By : shultz
 
@@ -224,7 +224,7 @@ void rot_llsq(int argc, char *argv[])
 
   try
   {
-  bar.check(foo,Jl,Jr); 
+    bar.check(foo,Jl,Jr); 
   }
   catch (std::string &s)
   {

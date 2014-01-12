@@ -134,7 +134,7 @@ namespace radmat
         success &= do_reg(std::string("RhoRho_0_0"),FacEnv::upCast<ffBase_t<std::complex<double> >, radmat::RhoRho::RhoRho<0,0> >);
         success &= do_reg(std::string("RhoRho_0_1"),FacEnv::upCast<ffBase_t<std::complex<double> >, radmat::RhoRho::RhoRho<0,1> >);
 
-        success &= do_reg(std::string("RhoRho_-1_-1"),FacEnv::upCast<ffBase_t<std::complex<double> >, radmat::RhoRho::RhoRho<1,1> >);
+        success &= do_reg(std::string("RhoRho_-1_-1"),FacEnv::upCast<ffBase_t<std::complex<double> >, radmat::RhoRho::RhoRho<-1,-1> >);
         success &= do_reg(std::string("RhoRho_-1_0"),FacEnv::upCast<ffBase_t<std::complex<double> >, radmat::RhoRho::RhoRho<-1,0> >);
         success &= do_reg(std::string("RhoRho_-1_1"),FacEnv::upCast<ffBase_t<std::complex<double> >, radmat::RhoRho::RhoRho<-1,1> >);
 

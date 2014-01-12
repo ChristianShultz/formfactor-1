@@ -54,12 +54,12 @@ namespace radmat
 
           ret = convertTensorUnderlyingType<std::complex<double>, double,1>(p_f + p_i); 
         
-          return (- val.value() * ret ); 
+          return -( val.value() * ret ); 
         }
     };
 
     template<int lambda_left, int lambda_right>
-      struct G1 : public canonicalFrameFormFactor<1,1,lambda_left,lambda_right, G1impl >
+      struct G1 : public canonicalFrameFormFactor<1,1,lambda_left,lambda_right, G1impl , true>
     {
       virtual ~G1() {}
     };
@@ -101,6 +101,15 @@ namespace radmat
           val_a = contract(eps_left, applyMetric(p_right,metric,0),0,0);  
           val_b = contract(eps_right, applyMetric(p_left,metric,0),0,0);  
 
+#if 0 
+          std::cout << __func__ << ": pleft = " << p_left 
+            << " pright = " << p_right 
+            << " epsl = " << eps_left 
+            << " epsr = " << eps_right 
+            << " el.pr = " << val_a.value() << "     er.pl = " << val_b.value() 
+            << std::endl;  
+#endif 
+
           ret = val_a.value() * eps_right + val_b.value() * eps_left; 
 
           return ret; 
@@ -109,7 +118,7 @@ namespace radmat
 
 
     template<int lambda_left, int lambda_right>
-      struct G2 : public canonicalFrameFormFactor<1,1,lambda_left,lambda_right, G2impl >
+      struct G2 : public canonicalFrameFormFactor<1,1,lambda_left,lambda_right, G2impl , true>
     {
       virtual ~G2() {}
     };
@@ -150,14 +159,15 @@ namespace radmat
           val_a = contract(eps_left, applyMetric(p_right,metric,0),0,0);  
           val_b = contract(eps_right, applyMetric(p_left,metric,0),0,0);  
           mass = contract(p_right, applyMetric(p_right,metric,0),0,0); 
-    
+
           ret = convertTensorUnderlyingType<std::complex<double>, double,1>(p_f + p_i); 
-          return  - (val_a.value() * val_b.value() / 2.*mass.value()) * ret; 
+          // return - val_a.value() * val_b.value() * ret;
+          return  - ( (val_a.value() * val_b.value() ) / (2.*mass.value()) ) * ret; 
         }
     };
 
     template<int lambda_left, int lambda_right>
-      struct G3 : public canonicalFrameFormFactor<1,1,lambda_left,lambda_right,G3impl>
+      struct G3 : public canonicalFrameFormFactor<1,1,lambda_left,lambda_right,G3impl,true>
     {
       virtual ~G3() {}
     };
@@ -223,6 +233,242 @@ namespace radmat
 
   } // namespace RhoRho
 
+
+#if 0 
+
+  namespace CRhoRho
+  {
+
+    // alternate derivation
+    //
+
+    //////////////////////////////////////////////////////////////////
+    //////////////////////////////////////////////////////////////////
+
+    struct Apimpl
+      : public FormFacRotationManager<Apimpl, std::complex<double> >,
+      public leftSpinPTensor<1> , 
+      public rightSpinPTensor<1>
+    {
+      typedef std::complex<double> Data_t;
+      virtual ~Apimpl() {}
+
+      virtual std::string
+        ff_impl() const
+        {
+          return "A_+(Q^2)(p_f + p_i)^\\mu \\epsilon^*_\\nu(p_f,\\lambda_f)\\epsilon^\\nu(p_i,\\lambda_i) \\\\";
+        }
+
+      virtual Tensor<std::complex<double> , 1> 
+        impl(const Tensor<double,1> &p_f, 
+            const Tensor<double,1> &p_i, 
+            const double mom_fac,
+            const int lh,
+            const int rh)  const
+        {
+          Tensor<std::complex<double> , 1> ret( (TensorShape<1>())[4], std::complex<double>(0.,0.)); 
+          Tensor<std::complex<double> , 1> eps_left, eps_right; 
+          eps_left = left_p_tensor(p_f,p_i,mom_fac,lh);
+          eps_right = right_p_tensor(p_f,p_i,mom_fac,rh);
+          Tensor<std::complex<double>,0> val; 
+          Tensor<std::complex<double>,2> metric; 
+          metric = convertTensorUnderlyingType<std::complex<double>,double,2>(g_dd()); 
+          val = contract(eps_left,applyMetric(eps_right,metric,0),0,0); 
+
+          ret = convertTensorUnderlyingType<std::complex<double>, double,1>(p_f + p_i); 
+
+          return  val.value() * ret ; 
+        }
+    };
+
+    template<int lambda_left, int lambda_right>
+      struct Ap : public canonicalFrameFormFactor<1,1,lambda_left,lambda_right, Apimpl,true >
+    {
+      virtual ~Ap() {}
+    };
+
+
+    //////////////////////////////////////////////////////////////////
+    //////////////////////////////////////////////////////////////////
+    struct Bpimpl : public FormFacRotationManager<Bpimpl, std::complex<double> >,
+    public leftSpinPTensor<1> , 
+    public rightSpinPTensor<1>
+    {
+      typedef std::complex<double> Data_t;
+      virtual ~Bpimpl() {}
+      virtual std::string 
+        ff_impl() const
+        {
+          std::string s = "B_+(Q^2)\\left[ \\epsilon^\\mu(p_i,\\lambda_i)\\epsilon^*_\\nu(p_f,\\lambda_f)p_i^\\nu";
+          s += "+ \\epsilon^{*\\mu}(p_f,\\lambda_f)\\epsilon_\\nu(p_i,\\lambda_i)p_f^\\nu \\right] \\\\";
+          return s;
+        }
+
+      virtual Tensor<std::complex<double> , 1> 
+        impl(const Tensor<double,1> &p_f, 
+            const Tensor<double,1> &p_i, 
+            const double mom_fac,
+            const int lh, 
+            const int rh)  const
+        {
+          Tensor<std::complex<double> , 1> ret( (TensorShape<1>())[4], std::complex<double>(0.,0.)); 
+          Tensor<std::complex<double> , 1> p_left,p_right; 
+          Tensor<std::complex<double> , 1> eps_left, eps_right; 
+          Tensor<std::complex<double> , 0> eldpr,erdpl; 
+          Tensor<std::complex<double> , 2> metric; 
+          metric = convertTensorUnderlyingType<std::complex<double>,double,2>(g_dd()); 
+          eps_left = left_p_tensor(p_f,p_i,mom_fac,lh);
+          eps_right = right_p_tensor(p_f,p_i,mom_fac,rh);
+          p_left = convertTensorUnderlyingType< Data_t , double , 1>(p_f); 
+          p_right = convertTensorUnderlyingType< Data_t , double , 1>(p_i); 
+          eldpr = contract(eps_left, applyMetric(p_right,metric,0),0,0);  
+          erdpl = contract(eps_right, applyMetric(p_left,metric,0),0,0);  
+
+          if (false ) 
+          {
+            std::cout << "el " << eps_left 
+              << "er " << eps_right 
+              << "pl " << p_left 
+              << "pr " << p_right 
+              << "el.pr " << val_a.value() 
+              << "\ner.pl " << val_b.value()
+              << std::endl;
+          }
+
+          ret = eldpr.value() * eps_right + erdpl.value() * eps_left; 
+
+          return ret; 
+        }
+    };
+
+
+    template<int lambda_left, int lambda_right>
+      struct Bp : public canonicalFrameFormFactor<1,1,lambda_left,lambda_right, Bpimpl, true >
+    {
+      virtual ~Bp() {}
+    };
+
+    //////////////////////////////////////////////////////////////////
+    //////////////////////////////////////////////////////////////////
+    struct Bmimpl : public FormFacRotationManager<Bmimpl, std::complex<double> >,
+    public leftSpinPTensor<1> , 
+    public rightSpinPTensor<1>
+    {
+      typedef std::complex<double> Data_t;
+      virtual ~Bmimpl() {}
+      virtual std::string
+        ff_impl() const
+        {
+          std::string s =  "stub";
+          return s; 
+        }
+      virtual Tensor<std::complex<double> , 1> 
+        impl(const Tensor<double,1> &p_f, 
+            const Tensor<double,1> &p_i, 
+            const double mom_fac,
+            const int lh,
+            const int rh)  const
+        {
+          Tensor<std::complex<double> , 1> ret,t1,t2,t3; 
+          Tensor<std::complex<double> , 1> p_left,p_right; 
+          Tensor<std::complex<double> , 1> eps_left, eps_right; 
+          Tensor<std::complex<double> , 0> eldpr,erdpl,mass,dot; 
+          Tensor<std::complex<double> , 2> metric; 
+          metric = convertTensorUnderlyingType<std::complex<double>,double,2>(g_dd()); 
+          eps_left = left_p_tensor(p_f,p_i,mom_fac,lh);
+          eps_right = right_p_tensor(p_f,p_i,mom_fac,rh);
+          p_left = convertTensorUnderlyingType< Data_t , double , 1>(p_f); 
+          p_right = convertTensorUnderlyingType< Data_t , double , 1>(p_i); 
+          eldpr = contract(eps_left, applyMetric(p_right,metric,0),0,0);  
+          erdpl = contract(eps_right, applyMetric(p_left,metric,0),0,0);  
+          mass = contract(p_right, applyMetric(p_right,metric,0),0,0); 
+          dot = contract(p_left, applyMetric(p_right,metric,0),0,0); 
+
+          std::complex<double> coeff; 
+
+          // avoid nan
+          if( std::norm( mass.value()  - dot.value() ) > 1e-6 ) 
+            coeff = ( eldpr.value() * erdpl.value() ) /  ( mass.value() - dot.value() ) ; 
+          else
+            coeff = std::complex<double>(0.,0.); 
+
+          t1 = eldpr.value() * eps_right; 
+          t2 = erdpl.value() * eps_left;
+          t3 = coeff *  convertTensorUnderlyingType<std::complex<double>, double,1>(p_f - p_i); 
+
+          ret = t1 - t2 - t3; 
+
+          return ret ; 
+        }
+    };
+
+    template<int lambda_left, int lambda_right>
+      struct Bm : public canonicalFrameFormFactor<1,1,lambda_left,lambda_right,Bmimpl,true>
+    {
+      virtual ~Bm() {}
+    };
+
+
+    //////////////////////////////////////////////////////////////////
+    //////////////////////////////////////////////////////////////////
+    template<int lambda_left, int lambda_right> 
+      ffBase_t<std::complex<double> >::ff_list genList(void)
+      {
+        ffBase_t<std::complex<double> >::ff_list retCRhoRho; 
+        ffBase_t<std::complex<double> >::BBType *ap , *bp, *bm; 
+
+        try
+        {
+          ap = new radmat::CRhoRho::Ap<lambda_left,lambda_right>();
+          bp = new radmat::CRhoRho::Bp<lambda_left,lambda_right>();
+          bm = new radmat::CRhoRho::Bm<lambda_left,lambda_right>();
+
+          // POW2_ASSERT(g1 && g2 && g3);
+          POW2_ASSERT( ap );
+          POW2_ASSERT( bp );
+          POW2_ASSERT( bm );
+          retCRhoRho.push_back(ffBase_t<std::complex<double> >::BBHandle_t(ap)); 
+          retCRhoRho.push_back(ffBase_t<std::complex<double> >::BBHandle_t(bp)); 
+          retCRhoRho.push_back(ffBase_t<std::complex<double> >::BBHandle_t(bm)); 
+        }
+        catch(...)
+        {
+          POW2_ASSERT(false); 
+        } 
+
+        return retCRhoRho;
+      }
+
+
+    //////////////////////////////////////////////////////////////////
+    //////////////////////////////////////////////////////////////////
+    template<int lambda_left, int lambda_right>
+      struct CRhoRho : public ffBase_t<std::complex<double> >
+    {
+      CRhoRho(void)
+        : ffBase_t<std::complex<double> >(radmat::CRhoRho::genList<lambda_left,lambda_right>())
+      { }
+
+      CRhoRho& operator=(const CRhoRho &o)
+      {
+        if (this != &o)
+          ffBase_t<std::complex<double> >::operator=(o);
+
+        return *this; 
+      }
+
+      CRhoRho(const CRhoRho &o)
+        : ffBase_t<std::complex<double> >(o)
+      {  }
+
+      private: 
+      CRhoRho(const ffBase_t<std::complex<double> >::ff_list &); 
+      CRhoRho(const ffBase_t<std::complex<double> >::ff_list ); 
+    };
+
+  } // namespace CRhoRho
+
+#endif 
 
 } // namespace radmat
 

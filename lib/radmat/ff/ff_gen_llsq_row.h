@@ -327,6 +327,11 @@ namespace radmat
         // scale up
         KF.rescaleSembleUp();
 
+        // std::cout << __func__ << ": pf " << p_f.mean()
+        // << " pi " << p_i.mean() 
+        //  << " K " << KF.mean() << std::endl;
+
+
         return KF;
       }
 
