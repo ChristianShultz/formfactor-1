@@ -50,13 +50,20 @@ namespace radmat
         pplus = applyMetric(pplus,gdd,0); 
         epsilon = applyMetric(epsilon,gdd,0); 
 
+
+          Tensor<double, 0> m_left, m_right;
+          std::complex<double> norm; 
+          m_left = contract(p_f,applyMetric(p_f,g_dd(),0),0,0);
+          m_right = contract(p_i,applyMetric(p_i,g_dd(),0),0,0);
+          norm = std::complex<double>( 2./( sqrt(m_left.value()) + sqrt(m_right.value()) ), 0.); 
+
 #if 1
         Tensor<std::complex<double> , 0> inner_prod = contract( epsilon, p_i , 0 , 0 ) ; 
         if ( std::norm ( inner_prod.value() ) >  1e-6 ) 
           std::cout << "mom dotted into polarization was " << inner_prod.value() << std::endl; 
 #endif 
         
-        return contract(
+        return  norm * contract(
             contract(
                 contract(levi,
                     pminus , 3 , 0),

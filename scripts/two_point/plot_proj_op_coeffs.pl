@@ -6,7 +6,8 @@ use strict;
 
 # some global switch to turn off/on unit normalization
 # NB: only undef is false since perl is dumb
-our $donorm = undef;  
+# our $donorm = undef;  
+our $donorm = "true";
 our $saveplot = "true";
 
 # the big list file
