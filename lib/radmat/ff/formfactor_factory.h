@@ -10,15 +10,8 @@
 
 namespace radmat
 {
-
-  enum FFMODE
-  {
-    HELICITY, 
-    CUBIC
-  };
-
   typedef Util::SingletonHolder<
-    Util::ObjectFactory<ffBase_t<std::complex<double> >,
+    Util::ObjectFactory<FFAbsBase_t,
 			std::string,
 			void,
 			FFAbsBase_t* (*)(void),

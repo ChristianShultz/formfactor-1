@@ -17,6 +17,7 @@
 
 namespace radmat
 {
+  double mom_factor(const double xi, const int L_s) ;
 
   std::map<double,std::vector<TaggedEnsemRedstarNPtBlock> > 
     sort_tagged_corrs_by_Q2(const std::vector<TaggedEnsemRedstarNPtBlock> &); 

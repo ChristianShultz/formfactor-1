@@ -3,7 +3,6 @@
 
 
 #include "radmat/construct_data/three_point.h"
-#include "radmat/fake_data/fake_3pt_function.h"
 #include <string>
 #include <complex>
 

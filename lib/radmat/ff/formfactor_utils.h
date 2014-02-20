@@ -19,8 +19,17 @@ using namespace ADATXML;
 namespace radmat
 {
 
-  Tensor<double,1> pPlus(const Tensor<double,1> &p_f, const Tensor<double,1> &p_i);   // p_f + p_i
-  Tensor<double,1> pMinus(const Tensor<double,1> &p_f, const Tensor<double,1> &p_i);  // p_f - p_i
+  template<typename T> Tensor<T,1> 
+    pPlus(const Tensor<T,1> &p_f, const Tensor<T,1> &p_i)   // p_f + p_i
+    {
+      return p_f + p_i; 
+    }
+
+  template<typename T> Tensor<T,1>
+  pMinus(const Tensor<T,1> &p_f, const Tensor<T,1> &p_i)  // p_f - p_i
+  {
+    return p_f - p_i; 
+  }
 
 
   /////////////////////////////////////////////////////////////////////////////////////////////////

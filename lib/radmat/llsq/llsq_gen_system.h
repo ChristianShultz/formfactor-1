@@ -1,8 +1,8 @@
 #ifndef LLSQ_GEN_SYSTEM_H_H_GUARD
 #define LLSQ_GEN_SYSTEM_H_H_GUARD
 
-#include "radmat/ff/ff_gen_llsq_row.h"
 #include "radmat/ff/formfactor_factory.h"
+#include "radmat/ff/formfactor_kinematic_factors.h"
 #include "io/adat_xmlio.h"
 #include "radmat/utils/splash.h"
 #include "semble/semble_vector.h"
@@ -73,7 +73,7 @@ namespace radmat
     }
 
 
-    std::string matElemID;                      // in the h_f h_i language
+    std::string matElemID;                      
     std::pair<bool,ENSEM::EnsemComplex> zero;   // lorentz index of measurements
     std::pair<bool,ENSEM::EnsemComplex> one;    // bool is if we want to use it
     std::pair<bool,ENSEM::EnsemComplex> two;
@@ -82,6 +82,8 @@ namespace radmat
     Array<int> p_i;
     ENSEM::EnsemReal E_f;                              // these are in flight energies 
     ENSEM::EnsemReal E_i;                              //  ie: sqrt(m*m + p*p)
+    int h_f;
+    int h_i; 
     double mom_fac;                           // (1/ xi) * 2pi/L_s -- the "unit" size  
 
   };
@@ -167,9 +169,9 @@ namespace radmat
       bool initK = false;
 
       it = data.begin();
+      FFKinematicFactors_t genK(FormFactorDecompositionFactoryEnv::callFactory(it->matElemID));
 
       do {
-        ffKinematicFactors_t<T> genK(FormFactorDecompositionFactoryEnv::callFactory(it->matElemID));
         KWork = genK.genFactors(makeMomInvariants(it->E_f,it->E_i,it->p_f,it->p_i,it->mom_fac));
 
         if(it->zero.first)

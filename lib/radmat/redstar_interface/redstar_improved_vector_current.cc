@@ -6,7 +6,7 @@
 
  * Creation Date : 20-11-2013
 
- * Last Modified : Thu 09 Jan 2014 10:37:23 PM EST
+ * Last Modified : Thu 20 Feb 2014 01:56:23 PM EST
 
  * Created By : shultz
 
@@ -17,24 +17,18 @@
 #include "redstar_cartesian_interface.h"
 #include "redstar_single_particle_meson_block.h"
 #include "redstar_invert_subduction.h"
-#include "radmat/fake_data/fake_3pt_function_aux.h"
-
 #include "semble/semble_meta.h"
-
 #include "adat/map_obj.h"
 #include "ensem/ensem.h"
 #include "hadron/ensem_filenames.h"
 #include "hadron/irrep_util.h"
 #include "hadron/clebsch.h"
 #include "formfac/formfac_qsq.h"
-
 #include "redstar_photon_polarization_tensor.h"
 #include "radmat/utils/tensor.h"
 #include "radmat/utils/obj_expr_t.h"
 #include "radmat/utils/pow2assert.h"
-
 #include "itpp/itbase.h"
-
 #include <map>
 #include <exception>
 #include <sstream>

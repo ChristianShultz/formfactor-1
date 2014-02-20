@@ -6,6 +6,7 @@
 #include "radmat/utils/pow2assert.h"
 #include "lorentzff_canonical_frame_formfacs_rotation_manager.h"
 #include "lorentzff_canonical_frame_formfactor.h"
+#include "radmat/utils/stringify.h"
 #include <complex>
 
 namespace radmat
@@ -68,10 +69,15 @@ namespace radmat
     ////////////////////////////////////////////////////////////////////////////////////
     ////////////////////////////////////////////////////////////////////////////////////
 
+    // embed spin into operator name -- only 0,0 compiles
+    template<int embedl, int embedr> struct PiPi; 
+    REGISTER_STRINGIFY_TYPE( PiPi<0,0> ); 
+
+
     // only need to derive the constructor, everything else is in the 
     // base class, do this polymorphically, make some function that 
     // returns the appropriate handle based on the requested matrix element type
-    template<int embed>
+    template<int embedl, int embedr>
     struct PiPi : public FFAbsBase_t
     {
       PiPi(void)
@@ -90,6 +96,13 @@ namespace radmat
       PiPi(const PiPi &o)
         : FFAbsBase_t(o)
       {  }
+
+      virtual ~PiPi() {} 
+
+      virtual std::string id(void) const { return Stringify< PiPi<embedl,embedr> >(); }
+      virtual int left_spin const {return embedl;}
+      virtual int right_spin const {return embedr;}
+
 
       private:
       // I'm not sure if these could inherit so we will hide them as well

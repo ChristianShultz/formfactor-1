@@ -6,7 +6,7 @@
 
  * Creation Date : 13-11-2013
 
- * Last Modified : Wed 08 Jan 2014 04:38:38 PM EST
+ * Last Modified : Thu 20 Feb 2014 02:02:00 PM EST
 
  * Created By : shultz
 
@@ -15,7 +15,6 @@
 
 #include "construct_correlators_utils.h"
 #include "construct_correlators_bad_data_repository.h"
-#include "radmat/fake_data/fake_3pt_function_aux.h"
 #include "semble/semble_meta.h"
 #include "semble/semble_file_management.h"
 #include "adat/adat_stopwatch.h"
@@ -31,6 +30,11 @@
 namespace radmat
 {
 
+  double mom_factor(const double xi, const int L_s) 
+  {
+    return 2.*acos(-1.)/xi/double(L_s);
+  }
+
   namespace BAD_DATA_REPO
   {
     BuildCorrsLocalBadDataRepo_t local_bad_data_repo; 
@@ -44,6 +48,27 @@ namespace radmat
 
   namespace
   {
+
+    template<typename T> 
+      struct ThreePtPropagationFactor
+      {
+        typename SEMBLE::PromoteEnsem<T>::Type operator()(const ENSEM::EnsemReal &E_sink,
+            const typename SEMBLE::PromoteEnsem<T>::Type &Z_sink,
+            const int t_sink,
+            const int t_ins,
+            const ENSEM::EnsemReal &E_source, 
+            const typename SEMBLE::PromoteEnsem<T>::Type &Z_source, 
+            const int t_source)
+        {
+          return ((ENSEM::conj(Z_source)*Z_sink/ (E_source * E_sink * SEMBLE::toScalar(4.)))
+              * ENSEM::exp(-E_sink*(SEMBLE::toScalar(double(t_sink - t_ins))))
+              * ENSEM::exp(-E_source*(SEMBLE::toScalar(double(t_ins - t_source))))
+              );
+
+        }
+
+      };
+
 
     typedef ADAT::MapObject<Hadron::KeyHadronNPartNPtCorr_t,
             ENSEM::EnsemVectorComplex> singleThreadQ2NormalizedCorrCache;

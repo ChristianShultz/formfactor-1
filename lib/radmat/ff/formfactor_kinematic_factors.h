@@ -83,7 +83,7 @@ namespace radmat
       b = SEMBLE::toScalar( lefty.p[1] - righty.p[1] );
       c = SEMBLE::toScalar( lefty.p[2] - righty.p[2] );
       
-      return (-q0*q0 + a*a + qb*b + c*c);
+      return (-q0*q0 + a*a + b*b + c*c);
     }
 
     // for strings
@@ -92,9 +92,7 @@ namespace radmat
       return SEMBLE::toScalar(ENSEM::mean(Q2())); 
     }
 
-    // momentum factor
-    double mom_factor(void) const {return mom_fac;} 
-    void set_mom_factor(const double p_fac) {mom_fac = p_fac;}
+    void set_mom_factor(const double p_fac) {mom_factor = p_fac;}
 
     FFSingleKinematicInvariants lefty,righty;
     double mom_factor; 
@@ -108,7 +106,7 @@ namespace radmat
   {
     // save some typing
     typedef rHandle<FFAbsBase_t > FFBase_h;
-    typedef typename SEMBLE::SembleMatrix<T> KinematicFactorMatrix;
+    typedef SEMBLE::SembleMatrix<std::complex<double> > KinematicFactorMatrix;
 
     // the only available constructor
     FFKinematicFactors_t(const FFBase_h &KFacGen)
@@ -121,9 +119,7 @@ namespace radmat
     // the row index is the lorentz index of the lattice matrix element
     KinematicFactorMatrix genFactors(const FFKinematicInvariants &inv)
     {
-      FFSingleKinematicInvariants lefty,righty; 
-      lefty = inv.lefty;
-      righty = inv.righty; 
+      FFSingleKinematicInvariants lefty(inv.lefty),righty(inv.righty); 
 
       int nfacs = m_KFacGen->nFacs();
       int nbins = righty.E.size();
@@ -156,7 +152,7 @@ namespace radmat
     private:
     FFKinematicFactors_t(void);
     FFKinematicFactors_t(const FFKinematicFactors_t &o);
-    FFKinematicFactors_t& operator=(const FFKinematicFactors_t<T> &o);
+    FFKinematicFactors_t& operator=(const FFKinematicFactors_t &o);
 
     private:
     FFBase_h m_KFacGen;

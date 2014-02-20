@@ -6,7 +6,7 @@
 
 * Creation Date : 01-10-2013
 
-* Last Modified : Tue 24 Dec 2013 08:43:09 AM EST
+* Last Modified : Thu 20 Feb 2014 01:53:50 PM EST
 
 * Created By : shultz
 
@@ -15,7 +15,6 @@ _._._._._._._._._._._._._._._._._._._._._.*/
 
 #include "lattice_multi_data_tag.h"
 #include "radmat_database_interface.h"
-#include "radmat/fake_data/fake_3pt_function_aux.h"
 #include "radmat/utils/pow2assert.h"
 #include "radmat/utils/perThreadStorage.h"
 #include "radmat/llsq/llsq_gen_system.h"

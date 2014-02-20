@@ -6,7 +6,7 @@
 
  * Creation Date : 04-12-2012
 
- * Last Modified : Fri Dec 27 19:19:59 2013
+ * Last Modified : Thu 20 Feb 2014 01:55:44 PM EST
 
  * Created By : shultz
 
@@ -17,7 +17,6 @@
 #include "construct_correlators.h"
 #include "construct_correlators_utils.h"
 #include "construct_correlators_bad_data_repository.h"
-#include "radmat/fake_data/fake_3pt_function_aux.h"
 #include "adat/adat_stopwatch.h"
 #include "adat/map_obj.h"
 #include <string>

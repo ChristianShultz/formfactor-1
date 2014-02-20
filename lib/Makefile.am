@@ -30,29 +30,32 @@ nobase_include_HEADERS =   \
 													 radmat/fake_data/fake_3pt_function.h		\
 													 radmat/fake_data/fake_data.h		\
 													 radmat/fake_data/fake_data_ini.h		\
+													 radmat/fake_data/fake.data.ini.xml		\
 													 radmat/fake_data/fake_overlaps.h		\
 													 radmat/fake_data/fake_spectrum.h		\
 													 radmat/fake_data/gen_fake_dataset.h		\
 													 radmat/fake_data/minimal_fake_data.h		\
 													 radmat/fake_data/normalize_fake_3pt_data.h		\
-													 radmat/ff/ff_gen_llsq_row.h		\
 													 radmat/ff/ff.h		\
+													 radmat/ff/formfactor_abs_base_cfg.h		\
 													 radmat/ff/formfactor_factory.h		\
+													 radmat/ff/formfactor_kinematic_factors.h		\
+													 radmat/ff/formfactor_utils.h		\
+													 radmat/ff_interface/ff_gen_llsq_row.h		\
 													 radmat/ff/lorentzff_canonical_frame_formfacs_rotation_manager.h		\
 													 radmat/ff/lorentzff_canonical_frame_formfactor.h		\
-													 radmat/ff/lorentzff_canonical_JJlist_ff.h \
+													 radmat/ff/lorentzff_canonical_JJlist_ff.h		\
+													 radmat/ff/lorentzff_canonical_PiPi.h		\
+													 radmat/ff/lorentzff_canonical_PiPiStar.h		\
 													 radmat/ff/lorentzff_canonical_PiRho.h		\
 													 radmat/ff/lorentzff_canonical_RhoPi.h		\
 													 radmat/ff/lorentzff_canonical_RhoRho.h		\
 													 radmat/ff/lorentzff_canonical_rotation_groups.h		\
+													 radmat/ff/lorentzff_canonical_rotations_checker.h		\
 													 radmat/ff/lorentzff_canonical_rotations.h		\
 													 radmat/ff/lorentzff_canonical_rotations_utils.h		\
-													 radmat/ff/lorentzff_canonical_rotations_checker.h		\
 													 radmat/ff/lorentzff_cubic_reps.h		\
 													 radmat/ff/lorentzff_formfac_utils.h		\
-													 radmat/ff/lorentzff_PiPi.h		\
-													 radmat/ff/lorentzff_PiPiStar.h		\
-													 radmat/ff/lorentzff_PiRho.h		\
 													 radmat/ff/lorentzff_polarization_embedding.h		\
 													 radmat/ff/lorentzff_polarization_embedding_old.h		\
 													 radmat/ff/lorentzff_polarization_tensors.h		\
@@ -106,7 +109,7 @@ nobase_include_HEADERS =   \
 													 radmat/utils/stringify.h		\
 													 radmat/utils/tensor.h		\
 													 radmat/utils/type_computations.h		\
-													 radmat/utils/utils.h	
+													 radmat/utils/utils.h		
 
 # the lib
 lib_LIBRARIES = libradmat.a
@@ -130,15 +133,12 @@ libradmat_a_SOURCES =	\
 											radmat/fake_data/fake_data_ini.cc		\
 											radmat/fake_data/fake_overlaps.cc		\
 											radmat/fake_data/fake_spectrum.cc		\
-											radmat/ff/ff_gen_llsq_row.cc		\
 											radmat/ff/formfactor_factory.cc		\
 											radmat/ff/lorentzff_canonical_frame_formfacs_rotation_manager.cc		\
 											radmat/ff/lorentzff_canonical_rotations.cc		\
 											radmat/ff/lorentzff_canonical_rotations_checker.cc		\
 											radmat/ff/lorentzff_canonical_rotations_utils.cc		\
 											radmat/ff/lorentzff_formfac_utils.cc		\
-											radmat/ff/lorentzff_PiPi.cc		\
-											radmat/ff/lorentzff_PiPiStar.cc		\
 											radmat/ff/lorentzff_Wigner_D_matrix_factory.cc		\
 											radmat/fitting/axis_plotter.cc		\
 											radmat/fitting/fit_tins.cc		\
