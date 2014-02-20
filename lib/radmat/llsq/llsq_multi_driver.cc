@@ -6,7 +6,7 @@
 
  * Creation Date : 22-02-2013
 
- * Last Modified : Wed 08 Jan 2014 04:58:58 PM EST
+ * Last Modified : Thu 20 Feb 2014 11:51:32 AM EST
 
  * Created By : shultz
 
@@ -86,7 +86,8 @@ namespace radmat
       }
     }
 
-    SemblePInv makeMomInvariants(const LatticeMultiDataTag &t)
+    FFKinematicInvariants 
+      makeMomInvariants(const LatticeMultiDataTag &t)
     {
 #ifdef DEBUG_AT_MAKE_MOM_INV_TAGS 
 
@@ -96,12 +97,11 @@ namespace radmat
       std::cout << "E_string = " << t.E_string() << std::endl;
 #endif
 
-      // need to scope for this to compile
-      return radmat::makeMomInvariants(t.E_f,
-          t.E_i,
-          t.p_f,
-          t.p_i,
-          t.mom_fac);
+      return FFKinematicInvariants(
+            FFSingleKinematicInvariants(t.E_f, t.p_f, t.hf, t.mom_fac ) ,
+            FFSingleKinematicInvariants(t.E_i, t.p_i, t.hi, t.mom_fac ) ,
+            t.mom_fac
+          );
     }
 
 
@@ -347,18 +347,14 @@ namespace radmat
     }
 
 
-    ffKinematicFactors_t<std::complex<double> >
-      KJunk(FormFactorDecompositionFactoryEnv::callFactory(
-            old_tags.begin()->mat_elem_id)); 
+    FFKinematicFactors_t KK( FormFactorDecompositionFactoryEnv::callFactory(old_tags.begin()->mat_elem_id) ); 
 
-    Junk = KJunk.genFactors(makeMomInvariants(*old_tags.begin())); 
+    Junk = KK.genFactors(makeMomInvariants(*old_tags.begin())); 
     Zero = Junk.getRow(0);
     Zero.zeros(); 
 
     for(unsigned int elem = 0; elem < sz; ++elem)
     {
-      ffKinematicFactors_t<std::complex<double> >
-        KK(FormFactorDecompositionFactoryEnv::callFactory(old_tags[elem].mat_elem_id)); 
       SEMBLE::SembleMatrix<std::complex<double> > workM;
       SEMBLE::SembleVector<std::complex<double> > workV;
 
@@ -639,18 +635,14 @@ namespace radmat
     check_exit_lat(); 
     std::vector<LatticeMultiDataTag> tags = lattice_data->tags(); 
     std::vector<LatticeMultiDataTag>::const_iterator it; 
+  
+    FFKinematicFactors_t KK( FormFactorDecompositionFactoryEnv::callFactory(tags.begin()->mat_elem_id) ); 
 
     for(it = tags.begin(); it != tags.end(); ++it)
     {
-      ffKinematicFactors_t<std::complex<double> >
-        KK(FormFactorDecompositionFactoryEnv::callFactory(it->mat_elem_id)); 
       SEMBLE::SembleMatrix<std::complex<double> > work;
       work = KK.genFactors(makeMomInvariants(*it));
 
-      /*  std::cout << __FILE__ << __func__ 
-          << "\n" <<  it->file_id << std::endl;
-          std::cout << SEMBLE::mean(work) << std::endl;
-          */
       if(it == tags.begin())
         init_dim(K, work.getRow(
               remap_jmu_4_to_0(it->jmu)));

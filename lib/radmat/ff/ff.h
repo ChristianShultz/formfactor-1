@@ -2,8 +2,6 @@
 #define FF_H 
 
 
-#include "radmat/ff/ff_gen_llsq_row.h"
-#include "radmat/ff/ff.h"
 #include "radmat/ff/formfactor_factory.h"
 #include "radmat/ff/lorentzff_canonical_rotations.h"
 #include "radmat/ff/lorentzff_canonical_rotation_groups.h"

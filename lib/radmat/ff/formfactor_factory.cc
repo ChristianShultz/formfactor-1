@@ -40,8 +40,6 @@ namespace radmat
         return t;
       }
 
-
-
     template<typename T> 
       bool 
       do_reg(const std::string &reg_id, T* (*ptr)())
@@ -60,9 +58,9 @@ namespace radmat
     // never played with this toy before so we are just going to 
     // make it blow up if anything goes wrong by wrapping another 
     // call around the factory.createObj method
-    rHandle<ffBase_t<std::complex<double> > > callFactory(const std::string &matElemID)
+    rHandle<FFAbsBase_t > callFactory(const std::string &matElemID)
     {
-      ffBase_t<std::complex<double> > *foo;
+      FFAbsBase_t *foo;
       foo = NULL;
       try
       {
@@ -88,7 +86,7 @@ namespace radmat
       }
 
       POW2_ASSERT(foo);
-      return rHandle<ffBase_t<std::complex<double> > >(foo);
+      return rHandle<FFAbsBase_t >(foo);
     }
 
     // register the factory "inventory"
@@ -102,41 +100,17 @@ namespace radmat
         // <Pi | jmu | Pi >
         // success &= Factory::Instance().registerObject(std::string("PiPi"),FacEnv::upCast<ffBase_t<std::complex<double> > ,radmat::PiPi::PiPi>);
 
-        success &= do_reg(std::string("PiPi"), FacEnv::upCast<ffBase_t<std::complex<double> > ,radmat::PiPi::PiPi>);
-        success &= do_reg(std::string("PiPi_0_0"),FacEnv::upCast<ffBase_t<std::complex<double> > ,radmat::PiPi::PiPi>);
-        success &= do_reg(std::string("PiPiStar_0_0"),FacEnv::upCast<ffBase_t<std::complex<double> > ,radmat::PiPiStar::PiPiStar>);
+        success &= do_reg(std::string("PiPi"), FacEnv::upCast<FFAbsBase_t ,radmat::PiPi::PiPi>);
+        success &= do_reg(std::string("PiPiStar"),FacEnv::upCast<FFAbsBase_t ,radmat::PiPiStar::PiPiStar>);
 
         // <Pi | jmu | Rho>
-        success &= do_reg(std::string("PiRho_0_-1"),FacEnv::upCast<ffBase_t<std::complex<double> >, radmat::PiRho::PiRho<-1> >);
-        success &= do_reg(std::string("PiRho_0_0"),FacEnv::upCast<ffBase_t<std::complex<double> >, radmat::PiRho::PiRho<0> >);
-        success &= do_reg(std::string("PiRho_0_1"),FacEnv::upCast<ffBase_t<std::complex<double> >, radmat::PiRho::PiRho<1> >);
-        // <Pi | jmu | Rho>
-        success &= do_reg(std::string("CanonicalPiRho_0_-1"),FacEnv::upCast<ffBase_t<std::complex<double> >, radmat::CanonicalPiRho::CanonicalPiRho<-1> >);
-        success &= do_reg(std::string("CanonicalPiRho_0_0"),FacEnv::upCast<ffBase_t<std::complex<double> >, radmat::CanonicalPiRho::CanonicalPiRho<0> >);
-        success &= do_reg(std::string("CanonicalPiRho_0_1"),FacEnv::upCast<ffBase_t<std::complex<double> >, radmat::CanonicalPiRho::CanonicalPiRho<1> >);
-
+        success &= do_reg(std::string("CanonicalPiRho"),FacEnv::upCast<FFAbsBase_t, radmat::CanonicalPiRho::CanonicalPiRho >);
 
         // <Rho | jmu | Pi> 
-        success &= do_reg(std::string("RhoPi_-1_0"),FacEnv::upCast<ffBase_t<std::complex<double> >, radmat::RhoPi::RhoPi<-1> >);
-        success &= do_reg(std::string("RhoPi_0_0"),FacEnv::upCast<ffBase_t<std::complex<double> >, radmat::RhoPi::RhoPi<0> >);
-        success &= do_reg(std::string("RhoPi_1_0"),FacEnv::upCast<ffBase_t<std::complex<double> >, radmat::RhoPi::RhoPi<1> >);
-        // <Rho | jmu | Pi> 
-        success &= do_reg(std::string("CanonicalRhoPi_-1_0"),FacEnv::upCast<ffBase_t<std::complex<double> >, radmat::CanonicalRhoPi::CanonicalRhoPi<-1> >);
-        success &= do_reg(std::string("CanonicalRhoPi_0_0"),FacEnv::upCast<ffBase_t<std::complex<double> >, radmat::CanonicalRhoPi::CanonicalRhoPi<0> >);
-        success &= do_reg(std::string("CanonicalRhoPi_1_0"),FacEnv::upCast<ffBase_t<std::complex<double> >, radmat::CanonicalRhoPi::CanonicalRhoPi<1> >);
+        success &= do_reg(std::string("CanonicalRhoPi"),FacEnv::upCast<FFAbsBase_t, radmat::CanonicalRhoPi::CanonicalRhoPi>);
 
         // <Rho | jum | Rho> 
-        success &= do_reg(std::string("RhoRho_1_-1"),FacEnv::upCast<ffBase_t<std::complex<double> >, radmat::RhoRho::RhoRho<1,-1> >);
-        success &= do_reg(std::string("RhoRho_1_0"),FacEnv::upCast<ffBase_t<std::complex<double> >, radmat::RhoRho::RhoRho<1,0> >);
-        success &= do_reg(std::string("RhoRho_1_1"),FacEnv::upCast<ffBase_t<std::complex<double> >, radmat::RhoRho::RhoRho<1,1> >);
-
-        success &= do_reg(std::string("RhoRho_0_-1"),FacEnv::upCast<ffBase_t<std::complex<double> >, radmat::RhoRho::RhoRho<0,-1> >);
-        success &= do_reg(std::string("RhoRho_0_0"),FacEnv::upCast<ffBase_t<std::complex<double> >, radmat::RhoRho::RhoRho<0,0> >);
-        success &= do_reg(std::string("RhoRho_0_1"),FacEnv::upCast<ffBase_t<std::complex<double> >, radmat::RhoRho::RhoRho<0,1> >);
-
-        success &= do_reg(std::string("RhoRho_-1_-1"),FacEnv::upCast<ffBase_t<std::complex<double> >, radmat::RhoRho::RhoRho<-1,-1> >);
-        success &= do_reg(std::string("RhoRho_-1_0"),FacEnv::upCast<ffBase_t<std::complex<double> >, radmat::RhoRho::RhoRho<-1,0> >);
-        success &= do_reg(std::string("RhoRho_-1_1"),FacEnv::upCast<ffBase_t<std::complex<double> >, radmat::RhoRho::RhoRho<-1,1> >);
+        success &= do_reg(std::string("RhoRho"),FacEnv::upCast<FFAbsBase_t, radmat::RhoRho::RhoRho >);
 
         registered = true;
       }

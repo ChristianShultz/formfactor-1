@@ -72,9 +72,8 @@ namespace radmat
       }
     };
 
-    template<int lambda_r>
       struct F1
-      : public canonicalFrameFormFactor<0,1,0,lambda_r,F1impl,false>
+      : public canonicalFrameFormFactor<0,1,F1impl>
       {
         virtual ~F1() {}
       };
@@ -82,22 +81,20 @@ namespace radmat
 
 
     // generate a list for the PiPi constructor
-    template<short lambda>
       ffBase_t<std::complex<double> >::ff_list genList(void)
       {
         ffBase_t<std::complex<double> >::ff_list retCanonicalPiRho;
         ffBase_t<std::complex<double> >::BBType *blockPtr;
-        blockPtr = new F1<lambda>();
+        blockPtr = new F1();
         POW2_ASSERT(blockPtr);
         retCanonicalPiRho.push_back(ffBase_t<std::complex<double> >::BBHandle_t(blockPtr));
         return retCanonicalPiRho;
       }
 
-    template<short lambda>
       struct CanonicalPiRho : public ffBase_t<std::complex<double> >
     {
       CanonicalPiRho(void)
-        : ffBase_t<std::complex<double> >(radmat::CanonicalPiRho::genList<lambda>())
+        : ffBase_t<std::complex<double> >(radmat::CanonicalPiRho::genList())
       {  }
 
       CanonicalPiRho& operator=(const CanonicalPiRho &o)

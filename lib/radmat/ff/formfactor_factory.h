@@ -1,7 +1,7 @@
 #ifndef FORMFACTOR_FACTORY_H_H_GUARD
 #define FORMFACTOR_FACTORY_H_H_GUARD
 
-#include "ff_gen_llsq_row.h"
+#include "formfactor_abs_base_cfg.h"
 #include <string>
 #include <complex>
 #include "adat/singleton.h"
@@ -15,7 +15,7 @@ namespace radmat
     Util::ObjectFactory<ffBase_t<std::complex<double> >,
 			std::string,
 			void,
-			ffBase_t<std::complex<double> >* (*)(void),
+			FFAbsBase_t* (*)(void),
 			Util::StringFactoryError> >
   TheFormFactorDecompositionFactory;
 
@@ -23,7 +23,7 @@ namespace radmat
   namespace FormFactorDecompositionFactoryEnv
   {
     bool registerAll();
-    rHandle<ffBase_t<std::complex<double> > > callFactory(const std::string &matElemID);
+    rHandle<FFAbsBase_t> callFactory(const std::string &matElemID);
   }
 
 }

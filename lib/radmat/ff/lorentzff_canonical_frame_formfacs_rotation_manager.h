@@ -5,7 +5,6 @@
 #include "lorentzff_canonical_rotations_utils.h"
 #include "lorentzff_canonical_rotations.h"
 #include "lorentzff_formfac_utils.h"
-#include "ff_gen_llsq_row.h"
 #include "hadron/irrep_util.h"
 #include "radmat/utils/tensor.h"
 #include <complex>

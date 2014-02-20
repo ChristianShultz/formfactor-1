@@ -6,7 +6,7 @@
 
  * Creation Date : 12-11-2013
 
- * Last Modified : Tue 24 Dec 2013 08:46:24 AM EST
+ * Last Modified : Thu 20 Feb 2014 11:48:26 AM EST
 
  * Created By : shultz
 
@@ -111,11 +111,9 @@ namespace radmat
         rHandle<RedstarUnimprovedVectorCurrentInput> ins(b);
         rHandle<RedstarSingleParticleMesonInput> src(c); 
 
-        std::stringstream ss, mat_elem; 
+        std::stringstream ss; 
         ss << snk->sname() << ".V_" << ins->lorentz 
           << "." << src->sname(); 
-
-        mat_elem << elem_id << "_" << snk->H << "_" << src->H; 
 
         ret.file_id = ss.str(); 
         ret.jmu = ins->lorentz;
@@ -123,7 +121,7 @@ namespace radmat
         ret.hi = src->H; 
         ret.p_f = snk->mom;
         ret.p_i = src->mom; 
-        ret.mat_elem_id = mat_elem.str(); 
+        ret.mat_elem_id = elem_id; 
 
         return ret;
       }
@@ -145,11 +143,9 @@ namespace radmat
         rHandle<RedstarImprovedVectorCurrentInput> ins(b);
         rHandle<RedstarSingleParticleMesonInput> src(c); 
 
-        std::stringstream ss, mat_elem; 
+        std::stringstream ss; 
         ss << snk->sname() << ".V_" << ins->lorentz 
           << "." << src->sname(); 
-
-        mat_elem << elem_id << "_" << snk->H << "_" << src->H; 
 
         ret.file_id = ss.str(); 
         ret.jmu = ins->lorentz;
@@ -157,7 +153,7 @@ namespace radmat
         ret.hi = src->H; 
         ret.p_f = snk->mom;
         ret.p_i = src->mom; 
-        ret.mat_elem_id = mat_elem.str(); 
+        ret.mat_elem_id = elem_id;
 
         return ret;
       }
