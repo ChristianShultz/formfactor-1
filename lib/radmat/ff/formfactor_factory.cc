@@ -90,27 +90,27 @@ namespace radmat
     }
 
     // register the factory "inventory"
-    bool registerAll(void)
+    bool registerAll( const FFMODE mode );
     {
 
       bool success = true;
 
       if(!!!registered)
       {
-        // <Pi | jmu | Pi >
-        // success &= Factory::Instance().registerObject(std::string("PiPi"),FacEnv::upCast<ffBase_t<std::complex<double> > ,radmat::PiPi::PiPi>);
 
-        success &= do_reg(std::string("PiPi"), FacEnv::upCast<FFAbsBase_t ,radmat::PiPi::PiPi>);
-        success &= do_reg(std::string("PiPiStar"),FacEnv::upCast<FFAbsBase_t ,radmat::PiPiStar::PiPiStar>);
-
-        // <Pi | jmu | Rho>
-        success &= do_reg(std::string("CanonicalPiRho"),FacEnv::upCast<FFAbsBase_t, radmat::CanonicalPiRho::CanonicalPiRho >);
-
-        // <Rho | jmu | Pi> 
-        success &= do_reg(std::string("CanonicalRhoPi"),FacEnv::upCast<FFAbsBase_t, radmat::CanonicalRhoPi::CanonicalRhoPi>);
-
-        // <Rho | jum | Rho> 
-        success &= do_reg(std::string("RhoRho"),FacEnv::upCast<FFAbsBase_t, radmat::RhoRho::RhoRho >);
+        if ( mode == HELICITY )
+        {
+          success &= do_reg(std::string("PiPi"), FacEnv::upCast<FFAbsBase_t ,radmat::PiPi::PiPi<HELICITY> >);
+          success &= do_reg(std::string("PiPiStar"),FacEnv::upCast<FFAbsBase_t ,radmat::PiPiStar::PiPiStar<HELICITY> >);
+          success &= do_reg(std::string("CanonicalPiRho"),FacEnv::upCast<FFAbsBase_t, radmat::CanonicalPiRho::CanonicalPiRho<HELICITY> >);
+          success &= do_reg(std::string("CanonicalRhoPi"),FacEnv::upCast<FFAbsBase_t, radmat::CanonicalRhoPi::CanonicalRhoPi<HELICITY> >);
+          success &= do_reg(std::string("RhoRho"),FacEnv::upCast<FFAbsBase_t, radmat::RhoRho::RhoRho<HELICITY> >);
+        }
+        else
+        {
+          std::cerr << "only HELICITY mode is supported" << std::endl;
+          exit(1); 
+        }
 
         registered = true;
       }

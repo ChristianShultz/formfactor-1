@@ -11,6 +11,12 @@
 namespace radmat
 {
 
+  enum FFMODE
+  {
+    HELICITY, 
+    CUBIC
+  };
+
   typedef Util::SingletonHolder<
     Util::ObjectFactory<ffBase_t<std::complex<double> >,
 			std::string,
@@ -22,7 +28,7 @@ namespace radmat
 
   namespace FormFactorDecompositionFactoryEnv
   {
-    bool registerAll();
+    bool registerAll( const FFMODE );
     rHandle<FFAbsBase_t> callFactory(const std::string &matElemID);
   }
 

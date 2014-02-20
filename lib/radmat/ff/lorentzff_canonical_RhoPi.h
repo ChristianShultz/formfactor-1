@@ -75,47 +75,46 @@ namespace radmat
         }
     };
 
-    template<int lambda_l>
       struct F1
-      : public canonicalFrameFormFactor<1,0,lambda_l,0,F1impl,false>
+      : public canonicalFrameFormFactor<1,0,F1impl>
       {
         virtual ~F1() {}
       };
 
 
-    template<short lambda>
-      ffBase_t<std::complex<double> >::ff_list genList(void)
+    template<int embed>
+      FFAbsBase_t::FFAbs_list genList(void)
       {
-        ffBase_t<std::complex<double> >::ff_list retCanonicalRhoPi;
-        ffBase_t<std::complex<double> >::BBType *blockPtr;
-        blockPtr = new radmat::CanonicalRhoPi::F1<lambda>();
+        FFAbsBase_t::FFAbs_list retCanonicalRhoPi;
+        FFAbsBase_t::BBType *blockPtr;
+        blockPtr = new radmat::CanonicalRhoPi::F1<embed>();
         POW2_ASSERT(blockPtr);
-        retCanonicalRhoPi.push_back(ffBase_t<std::complex<double> >::BBHandle_t(blockPtr));
+        retCanonicalRhoPi.push_back(FFAbsBase_t::BBHandle_t(blockPtr));
         return retCanonicalRhoPi;
       }
 
 
-    template<short lambda>
-      struct CanonicalRhoPi : public ffBase_t<std::complex<double> >
+    template<int embed>
+      struct CanonicalRhoPi : public FFAbsBase_t
     {
       CanonicalRhoPi(void) 
-        : ffBase_t<std::complex<double> >(radmat::CanonicalRhoPi::genList<lambda>())
+        : FFAbsBase_t(radmat::CanonicalRhoPi::genList<embed>())
       {   }
 
       CanonicalRhoPi& operator=(const CanonicalRhoPi &o)
       {
         if(this != &o)
-          ffBase_t<std::complex<double> >::operator=(o);
+          FFAbsBase_t::operator=(o);
         return *this; 
       }
 
       CanonicalRhoPi(const CanonicalRhoPi &o)
-        : ffBase_t<std::complex<double> >(o)
+        : FFAbsBase_t(o)
       {  }
 
       private:
-      CanonicalRhoPi(const ffBase_t<std::complex<double> >::ff_list &);
-      CanonicalRhoPi(const ffBase_t<std::complex<double> >::ff_list); 
+      CanonicalRhoPi(const FFAbsBase_t::FFAbs_list &);
+      CanonicalRhoPi(const FFAbsBase_t::FFAbs_list); 
 
     };
 
