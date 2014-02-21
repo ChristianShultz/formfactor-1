@@ -5,6 +5,7 @@
 
 #include "radmat/utils/levi_civita.h"
 #include "radmat/utils/pow2assert.h"
+#include "radmat/utils/stringify.h"
 #include "lorentzff_polarization_embedding.h"
 #include "lorentzff_canonical_frame_formfacs_rotation_manager.h"
 #include "lorentzff_canonical_frame_formfactor.h"
@@ -12,15 +13,14 @@
 namespace radmat
 {
 
-  namespace CanonicalRhoPi
-  {
-    struct F1impl
-      : public FormFacRotationManager<F1impl,std::complex<double> >,
+
+    struct RhoPiF1impl
+      : public FormFacRotationManager<RhoPiF1impl,std::complex<double> >,
       public leftSpinPTensor<1>
     {
       typedef std::complex<double> Data_t; 
 
-      virtual ~F1impl() {}
+      virtual ~RhoPiF1impl() {}
 
       virtual std::string ff_impl(void) const
       {
@@ -56,15 +56,15 @@ namespace radmat
           m_right = contract(p_i,applyMetric(p_i,g_dd(),0),0,0);
           norm = std::complex<double>( 2./( sqrt(m_left.value()) + sqrt(m_right.value()) ), 0.); 
 
-     //     std::cout << __func__ << "hl " << hel << " hr " << zzero << std::endl;
-     //
-     //     std::cout 
-     //      << __func__ << ": pleft " << p_f  
-     //      << __func__ << ": pright " << p_i 
-     //      << __func__ << ": pplus " << pplus 
-     //      << __func__ << ": minus " << pminus 
-     //      << __func__ << ": epsilon " << epsilon 
-     //      << std::endl;
+          //     std::cout << __func__ << "hl " << hel << " hr " << zzero << std::endl;
+          //
+          //     std::cout 
+          //      << __func__ << ": pleft " << p_f  
+          //      << __func__ << ": pright " << p_i 
+          //      << __func__ << ": pplus " << pplus 
+          //      << __func__ << ": minus " << pminus 
+          //      << __func__ << ": epsilon " << epsilon 
+          //      << std::endl;
 
           return norm * contract(
               contract(
@@ -75,52 +75,69 @@ namespace radmat
         }
     };
 
-      struct F1
-      : public canonicalFrameFormFactor<1,0,F1impl>
-      {
-        virtual ~F1() {}
-      };
+    struct RhoPiF1;
+    REGISTER_STRINGIFY_TYPE( RhoPiF1 ); 
 
-
-    template<int embed>
-      FFAbsBase_t::FFAbs_list genList(void)
-      {
-        FFAbsBase_t::FFAbs_list retCanonicalRhoPi;
-        FFAbsBase_t::BBType *blockPtr;
-        blockPtr = new radmat::CanonicalRhoPi::F1<embed>();
-        POW2_ASSERT(blockPtr);
-        retCanonicalRhoPi.push_back(FFAbsBase_t::BBHandle_t(blockPtr));
-        return retCanonicalRhoPi;
-      }
-
-
-    template<int embed>
-      struct CanonicalRhoPi : public FFAbsBase_t
+    struct RhoPiF1
+      : public canonicalFrameFormFactor<1,0,RhoPiF1impl>
     {
-      CanonicalRhoPi(void) 
-        : FFAbsBase_t(radmat::CanonicalRhoPi::genList<embed>())
-      {   }
-
-      CanonicalRhoPi& operator=(const CanonicalRhoPi &o)
-      {
-        if(this != &o)
-          FFAbsBase_t::operator=(o);
-        return *this; 
-      }
-
-      CanonicalRhoPi(const CanonicalRhoPi &o)
-        : FFAbsBase_t(o)
-      {  }
-
-      private:
-      CanonicalRhoPi(const FFAbsBase_t::FFAbs_list &);
-      CanonicalRhoPi(const FFAbsBase_t::FFAbs_list); 
-
+      virtual ~RhoPiF1() {}
+      virtual std::string id() const { return Stringify<RhoPiF1>(); }
     };
 
-  } // CanonicalRhoPi
+
+    template<int embedl, int embedr>
+      FFAbsBase_t::FFAbs_list RhoPiGenList(void)
+      {
+        FFAbsBase_t::FFAbs_list retRhoPi;
+        FFAbsBase_t::BBType *blockPtr;
+        blockPtr = new radmat::RhoPiF1();
+        POW2_ASSERT(blockPtr);
+        retRhoPi.push_back(FFAbsBase_t::BBHandle_t(blockPtr));
+        return retRhoPi;
+      }
+
+
+  template<int embedl, int embedr> struct RhoPi;
+  REGISTER_STRINGIFY_TYPE2( RhoPi<1,0> ); 
+
+
+
+  template<int embedl, int embedr>
+    struct RhoPi : public FFAbsBase_t
+  {
+    RhoPi(void) 
+      : FFAbsBase_t(radmat::RhoPiGenList<embedl,embedr>())
+    {   }
+
+    RhoPi& operator=(const RhoPi &o)
+    {
+      if(this != &o)
+        FFAbsBase_t::operator=(o);
+      return *this; 
+    }
+
+    RhoPi(const RhoPi &o)
+      : FFAbsBase_t(o)
+    {  }
+
+    virtual ~RhoPi() {}
+
+    virtual std::string id(void) { return Stringify< RhoPi<embedl,embedr> >(); }
+    virtual int left_spin(void) const { return embedl; }
+    virtual int right_spin(void) const { return embedr; }
+
+    private:
+    RhoPi(const FFAbsBase_t::FFAbs_list &);
+    RhoPi(const FFAbsBase_t::FFAbs_list); 
+
+  };
+
+
 
 } // radmat
+
+
 
 
 

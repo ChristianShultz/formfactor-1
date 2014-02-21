@@ -86,19 +86,16 @@ am_libradmat_a_OBJECTS =  \
 	radmat_overlap_key_val_db.$(OBJEXT) \
 	radmat_driver_aux.$(OBJEXT) radmat_driver.$(OBJEXT) \
 	radmat_driver_props.$(OBJEXT) \
-	radmat_single_q2_driver.$(OBJEXT) covarrying_vectors.$(OBJEXT) \
-	fake_3pt_function_aux.$(OBJEXT) fake_data_ini.$(OBJEXT) \
-	fake_overlaps.$(OBJEXT) fake_spectrum.$(OBJEXT) \
-	formfactor_factory.$(OBJEXT) \
+	radmat_single_q2_driver.$(OBJEXT) formfactor_factory.$(OBJEXT) \
 	lorentzff_canonical_frame_formfacs_rotation_manager.$(OBJEXT) \
 	lorentzff_canonical_rotations.$(OBJEXT) \
 	lorentzff_canonical_rotations_checker.$(OBJEXT) \
 	lorentzff_canonical_rotations_utils.$(OBJEXT) \
 	lorentzff_formfac_utils.$(OBJEXT) \
-	lorentzff_Wigner_D_matrix_factory.$(OBJEXT) \
-	axis_plotter.$(OBJEXT) fit_tins.$(OBJEXT) llsq_chisq.$(OBJEXT) \
+	lorentzff_Wigner_D_matrix_factory.$(OBJEXT) fit_tins.$(OBJEXT) \
+	llsq_chisq.$(OBJEXT) llsq_formfactor_data.$(OBJEXT) \
 	llsq_gen_system.$(OBJEXT) llsq_multi_driver.$(OBJEXT) \
-	llsq_q2_pack.$(OBJEXT) llsq_solvers.$(OBJEXT) \
+	llsq_solvers.$(OBJEXT) \
 	redstar_abstract_merge_npoint_factory.$(OBJEXT) \
 	redstar_abstract_xml_factory.$(OBJEXT) \
 	redstar_canonical_lattice_rotations.$(OBJEXT) \
@@ -238,165 +235,142 @@ AM_CXXFLAGS = -I@top_srcdir@/lib		\
 
 #utils
 nobase_include_HEADERS = \
-													 radmat/construct_data/construct_correlators_bad_data_repository.h		\
-													 radmat/construct_data/construct_correlators.h		\
-													 radmat/construct_data/construct_correlators_utils.h		\
-													 radmat/construct_data/construct_correlators_xml.h		\
-													 radmat/construct_data/construct_data.h		\
-													 radmat/construct_data/construct_q2_packs.h		\
-													 radmat/construct_data/lattice_multi_data_object.h		\
-													 radmat/construct_data/lattice_multi_data_tag.h		\
-													 radmat/construct_data/lattice_multi_data_tag_redstar_interface.h		\
-													 radmat/construct_data/load_fake_data.h		\
-													 radmat/construct_data/radmat_database_interface.h		\
-													 radmat/construct_data/radmat_overlap_key_val_db.h		\
-													 radmat/construct_data/three_point.h		\
-													 radmat/driver/driver.h		\
-													 radmat/driver/radmat_driver_aux.h		\
-													 radmat/driver/radmat_driver.h		\
-													 radmat/driver/radmat_driver_props.h		\
-													 radmat/driver/radmat_single_q2_driver.h		\
-													 radmat/fake_data/covarrying_vectors.h		\
-													 radmat/fake_data/fake_3pt_function_aux.h		\
-													 radmat/fake_data/fake_3pt_function.h		\
-													 radmat/fake_data/fake_data.h		\
-													 radmat/fake_data/fake_data_ini.h		\
-													 radmat/fake_data/fake.data.ini.xml		\
-													 radmat/fake_data/fake_overlaps.h		\
-													 radmat/fake_data/fake_spectrum.h		\
-													 radmat/fake_data/gen_fake_dataset.h		\
-													 radmat/fake_data/minimal_fake_data.h		\
-													 radmat/fake_data/normalize_fake_3pt_data.h		\
-													 radmat/ff/ff.h		\
-													 radmat/ff/formfactor_abs_base_cfg.h		\
-													 radmat/ff/formfactor_factory.h		\
-													 radmat/ff/formfactor_kinematic_factors.h		\
-													 radmat/ff/formfactor_utils.h		\
-													 radmat/ff_interface/ff_gen_llsq_row.h		\
-													 radmat/ff/lorentzff_canonical_frame_formfacs_rotation_manager.h		\
-													 radmat/ff/lorentzff_canonical_frame_formfactor.h		\
-													 radmat/ff/lorentzff_canonical_JJlist_ff.h		\
-													 radmat/ff/lorentzff_canonical_PiPi.h		\
-													 radmat/ff/lorentzff_canonical_PiPiStar.h		\
-													 radmat/ff/lorentzff_canonical_PiRho.h		\
-													 radmat/ff/lorentzff_canonical_RhoPi.h		\
-													 radmat/ff/lorentzff_canonical_RhoRho.h		\
-													 radmat/ff/lorentzff_canonical_rotation_groups.h		\
-													 radmat/ff/lorentzff_canonical_rotations_checker.h		\
-													 radmat/ff/lorentzff_canonical_rotations.h		\
-													 radmat/ff/lorentzff_canonical_rotations_utils.h		\
-													 radmat/ff/lorentzff_cubic_reps.h		\
-													 radmat/ff/lorentzff_formfac_utils.h		\
-													 radmat/ff/lorentzff_polarization_embedding.h		\
-													 radmat/ff/lorentzff_polarization_embedding_old.h		\
-													 radmat/ff/lorentzff_polarization_tensors.h		\
-													 radmat/ff/lorentzff_RhoPi.h		\
-													 radmat/ff/lorentzff_Wigner_D_matrix_embedding.h		\
-													 radmat/ff/lorentzff_Wigner_D_matrix_factory.h		\
-													 radmat/fitting/axis_plotter.h		\
-													 radmat/fitting/fit_tins.h		\
-													 radmat/llsq/llsq_chisq.h		\
-													 radmat/llsq/llsq_driver.h		\
-													 radmat/llsq/llsq_gen_system.h		\
-													 radmat/llsq/llsq.h		\
-													 radmat/llsq/llsq_multi_data.h		\
-													 radmat/llsq/llsq_multi_data_serialize.h		\
-													 radmat/llsq/llsq_multi_driver.h		\
-													 radmat/llsq/llsq_q2_pack.h		\
-													 radmat/llsq/llsq_solution.h		\
-													 radmat/llsq/llsq_solver.h		\
-													 radmat/llsq/llsq_solvers.h		\
-													 radmat/llsq/llsq_zero_filter.h		\
-													 radmat/redstar_interface/abstract_named_object.h		\
-													 radmat/redstar_interface/redstar_abstract_block_base.h		\
-													 radmat/redstar_interface/redstar_abstract_merge_npoint_factory.h		\
-													 radmat/redstar_interface/redstar_abstract_merge_npoint.h		\
-													 radmat/redstar_interface/redstar_abstract_xml_factory.h		\
-													 radmat/redstar_interface/redstar_canonical_lattice_rotations.h		\
-													 radmat/redstar_interface/redstar_canonical_rotations.h		\
-													 radmat/redstar_interface/redstar_cartesian_interface.h		\
-													 radmat/redstar_interface/redstar_improved_vector_current.h		\
-													 radmat/redstar_interface/redstar_interface.h		\
-													 radmat/redstar_interface/redstar_invert_subduction.h		\
-													 radmat/redstar_interface/redstar_merge_function_xml.h		\
-													 radmat/redstar_interface/redstar_merge_vector_current_npoint.h		\
-													 radmat/redstar_interface/redstar_npoint_function_xml.h		\
-													 radmat/redstar_interface/redstar_photon_polarization_tensor.h		\
-													 radmat/redstar_interface/redstar_single_particle_meson_block.h		\
-													 radmat/redstar_interface/redstar_unimproved_vector_current.h		\
-													 radmat/register_all/register_all.h		\
-													 radmat/utils/aux.h		\
-													 radmat/utils/debug_handler.h		\
-													 radmat/utils/handle.h		\
-													 radmat/utils/harmonic.h		\
-													 radmat/utils/levi_civita.h		\
-													 radmat/utils/map_obj.h		\
-													 radmat/utils/mink_qsq.h		\
-													 radmat/utils/obj_expr_t.h		\
-													 radmat/utils/perThreadStorage.h		\
-													 radmat/utils/polarization_tensors.h		\
-													 radmat/utils/pow2assert.h		\
-													 radmat/utils/splash.h		\
-													 radmat/utils/stringify.h		\
-													 radmat/utils/tensor.h		\
-													 radmat/utils/type_computations.h		\
-													 radmat/utils/utils.h		
+													 radmat/construct_data/construct_correlators_bad_data_repository.h			\
+													 radmat/construct_data/construct_correlators.h			\
+													 radmat/construct_data/construct_correlators_utils.h			\
+													 radmat/construct_data/construct_correlators_xml.h			\
+													 radmat/construct_data/construct_data.h			\
+													 radmat/construct_data/lattice_multi_data_object.h			\
+													 radmat/construct_data/lattice_multi_data_tag.h			\
+													 radmat/construct_data/lattice_multi_data_tag_redstar_interface.h			\
+													 radmat/construct_data/radmat_database_interface.h			\
+													 radmat/construct_data/radmat_overlap_key_val_db.h			\
+													 radmat/driver/driver.h			\
+													 radmat/driver/radmat_driver_aux.h			\
+													 radmat/driver/radmat_driver.h			\
+													 radmat/driver/radmat_driver_props.h			\
+													 radmat/driver/radmat_single_q2_driver.h			\
+													 radmat/ff/ff.h			\
+													 radmat/ff/formfactor_abs_base_cfg.h			\
+													 radmat/ff/formfactor_factory.h			\
+													 radmat/ff/formfactor_kinematic_factors.h			\
+													 radmat/ff/formfactor_utils.h			\
+													 radmat/ff/lorentzff_canonical_frame_formfacs_rotation_manager.h			\
+													 radmat/ff/lorentzff_canonical_frame_formfactor.h			\
+													 radmat/ff/lorentzff_canonical_JJlist_ff.h			\
+													 radmat/ff/lorentzff_canonical_PiPi.h			\
+													 radmat/ff/lorentzff_canonical_PiPiStar.h			\
+													 radmat/ff/lorentzff_canonical_PiRho.h			\
+													 radmat/ff/lorentzff_canonical_RhoPi.h			\
+													 radmat/ff/lorentzff_canonical_RhoRho.h			\
+													 radmat/ff/lorentzff_canonical_rotation_groups.h			\
+													 radmat/ff/lorentzff_canonical_rotations_checker.h			\
+													 radmat/ff/lorentzff_canonical_rotations.h			\
+													 radmat/ff/lorentzff_canonical_rotations_utils.h			\
+													 radmat/ff/lorentzff_cubic_reps.h			\
+													 radmat/ff/lorentzff_formfac_utils.h			\
+													 radmat/ff/lorentzff_polarization_embedding.h			\
+													 radmat/ff/lorentzff_polarization_embedding_old.h			\
+													 radmat/ff/lorentzff_polarization_tensors.h			\
+													 radmat/ff/lorentzff_RhoPi.h			\
+													 radmat/ff/lorentzff_Wigner_D_matrix_embedding.h			\
+													 radmat/ff/lorentzff_Wigner_D_matrix_factory.h			\
+													 radmat/fitting/fit_tins.h			\
+													 radmat/llsq/llsq_chisq.h			\
+													 radmat/llsq/llsq_formfactor_data.h			\
+													 radmat/llsq/llsq_gen_system.h			\
+													 radmat/llsq/llsq.h			\
+													 radmat/llsq/llsq_multi_data.h			\
+													 radmat/llsq/llsq_multi_data_serialize.h			\
+													 radmat/llsq/llsq_multi_driver.h			\
+													 radmat/llsq/llsq_solution.h			\
+													 radmat/llsq/llsq_solver.h			\
+													 radmat/llsq/llsq_solvers.h			\
+													 radmat/llsq/llsq_zero_filter.h			\
+													 radmat/redstar_interface/abstract_named_object.h			\
+													 radmat/redstar_interface/redstar_abstract_block_base.h			\
+													 radmat/redstar_interface/redstar_abstract_merge_npoint_factory.h			\
+													 radmat/redstar_interface/redstar_abstract_merge_npoint.h			\
+													 radmat/redstar_interface/redstar_abstract_xml_factory.h			\
+													 radmat/redstar_interface/redstar_canonical_lattice_rotations.h			\
+													 radmat/redstar_interface/redstar_canonical_rotations.h			\
+													 radmat/redstar_interface/redstar_cartesian_interface.h			\
+													 radmat/redstar_interface/redstar_improved_vector_current.h			\
+													 radmat/redstar_interface/redstar_interface.h			\
+													 radmat/redstar_interface/redstar_invert_subduction.h			\
+													 radmat/redstar_interface/redstar_merge_function_xml.h			\
+													 radmat/redstar_interface/redstar_merge_vector_current_npoint.h			\
+													 radmat/redstar_interface/redstar_npoint_function_xml.h			\
+													 radmat/redstar_interface/redstar_photon_polarization_tensor.h			\
+													 radmat/redstar_interface/redstar_single_particle_meson_block.h			\
+													 radmat/redstar_interface/redstar_unimproved_vector_current.h			\
+													 radmat/register_all/register_all.h			\
+													 radmat/utils/aux.h			\
+													 radmat/utils/debug_handler.h			\
+													 radmat/utils/handle.h			\
+													 radmat/utils/harmonic.h			\
+													 radmat/utils/levi_civita.h			\
+													 radmat/utils/map_obj.h			\
+													 radmat/utils/mink_qsq.h			\
+													 radmat/utils/obj_expr_t.h			\
+													 radmat/utils/perThreadStorage.h			\
+													 radmat/utils/polarization_tensors.h			\
+													 radmat/utils/pow2assert.h			\
+													 radmat/utils/splash.h			\
+													 radmat/utils/stringify.h			\
+													 radmat/utils/tensor.h			\
+													 radmat/utils/type_computations.h			\
+													 radmat/utils/utils.h			
 
 
 # the lib
 lib_LIBRARIES = libradmat.a
 libradmat_a_SOURCES = \
-											radmat/construct_data/construct_correlators_bad_data_repository.cc		\
-											radmat/construct_data/construct_correlators.cc		\
-											radmat/construct_data/construct_correlators_utils.cc		\
-											radmat/construct_data/construct_correlators_xml.cc		\
-											radmat/construct_data/lattice_multi_data_tag.cc		\
-											radmat/construct_data/lattice_multi_data_tag_redstar_interface.cc		\
-											radmat/construct_data/radmat_database_interface.cc		\
-											radmat/construct_data/radmat_overlap_key_val_db.cc		\
-											radmat/driver/radmat_driver_aux.cc		\
-											radmat/driver/radmat_driver.cc		\
-											radmat/driver/radmat_driver_props.cc		\
-											radmat/driver/radmat_single_q2_driver.cc		\
-											radmat/fake_data/covarrying_vectors.cc		\
-											radmat/fake_data/fake_3pt_function_aux.cc		\
-											radmat/fake_data/fake_data_ini.cc		\
-											radmat/fake_data/fake_overlaps.cc		\
-											radmat/fake_data/fake_spectrum.cc		\
-											radmat/ff/formfactor_factory.cc		\
-											radmat/ff/lorentzff_canonical_frame_formfacs_rotation_manager.cc		\
-											radmat/ff/lorentzff_canonical_rotations.cc		\
-											radmat/ff/lorentzff_canonical_rotations_checker.cc		\
-											radmat/ff/lorentzff_canonical_rotations_utils.cc		\
-											radmat/ff/lorentzff_formfac_utils.cc		\
-											radmat/ff/lorentzff_Wigner_D_matrix_factory.cc		\
-											radmat/fitting/axis_plotter.cc		\
-											radmat/fitting/fit_tins.cc		\
-											radmat/llsq/llsq_chisq.cc		\
-											radmat/llsq/llsq_gen_system.cc		\
-											radmat/llsq/llsq_multi_driver.cc		\
-											radmat/llsq/llsq_q2_pack.cc		\
-											radmat/llsq/llsq_solvers.cc		\
-											radmat/redstar_interface/redstar_abstract_merge_npoint_factory.cc		\
-											radmat/redstar_interface/redstar_abstract_xml_factory.cc		\
-											radmat/redstar_interface/redstar_canonical_lattice_rotations.cc		\
-											radmat/redstar_interface/redstar_canonical_rotations.cc		\
-											radmat/redstar_interface/redstar_cartesian_interface.cc		\
-											radmat/redstar_interface/redstar_improved_vector_current.cc		\
-											radmat/redstar_interface/redstar_invert_subduction.cc		\
-											radmat/redstar_interface/redstar_merge_function_xml.cc		\
-											radmat/redstar_interface/redstar_merge_vector_current_npoint.cc		\
-											radmat/redstar_interface/redstar_npoint_function_xml.cc		\
-											radmat/redstar_interface/redstar_single_particle_meson_block.cc		\
-											radmat/redstar_interface/redstar_unimproved_vector_current.cc		\
-											radmat/register_all/register_all.cc		\
-											radmat/utils/aux.cc		\
-											radmat/utils/harmonic.cc		\
-											radmat/utils/mink_qsq.cc		\
-											radmat/utils/polarization_tensors.cc		\
-											radmat/utils/pow2assert.cc		\
-											radmat/utils/splash.cc		\
-											radmat/utils/tensor.cc		
+											radmat/construct_data/construct_correlators_bad_data_repository.cc			\
+											radmat/construct_data/construct_correlators.cc			\
+											radmat/construct_data/construct_correlators_utils.cc			\
+											radmat/construct_data/construct_correlators_xml.cc			\
+											radmat/construct_data/lattice_multi_data_tag.cc			\
+											radmat/construct_data/lattice_multi_data_tag_redstar_interface.cc			\
+											radmat/construct_data/radmat_database_interface.cc			\
+											radmat/construct_data/radmat_overlap_key_val_db.cc			\
+											radmat/driver/radmat_driver_aux.cc			\
+											radmat/driver/radmat_driver.cc			\
+											radmat/driver/radmat_driver_props.cc			\
+											radmat/driver/radmat_single_q2_driver.cc			\
+											radmat/ff/formfactor_factory.cc			\
+											radmat/ff/lorentzff_canonical_frame_formfacs_rotation_manager.cc			\
+											radmat/ff/lorentzff_canonical_rotations.cc			\
+											radmat/ff/lorentzff_canonical_rotations_checker.cc			\
+											radmat/ff/lorentzff_canonical_rotations_utils.cc			\
+											radmat/ff/lorentzff_formfac_utils.cc			\
+											radmat/ff/lorentzff_Wigner_D_matrix_factory.cc			\
+											radmat/fitting/fit_tins.cc			\
+											radmat/llsq/llsq_chisq.cc			\
+											radmat/llsq/llsq_formfactor_data.cc			\
+											radmat/llsq/llsq_gen_system.cc			\
+											radmat/llsq/llsq_multi_driver.cc			\
+											radmat/llsq/llsq_solvers.cc			\
+											radmat/redstar_interface/redstar_abstract_merge_npoint_factory.cc			\
+											radmat/redstar_interface/redstar_abstract_xml_factory.cc			\
+											radmat/redstar_interface/redstar_canonical_lattice_rotations.cc			\
+											radmat/redstar_interface/redstar_canonical_rotations.cc			\
+											radmat/redstar_interface/redstar_cartesian_interface.cc			\
+											radmat/redstar_interface/redstar_improved_vector_current.cc			\
+											radmat/redstar_interface/redstar_invert_subduction.cc			\
+											radmat/redstar_interface/redstar_merge_function_xml.cc			\
+											radmat/redstar_interface/redstar_merge_vector_current_npoint.cc			\
+											radmat/redstar_interface/redstar_npoint_function_xml.cc			\
+											radmat/redstar_interface/redstar_single_particle_meson_block.cc			\
+											radmat/redstar_interface/redstar_unimproved_vector_current.cc			\
+											radmat/register_all/register_all.cc			\
+											radmat/utils/aux.cc			\
+											radmat/utils/harmonic.cc			\
+											radmat/utils/mink_qsq.cc			\
+											radmat/utils/polarization_tensors.cc			\
+											radmat/utils/pow2assert.cc			\
+											radmat/utils/splash.cc			\
+											radmat/utils/tensor.cc			
 
 all: all-am
 
@@ -476,25 +450,19 @@ distclean-compile:
 	-rm -f *.tab.c
 
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/aux.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/axis_plotter.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/construct_correlators.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/construct_correlators_bad_data_repository.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/construct_correlators_utils.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/construct_correlators_xml.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/covarrying_vectors.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/fake_3pt_function_aux.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/fake_data_ini.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/fake_overlaps.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/fake_spectrum.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/fit_tins.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/formfactor_factory.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/harmonic.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/lattice_multi_data_tag.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/lattice_multi_data_tag_redstar_interface.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/llsq_chisq.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/llsq_formfactor_data.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/llsq_gen_system.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/llsq_multi_driver.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/llsq_q2_pack.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/llsq_solvers.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/lorentzff_Wigner_D_matrix_factory.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/lorentzff_canonical_frame_formfacs_rotation_manager.Po@am__quote@
@@ -709,76 +677,6 @@ radmat_single_q2_driver.obj: radmat/driver/radmat_single_q2_driver.cc
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCXX_FALSE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o radmat_single_q2_driver.obj `if test -f 'radmat/driver/radmat_single_q2_driver.cc'; then $(CYGPATH_W) 'radmat/driver/radmat_single_q2_driver.cc'; else $(CYGPATH_W) '$(srcdir)/radmat/driver/radmat_single_q2_driver.cc'; fi`
 
-covarrying_vectors.o: radmat/fake_data/covarrying_vectors.cc
-@am__fastdepCXX_TRUE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT covarrying_vectors.o -MD -MP -MF $(DEPDIR)/covarrying_vectors.Tpo -c -o covarrying_vectors.o `test -f 'radmat/fake_data/covarrying_vectors.cc' || echo '$(srcdir)/'`radmat/fake_data/covarrying_vectors.cc
-@am__fastdepCXX_TRUE@	$(am__mv) $(DEPDIR)/covarrying_vectors.Tpo $(DEPDIR)/covarrying_vectors.Po
-@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='radmat/fake_data/covarrying_vectors.cc' object='covarrying_vectors.o' libtool=no @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCXX_FALSE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o covarrying_vectors.o `test -f 'radmat/fake_data/covarrying_vectors.cc' || echo '$(srcdir)/'`radmat/fake_data/covarrying_vectors.cc
-
-covarrying_vectors.obj: radmat/fake_data/covarrying_vectors.cc
-@am__fastdepCXX_TRUE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT covarrying_vectors.obj -MD -MP -MF $(DEPDIR)/covarrying_vectors.Tpo -c -o covarrying_vectors.obj `if test -f 'radmat/fake_data/covarrying_vectors.cc'; then $(CYGPATH_W) 'radmat/fake_data/covarrying_vectors.cc'; else $(CYGPATH_W) '$(srcdir)/radmat/fake_data/covarrying_vectors.cc'; fi`
-@am__fastdepCXX_TRUE@	$(am__mv) $(DEPDIR)/covarrying_vectors.Tpo $(DEPDIR)/covarrying_vectors.Po
-@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='radmat/fake_data/covarrying_vectors.cc' object='covarrying_vectors.obj' libtool=no @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCXX_FALSE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o covarrying_vectors.obj `if test -f 'radmat/fake_data/covarrying_vectors.cc'; then $(CYGPATH_W) 'radmat/fake_data/covarrying_vectors.cc'; else $(CYGPATH_W) '$(srcdir)/radmat/fake_data/covarrying_vectors.cc'; fi`
-
-fake_3pt_function_aux.o: radmat/fake_data/fake_3pt_function_aux.cc
-@am__fastdepCXX_TRUE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT fake_3pt_function_aux.o -MD -MP -MF $(DEPDIR)/fake_3pt_function_aux.Tpo -c -o fake_3pt_function_aux.o `test -f 'radmat/fake_data/fake_3pt_function_aux.cc' || echo '$(srcdir)/'`radmat/fake_data/fake_3pt_function_aux.cc
-@am__fastdepCXX_TRUE@	$(am__mv) $(DEPDIR)/fake_3pt_function_aux.Tpo $(DEPDIR)/fake_3pt_function_aux.Po
-@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='radmat/fake_data/fake_3pt_function_aux.cc' object='fake_3pt_function_aux.o' libtool=no @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCXX_FALSE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o fake_3pt_function_aux.o `test -f 'radmat/fake_data/fake_3pt_function_aux.cc' || echo '$(srcdir)/'`radmat/fake_data/fake_3pt_function_aux.cc
-
-fake_3pt_function_aux.obj: radmat/fake_data/fake_3pt_function_aux.cc
-@am__fastdepCXX_TRUE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT fake_3pt_function_aux.obj -MD -MP -MF $(DEPDIR)/fake_3pt_function_aux.Tpo -c -o fake_3pt_function_aux.obj `if test -f 'radmat/fake_data/fake_3pt_function_aux.cc'; then $(CYGPATH_W) 'radmat/fake_data/fake_3pt_function_aux.cc'; else $(CYGPATH_W) '$(srcdir)/radmat/fake_data/fake_3pt_function_aux.cc'; fi`
-@am__fastdepCXX_TRUE@	$(am__mv) $(DEPDIR)/fake_3pt_function_aux.Tpo $(DEPDIR)/fake_3pt_function_aux.Po
-@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='radmat/fake_data/fake_3pt_function_aux.cc' object='fake_3pt_function_aux.obj' libtool=no @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCXX_FALSE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o fake_3pt_function_aux.obj `if test -f 'radmat/fake_data/fake_3pt_function_aux.cc'; then $(CYGPATH_W) 'radmat/fake_data/fake_3pt_function_aux.cc'; else $(CYGPATH_W) '$(srcdir)/radmat/fake_data/fake_3pt_function_aux.cc'; fi`
-
-fake_data_ini.o: radmat/fake_data/fake_data_ini.cc
-@am__fastdepCXX_TRUE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT fake_data_ini.o -MD -MP -MF $(DEPDIR)/fake_data_ini.Tpo -c -o fake_data_ini.o `test -f 'radmat/fake_data/fake_data_ini.cc' || echo '$(srcdir)/'`radmat/fake_data/fake_data_ini.cc
-@am__fastdepCXX_TRUE@	$(am__mv) $(DEPDIR)/fake_data_ini.Tpo $(DEPDIR)/fake_data_ini.Po
-@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='radmat/fake_data/fake_data_ini.cc' object='fake_data_ini.o' libtool=no @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCXX_FALSE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o fake_data_ini.o `test -f 'radmat/fake_data/fake_data_ini.cc' || echo '$(srcdir)/'`radmat/fake_data/fake_data_ini.cc
-
-fake_data_ini.obj: radmat/fake_data/fake_data_ini.cc
-@am__fastdepCXX_TRUE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT fake_data_ini.obj -MD -MP -MF $(DEPDIR)/fake_data_ini.Tpo -c -o fake_data_ini.obj `if test -f 'radmat/fake_data/fake_data_ini.cc'; then $(CYGPATH_W) 'radmat/fake_data/fake_data_ini.cc'; else $(CYGPATH_W) '$(srcdir)/radmat/fake_data/fake_data_ini.cc'; fi`
-@am__fastdepCXX_TRUE@	$(am__mv) $(DEPDIR)/fake_data_ini.Tpo $(DEPDIR)/fake_data_ini.Po
-@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='radmat/fake_data/fake_data_ini.cc' object='fake_data_ini.obj' libtool=no @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCXX_FALSE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o fake_data_ini.obj `if test -f 'radmat/fake_data/fake_data_ini.cc'; then $(CYGPATH_W) 'radmat/fake_data/fake_data_ini.cc'; else $(CYGPATH_W) '$(srcdir)/radmat/fake_data/fake_data_ini.cc'; fi`
-
-fake_overlaps.o: radmat/fake_data/fake_overlaps.cc
-@am__fastdepCXX_TRUE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT fake_overlaps.o -MD -MP -MF $(DEPDIR)/fake_overlaps.Tpo -c -o fake_overlaps.o `test -f 'radmat/fake_data/fake_overlaps.cc' || echo '$(srcdir)/'`radmat/fake_data/fake_overlaps.cc
-@am__fastdepCXX_TRUE@	$(am__mv) $(DEPDIR)/fake_overlaps.Tpo $(DEPDIR)/fake_overlaps.Po
-@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='radmat/fake_data/fake_overlaps.cc' object='fake_overlaps.o' libtool=no @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCXX_FALSE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o fake_overlaps.o `test -f 'radmat/fake_data/fake_overlaps.cc' || echo '$(srcdir)/'`radmat/fake_data/fake_overlaps.cc
-
-fake_overlaps.obj: radmat/fake_data/fake_overlaps.cc
-@am__fastdepCXX_TRUE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT fake_overlaps.obj -MD -MP -MF $(DEPDIR)/fake_overlaps.Tpo -c -o fake_overlaps.obj `if test -f 'radmat/fake_data/fake_overlaps.cc'; then $(CYGPATH_W) 'radmat/fake_data/fake_overlaps.cc'; else $(CYGPATH_W) '$(srcdir)/radmat/fake_data/fake_overlaps.cc'; fi`
-@am__fastdepCXX_TRUE@	$(am__mv) $(DEPDIR)/fake_overlaps.Tpo $(DEPDIR)/fake_overlaps.Po
-@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='radmat/fake_data/fake_overlaps.cc' object='fake_overlaps.obj' libtool=no @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCXX_FALSE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o fake_overlaps.obj `if test -f 'radmat/fake_data/fake_overlaps.cc'; then $(CYGPATH_W) 'radmat/fake_data/fake_overlaps.cc'; else $(CYGPATH_W) '$(srcdir)/radmat/fake_data/fake_overlaps.cc'; fi`
-
-fake_spectrum.o: radmat/fake_data/fake_spectrum.cc
-@am__fastdepCXX_TRUE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT fake_spectrum.o -MD -MP -MF $(DEPDIR)/fake_spectrum.Tpo -c -o fake_spectrum.o `test -f 'radmat/fake_data/fake_spectrum.cc' || echo '$(srcdir)/'`radmat/fake_data/fake_spectrum.cc
-@am__fastdepCXX_TRUE@	$(am__mv) $(DEPDIR)/fake_spectrum.Tpo $(DEPDIR)/fake_spectrum.Po
-@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='radmat/fake_data/fake_spectrum.cc' object='fake_spectrum.o' libtool=no @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCXX_FALSE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o fake_spectrum.o `test -f 'radmat/fake_data/fake_spectrum.cc' || echo '$(srcdir)/'`radmat/fake_data/fake_spectrum.cc
-
-fake_spectrum.obj: radmat/fake_data/fake_spectrum.cc
-@am__fastdepCXX_TRUE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT fake_spectrum.obj -MD -MP -MF $(DEPDIR)/fake_spectrum.Tpo -c -o fake_spectrum.obj `if test -f 'radmat/fake_data/fake_spectrum.cc'; then $(CYGPATH_W) 'radmat/fake_data/fake_spectrum.cc'; else $(CYGPATH_W) '$(srcdir)/radmat/fake_data/fake_spectrum.cc'; fi`
-@am__fastdepCXX_TRUE@	$(am__mv) $(DEPDIR)/fake_spectrum.Tpo $(DEPDIR)/fake_spectrum.Po
-@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='radmat/fake_data/fake_spectrum.cc' object='fake_spectrum.obj' libtool=no @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCXX_FALSE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o fake_spectrum.obj `if test -f 'radmat/fake_data/fake_spectrum.cc'; then $(CYGPATH_W) 'radmat/fake_data/fake_spectrum.cc'; else $(CYGPATH_W) '$(srcdir)/radmat/fake_data/fake_spectrum.cc'; fi`
-
 formfactor_factory.o: radmat/ff/formfactor_factory.cc
 @am__fastdepCXX_TRUE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT formfactor_factory.o -MD -MP -MF $(DEPDIR)/formfactor_factory.Tpo -c -o formfactor_factory.o `test -f 'radmat/ff/formfactor_factory.cc' || echo '$(srcdir)/'`radmat/ff/formfactor_factory.cc
 @am__fastdepCXX_TRUE@	$(am__mv) $(DEPDIR)/formfactor_factory.Tpo $(DEPDIR)/formfactor_factory.Po
@@ -877,20 +775,6 @@ lorentzff_Wigner_D_matrix_factory.obj: radmat/ff/lorentzff_Wigner_D_matrix_facto
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCXX_FALSE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o lorentzff_Wigner_D_matrix_factory.obj `if test -f 'radmat/ff/lorentzff_Wigner_D_matrix_factory.cc'; then $(CYGPATH_W) 'radmat/ff/lorentzff_Wigner_D_matrix_factory.cc'; else $(CYGPATH_W) '$(srcdir)/radmat/ff/lorentzff_Wigner_D_matrix_factory.cc'; fi`
 
-axis_plotter.o: radmat/fitting/axis_plotter.cc
-@am__fastdepCXX_TRUE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT axis_plotter.o -MD -MP -MF $(DEPDIR)/axis_plotter.Tpo -c -o axis_plotter.o `test -f 'radmat/fitting/axis_plotter.cc' || echo '$(srcdir)/'`radmat/fitting/axis_plotter.cc
-@am__fastdepCXX_TRUE@	$(am__mv) $(DEPDIR)/axis_plotter.Tpo $(DEPDIR)/axis_plotter.Po
-@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='radmat/fitting/axis_plotter.cc' object='axis_plotter.o' libtool=no @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCXX_FALSE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o axis_plotter.o `test -f 'radmat/fitting/axis_plotter.cc' || echo '$(srcdir)/'`radmat/fitting/axis_plotter.cc
-
-axis_plotter.obj: radmat/fitting/axis_plotter.cc
-@am__fastdepCXX_TRUE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT axis_plotter.obj -MD -MP -MF $(DEPDIR)/axis_plotter.Tpo -c -o axis_plotter.obj `if test -f 'radmat/fitting/axis_plotter.cc'; then $(CYGPATH_W) 'radmat/fitting/axis_plotter.cc'; else $(CYGPATH_W) '$(srcdir)/radmat/fitting/axis_plotter.cc'; fi`
-@am__fastdepCXX_TRUE@	$(am__mv) $(DEPDIR)/axis_plotter.Tpo $(DEPDIR)/axis_plotter.Po
-@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='radmat/fitting/axis_plotter.cc' object='axis_plotter.obj' libtool=no @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCXX_FALSE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o axis_plotter.obj `if test -f 'radmat/fitting/axis_plotter.cc'; then $(CYGPATH_W) 'radmat/fitting/axis_plotter.cc'; else $(CYGPATH_W) '$(srcdir)/radmat/fitting/axis_plotter.cc'; fi`
-
 fit_tins.o: radmat/fitting/fit_tins.cc
 @am__fastdepCXX_TRUE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT fit_tins.o -MD -MP -MF $(DEPDIR)/fit_tins.Tpo -c -o fit_tins.o `test -f 'radmat/fitting/fit_tins.cc' || echo '$(srcdir)/'`radmat/fitting/fit_tins.cc
 @am__fastdepCXX_TRUE@	$(am__mv) $(DEPDIR)/fit_tins.Tpo $(DEPDIR)/fit_tins.Po
@@ -919,6 +803,20 @@ llsq_chisq.obj: radmat/llsq/llsq_chisq.cc
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCXX_FALSE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o llsq_chisq.obj `if test -f 'radmat/llsq/llsq_chisq.cc'; then $(CYGPATH_W) 'radmat/llsq/llsq_chisq.cc'; else $(CYGPATH_W) '$(srcdir)/radmat/llsq/llsq_chisq.cc'; fi`
 
+llsq_formfactor_data.o: radmat/llsq/llsq_formfactor_data.cc
+@am__fastdepCXX_TRUE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT llsq_formfactor_data.o -MD -MP -MF $(DEPDIR)/llsq_formfactor_data.Tpo -c -o llsq_formfactor_data.o `test -f 'radmat/llsq/llsq_formfactor_data.cc' || echo '$(srcdir)/'`radmat/llsq/llsq_formfactor_data.cc
+@am__fastdepCXX_TRUE@	$(am__mv) $(DEPDIR)/llsq_formfactor_data.Tpo $(DEPDIR)/llsq_formfactor_data.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='radmat/llsq/llsq_formfactor_data.cc' object='llsq_formfactor_data.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o llsq_formfactor_data.o `test -f 'radmat/llsq/llsq_formfactor_data.cc' || echo '$(srcdir)/'`radmat/llsq/llsq_formfactor_data.cc
+
+llsq_formfactor_data.obj: radmat/llsq/llsq_formfactor_data.cc
+@am__fastdepCXX_TRUE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT llsq_formfactor_data.obj -MD -MP -MF $(DEPDIR)/llsq_formfactor_data.Tpo -c -o llsq_formfactor_data.obj `if test -f 'radmat/llsq/llsq_formfactor_data.cc'; then $(CYGPATH_W) 'radmat/llsq/llsq_formfactor_data.cc'; else $(CYGPATH_W) '$(srcdir)/radmat/llsq/llsq_formfactor_data.cc'; fi`
+@am__fastdepCXX_TRUE@	$(am__mv) $(DEPDIR)/llsq_formfactor_data.Tpo $(DEPDIR)/llsq_formfactor_data.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='radmat/llsq/llsq_formfactor_data.cc' object='llsq_formfactor_data.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o llsq_formfactor_data.obj `if test -f 'radmat/llsq/llsq_formfactor_data.cc'; then $(CYGPATH_W) 'radmat/llsq/llsq_formfactor_data.cc'; else $(CYGPATH_W) '$(srcdir)/radmat/llsq/llsq_formfactor_data.cc'; fi`
+
 llsq_gen_system.o: radmat/llsq/llsq_gen_system.cc
 @am__fastdepCXX_TRUE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT llsq_gen_system.o -MD -MP -MF $(DEPDIR)/llsq_gen_system.Tpo -c -o llsq_gen_system.o `test -f 'radmat/llsq/llsq_gen_system.cc' || echo '$(srcdir)/'`radmat/llsq/llsq_gen_system.cc
 @am__fastdepCXX_TRUE@	$(am__mv) $(DEPDIR)/llsq_gen_system.Tpo $(DEPDIR)/llsq_gen_system.Po
@@ -946,20 +844,6 @@ llsq_multi_driver.obj: radmat/llsq/llsq_multi_driver.cc
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='radmat/llsq/llsq_multi_driver.cc' object='llsq_multi_driver.obj' libtool=no @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCXX_FALSE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o llsq_multi_driver.obj `if test -f 'radmat/llsq/llsq_multi_driver.cc'; then $(CYGPATH_W) 'radmat/llsq/llsq_multi_driver.cc'; else $(CYGPATH_W) '$(srcdir)/radmat/llsq/llsq_multi_driver.cc'; fi`
-
-llsq_q2_pack.o: radmat/llsq/llsq_q2_pack.cc
-@am__fastdepCXX_TRUE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT llsq_q2_pack.o -MD -MP -MF $(DEPDIR)/llsq_q2_pack.Tpo -c -o llsq_q2_pack.o `test -f 'radmat/llsq/llsq_q2_pack.cc' || echo '$(srcdir)/'`radmat/llsq/llsq_q2_pack.cc
-@am__fastdepCXX_TRUE@	$(am__mv) $(DEPDIR)/llsq_q2_pack.Tpo $(DEPDIR)/llsq_q2_pack.Po
-@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='radmat/llsq/llsq_q2_pack.cc' object='llsq_q2_pack.o' libtool=no @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCXX_FALSE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o llsq_q2_pack.o `test -f 'radmat/llsq/llsq_q2_pack.cc' || echo '$(srcdir)/'`radmat/llsq/llsq_q2_pack.cc
-
-llsq_q2_pack.obj: radmat/llsq/llsq_q2_pack.cc
-@am__fastdepCXX_TRUE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT llsq_q2_pack.obj -MD -MP -MF $(DEPDIR)/llsq_q2_pack.Tpo -c -o llsq_q2_pack.obj `if test -f 'radmat/llsq/llsq_q2_pack.cc'; then $(CYGPATH_W) 'radmat/llsq/llsq_q2_pack.cc'; else $(CYGPATH_W) '$(srcdir)/radmat/llsq/llsq_q2_pack.cc'; fi`
-@am__fastdepCXX_TRUE@	$(am__mv) $(DEPDIR)/llsq_q2_pack.Tpo $(DEPDIR)/llsq_q2_pack.Po
-@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='radmat/llsq/llsq_q2_pack.cc' object='llsq_q2_pack.obj' libtool=no @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCXX_FALSE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o llsq_q2_pack.obj `if test -f 'radmat/llsq/llsq_q2_pack.cc'; then $(CYGPATH_W) 'radmat/llsq/llsq_q2_pack.cc'; else $(CYGPATH_W) '$(srcdir)/radmat/llsq/llsq_q2_pack.cc'; fi`
 
 llsq_solvers.o: radmat/llsq/llsq_solvers.cc
 @am__fastdepCXX_TRUE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT llsq_solvers.o -MD -MP -MF $(DEPDIR)/llsq_solvers.Tpo -c -o llsq_solvers.o `test -f 'radmat/llsq/llsq_solvers.cc' || echo '$(srcdir)/'`radmat/llsq/llsq_solvers.cc

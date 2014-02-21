@@ -2,10 +2,10 @@
 #define LLSQ_MULTI_DRIVER_H
 
 
-#include "llsq_driver.h"
 #include "llsq_solvers.h"
 #include "llsq_gen_system.h"
 #include "radmat/construct_data/lattice_multi_data_object.h"
+#include "radmat/utils/pow2assert.h"
 #include <complex>
 #include <string>
 
@@ -40,6 +40,7 @@ namespace radmat
         const int tlow,
         const int thigh,
         double tol=1e-6); 
+
     void dump_llsq(const std::string &path);
     void dump_llsq_lattice(const std::string &path);  
 
@@ -47,14 +48,33 @@ namespace radmat
     void save_ff_state(const std::string &path) const; 
 
     SEMBLE::SembleMatrix<T> get_rephase_FF(void) const; 
-    SEMBLE::SembleMatrix<T> peek_K(void) const {check_exit_K();return K;}
-    SEMBLE::SembleMatrix<T> peek_Kinv(void) const {check_exit_Kinv();return Kinv;}
-    SEMBLE::SembleMatrix<T> peek_FF(void) const {check_exit_FF(); return FF_t;}
-    SEMBLE::SembleMatrix<T> peek_data(void) const {check_exit_lat(); return lattice_data->data();}
-    std::vector<LatticeMultiDataTag> peek_tags(void) const {check_exit_lat(); return lattice_data->tags();}
-    ENSEM::EnsemReal Q2(void) const {check_exit_lat(); return lattice_data->tags().begin()->Q2();}
-    double qsq_label(void) const {check_exit_lat(); return ENSEM::toDouble( ENSEM::mean ( this->Q2() ) );}
-    double qsq_sort(void) const {check_exit_lat(); return lattice_data->tags().begin()->get_qsq_label();}
+
+    SEMBLE::SembleMatrix<T> peek_K(void) const 
+    {check_exit_K();return K;}
+
+    SEMBLE::SembleMatrix<T> peek_Kinv(void) const 
+    {check_exit_Kinv();return Kinv;}
+
+    SEMBLE::SembleMatrix<T> peek_FF(void) const 
+    {check_exit_FF(); return FF_t;}
+
+    SEMBLE::SembleMatrix<T> peek_data(void) const 
+    {check_exit_lat(); return lattice_data->data();}
+
+    std::vector<LatticeMultiDataTag> peek_tags(void) const 
+    {check_exit_lat(); return lattice_data->tags();}
+
+    ENSEM::EnsemReal Q2(void) const 
+    {check_exit_lat(); return lattice_data->tags().begin()->Q2();}
+
+    double qsq_label(void) const 
+    {check_exit_lat(); return ENSEM::toDouble( ENSEM::mean ( this->Q2() ) );}
+
+    double qsq_sort(void) const 
+    {check_exit_lat(); return lattice_data->tags().begin()->get_qsq_label();}
+
+    std::string ff_id(const int i) const 
+    { check_exit_FF(); return ff_ids.at(i);} // throws out_of_range if i is not present
 
     private:
     void sort_data(void); 
@@ -70,10 +90,10 @@ namespace radmat
     void check_exit_Kinv(void) const {check_exit(init_Kinv,__func__);}
     void check_exit_FF(void) const {check_exit(init_FF,__func__);}
     void check_exit(const bool, const char *) const ;     
-
     bool init_lat,init_K,init_Kinv,init_FF; 
     rHandle<LLSQLatticeMultiData> lattice_data;
     SEMBLE::SembleMatrix<T> K,Kinv,FF_t;
+    std::map<int,std::string> ff_ids; 
     LLSQLatticeMultiData zeroed_data; 
     std::string solver_log; 
   };

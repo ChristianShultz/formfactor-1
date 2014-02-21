@@ -32,7 +32,7 @@ POST_INSTALL = :
 NORMAL_UNINSTALL = :
 PRE_UNINSTALL = :
 POST_UNINSTALL = :
-bin_PROGRAMS = corr_norm$(EXEEXT) grab_ff$(EXEEXT) grab_pol$(EXEEXT) \
+bin_PROGRAMS = grab_ff$(EXEEXT) grab_pol$(EXEEXT) \
 	grab_vector_mean_cmp$(EXEEXT) invert_subduced$(EXEEXT) \
 	mass_overlap_db_combine$(EXEEXT) \
 	mass_overlap_db_create$(EXEEXT) mass_overlap_db_util$(EXEEXT) \
@@ -51,10 +51,6 @@ CONFIG_CLEAN_FILES =
 CONFIG_CLEAN_VPATH_FILES =
 am__installdirs = "$(DESTDIR)$(bindir)"
 PROGRAMS = $(bin_PROGRAMS)
-am_corr_norm_OBJECTS = corr_norm.$(OBJEXT)
-corr_norm_OBJECTS = $(am_corr_norm_OBJECTS)
-corr_norm_LDADD = $(LDADD)
-corr_norm_DEPENDENCIES =
 am_grab_ff_OBJECTS = grab_ff.$(OBJEXT)
 grab_ff_OBJECTS = $(am_grab_ff_OBJECTS)
 grab_ff_LDADD = $(LDADD)
@@ -122,7 +118,7 @@ CXXCOMPILE = $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) \
 CXXLD = $(CXX)
 CXXLINK = $(CXXLD) $(AM_CXXFLAGS) $(CXXFLAGS) $(AM_LDFLAGS) $(LDFLAGS) \
 	-o $@
-SOURCES = $(corr_norm_SOURCES) $(grab_ff_SOURCES) $(grab_pol_SOURCES) \
+SOURCES = $(grab_ff_SOURCES) $(grab_pol_SOURCES) \
 	$(grab_vector_mean_cmp_SOURCES) $(invert_subduced_SOURCES) \
 	$(mass_overlap_db_combine_SOURCES) \
 	$(mass_overlap_db_create_SOURCES) \
@@ -130,9 +126,9 @@ SOURCES = $(corr_norm_SOURCES) $(grab_ff_SOURCES) $(grab_pol_SOURCES) \
 	$(radmat_util_SOURCES) $(single_plot_SOURCES) \
 	$(test_levi_civita_SOURCES) $(test_redstar_ops_SOURCES) \
 	$(test_rotations_SOURCES) $(test_tens_SOURCES)
-DIST_SOURCES = $(corr_norm_SOURCES) $(grab_ff_SOURCES) \
-	$(grab_pol_SOURCES) $(grab_vector_mean_cmp_SOURCES) \
-	$(invert_subduced_SOURCES) $(mass_overlap_db_combine_SOURCES) \
+DIST_SOURCES = $(grab_ff_SOURCES) $(grab_pol_SOURCES) \
+	$(grab_vector_mean_cmp_SOURCES) $(invert_subduced_SOURCES) \
+	$(mass_overlap_db_combine_SOURCES) \
 	$(mass_overlap_db_create_SOURCES) \
 	$(mass_overlap_db_util_SOURCES) $(radmat_SOURCES) \
 	$(radmat_util_SOURCES) $(single_plot_SOURCES) \
@@ -254,7 +250,6 @@ AM_LDFLAGS = -L@top_builddir@/lib/ \
                @LDFLAGS@ @SEMBLE_LDFLAGS@ @JACKFITTER_LDFLAGS@ @ADAT_LDFLAGS@ 
 
 LDADD = -lradmat @SEMBLE_LIBS@ @JACKFITTER_LIBS@ @ADAT_LIBS@ @ITPP_LIBS@ @LIBS@ 
-corr_norm_SOURCES = corr_norm.cc
 grab_ff_SOURCES = grab_ff.cc
 grab_pol_SOURCES = grab_pol.cc
 grab_vector_mean_cmp_SOURCES = grab_vector_mean_cmp.cc
@@ -345,9 +340,6 @@ uninstall-binPROGRAMS:
 
 clean-binPROGRAMS:
 	-test -z "$(bin_PROGRAMS)" || rm -f $(bin_PROGRAMS)
-corr_norm$(EXEEXT): $(corr_norm_OBJECTS) $(corr_norm_DEPENDENCIES) 
-	@rm -f corr_norm$(EXEEXT)
-	$(CXXLINK) $(corr_norm_OBJECTS) $(corr_norm_LDADD) $(LIBS)
 grab_ff$(EXEEXT): $(grab_ff_OBJECTS) $(grab_ff_DEPENDENCIES) 
 	@rm -f grab_ff$(EXEEXT)
 	$(CXXLINK) $(grab_ff_OBJECTS) $(grab_ff_LDADD) $(LIBS)
@@ -397,7 +389,6 @@ mostlyclean-compile:
 distclean-compile:
 	-rm -f *.tab.c
 
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/corr_norm.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/grab_ff.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/grab_pol.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/grab_vector_mean_cmp.Po@am__quote@

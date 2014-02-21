@@ -155,140 +155,140 @@ namespace radmat
 
   ///////////////////////////////////////////////////////////////////////////////////////////
   ///////////////////////////////////////////////////////////////////////////////////////////
-
-  template<typename T>
-    rHandle<LLSQInputType_t<T> >
-    generateLLSQSystem(const std::vector<LLSQDataPoint> &unsorted_data, 
-        const int t_ins)
-    {
-
-      typename LLSQInputType_t<T>::KinematicFactors K,KWork;
-      std::vector<ENSEM::EnsemComplex> vectorData;
-      std::vector<LLSQDataPoint>::const_iterator it;
-      std::vector<LLSQDataPoint> data = left_sort(unsorted_data); 
-      bool initK = false;
-
-      it = data.begin();
-      FFKinematicFactors_t genK(FormFactorDecompositionFactoryEnv::callFactory(it->matElemID));
-
-      do {
-        KWork = genK.genFactors(makeMomInvariants(it->E_f,it->E_i,it->p_f,it->p_i,it->mom_fac));
-
-        if(it->zero.first)
-        {
-          initK = true;
-          K.reDim(KWork.getB(),1,KWork.getM());
-          for(int i = 0; i < KWork.getM(); i++)
-            K.loadEnsemElement(0,i,KWork(0,i));
-          vectorData.push_back(it->zero.second);
-
-          if(it->one.first)
-          {
-            K.append_row(KWork.getRow(1));
-            vectorData.push_back(it->one.second);
-          }
-          if(it->two.first)
-          {
-            K.append_row(KWork.getRow(2));
-            vectorData.push_back(it->two.second);
-          }
-          if(it->three.first)
-          {
-            K.append_row(KWork.getRow(3));
-            vectorData.push_back(it->three.second);
-          }
-        }
-        else if(it->one.first)
-        {
-          initK = true;
-          K.reDim(KWork.getB(),1,KWork.getM());
-          for(int i = 0; i < KWork.getM(); i++)
-            K.loadEnsemElement(0,i,KWork(1,i));
-          vectorData.push_back(it->one.second);
-
-          if(it->two.first)
-          {
-            K.append_row(KWork.getRow(2));
-            vectorData.push_back(it->two.second);
-          }
-          if(it->three.first)
-          {
-            K.append_row(KWork.getRow(3));
-            vectorData.push_back(it->three.second);
-          }
-        }
-        else if(it->two.first)
-        {
-          initK = true;
-          K.reDim(KWork.getB(),1,KWork.getM());
-          for(int i = 0; i < KWork.getM(); i++)
-            K.loadEnsemElement(0,i,KWork(2,i));
-          vectorData.push_back(it->two.second);
-
-          if(it->three.first)
-          {
-            K.append_row(KWork.getRow(3));
-            vectorData.push_back(it->three.second);
-          }
-        }
-        else if(it->three.first)
-        {
-          initK = true;
-          K.reDim(KWork.getB(),1,KWork.getM());
-          for(int i = 0; i < KWork.getM(); i++)
-            K.loadEnsemElement(0,i,KWork(3,i));
-          vectorData.push_back(it->three.second);
-        }
-        else
-        {
-          SPLASH("there was a data error in this context, basically christian is a moron");
-          exit(1);
-        }
-      } while(false); // execute once to force a scoped loop --> should be rewritten to break on initK? probably
-
-      do
-      {
-        it ++;
-        if(it == data.end())
-          break;
-
-        ffKinematicFactors_t<T> genK(FormFactorDecompositionFactoryEnv::callFactory(it->matElemID));
-        KWork = genK.genFactors(makeMomInvariants(it->E_f,it->E_i,it->p_f,it->p_i,it->mom_fac));
-
-        if(it->zero.first)
-        {
-          K.append_row(KWork.getRow(0));
-          vectorData.push_back(it->zero.second);
-        }
-        if(it->one.first)
-        {
-          K.append_row(KWork.getRow(1));
-          vectorData.push_back(it->one.second);
-        }
-        if(it->two.first)
-        {
-          K.append_row(KWork.getRow(2));
-          vectorData.push_back(it->two.second);
-        }
-        if(it->three.first)
-        {
-          K.append_row(KWork.getRow(3));
-          vectorData.push_back(it->three.second);
-        }
-
-      } while(true);
-
-      SEMBLE::SembleVector<std::complex<double> >
-        matElems(KWork.getB(),vectorData.size());
-
-      for(unsigned int i =0; i < vectorData.size(); i++)
-        matElems.loadEnsemElement(i,vectorData[i]);
-
-
-      double q2 = SEMBLE::toScalar(ENSEM::mean(data.begin()->Q2())); 
-
-      return rHandle<LLSQInputType_t<T> >( new LLSQInputType_t<T>(K,matElems,q2));
-    }
+//
+//  template<typename T>
+//    rHandle<LLSQInputType_t<T> >
+//    generateLLSQSystem(const std::vector<LLSQDataPoint> &unsorted_data, 
+//        const int t_ins)
+//    {
+//
+//      typename LLSQInputType_t<T>::KinematicFactors K,KWork;
+//      std::vector<ENSEM::EnsemComplex> vectorData;
+//      std::vector<LLSQDataPoint>::const_iterator it;
+//      std::vector<LLSQDataPoint> data = left_sort(unsorted_data); 
+//      bool initK = false;
+//
+//      it = data.begin();
+//      FFKinematicFactors_t genK(FormFactorDecompositionFactoryEnv::callFactory(it->matElemID));
+//
+//      do {
+//        KWork = genK.genFactors(makeMomInvariants(it->E_f,it->E_i,it->p_f,it->p_i,it->mom_fac));
+//
+//        if(it->zero.first)
+//        {
+//          initK = true;
+//          K.reDim(KWork.getB(),1,KWork.getM());
+//          for(int i = 0; i < KWork.getM(); i++)
+//            K.loadEnsemElement(0,i,KWork(0,i));
+//          vectorData.push_back(it->zero.second);
+//
+//          if(it->one.first)
+//          {
+//            K.append_row(KWork.getRow(1));
+//            vectorData.push_back(it->one.second);
+//          }
+//          if(it->two.first)
+//          {
+//            K.append_row(KWork.getRow(2));
+//            vectorData.push_back(it->two.second);
+//          }
+//          if(it->three.first)
+//          {
+//            K.append_row(KWork.getRow(3));
+//            vectorData.push_back(it->three.second);
+//          }
+//        }
+//        else if(it->one.first)
+//        {
+//          initK = true;
+//          K.reDim(KWork.getB(),1,KWork.getM());
+//          for(int i = 0; i < KWork.getM(); i++)
+//            K.loadEnsemElement(0,i,KWork(1,i));
+//          vectorData.push_back(it->one.second);
+//
+//          if(it->two.first)
+//          {
+//            K.append_row(KWork.getRow(2));
+//            vectorData.push_back(it->two.second);
+//          }
+//          if(it->three.first)
+//          {
+//            K.append_row(KWork.getRow(3));
+//            vectorData.push_back(it->three.second);
+//          }
+//        }
+//        else if(it->two.first)
+//        {
+//          initK = true;
+//          K.reDim(KWork.getB(),1,KWork.getM());
+//          for(int i = 0; i < KWork.getM(); i++)
+//            K.loadEnsemElement(0,i,KWork(2,i));
+//          vectorData.push_back(it->two.second);
+//
+//          if(it->three.first)
+//          {
+//            K.append_row(KWork.getRow(3));
+//            vectorData.push_back(it->three.second);
+//          }
+//        }
+//        else if(it->three.first)
+//        {
+//          initK = true;
+//          K.reDim(KWork.getB(),1,KWork.getM());
+//          for(int i = 0; i < KWork.getM(); i++)
+//            K.loadEnsemElement(0,i,KWork(3,i));
+//          vectorData.push_back(it->three.second);
+//        }
+//        else
+//        {
+//          SPLASH("there was a data error in this context, basically christian is a moron");
+//          exit(1);
+//        }
+//      } while(false); // execute once to force a scoped loop --> should be rewritten to break on initK? probably
+//
+//      do
+//      {
+//        it ++;
+//        if(it == data.end())
+//          break;
+//
+//        ffKinematicFactors_t<T> genK(FormFactorDecompositionFactoryEnv::callFactory(it->matElemID));
+//        KWork = genK.genFactors(makeMomInvariants(it->E_f,it->E_i,it->p_f,it->p_i,it->mom_fac));
+//
+//        if(it->zero.first)
+//        {
+//          K.append_row(KWork.getRow(0));
+//          vectorData.push_back(it->zero.second);
+//        }
+//        if(it->one.first)
+//        {
+//          K.append_row(KWork.getRow(1));
+//          vectorData.push_back(it->one.second);
+//        }
+//        if(it->two.first)
+//        {
+//          K.append_row(KWork.getRow(2));
+//          vectorData.push_back(it->two.second);
+//        }
+//        if(it->three.first)
+//        {
+//          K.append_row(KWork.getRow(3));
+//          vectorData.push_back(it->three.second);
+//        }
+//
+//      } while(true);
+//
+//      SEMBLE::SembleVector<std::complex<double> >
+//        matElems(KWork.getB(),vectorData.size());
+//
+//      for(unsigned int i =0; i < vectorData.size(); i++)
+//        matElems.loadEnsemElement(i,vectorData[i]);
+//
+//
+//      double q2 = SEMBLE::toScalar(ENSEM::mean(data.begin()->Q2())); 
+//
+//      return rHandle<LLSQInputType_t<T> >( new LLSQInputType_t<T>(K,matElems,q2));
+//    }
 
   ///////////////////////////////////////////////////////////////////////////////////////////
   ///////////////////////////////////////////////////////////////////////////////////////////

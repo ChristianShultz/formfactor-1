@@ -146,7 +146,8 @@ namespace radmat
       return KF;
     }
 
-    int nFacs(void) {return m_KFacGen->nFacs();}
+    int nFacs(void) const {return m_KFacGen->nFacs();}
+    std::map<int,std::string> ff_ids(void) const {return m_KFacGen->ff_ids();}
 
     // hide ctor    
     private:

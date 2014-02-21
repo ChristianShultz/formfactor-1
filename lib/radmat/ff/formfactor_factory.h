@@ -21,7 +21,7 @@ namespace radmat
 
   namespace FormFactorDecompositionFactoryEnv
   {
-    bool registerAll( const FFMODE );
+    bool registerAll( void );
     rHandle<FFAbsBase_t> callFactory(const std::string &matElemID);
   }
 

@@ -6,7 +6,7 @@
 
  * Creation Date : 01-08-2012
 
- * Last Modified : Wed 11 Dec 2013 06:10:37 PM EST
+ * Last Modified : Fri 21 Feb 2014 03:52:31 PM EST
 
  * Created By : shultz
 
@@ -15,8 +15,7 @@
 
 #include "fit_tins.h"
 #include "ensem/ensem.h"
-#include "semble/semble_meta.h"
-#include "semble/semble_vector.h"
+#include "semble/semble_semble.h"
 #include "jackFitter/ensem_data.h"
 #include "jackFitter/jackknife_fitter.h"
 #include "jackFitter/ensem_data.h"
@@ -37,211 +36,54 @@
 namespace radmat
 {
 
-
   namespace 
   {
-    inline double rad(const double deg)
-    {
-      return 3.14159 * deg/180.;
-    }
-
-    // run an avg fit on the real and imag bits
-    //      to try to find a phase
-    ENSEM::EnsemVectorReal 
-      convertToReal(const TinsFitter &fitter,
-          const ENSEM::EnsemVectorComplex & in, 
-          const int tlow,
-          const int thigh)
-    {
-      ENSEM::EnsemVectorReal real, imag;
-
-      double const_real, const_imag; 
-
-      real = ENSEM::real(in);
-      imag = ENSEM::imag(in);
-
-      std::vector<double> t;
-      for(int i = 0; i < in.numElem(); ++i)
-        t.push_back(double(i)); 
-
-      EnsemData ereal(t,real),eimag(t,imag); 
-      ereal.hideDataAboveX(thigh - 0.1); 
-      eimag.hideDataBelowX(tlow -0.1); 
-
-      ADAT::Handle<FitFunction> freal(new ThreePointConstant), fimag(new ThreePointConstant);  
-      JackFit fit_real(ereal,freal), fit_imag(eimag,fimag); 
-
-      fit_real.runAvgFit(); 
-      fit_imag.runAvgFit(); 
-      const_real = fit_real.getAvgFitParValue(0);
-      const_imag = fit_imag.getAvgFitParValue(0);
-
-      // no on has time for this 
-      //   fit_real.runJackFit(); 
-      //   fit_imag.runJackFit(); 
-      //   const_real = fit_real.getAvgFitParValue(0);
-      //   const_imag = fit_imag.getAvgFitParValue(0);
-
-      double const_real_var = fit_real.getAvgFitParError(0);
-      double const_imag_var = fit_imag.getAvgFitParError(0);
-
-      if( fabs(const_real) - 3.*fabs(const_real_var) < 0.)
-        return imag; 
-      if( fabs(const_imag) - 3.*fabs(const_imag_var) < 0.)
-        return real; 
-
-      // what if it is a longitudial factor or crossing 
-      //    we are only getting about 2% precision, 
-      //    assume a FF of O(1)
-      if( (const_real < 2e-2) && (const_imag < 2e-2) ) 
+    template<typename T> 
+      typename SEMBLE::PromoteEnsemVec<T>::Type
+      to_ensem(const SEMBLE::SembleVector<T> &in)
       {
-        // doesn't matter, both are zero to precision  
-        return real;
+        typename SEMBLE::PromoteEnsemVec<T>::Type out;
+        out.resize(in.getB());
+        out.resizeObs(in.getN());
+        for(int elem = 0; elem < in.getN(); ++elem)
+          ENSEM::pokeObs(out,in.getEnsemElement(elem),elem);
+
+        return out;
       }
-
-      if ( isnan(const_real) && isnan(const_imag))
-      {
-        return real; 
-      }
+  }
 
 
-      double fit_phase = std::arg(std::complex<double>(const_real,const_imag)); 
+  void TinsFitter::fit(const std::string &fname, 
+      const LLSQRealFormFactorData_t &data, 
+      const ThreePointComparatorProps_t &fitProps,
+      const int tsrc, 
+      const int tsnk)
+  {
+    const unsigned int sz = data.size();
+    const int nbins = data.esize();
+    ff.reDim(nbins,sz);
+    Q2 = data.Q2();
 
-      if(fit_phase < -3.*3.14159/4.)
-        fit_phase = - fit_phase; 
+    LLSQRealFormFactorData_t::const_iterator it;
 
+    for(it = data.begin(); it != data.end(); ++it)
+      doFit(fname,to_ensem(it->second),it->first,fitProps,tsrc,tsnk);
 
-      double phase = fit_phase ; 
-
-      if( (phase < 0.174528) && (phase > -0.174708) ) // +/- 10 degree about 0 in rad
-        return real;
-      else if( (phase > 1.39622) && (phase < 1.74528)) // 90deg
-        return imag;
-      else if( (phase > 2.96697) || (phase < -2.96715))  //180deg // this is atan2 specific, it returns (-pi,pi)
-        return real;
-      else if( (phase > -1.74546) && (phase < -1.3964)) // 270 de/doFit
-        return imag;
-      else
-      {
-        std::cout << "The calculated phase was " << phase*180./3.14159 << " (deg)" << std::endl;
-        std::cout << "rl = " << const_real << " im = " << const_imag << std::endl;
-        std::cout << "for Q2 = " << SEMBLE::toScalar(ENSEM::mean(fitter.getQ2())) << std::endl;  
-        std::cout << "used tlow = " << tlow << " thigh = " << thigh << std::endl; 
-        SPLASH("check bad_corr.jack, bad_corr.ax for the correlator, returning zero"); 
-
-        AxisPlot plot; 
-        plot.addEnsemData(ENSEM::real(in),"\\sq",1);
-        plot.addEnsemData(ENSEM::imag(in),"\\sq",2);
-        plot.sendToFile("bad_corr.ax");
-
-        ENSEM::write("bad_corr.jack",in); 
-
-      }
-
-      return SEMBLE::toScalar( double(0.) ) * real; 
-    }
-
-
-  } // anonymous
-
-  template<>
-    void TinsFitter::single_fit<double>(const std::string &fname, 
-        const LLSQRet_ff_Q2Pack<double> &pack,
-        const int ff_max, 
-        const ThreePointComparatorProps_t &fitProps,
-        const int tsrc, 
-        const int tsnk)
-    {
-      const int nbins = pack.Q2().size();
-      ff.reDim(nbins,ff_max);
-      Q2 = pack.Q2();
-
-      LLSQRet_ff_Q2Pack<double>::const_iterator it;
-
-      for(it = pack.begin(); it != pack.end(); ++it)
-        doFit(fname,it->second,it->first,fitProps,tsrc,tsnk);
-
-      didFit = true;
-    }
-
-
-
-  template<>
-    void TinsFitter::single_fit<std::complex<double> >(const std::string &fname , 
-        const LLSQRet_ff_Q2Pack<std::complex<double> > &pack,
-        const int ff_max,
-        const ThreePointComparatorProps_t &fitProps,
-        const int tsrc,
-        const int tsnk)
-    {
-      const int nbins = pack.Q2().size();
-      ff.reDim(nbins,ff_max);
-      Q2 = pack.Q2();
-
-      LLSQRet_ff_Q2Pack<std::complex<double> >::const_iterator it;
-
-      for(it = pack.begin(); it != pack.end(); ++it)
-        doFit(fname,convertToReal(*this,it->second,tsrc,tsnk),it->first,fitProps,tsrc,tsnk);
-
-      didFit = true;
-    }
-
-
-  template<>
-    void TinsFitter::fit<double>(const std::string &fname, 
-        const LLSQRet_ff_Q2Pack<double> &pack,
-        const ThreePointComparatorProps_t &fitProps,
-        const int tsrc, 
-        const int tsnk)
-    {
-      const unsigned int sz = pack.size();
-      const int nbins = pack.Q2().size();
-      ff.reDim(nbins,sz);
-      Q2 = pack.Q2();
-
-      LLSQRet_ff_Q2Pack<double>::const_iterator it;
-
-      for(it = pack.begin(); it != pack.end(); ++it)
-        doFit(fname,it->second,it->first,fitProps,tsrc,tsnk);
-
-      didFit = true;
-    }
-
-
-
-  template<>
-    void TinsFitter::fit<std::complex<double> >(const std::string &fname , 
-        const LLSQRet_ff_Q2Pack<std::complex<double> > &pack,
-        const ThreePointComparatorProps_t &fitProps,
-        const int tsrc,
-        const int tsnk)
-    {
-      const unsigned int sz = pack.size();
-      const int nbins = pack.Q2().size();
-      ff.reDim(nbins,sz);
-      Q2 = pack.Q2();
-
-      LLSQRet_ff_Q2Pack<std::complex<double> >::const_iterator it;
-
-      for(it = pack.begin(); it != pack.end(); ++it)
-        doFit(fname,convertToReal(*this,it->second,tsrc,tsnk),it->first,fitProps,tsrc,tsnk);
-
-      didFit = true;
-    }
-
+    didFit = true;
+  }
 
   void TinsFitter::doFit(const std::string &filenameBase, 
       const ENSEM::EnsemVectorReal &data, 
-      const int ffnum,
+      const std::string &ffid,
       const ThreePointComparatorProps_t &fitProps,
       const int tsrc,
       const int tsnk)
   {
     std::stringstream ss,jack,ax,fit;
     ss << filenameBase;
-    fit << ss.str() << "FF_" << ffnum << "_fit.jack";
-    jack << ss.str() << "FF_" << ffnum << ".jack";
-    ax << ss.str() << "FF_" << ffnum << ".ax";
+    fit << ss.str() << ffid << "_fit.jack";
+    jack << ss.str() << ffid << ".jack";
+    ax << ss.str() << ffid << ".ax";
 
     std::vector<double> time; 
     const int Lt = data.numElem();
@@ -261,20 +103,28 @@ namespace radmat
     fitCorr->saveFitPlot(ax.str());
     write(jack.str(),data);
 
-    ff.loadEnsemElement(ffnum,fitCorr->getFF());
+    // require unique fit names -- they are class names 
+    // so this is a paranoia check 
+    POW2_ASSERT( fit_index.find(ffid) != fit_index.end());
+
+    // this grows the map effectively incrementing the index!
+    int index = fit_index.size(); 
+    fit_index[ffid] = index; 
+
+    ff.loadEnsemElement(index,fitCorr->getFF());
     write(fit.str(),fitCorr->getFF()); 
 
-    fitters.insert(std::map<int,rHandle<FitThreePoint> >::value_type(ffnum,fitCorr));
+    fitters.insert(std::map<std::string,rHandle<FitThreePoint> >::value_type(ffid,fitCorr));
   }
 
 
   void TinsFitter::writeFitLogs(const std::string &path) const
   {
-    std::map<int,rHandle<FitThreePoint> >::const_iterator it;
+    std::map<std::string,rHandle<FitThreePoint> >::const_iterator it;
     for(it = fitters.begin(); it != fitters.end(); ++it)
     {
       std::stringstream ss;
-      ss << path << "F_" << it->first << ".fitlog";
+      ss << path << it->first << ".fitlog";
       std::ofstream out(ss.str().c_str());
       out << it->second->getFitSummary();
       out.close();
@@ -284,11 +134,11 @@ namespace radmat
 
   void TinsFitter::writeFitPlotsWithComponents(const std::string & path) const
   {
-    std::map<int,rHandle<FitThreePoint> >::const_iterator it;
+    std::map<std::string,rHandle<FitThreePoint> >::const_iterator it;
     for(it = fitters.begin(); it != fitters.end(); ++it)
     {
       std::stringstream ss; 
-      ss << path <<  "FF_" << it->first << ".ax";
+      ss << path << it->first << ".ax";
       std::ofstream out(ss.str().c_str());
       out << it->second->getFitPlotStringWithComponents(); 
       out.close();
@@ -305,16 +155,23 @@ namespace radmat
   }
 
 
-  ENSEM::EnsemReal TinsFitter::getFF(const int index) const
+  ENSEM::EnsemReal TinsFitter::getFF(const std::string &id) const
   {
-    POW2_ASSERT(index < ff.getN());
-    return ff.getEnsemElement(index);
+    return ff.getEnsemElement(fit_index.at(id)); // throws out_of_range
   }
 
-  rHandle<FitThreePoint> TinsFitter::getFit(const int ffnum) const
+  rHandle<FitThreePoint> TinsFitter::getFit(const std::string &id) const
   {
-    POW2_ASSERT(fitters.find(ffnum) != fitters.end());
-    return rHandle<FitThreePoint>(fitters.find(ffnum)->second);
+    return rHandle<FitThreePoint>(fitters.at(id)); // throws out_of_range
+  }
+
+  std::vector<std::string> TinsFitter::ff_ids(void) const
+  {
+    std::vector<std::string> k; 
+    std::map<std::string,int>::const_iterator it;
+    for(it = fit_index.begin(); it != fit_index.end(); ++it)
+      k.push_back(it->first);
+    return k; 
   }
 
 

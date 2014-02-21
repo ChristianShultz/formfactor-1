@@ -6,7 +6,7 @@
 
  * Creation Date : 13-11-2013
 
- * Last Modified : Thu 20 Feb 2014 02:02:00 PM EST
+ * Last Modified : Fri 21 Feb 2014 09:58:07 AM EST
 
  * Created By : shultz
 
@@ -29,12 +29,6 @@
 
 namespace radmat
 {
-
-  double mom_factor(const double xi, const int L_s) 
-  {
-    return 2.*acos(-1.)/xi/double(L_s);
-  }
-
   namespace BAD_DATA_REPO
   {
     BuildCorrsLocalBadDataRepo_t local_bad_data_repo; 

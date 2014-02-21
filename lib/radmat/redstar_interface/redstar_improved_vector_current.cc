@@ -6,7 +6,7 @@
 
  * Creation Date : 20-11-2013
 
- * Last Modified : Thu 20 Feb 2014 01:56:23 PM EST
+ * Last Modified : Fri 21 Feb 2014 09:59:51 AM EST
 
  * Created By : shultz
 
@@ -28,6 +28,7 @@
 #include "radmat/utils/tensor.h"
 #include "radmat/utils/obj_expr_t.h"
 #include "radmat/utils/pow2assert.h"
+#include "radmat/utils/mink_qsq.h"
 #include "itpp/itbase.h"
 #include <map>
 #include <exception>

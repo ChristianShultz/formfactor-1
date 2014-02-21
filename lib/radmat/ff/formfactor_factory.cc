@@ -11,10 +11,8 @@
 #include "adat/objfactory.h"
 
 // ffs
-#include "lorentzff_PiPi.h"
-#include "lorentzff_PiPiStar.h"
-#include "lorentzff_PiRho.h"
-#include "lorentzff_RhoPi.h"
+#include "lorentzff_canonical_PiPi.h"
+#include "lorentzff_canonical_PiPiStar.h"
 #include "lorentzff_canonical_PiRho.h"
 #include "lorentzff_canonical_RhoPi.h"
 #include "lorentzff_canonical_RhoRho.h"
@@ -40,11 +38,12 @@ namespace radmat
         return t;
       }
 
-    template<typename T> 
+    template<typename Base, typename Derived> 
       bool 
-      do_reg(const std::string &reg_id, T* (*ptr)())
+      do_reg(void)
       {
-        bool reg = Factory::Instance().registerObject(reg_id,ptr); 
+        std::string reg_id = Stringify<Derived>(); 
+        bool reg = Factory::Instance().registerObject(reg_id, upCast<Base,Derived> ); 
 
         if ( !!! reg ) 
         {
@@ -90,7 +89,7 @@ namespace radmat
     }
 
     // register the factory "inventory"
-    bool registerAll( const FFMODE mode );
+    bool registerAll( void )
     {
 
       bool success = true;
@@ -98,19 +97,11 @@ namespace radmat
       if(!!!registered)
       {
 
-        if ( mode == HELICITY )
-        {
-          success &= do_reg(std::string("PiPi"), FacEnv::upCast<FFAbsBase_t ,radmat::PiPi::PiPi<HELICITY> >);
-          success &= do_reg(std::string("PiPiStar"),FacEnv::upCast<FFAbsBase_t ,radmat::PiPiStar::PiPiStar<HELICITY> >);
-          success &= do_reg(std::string("CanonicalPiRho"),FacEnv::upCast<FFAbsBase_t, radmat::CanonicalPiRho::CanonicalPiRho<HELICITY> >);
-          success &= do_reg(std::string("CanonicalRhoPi"),FacEnv::upCast<FFAbsBase_t, radmat::CanonicalRhoPi::CanonicalRhoPi<HELICITY> >);
-          success &= do_reg(std::string("RhoRho"),FacEnv::upCast<FFAbsBase_t, radmat::RhoRho::RhoRho<HELICITY> >);
-        }
-        else
-        {
-          std::cerr << "only HELICITY mode is supported" << std::endl;
-          exit(1); 
-        }
+          success &= do_reg< FFAbsBase_t ,radmat::PiPi<0,0> >();
+          success &= do_reg<FFAbsBase_t ,radmat::PiPiStar<0,0> >();
+          success &= do_reg<FFAbsBase_t, radmat::PiRho<0,1> >();
+          success &= do_reg<FFAbsBase_t, radmat::RhoPi<1,0> >();
+          success &= do_reg<FFAbsBase_t, radmat::RhoRho<1,1> >();
 
         registered = true;
       }

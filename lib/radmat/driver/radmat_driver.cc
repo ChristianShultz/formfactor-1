@@ -6,7 +6,7 @@
 
  * Creation Date : 25-02-2013
 
- * Last Modified : Tue 24 Dec 2013 10:04:47 PM EST
+ * Last Modified : Fri 21 Feb 2014 09:54:35 AM EST
 
  * Created By : shultz
 
@@ -16,8 +16,6 @@
 #include "radmat/driver/radmat_driver_aux.h"
 
 #include "radmat/utils/splash.h"
-#include "radmat/llsq/llsq_driver.h"
-#include "radmat/llsq/llsq_q2_pack.h"
 #include "radmat/driver/radmat_driver_props.h"
 
 #include "jackFitter/plot.h"

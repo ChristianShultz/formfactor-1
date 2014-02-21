@@ -10,7 +10,6 @@ AM_LDFLAGS  = -L@top_builddir@/lib/ \
 LDADD = -lradmat @SEMBLE_LIBS@ @JACKFITTER_LIBS@ @ADAT_LIBS@ @ITPP_LIBS@ @LIBS@ 
 
 bin_PROGRAMS =   \
-								 corr_norm		\
 								 grab_ff		\
 								 grab_pol		\
 								 grab_vector_mean_cmp		\
@@ -27,7 +26,6 @@ bin_PROGRAMS =   \
 								 test_tens		
 
 
-corr_norm_SOURCES = corr_norm.cc
 grab_ff_SOURCES = grab_ff.cc
 grab_pol_SOURCES = grab_pol.cc
 grab_vector_mean_cmp_SOURCES = grab_vector_mean_cmp.cc

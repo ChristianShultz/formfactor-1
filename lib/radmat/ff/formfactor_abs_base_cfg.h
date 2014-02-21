@@ -6,6 +6,7 @@
 #include "radmat/utils/pow2assert.h"
 #include "radmat/utils/tensor.h"
 #include "radmat/utils/handle.h"
+#include "ensem/ensem.h"
 #include <complex>
 #include <utility>
 #include <sstream>
@@ -40,6 +41,7 @@ namespace radmat
   {
     virtual ~FFAbsBlockBase_t() {}
     virtual std::string ff() const {return Stringify<FFAbsBlockBase_t>();}
+    virtual std::string id() const = 0; // the derived class name
 
 
     virtual Tensor<std::complex<double> , 1> 
@@ -91,7 +93,7 @@ namespace radmat
     virtual ~FFAbsBase_t(void) {}
 
     // useful higher up
-    virtual int nFacs(void) {return m_list.size();}
+    virtual int nFacs(void) const {return m_list.size();}
 
     // generate some tex code corresponding to thestring of stuff we think this is making
     std::string ff(void) const 
@@ -101,6 +103,19 @@ namespace radmat
       for (it = m_list.begin(); it != m_list.end(); it++)
         ss << (*it)->ff() << "  ";
       return ss.str();
+    }
+
+    std::map<int,std::string> ff_ids(void) const
+    {
+      std::map<int,std::string> ret; 
+      int index = 0; 
+      FFAbs_list::const_iterator it; 
+      for(it = m_list.begin(); it != m_list.end(); ++it)
+      {
+        ret[index] = (*it)->id(); 
+        ++index; 
+      } 
+      return ret; 
     }
 
     // matrix elem id

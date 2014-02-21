@@ -6,7 +6,7 @@
 
 * Creation Date : 22-04-2013
 
-* Last Modified : Thu 12 Dec 2013 10:13:29 AM EST
+* Last Modified : Fri 21 Feb 2014 04:13:59 PM EST
 
 * Created By : shultz
 
@@ -31,7 +31,7 @@ struct inp
   mom_t l,r; 
   double pfac;
   bool jmu;
-  int mu; 
+  int mu, hf, hi; 
 };
 
 
@@ -44,9 +44,9 @@ void do_boost(Tensor<double,1> &p)
 
 inp usage(int argc, char *argv[])
 {
-  if( (argc != 11) && (argc != 12) ) 
+  if( (argc != 13) && (argc != 14) ) 
   {
-    std::cerr << "usage: <grab_ff> <matElemID> <m_f> <nx ny nz>  <m_i> <nx ny, nz> <2pi/xi/nspace>  <optional jmu>" << std::endl;
+    std::cerr << "usage: <grab_ff> <matElemID> <m_f> <nx ny nz>  <m_i> <nx ny, nz> <2pi/xi/nspace> <h_f> <h_i>  <optional jmu>" << std::endl;
     exit(1); 
   }
 
@@ -88,6 +88,8 @@ inp usage(int argc, char *argv[])
     foo.pi = fred; }
 
     {std::stringstream ss(argv[10]); ss >> foo.pfac;}
+    {std::stringstream ss(argv[11]); ss >> foo.hf;}
+    {std::stringstream ss(argv[12]); ss >> foo.hi;}
 
 
     for(int i = 1; i < 4; ++i)
@@ -101,7 +103,7 @@ inp usage(int argc, char *argv[])
 
     foo.jmu = false; 
 
-    if(argc == 12)
+    if(argc == 14)
     {
       foo.jmu = true;
       std::stringstream ss(argv[11]); ss >> foo.mu; 
@@ -121,12 +123,16 @@ int main(int argc, char *argv[])
   std::cout << "the canonical frame is " <<
     radmat::LatticeRotationEnv::TheRotationGroupGenerator::Instance().get_can_frame_string(fred.l,fred.r) << std::endl;
 
-  rHandle<ffBase_t<std::complex<double> > > foo = FormFactorDecompositionFactoryEnv::callFactory(fred.matElemID); 
+  rHandle<FFAbsBase_t > foo = FormFactorDecompositionFactoryEnv::callFactory(fred.matElemID); 
+
+  itpp::Mat<std::complex<double> > baz = (*foo)( 
+      std::pair< Tensor<double,1> , int >(fred.pf,fred.hf),
+      std::pair< Tensor<double,1> , int >(fred.pi,fred.hi),
+      fred.pfac); 
 
   if(fred.jmu)
   {
 
-    itpp::Mat<std::complex<double> > baz = (*foo)(fred.pf,fred.pi,fred.pfac); 
     itpp::Vec<std::complex<double> > bar;
     bar = itpp::round_to_zero(baz.get_row(fred.mu) , 1e-6); 
 
@@ -145,7 +151,7 @@ int main(int argc, char *argv[])
     std::cout << " The list of ffs is : \n" << foo->ff() << std::endl;
 
     std::cout << "by value (row index is lorentz, col is FF num) \n" 
-      << itpp::round_to_zero( (*foo)(fred.pf,fred.pi,fred.pfac) , 1e-6);
+      << itpp::round_to_zero( baz , 1e-6);
 
 
     std::cout << "\n\n" << std::endl;

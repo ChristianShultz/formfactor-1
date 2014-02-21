@@ -14,6 +14,7 @@ namespace radmat
        const ADATXML::Array<int> &pi, const double mi,
        const double factor); 
 
+  double mom_factor(const double xi, const int L_s) ;
 }
 
 #endif /* MINK_QSQ_H */

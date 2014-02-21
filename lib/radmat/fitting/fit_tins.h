@@ -8,7 +8,7 @@
 #include "ensem/ensem.h"
 #include "semble/semble_vector.h"
 #include "radmat/utils/handle.h"
-#include "radmat/llsq/llsq_q2_pack.h"
+#include "radmat/llsq/llsq_formfactor_data.h"
 #include "jackFitter/three_point_fit_forms.h"
 
 namespace radmat
@@ -27,32 +27,33 @@ namespace radmat
       Q2 = ENSEM::toDouble(10000000.);
     }
 
-    // template to do the fit with real or complex data
-    template<typename T>
-      void fit(const std::string &filenameBase, 
-          const LLSQRet_ff_Q2Pack<T> &data,
-          const ThreePointComparatorProps_t &fitProps, 
-          const int tsrc,
-          const int tsnk);
 
-    // template to do the fit with real or complex data
-    template<typename T>
-      void single_fit(const std::string &filenameBase, 
-          const LLSQRet_ff_Q2Pack<T> &data,
-          const int ff_max, 
-          const ThreePointComparatorProps_t &fitProps, 
-          const int tsrc,
-          const int tsnk);
+    void fit( const std::string &filenameBase, 
+        const LLSQComplexFormFactorData_t &data,
+        const ThreePointComparatorProps_t &fitProps, 
+        const int tsrc,
+        const int tsnk)
+    {
+      fit(filenameBase, rephase_formfactor_data( data ), fitProps, tsrc, tsnk); 
+    }
 
+    void fit( const std::string &filenameBase, 
+        const LLSQRealFormFactorData_t &data,
+        const ThreePointComparatorProps_t &fitProps, 
+        const int tsrc,
+        const int tsnk);
 
     // get the form factors at this q2
     std::pair<ENSEM::EnsemReal, SEMBLE::SembleVector<double> > fetchFF(void) const;
 
+    // get all of the ids
+    std::vector<std::string> ff_ids(void) const; 
+
     // get a single form factor at this q2
-    ENSEM::EnsemReal getFF(const int ffnum) const; 
+    ENSEM::EnsemReal getFF(const std::string &ffid) const; 
 
     // get the fit associated with ffnum
-    rHandle<FitThreePoint> getFit(const int ffnum) const;
+    rHandle<FitThreePoint> getFit(const std::string &ffid) const;
 
     // get the ensemble value for q2
     ENSEM::EnsemReal getQ2(void) const {return Q2;}
@@ -71,53 +72,18 @@ namespace radmat
     // plays nicely with the "fit" function
     void doFit(const std::string &filenameBase, 
         const ENSEM::EnsemVectorReal &data, 
-        const int ffnum,
+        const std::string &ffid,
         const ThreePointComparatorProps_t &fitProps,
         const int tsrc, 
         const int tsnk);
 
     // data store
     bool didFit;
-    std::map<int,rHandle<FitThreePoint> > fitters; 
+    std::map<std::string,rHandle<FitThreePoint> > fitters; 
+    std::map<std::string,int> fit_index; 
     ENSEM::EnsemReal Q2;
     SEMBLE::SembleVector<double> ff;
   };
-
-
-  // pre declare the template specializations so we can put them in the cc file
-  // won't compile if its called with int or char or something
-  template<>
-    void TinsFitter::fit<double>(const std::string &, 
-        const LLSQRet_ff_Q2Pack<double> &,
-        const ThreePointComparatorProps_t &,
-        const int tsrc,
-        const int tsnk);
-
-  template<>
-    void TinsFitter::fit<std::complex<double> >(const std::string &,
-        const LLSQRet_ff_Q2Pack<std::complex<double> > &,
-        const ThreePointComparatorProps_t &fitProps,
-        const int tsrc,
-        const int tsnk);
-
-
-    // template to do the fit with real or complex data
-    template<>
-      void TinsFitter::single_fit<std::complex<double> >(const std::string &filenameBase, 
-          const LLSQRet_ff_Q2Pack<std::complex<double> > &data,
-          const int ff_max, 
-          const ThreePointComparatorProps_t &fitProps, 
-          const int tsrc,
-          const int tsnk);
-
-    // template to do the fit with real or complex data
-    template<>
-      void TinsFitter::single_fit<double>(const std::string &filenameBase, 
-          const LLSQRet_ff_Q2Pack<double> &data,
-          const int ff_max, 
-          const ThreePointComparatorProps_t &fitProps, 
-          const int tsrc,
-          const int tsnk);
 
 
 } // namespace radmat

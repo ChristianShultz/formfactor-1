@@ -16,12 +16,12 @@ namespace radmat
 {
 
 
-    struct StringifyBase
-    {
-      StringifyBase() {}
-      virtual ~StringifyBase() {}
-      virtual std::string name() const = 0; 
-    }; 
+  struct StringifyBase
+  {
+    StringifyBase() {}
+    virtual ~StringifyBase() {}
+    virtual std::string name() const = 0; 
+  }; 
 
   template<class T>
     struct StringifyType : public StringifyBase
@@ -30,13 +30,6 @@ namespace radmat
   };
 
 
-#define REGISTER_STRINGIFY_TYPE(X)                \
-  template<>                                      \
-  struct StringifyType<X> : public StringifyBase  \
-  {                                               \
-    std::string name() const { return #X ;}       \
-  };                                              \
-
   // only specializations may be instatiated
   template<typename T>
     std::string Stringify(void)
@@ -44,6 +37,37 @@ namespace radmat
       StringifyType<T> f;
       return f.name(); 
     }
+
+
+#define REGISTER_STRINGIFY_TYPE(X)                \
+  template<>                                      \
+  struct StringifyType<X> : public StringifyBase  \
+  {                                               \
+    std::string name() const                      \
+    { return std::string( #X  );}                 \
+  };                                              \
+
+
+#define REGISTER_STRINGIFY_TYPE2(X,Y)                 \
+  template<>                                          \
+  struct StringifyType<X,Y> : public StringifyBase    \
+  {                                                   \
+    std::string name() const                          \
+    { return std::string( #X )                        \
+      + "," + std::string( #Y ) ;}                    \
+  };                                                  \
+
+
+#define REGISTER_STRINGIFY_TYPE3(X,Y,Z)                 \
+  template<>                                            \
+  struct StringifyType<X,Y,Z> : public StringifyBase    \
+  {                                                     \
+    std::string name() const                            \
+    { return std::string( #X ) + "," +                  \
+      std::string( #Y ) + "," + std::string( #Z ) ;}    \
+  };                                                    \
+
+  // and on and on and on -- this works 
 
 }
 #endif

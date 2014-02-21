@@ -8,6 +8,7 @@
 #include "hadron/hadron_npart_npt_corr.h"
 #include "radmat_database_interface.h"
 #include "radmat_overlap_key_val_db.h"
+#include "radmat/utils/mink_qsq.h"
 #include "ensem/ensem.h"
 #include "adat/map_obj.h"
 #include <vector>
@@ -17,7 +18,6 @@
 
 namespace radmat
 {
-  double mom_factor(const double xi, const int L_s) ;
 
   std::map<double,std::vector<TaggedEnsemRedstarNPtBlock> > 
     sort_tagged_corrs_by_Q2(const std::vector<TaggedEnsemRedstarNPtBlock> &); 

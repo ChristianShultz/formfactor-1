@@ -6,7 +6,7 @@
 
  * Creation Date : 22-02-2013
 
- * Last Modified : Thu 20 Feb 2014 11:51:32 AM EST
+ * Last Modified : Fri 21 Feb 2014 03:56:00 PM EST
 
  * Created By : shultz
 
@@ -19,7 +19,7 @@
 #include "llsq_multi_data_serialize.h"
 #include "llsq_solution.h"
 #include "radmat/utils/pow2assert.h"
-#include "radmat/ff/ff_gen_llsq_row.h"
+#include "radmat/ff/formfactor_kinematic_factors.h"
 #include "ensem/ensem.h"
 #include <complex>
 #include <sstream>
@@ -386,11 +386,11 @@ namespace radmat
     lattice_data = non_zero_data;
 
     // warn that we are killing this data point 
-    if(non_zero_data->nrows() < KJunk.nFacs())
+    if(non_zero_data->nrows() < KK.nFacs())
     {
       std::cout << __func__ << ": not enough data points to solve the llsq" << std::endl;
       std::cout << "passed in " << sz << " elements of which " << zeroed_data.nrows() 
-        << " failed the zero test, needed " << KJunk.nFacs() << " elems, had " 
+        << " failed the zero test, needed " << KK.nFacs() << " elems, had " 
         << non_zero_data->nrows() << "elements " << std::endl;
     }
 
@@ -399,7 +399,7 @@ namespace radmat
 //      if ( is_singular( check_singular->data() ) )
 //        return false; 
 //
-    return (non_zero_data->nrows() >= KJunk.nFacs());
+    return (non_zero_data->nrows() >= KK.nFacs());
   }
 
 
@@ -608,6 +608,14 @@ namespace radmat
     init_Kinv = true; 
 
     FF_t = Kinv * lattice_data->data(); 
+
+    // pull out the name list here -- yuck
+    FFKinematicFactors_t KK( 
+        FormFactorDecompositionFactoryEnv::callFactory(
+          lattice_data->tags().begin()->mat_elem_id) ); 
+    
+    ff_ids = KK.ff_ids(); 
+
     init_FF = true; 
 
     /*

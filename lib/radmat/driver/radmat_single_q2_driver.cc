@@ -6,7 +6,7 @@
 
  * Creation Date : 25-02-2013
 
- * Last Modified : Wed 08 Jan 2014 01:36:40 AM EST
+ * Last Modified : Fri 21 Feb 2014 02:47:56 PM EST
 
  * Created By : shultz
 
@@ -16,6 +16,7 @@
 
 #include "radmat/driver/radmat_single_q2_driver.h"
 #include "radmat/llsq/llsq_multi_data_serialize.h"
+#include "radmat/llsq/llsq_formfactor_data.h"
 #include "radmat/ff/lorentzff_canonical_rotations.h"
 #include "semble/semble_semble.h"
 #include "ensem/ensem.h"
@@ -45,11 +46,13 @@ namespace radmat
   
     void write_jackfile_fit_report ( const TinsFitter &fits, const std::string &bpth)
     {
-      for (int ff = 0; ff < fits.nFF(); ++ff)
+      std::vector<std::string> keys = fits.ff_ids(); 
+      std::vector<std::string>::const_iterator it; 
+      for(it = keys.begin(); it != keys.end(); ++it)
       {
         std::stringstream ss;
-        ss << bpth << "FF_" << ff << ".jack";
-        ENSEM::write(ss.str(),fits.getFF(ff));  
+        ss << bpth << *it << ".jack";
+        ENSEM::write(ss.str(),fits.getFF(*it));  
       }
 
       std::stringstream ss; 
@@ -57,10 +60,10 @@ namespace radmat
       ENSEM::write(ss.str(),fits.getQ2()); 
     }
 
-    void write_single_jackfile_fit_report ( const TinsFitter &fits, const std::string &bpth, const int ff)
+    void write_single_jackfile_fit_report ( const TinsFitter &fits, const std::string &bpth, const std::string  &ff)
     {
       std::stringstream ss;
-      ss << bpth << "FF_" << ff << ".jack";
+      ss << bpth << ff<< ".jack";
       ENSEM::write(ss.str(),fits.getFF(ff));  
 
       std::stringstream s; 
@@ -189,18 +192,18 @@ namespace radmat
     check_exit_linear_system();
     check_exit_solved_llsq(); 
     SEMBLE::SembleMatrix<std::complex<double> > FF_of_t = linear_system.peek_FF(); 
-    LLSQRet_ff_Q2Pack<std::complex<double> > tmp;
+    LLSQComplexFormFactorData_t tmp; 
 
+    // load up data
     for(int row = 0; row < FF_of_t.getN(); ++row)
-      tmp.insert(row,get_ensem_row(row,FF_of_t));
+      tmp.insert(linear_system.ff_id(row),FF_of_t.getRow(row));
 
-    tmp.setQ2(linear_system.Q2()); 
-    SEMBLE::SEMBLEIO::makeDirectoryPath(base_path() + std::string("t_ins_fits/"));
-    fit_across_time.fit<std::complex<double> >(base_path() + std::string("t_ins_fits/"),
-        tmp,
-        fit_props,
-        tsrc,
-        tsnk);
+    tmp.Qsq = linear_system.Q2(); 
+    std::string pth = base_path() + std::string("t_ins_fits/");
+    SEMBLE::SEMBLEIO::makeDirectoryPath(pth);
+
+    // run the fit
+    fit_across_time.fit(pth,tmp,fit_props,tsrc,tsnk);
     init_fits = true; 
   }
 
@@ -213,35 +216,36 @@ namespace radmat
         const int ff,
         const int ff_max) const
     {
-      // snarf (RGEism)  ffs
-      LLSQRet_ff_Q2Pack<std::complex<double> > tmp;
-
-      // build a "fake" pack
-      tmp.insert(ff,get_ensem_row(ff,FF_of_t));
-      tmp.setQ2(Q2); 
-
-      // i/o junk 
-      std::string base_p = std::string("REFIT/");
-      SEMBLE::SEMBLEIO::makeDirectoryPath(base_p); 
-      SEMBLE::SEMBLEIO::makeDirectoryPath(base_p + std::string("t_ins_fits/"));
-
-      // run a fit on this ff 
-      TinsFitter local_fit_across_time; 
-      local_fit_across_time.single_fit<std::complex<double> >(base_p + std::string("t_ins_fits/"),
-          tmp,
-          ff_max, 
-          fit_props,
-          tsrc,
-          tsnk);
-
-
-      // dump results
-      SEMBLE::SEMBLEIO::makeDirectoryPath(base_p + std::string("fit_logs/"));
-      local_fit_across_time.writeFitLogs(base_p + std::string("fit_logs/"));
-      SEMBLE::SEMBLEIO::makeDirectoryPath(base_p + std::string("component_fits/")); 
-      local_fit_across_time.writeFitPlotsWithComponents(base_p + std::string("component_fits/"));
-      SEMBLE::SEMBLEIO::makeDirectoryPath(base_p + std::string("jack_files/")); 
-      write_single_jackfile_fit_report ( local_fit_across_time, base_p + std::string("jack_files/"), ff);
+      // stub
+//      // snarf (RGEism)  ffs
+//      LLSQRet_ff_Q2Pack<std::complex<double> > tmp;
+//
+//      // build a "fake" pack
+//      tmp.insert(ff,get_ensem_row(ff,FF_of_t));
+//      tmp.setQ2(Q2); 
+//
+//      // i/o junk 
+//      std::string base_p = std::string("REFIT/");
+//      SEMBLE::SEMBLEIO::makeDirectoryPath(base_p); 
+//      SEMBLE::SEMBLEIO::makeDirectoryPath(base_p + std::string("t_ins_fits/"));
+//
+//      // run a fit on this ff 
+//      TinsFitter local_fit_across_time; 
+//      local_fit_across_time.single_fit<std::complex<double> >(base_p + std::string("t_ins_fits/"),
+//          tmp,
+//          ff_max, 
+//          fit_props,
+//          tsrc,
+//          tsnk);
+//
+//
+//      // dump results
+//      SEMBLE::SEMBLEIO::makeDirectoryPath(base_p + std::string("fit_logs/"));
+//      local_fit_across_time.writeFitLogs(base_p + std::string("fit_logs/"));
+//      SEMBLE::SEMBLEIO::makeDirectoryPath(base_p + std::string("component_fits/")); 
+//      local_fit_across_time.writeFitPlotsWithComponents(base_p + std::string("component_fits/"));
+//      SEMBLE::SEMBLEIO::makeDirectoryPath(base_p + std::string("jack_files/")); 
+//      write_single_jackfile_fit_report ( local_fit_across_time, base_p + std::string("jack_files/"), ff);
     }
 
   void RadmatSingleQ2Driver::chisq_analysis(const int tlows, const int thighs)
@@ -251,9 +255,11 @@ namespace radmat
     int tlow = tlows; 
     int thigh = thighs; 
 
-    for(int fn = 0; fn < fit_across_time.nFF(); ++fn)
+    std::vector<std::string> ids = fit_across_time.ff_ids(); 
+    std::vector<std::string>::const_iterator it; 
+    for(it = ids.begin(); it != ids.end(); ++it)
     {
-      rHandle<FitThreePoint> some_fit = fit_across_time.getFit(fn); 
+      rHandle<FitThreePoint> some_fit = fit_across_time.getFit(*it); 
       if ( some_fit->tlow() > tlow) 
         tlow = some_fit->tlow(); 
 

@@ -6,7 +6,7 @@
 
  * Creation Date : 18-12-2013
 
- * Last Modified : Fri 20 Dec 2013 04:41:44 PM EST
+ * Last Modified : Fri 21 Feb 2014 09:45:57 AM EST
 
  * Created By : shultz
 
@@ -16,6 +16,7 @@
 #include "lorentzff_formfac_utils.h"
 #include "hadron/clebsch.h"
 #include "radmat/utils/pow2assert.h"
+#include "semble/semble_semble.h"
 
 
 

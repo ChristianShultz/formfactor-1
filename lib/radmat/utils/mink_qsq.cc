@@ -6,7 +6,7 @@
 
  * Creation Date : 01-11-2013
 
- * Last Modified : Fri 01 Nov 2013 03:57:37 PM EDT
+ * Last Modified : Fri 21 Feb 2014 09:58:21 AM EST
 
  * Created By : shultz
 
@@ -44,6 +44,12 @@ namespace radmat
     double q_time =  sqrt(mi*mi + p_i_sq) - sqrt(mf*mf + p_f_sq);  
 
     return -((q_time*q_time) - q_space_sq); 
+  }
+
+
+  double mom_factor(const double xi, const int L_s) 
+  {
+    return 2.*acos(-1.)/xi/double(L_s);
   }
 
 
