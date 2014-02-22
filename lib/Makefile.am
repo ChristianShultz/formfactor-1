@@ -50,6 +50,7 @@ nobase_include_HEADERS =   \
 													 radmat/ff/lorentzff_formfactor_factory.h    \
 													 radmat/ff/lorentzff_formfac_utils.h    \
 													 radmat/ff/lorentzff_polarization_embedding.h    \
+													 radmat/ff/lorentzff_polarization_embedding_old.h    \
 													 radmat/ff/lorentzff_polarization_tensors.h    \
 													 radmat/ff/lorentzff_RhoPi.h    \
 													 radmat/ff/lorentzff_Wigner_D_matrix_embedding.h    \

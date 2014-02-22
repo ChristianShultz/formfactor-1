@@ -6,7 +6,7 @@
 
 * Creation Date : 22-04-2013
 
-* Last Modified : Fri 21 Feb 2014 04:13:59 PM EST
+* Last Modified : Sat 22 Feb 2014 05:05:47 PM EST
 
 * Created By : shultz
 
@@ -16,10 +16,31 @@ _._._._._._._._._._._._._._._._._._._._._.*/
 #include <string>
 #include <sstream>
 
-#include "radmat/ff/formfactor_factory.h"
+#include "radmat/ff/lorentzff_formfactor_factory.h"
 #include "radmat/ff/lorentzff_canonical_rotations.h"
 #include "radmat/utils/tensor.h"
 #include "radmat/register_all/register_all.h"
+
+//
+//
+// NB: this uses lorentzff_formfactor_factory
+//
+//  the internal form factors used by radmat are 
+//  mapped to linear combinations of these but are
+//  evaluated in a slightly different way, check 
+//  radmat/ff_interface/forfactor_factory.h for
+//  more details 
+//
+//
+//  -- currently this guy does not have access to 
+//  the cubic form factors 
+//
+//  -- currently this guy does not have access to 
+//  the helicity form factors
+//
+//
+
+
 
 using namespace radmat;
 using namespace std; 
@@ -123,7 +144,7 @@ int main(int argc, char *argv[])
   std::cout << "the canonical frame is " <<
     radmat::LatticeRotationEnv::TheRotationGroupGenerator::Instance().get_can_frame_string(fred.l,fred.r) << std::endl;
 
-  rHandle<FFAbsBase_t > foo = FormFactorDecompositionFactoryEnv::callFactory(fred.matElemID); 
+  rHandle<FFAbsBase_t > foo = LorentzffFormFactorDecompositionFactoryEnv::callFactory(fred.matElemID); 
 
   itpp::Mat<std::complex<double> > baz = (*foo)( 
       std::pair< Tensor<double,1> , int >(fred.pf,fred.hf),

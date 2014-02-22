@@ -6,14 +6,13 @@
 
  * Creation Date : 10-12-2013
 
- * Last Modified : Sat 22 Feb 2014 04:48:00 PM EST
+ * Last Modified : Sat 22 Feb 2014 05:02:39 PM EST
 
  * Created By : shultz
 
  _._._._._._._._._._._._._._._._._._._._._.*/
 
 
-#include "radmat/ff/formfactor_factory.h"
 #include "radmat/ff/lorentzff_canonical_rotations.h"
 #include "radmat/ff/lorentzff_Wigner_D_matrix_factory.h"
 #include "radmat/ff/lorentzff_formfactor_factory.h"
@@ -47,6 +46,8 @@ namespace radmat
         try
         {
           success &= radmat::InvertSubductionEnv::registerAll(); 
+          success &= radmat::LorentzffFormFactorDecompositionFactoryEnv::registerAll(); 
+          success &= radmat::SpherInvariantsFactoryEnv::registerAll(); 
           success &= radmat::FormFactorDecompositionFactoryEnv::registerAll(); 
           success &= radmat::LLSQSolverFactoryEnv::registerAll(); 
           success &= radmat::TheRedstarAbstractMergeNPtFactoryEnv::registerAll(); 
