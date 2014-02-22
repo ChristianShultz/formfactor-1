@@ -255,6 +255,7 @@ nobase_include_HEADERS = \
 													 radmat/ff/formfactor_factory.h			\
 													 radmat/ff/formfactor_kinematic_factors.h			\
 													 radmat/ff/formfactor_utils.h			\
+													 radmat/ff/lorentzff_canonical_cont_spin_formfactors.h			\
 													 radmat/ff/lorentzff_canonical_frame_formfacs_rotation_manager.h			\
 													 radmat/ff/lorentzff_canonical_frame_formfactor.h			\
 													 radmat/ff/lorentzff_canonical_JJlist_ff.h			\

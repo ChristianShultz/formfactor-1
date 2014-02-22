@@ -11,11 +11,15 @@
 #include "adat/objfactory.h"
 
 // ffs
-#include "lorentzff_canonical_PiPi.h"
-#include "lorentzff_canonical_PiPiStar.h"
-#include "lorentzff_canonical_PiRho.h"
-#include "lorentzff_canonical_RhoPi.h"
-#include "lorentzff_canonical_RhoRho.h"
+//#include "lorentzff_canonical_PiPi.h"
+//#include "lorentzff_canonical_PiPiStar.h"
+//#include "lorentzff_canonical_PiRho.h"
+//#include "lorentzff_canonical_RhoPi.h"
+//#include "lorentzff_canonical_RhoRho.h"
+
+
+#include "lorentzff_canonical_cont_spin_formfactors.h"
+
 
 #include <omp.h>
 
@@ -38,12 +42,12 @@ namespace radmat
         return t;
       }
 
-    template<typename Base, typename Derived> 
+    template<typename Derived> 
       bool 
       do_reg(void)
       {
         std::string reg_id = Stringify<Derived>(); 
-        bool reg = Factory::Instance().registerObject(reg_id, upCast<Base,Derived> ); 
+        bool reg = Factory::Instance().registerObject(reg_id, upCast<FFAbsBase_t,Derived> ); 
 
         if ( !!! reg ) 
         {
@@ -97,11 +101,24 @@ namespace radmat
       if(!!!registered)
       {
 
-          success &= do_reg< FFAbsBase_t ,radmat::PiPi<0,0> >();
-          success &= do_reg<FFAbsBase_t ,radmat::PiPiStar<0,0> >();
-          success &= do_reg<FFAbsBase_t, radmat::PiRho<0,1> >();
-          success &= do_reg<FFAbsBase_t, radmat::RhoPi<1,0> >();
-          success &= do_reg<FFAbsBase_t, radmat::RhoRho<1,1> >();
+      //    success &= do_reg<radmat::PiPi<0,0> >();
+      //    success &= do_reg<radmat::PiPiStar<0,0> >();
+      //    success &= do_reg<radmat::PiRho<0,1> >();
+      //    success &= do_reg<radmat::RhoPi<1,0> >();
+      //    success &= do_reg<radmat::RhoRho<1,1> >();
+
+
+        success &= do_reg<J0pJ0p_diag>();
+        success &= do_reg<J0mJ0m_diag>();
+        success &= do_reg<J0pJ0p_tran>();
+        success &= do_reg<J0mJ0m_tran>();
+        success &= do_reg<J1mJ0m_tran>();
+        success &= do_reg<J1pJ0p_tran>();
+        success &= do_reg<J0mJ1m_tran>();
+        success &= do_reg<J0pJ1p_tran>();
+        success &= do_reg<J1pJ1p_diag>();
+        success &= do_reg<J1mJ1m_diag>();
+
 
         registered = true;
       }
