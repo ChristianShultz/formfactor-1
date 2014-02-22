@@ -20,7 +20,6 @@
 #include "radmat/ff/lorentzff_cubic_reps.h"
 #include "radmat/ff/lorentzff_formfac_utils.h"
 #include "radmat/ff/lorentzff_polarization_embedding.h"
-#include "radmat/ff/lorentzff_polarization_embedding_old.h"
 #include "radmat/ff/lorentzff_polarization_tensors.h"
 #include "radmat/ff/lorentzff_RhoPi.h"
 #include "radmat/ff/lorentzff_Wigner_D_matrix_embedding.h"

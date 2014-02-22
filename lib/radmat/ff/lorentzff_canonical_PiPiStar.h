@@ -63,13 +63,13 @@ namespace radmat
 
   // generate a list for the PiPiStar constructor
   template<int embedl, int embedr>
-    FFAbsBase_t::FFAbs_list PiPiStarGenList(void)
+    LorentzFFAbsBase_t::LorentzFFAbs_list PiPiStarGenList(void)
     {
-      FFAbsBase_t::FFAbs_list retPiPiStar;
-      FFAbsBase_t::BBType *blockPtr;
+      LorentzFFAbsBase_t::LorentzFFAbs_list retPiPiStar;
+      LorentzFFAbsBase_t::BBType *blockPtr;
       blockPtr = new PiPiStarF1();
       POW2_ASSERT(blockPtr);  // blow up if something went wrong
-      retPiPiStar.push_back(FFAbsBase_t::BBHandle_t(blockPtr));
+      retPiPiStar.push_back(LorentzFFAbsBase_t::BBHandle_t(blockPtr));
       return retPiPiStar;
     }
 
@@ -84,23 +84,23 @@ namespace radmat
   // base class, do this polymorphically, make some function that 
   // returns the appropriate handle based on the requested matrix element type
   template<int embedl, int embedr>
-    struct PiPiStar : public FFAbsBase_t
+    struct PiPiStar : public LorentzFFAbsBase_t
   {
     PiPiStar(void)
-      : FFAbsBase_t(radmat::PiPiStarGenList<embedl,embedr>())  
+      : LorentzFFAbsBase_t(radmat::PiPiStarGenList<embedl,embedr>())  
     {  } 
 
     PiPiStar& operator=(const PiPiStar &o)
     {
 
       if(this != &o)
-        FFAbsBase_t::operator=(o);
+        LorentzFFAbsBase_t::operator=(o);
       return *this;
     }
 
     // no slicing
     PiPiStar(const PiPiStar &o)
-      : FFAbsBase_t(o)
+      : LorentzFFAbsBase_t(o)
     {  }
 
     virtual std::string id(void) const { return Stringify< PiPiStar<embedl,embedr> >(); }
@@ -109,8 +109,8 @@ namespace radmat
 
     private:
     // I'm not sure if these could inherit so we will hide them as well
-    PiPiStar(const FFAbsBase_t::FFAbs_list &);
-    PiPiStar(const FFAbsBase_t::FFAbs_list);
+    PiPiStar(const LorentzFFAbsBase_t::LorentzFFAbs_list &);
+    PiPiStar(const LorentzFFAbsBase_t::LorentzFFAbs_list);
   };
 
 } // close radmat

@@ -6,7 +6,7 @@
 
  * Creation Date : 10-12-2013
 
- * Last Modified : Mon 16 Dec 2013 10:30:17 AM EST
+ * Last Modified : Sat 22 Feb 2014 04:48:00 PM EST
 
  * Created By : shultz
 
@@ -16,6 +16,9 @@
 #include "radmat/ff/formfactor_factory.h"
 #include "radmat/ff/lorentzff_canonical_rotations.h"
 #include "radmat/ff/lorentzff_Wigner_D_matrix_factory.h"
+#include "radmat/ff/lorentzff_formfactor_factory.h"
+#include "radmat/ff_interface/formfactor_spherical_invariants.h"
+#include "radmat/ff_interface/formfactor_factory.h"
 #include "radmat/llsq/llsq_solvers.h"
 #include "radmat/redstar_interface/redstar_abstract_merge_npoint_factory.h"
 #include "radmat/redstar_interface/redstar_abstract_xml_factory.h"

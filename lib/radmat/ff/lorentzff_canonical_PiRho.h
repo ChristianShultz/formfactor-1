@@ -89,13 +89,13 @@ namespace radmat
   //  use an embedding so we can play with subduction later
   //
   template< int embedl , int embedr  > 
-    FFAbsBase_t::FFAbs_list PiRhoGenList(void)
+    LorentzFFAbsBase_t::LorentzFFAbs_list PiRhoGenList(void)
     {
-      FFAbsBase_t::FFAbs_list retCanonicalPiRho;
-      FFAbsBase_t::BBType *blockPtr;
+      LorentzFFAbsBase_t::LorentzFFAbs_list retCanonicalPiRho;
+      LorentzFFAbsBase_t::BBType *blockPtr;
       blockPtr = new PiRhoF1();
       POW2_ASSERT(blockPtr);
-      retCanonicalPiRho.push_back(FFAbsBase_t::BBHandle_t(blockPtr));
+      retCanonicalPiRho.push_back(LorentzFFAbsBase_t::BBHandle_t(blockPtr));
       return retCanonicalPiRho;
     }
 
@@ -109,21 +109,21 @@ namespace radmat
 
   //  use an embedding so we can play with subduction later
   template<int embedl, int embedr>
-    struct PiRho : public FFAbsBase_t
+    struct PiRho : public LorentzFFAbsBase_t
   {
     PiRho(void)
-      : FFAbsBase_t(radmat::PiRhoGenList<embedl,embedr>())
+      : LorentzFFAbsBase_t(radmat::PiRhoGenList<embedl,embedr>())
     {  }
 
     PiRho& operator=(const PiRho &o)
     {
       if(this != &o)
-        FFAbsBase_t::operator=(o);
+        LorentzFFAbsBase_t::operator=(o);
       return *this;
     }
 
     PiRho(const PiRho &o)
-      : FFAbsBase_t(o)
+      : LorentzFFAbsBase_t(o)
     { }
 
     virtual ~PiRho() {}
@@ -133,8 +133,8 @@ namespace radmat
     virtual int right_spin(void) const { return embedr; }
 
     private:
-    PiRho(const FFAbsBase_t::FFAbs_list &);
-    PiRho(const FFAbsBase_t::FFAbs_list); 
+    PiRho(const LorentzFFAbsBase_t::LorentzFFAbs_list &);
+    PiRho(const LorentzFFAbsBase_t::LorentzFFAbs_list); 
 
   };
 

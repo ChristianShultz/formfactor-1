@@ -17,14 +17,7 @@
 namespace radmat
 {
 
-  enum FFMODE
-  {
-    HELICITY, 
-    CUBIC
-  };
-
-
-  typedef std::pair< Tensor<double,1> , int > MomHelPair_t; 
+  typedef std::pair< Tensor<double,1> , int > MomRowPair_t; 
 
   // this is a base class to set up list of handles 
   // to polymorphic functors to construct a generalization
@@ -43,10 +36,9 @@ namespace radmat
     virtual std::string ff() const {return Stringify<FFAbsBlockBase_t>();}
     virtual std::string id() const = 0; // the derived class name
 
-
     virtual Tensor<std::complex<double> , 1> 
-      operator()( const MomHelPair_t &lefty, 
-          const MomHelPair_t &righty,
+      operator()( const MomRowPair_t &lefty, 
+          const MomRowPair_t &righty,
           const double mom_fac) const = 0; 
   };
 
@@ -64,83 +56,29 @@ namespace radmat
   struct FFAbsBase_t; 
   REGISTER_STRINGIFY_TYPE( FFAbsBase_t );
 
+
+  // this is pure right now
   struct FFAbsBase_t
   {
-    // save some typing
-    typedef FFAbsBlockBase_t BBType;
-    typedef rHandle< FFAbsBlockBase_t > BBHandle_t;
-    typedef std::list< BBHandle_t > FFAbs_list;
 
-    // this will be useful when we derive
-    FFAbsBase_t(const FFAbs_list& list)
-      : m_list(list) 
-    {  }
-
-    FFAbsBase_t& operator=(const FFAbsBase_t &o)
-    {
-      if(this != &o)
-      {
-        m_list = o.m_list;
-      }
-      return *this;
-    }
-
-    FFAbsBase_t(const FFAbsBase_t &o)
-      : m_list(o.m_list)
-    {  }
-
-    // needs to be present and virtual b/c we are using pointers to derived
-    virtual ~FFAbsBase_t(void) {}
-
-    // useful higher up
-    virtual int nFacs(void) const {return m_list.size();}
-
-    // generate some tex code corresponding to thestring of stuff we think this is making
-    std::string ff(void) const 
-    {
-      std::stringstream ss;
-      FFAbs_list::const_iterator it;
-      for (it = m_list.begin(); it != m_list.end(); it++)
-        ss << (*it)->ff() << "  ";
-      return ss.str();
-    }
-
-    std::map<int,std::string> ff_ids(void) const
-    {
-      std::map<int,std::string> ret; 
-      int index = 0; 
-      FFAbs_list::const_iterator it; 
-      for(it = m_list.begin(); it != m_list.end(); ++it)
-      {
-        ret[index] = (*it)->id(); 
-        ++index; 
-      } 
-      return ret; 
-    }
-
-    // matrix elem id
+    virtual ~FFAbsBase_t() {}
+    virtual int nFacs(void) const = 0; 
+    virtual std::string ff(void) const = 0; 
+    virtual std::map<int,std::string> ff_ids(void) const = 0; 
     virtual std::string id() const { return Stringify<FFAbsBase_t>(); }
     virtual int left_spin() const = 0; 
     virtual int right_spin() const = 0; 
 
-    // generate the linear system based on the available set of kinematic factors
     virtual itpp::Mat<std::complex<double> > 
-      operator()( const MomHelPair_t &lefty, 
-          const MomHelPair_t &righty,
-          const double mom_fac) const
-      {
-        itpp::Mat<std::complex<double> > ret;
+      operator()( const MomRowPair_t &lefty, 
+          const MomRowPair_t &righty,
+          const double mom_fac) const = 0; 
 
-        FFAbs_list::const_iterator it;
-        for (it = m_list.begin(); it != m_list.end(); it++)
-          ret.append_col(toItpp<std::complex<double> >((**it)(lefty,righty,mom_fac)));
 
-        return ret;
-      }
-
-    MomHelPair_t to_mom_hel_pair( const double E, 
+    // only actual methods
+    virtual MomRowPair_t to_mom_row_pair( const double E, 
         const Array<double> &p, 
-        const int h)
+        const int row)
     {
       Tensor<double,1> mom( (TensorShape<1>())[4] , 0. );
       mom[0] = E;
@@ -148,30 +86,24 @@ namespace radmat
       mom[2] = p[1];
       mom[3] = p[2];
 
-      return MomHelPair_t(mom,h); 
+      return MomRowPair_t(mom,row); 
     }
 
     // wrap the call to operator() so we have a condensed
     // version of the information later
     virtual itpp::Mat<std::complex<double> >
       wrapper(const ENSEM::Real El, 
-        const Array<double> &pl,
-        const int hl, 
-        const ENSEM::Real Er, 
-        const Array<double> &pr,
-        const int hr,
-        const double mom_fac)
-    {
-      return this->operator()(to_mom_hel_pair(ENSEM::toDouble(El),pl,hl),
-          to_mom_hel_pair(ENSEM::toDouble(Er),pr,hr),
-          mom_fac); 
-    }
-
-    protected:  // hide ctor
-    FFAbsBase_t(void);
-
-    // data store
-    FFAbs_list m_list;
+          const Array<double> &pl,
+          const int hl, 
+          const ENSEM::Real Er, 
+          const Array<double> &pr,
+          const int hr,
+          const double mom_fac)
+      {
+        return this->operator()(to_mom_row_pair(ENSEM::toDouble(El),pl,hl),
+            to_mom_row_pair(ENSEM::toDouble(Er),pr,hr),
+            mom_fac); 
+      }
   };
 
 

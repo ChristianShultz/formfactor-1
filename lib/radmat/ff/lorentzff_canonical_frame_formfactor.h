@@ -4,6 +4,11 @@
 
 #include "lorentzff_canonical_frame_formfacs_rotation_manager.h"
 
+// throw this in even though no dependence since all 
+// block types include this file, provides the 
+// definition of the formfactor list type
+#include "lorentzff_formfactor_abs_base_cfg.h"
+
 namespace radmat
 {
 
@@ -15,12 +20,11 @@ namespace radmat
     : public DerivedFF,
     public FFAbsBlockBase_t
   {
-    typedef MomHelPair_t p4_t; 
 
     virtual ~canonicalFrameFormFactor() {}
 
     virtual Tensor<std::complex<double>,1>
-      operator()(const p4_t &l, const p4_t &r, const double kick) const 
+      operator()(const MomRowPair_t &l, const MomRowPair_t &r, const double kick) const 
       {
         return DerivedFF::operator()(l.first,r.first,kick,Jl,Jr,l.second,r.second); 
       }   

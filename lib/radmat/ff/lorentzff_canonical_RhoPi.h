@@ -87,13 +87,13 @@ namespace radmat
 
 
     template<int embedl, int embedr>
-      FFAbsBase_t::FFAbs_list RhoPiGenList(void)
+      LorentzFFAbsBase_t::LorentzFFAbs_list RhoPiGenList(void)
       {
-        FFAbsBase_t::FFAbs_list retRhoPi;
-        FFAbsBase_t::BBType *blockPtr;
+        LorentzFFAbsBase_t::LorentzFFAbs_list retRhoPi;
+        LorentzFFAbsBase_t::BBType *blockPtr;
         blockPtr = new radmat::RhoPiF1();
         POW2_ASSERT(blockPtr);
-        retRhoPi.push_back(FFAbsBase_t::BBHandle_t(blockPtr));
+        retRhoPi.push_back(LorentzFFAbsBase_t::BBHandle_t(blockPtr));
         return retRhoPi;
       }
 
@@ -104,21 +104,21 @@ namespace radmat
 
 
   template<int embedl, int embedr>
-    struct RhoPi : public FFAbsBase_t
+    struct RhoPi : public LorentzFFAbsBase_t
   {
     RhoPi(void) 
-      : FFAbsBase_t(radmat::RhoPiGenList<embedl,embedr>())
+      : LorentzFFAbsBase_t(radmat::RhoPiGenList<embedl,embedr>())
     {   }
 
     RhoPi& operator=(const RhoPi &o)
     {
       if(this != &o)
-        FFAbsBase_t::operator=(o);
+        LorentzFFAbsBase_t::operator=(o);
       return *this; 
     }
 
     RhoPi(const RhoPi &o)
-      : FFAbsBase_t(o)
+      : LorentzFFAbsBase_t(o)
     {  }
 
     virtual ~RhoPi() {}
@@ -128,8 +128,8 @@ namespace radmat
     virtual int right_spin(void) const { return embedr; }
 
     private:
-    RhoPi(const FFAbsBase_t::FFAbs_list &);
-    RhoPi(const FFAbsBase_t::FFAbs_list); 
+    RhoPi(const LorentzFFAbsBase_t::LorentzFFAbs_list &);
+    RhoPi(const LorentzFFAbsBase_t::LorentzFFAbs_list); 
 
   };
 

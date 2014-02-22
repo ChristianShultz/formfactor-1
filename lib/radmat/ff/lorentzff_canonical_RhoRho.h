@@ -186,10 +186,10 @@ namespace radmat
   //////////////////////////////////////////////////////////////////
 
   template<int embedl, int embedr>
-    FFAbsBase_t::FFAbs_list RhoRhoGenList(void)
+    LorentzFFAbsBase_t::LorentzFFAbs_list RhoRhoGenList(void)
     {
-      FFAbsBase_t::FFAbs_list retRhoRho; 
-      FFAbsBase_t::BBType *g1 , *g2, *g3; 
+      LorentzFFAbsBase_t::LorentzFFAbs_list retRhoRho; 
+      LorentzFFAbsBase_t::BBType *g1 , *g2, *g3; 
 
       try
       {
@@ -202,9 +202,9 @@ namespace radmat
         POW2_ASSERT( g2 );
         POW2_ASSERT( g3 );
 
-        retRhoRho.push_back(FFAbsBase_t::BBHandle_t(g1)); 
-        retRhoRho.push_back(FFAbsBase_t::BBHandle_t(g2)); 
-        retRhoRho.push_back(FFAbsBase_t::BBHandle_t(g3)); 
+        retRhoRho.push_back(LorentzFFAbsBase_t::BBHandle_t(g1)); 
+        retRhoRho.push_back(LorentzFFAbsBase_t::BBHandle_t(g2)); 
+        retRhoRho.push_back(LorentzFFAbsBase_t::BBHandle_t(g3)); 
       }
       catch(...)
       {
@@ -223,22 +223,22 @@ namespace radmat
   //////////////////////////////////////////////////////////////////
   //////////////////////////////////////////////////////////////////
   template<int embedl, int embedr>
-    struct RhoRho : public FFAbsBase_t
+    struct RhoRho : public LorentzFFAbsBase_t
   {
     RhoRho(void)
-      : FFAbsBase_t(radmat::RhoRhoGenList<embedl,embedr>())
+      : LorentzFFAbsBase_t(radmat::RhoRhoGenList<embedl,embedr>())
     { }
 
     RhoRho& operator=(const RhoRho &o)
     {
       if (this != &o)
-        FFAbsBase_t::operator=(o);
+        LorentzFFAbsBase_t::operator=(o);
 
       return *this; 
     }
 
     RhoRho(const RhoRho &o)
-      : FFAbsBase_t(o)
+      : LorentzFFAbsBase_t(o)
     {  }
 
     virtual ~RhoRho() {}
@@ -248,8 +248,8 @@ namespace radmat
     virtual int right_spin(void) const { return embedr; }
 
     private: 
-    RhoRho(const FFAbsBase_t::FFAbs_list &); 
-    RhoRho(const FFAbsBase_t::FFAbs_list ); 
+    RhoRho(const LorentzFFAbsBase_t::LorentzFFAbs_list &); 
+    RhoRho(const LorentzFFAbsBase_t::LorentzFFAbs_list ); 
   };
 
 

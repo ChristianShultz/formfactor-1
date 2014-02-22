@@ -1,9 +1,9 @@
-// formfactor_factory.cc -
+// lorentzff_formfactor_factory.cc -
 //
 // Saturday, June  2 2012
 //
 
-#include"formfactor_factory.h"
+#include "lorentzff_formfactor_factory.h"
 #include <string>
 #include <complex>
 #include <exception>
@@ -23,14 +23,14 @@
 
 #include <omp.h>
 
-namespace FacEnv = radmat::FormFactorDecompositionFactoryEnv;
-typedef radmat::TheFormFactorDecompositionFactory Factory;
+namespace FacEnv = radmat::LorentzffFormFactorDecompositionFactoryEnv;
+typedef radmat::TheLorentzffFormFactorDecompositionFactory Factory;
 
 
 namespace radmat
 {
 
-  namespace FormFactorDecompositionFactoryEnv
+  namespace LorentzffFormFactorDecompositionFactoryEnv
   {
 
     // helper function
@@ -47,7 +47,8 @@ namespace radmat
       do_reg(void)
       {
         std::string reg_id = Stringify<Derived>(); 
-        bool reg = Factory::Instance().registerObject(reg_id, upCast<FFAbsBase_t,Derived> ); 
+        bool reg = Factory::Instance().registerObject(
+            reg_id, upCast<FFAbsBase_t,Derived> ); 
 
         if ( !!! reg ) 
         {
@@ -58,7 +59,6 @@ namespace radmat
 
     bool registered = false;
 
-    // never played with this toy before so we are just going to 
     // make it blow up if anything goes wrong by wrapping another 
     // call around the factory.createObj method
     rHandle<FFAbsBase_t > callFactory(const std::string &matElemID)
@@ -67,7 +67,7 @@ namespace radmat
       foo = NULL;
       try
       {
-        foo = TheFormFactorDecompositionFactory::Instance().createObject(matElemID);
+        foo = TheLorentzffFormFactorDecompositionFactory::Instance().createObject(matElemID);
       }
       catch(std::exception &e)
       {
@@ -88,14 +88,22 @@ namespace radmat
         POW2_ASSERT(false); 
       }
 
+      // not a null pointer
       POW2_ASSERT(foo);
       return rHandle<FFAbsBase_t >(foo);
     }
 
+    // dump all keys in the factory
+    std::vector<std::string> 
+      all_keys(void)
+    {
+      return TheLorentzffFormFactorDecompositionFactory::Instance().keys(); 
+    }
+
+
     // register the factory "inventory"
     bool registerAll( void )
     {
-
       bool success = true;
 
       if(!!!registered)
@@ -125,14 +133,12 @@ namespace radmat
 
       if( !!! success )
       {
-        throw std::string("failed to reg in FormFactorDecompositionFactoryEnv"); 
+        throw std::string("failed to reg in LorentzffFormFactorDecompositionFactoryEnv"); 
       }
 
       return success;
-
     }
 
-
-  } // close FormFactorDecompositionFactoryEnv
+  } // close LorentzffFormFactorDecompositionFactoryEnv
 
 } // close radmat

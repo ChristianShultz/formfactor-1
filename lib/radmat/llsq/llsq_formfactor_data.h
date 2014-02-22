@@ -24,7 +24,7 @@ namespace radmat
     LLSQFormFactorData_t() 
     {
       Qsq.resize(1); 
-      Qsq = SEMBLE::toScalar(double(1337)); 
+      Qsq = SEMBLE::toScalar(double(0.)); 
     }
 
     LLSQFormFactorData_t(const LLSQFormFactorData_t &d)
