@@ -21,14 +21,32 @@
 namespace radmat
 {
 
+  struct PtrRecipeHolder
+  {
+    typedef std::map<std::string, FormFactorRecipe_t *> map_t; 
+    ~PtrRecipeHolder() 
+    {
+      map_t::iterator it; 
+      for(it = mappy.begin(); it != mappy.end(); ++it)
+        delete it->second; 
+    }
+
+    map_t mappy; 
+  };
+
+  // use PtrRecipeHolder since this can be threadded 
+  typedef Util::SingletonHolder< PtrRecipeHolder >
+    TheFormFactorInjectionRecipeCookbook; 
+
+
   // inject recipes upon instantiation 
   typedef Util::SingletonHolder<
-    Util::ObjectFactory<FormFactorRecipe_t,
-			std::string,
-			void,
-			FormFactorRecipe_t* (*)(void),
-			Util::StringFactoryError> >
-  TheFormFactorInjectionRecipeFactory;
+    Util::ObjectFactory<FFAbsBase_t,
+    std::string,
+    TYPELIST_1(const std::string &),
+    FFAbsBase_t* (*)(const std::string &),
+    Util::StringFactoryError> >
+      TheFormFactorInjectionRecipeFactory;
 
 
   // return a recipe injected form factor

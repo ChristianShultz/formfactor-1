@@ -6,7 +6,7 @@
 
  * Creation Date : 25-02-2013
 
- * Last Modified : Sat 11 Jan 2014 06:07:52 PM EST
+ * Last Modified : Sat 22 Feb 2014 05:39:23 PM EST
 
  * Created By : shultz
 
@@ -154,6 +154,12 @@ void gen_xml(int argc , char *argv[] )
   d.xml_handler(ini,mode); 
 }
 
+
+//    just do a registration
+//
+/////////////////////////////////////////////////////
+void do_registerAll(int argc , char *argv[] )
+{}
 
 //    use a statedatabase to check the rotation 
 //    properties of the data 
@@ -423,6 +429,7 @@ void init_options(void)
   options.insert(std::pair<std::string,fptr>("rot_llsq",&rot_llsq)); 
   options.insert(std::pair<std::string,fptr>("Q2_llsq",&Q2_llsq)); 
   options.insert(std::pair<std::string,fptr>("refit_ffs",&refit_ffs)); 
+  options.insert(std::pair<std::string,fptr>("registerAll",&do_registerAll));
 }
 
 // pick appropriate function and pass on command line inputs 

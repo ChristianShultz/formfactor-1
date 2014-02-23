@@ -6,7 +6,7 @@
 
  * Creation Date : 09-12-2013
 
- * Last Modified : Thu 12 Dec 2013 05:45:05 PM EST
+ * Last Modified : Sun 23 Feb 2014 10:34:23 AM EST
 
  * Created By : shultz
 
@@ -15,6 +15,7 @@
 #include "redstar_canonical_rotations.h"
 #include "hadron/irrep_util.h"
 #include <exception>
+#include "radmat/utils/printer.h"
 
 
 
@@ -119,6 +120,7 @@ namespace radmat
 
     bool registerAll(void)
     {
+      printer_function<debug_print_reg_all>(__PRETTY_FUNCTION__); 
       bool success = true; 
 
       if ( !!! local_registration )

@@ -19,6 +19,7 @@ bin_PROGRAMS =   \
 								 mass_overlap_db_util		\
 								 radmat		\
 								 radmat_util		\
+								 simple_test		\
 								 single_plot		\
 								 test_levi_civita \
 								 test_redstar_ops		\
@@ -35,6 +36,7 @@ mass_overlap_db_create_SOURCES = mass_overlap_db_create.cc
 mass_overlap_db_util_SOURCES = mass_overlap_db_util.cc
 radmat_SOURCES = radmat.cc
 radmat_util_SOURCES = radmat_util.cc
+simple_test_SOURCES = simple_test.cc
 single_plot_SOURCES = single_plot.cc
 test_levi_civita_SOURCES = test_levi_civita.cc
 test_redstar_ops_SOURCES = test_redstar_ops.cc

@@ -9,6 +9,7 @@
 #include <exception>
 #include "adat/singleton.h"
 #include "adat/objfactory.h"
+#include "radmat/utils/printer.h"
 
 // ffs
 //#include "lorentzff_canonical_PiPi.h"
@@ -33,31 +34,34 @@ namespace radmat
   namespace LorentzffFormFactorDecompositionFactoryEnv
   {
 
-    // helper function
-    template<class T, class U> 
-      T* upCast(void)
-      {
-        T *t = new U();
-        POW2_ASSERT(t);
-        return t;
-      }
-
-    template<typename Derived> 
-      bool 
-      do_reg(void)
-      {
-        std::string reg_id = Stringify<Derived>(); 
-        bool reg = Factory::Instance().registerObject(
-            reg_id, upCast<FFAbsBase_t,Derived> ); 
-
-        if ( !!! reg ) 
+    namespace
+    {
+      // helper function
+      template<class T, class U> 
+        T* upCast(void)
         {
-          std::cout << __PRETTY_FUNCTION__ << ": reg error for " << reg_id << std::endl;
-        } 
-        return reg; 
-      }
+          T *t = new U();
+          POW2_ASSERT(t);
+          return t;
+        }
 
-    bool registered = false;
+      template<typename Derived> 
+        bool 
+        do_reg(void)
+        {
+          std::string reg_id = Stringify<Derived>(); 
+          bool reg = Factory::Instance().registerObject(
+              reg_id, upCast<FFAbsBase_t,Derived> ); 
+
+          if ( !!! reg ) 
+          {
+            std::cout << __PRETTY_FUNCTION__ << ": reg error for " << reg_id << std::endl;
+          } 
+          return reg; 
+        }
+
+      bool registered = false;
+    } // anonomyous 
 
     // make it blow up if anything goes wrong by wrapping another 
     // call around the factory.createObj method
@@ -96,24 +100,25 @@ namespace radmat
     // dump all keys in the factory
     std::vector<std::string> 
       all_keys(void)
-    {
-      return TheLorentzffFormFactorDecompositionFactory::Instance().keys(); 
-    }
+      {
+        return TheLorentzffFormFactorDecompositionFactory::Instance().keys(); 
+      }
 
 
     // register the factory "inventory"
     bool registerAll( void )
     {
+      printer_function<debug_print_reg_all>(__PRETTY_FUNCTION__); 
       bool success = true;
 
       if(!!!registered)
       {
 
-      //    success &= do_reg<radmat::PiPi<0,0> >();
-      //    success &= do_reg<radmat::PiPiStar<0,0> >();
-      //    success &= do_reg<radmat::PiRho<0,1> >();
-      //    success &= do_reg<radmat::RhoPi<1,0> >();
-      //    success &= do_reg<radmat::RhoRho<1,1> >();
+        //    success &= do_reg<radmat::PiPi<0,0> >();
+        //    success &= do_reg<radmat::PiPiStar<0,0> >();
+        //    success &= do_reg<radmat::PiRho<0,1> >();
+        //    success &= do_reg<radmat::RhoPi<1,0> >();
+        //    success &= do_reg<radmat::RhoRho<1,1> >();
 
 
         success &= do_reg<J0pJ0p_diag>();

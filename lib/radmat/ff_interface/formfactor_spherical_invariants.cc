@@ -6,7 +6,7 @@
 
 * Creation Date : 22-02-2014
 
-* Last Modified : Sat 22 Feb 2014 04:51:12 PM EST
+* Last Modified : Sun 23 Feb 2014 10:31:02 AM EST
 
 * Created By : shultz
 
@@ -14,6 +14,7 @@ _._._._._._._._._._._._._._._._._._._._._.*/
 
 #include "formfactor_spherical_invariants.h"
 #include "radmat/utils/pow2assert.h"
+#include "radmat/utils/printer.h"
 
 namespace FacEnv = radmat::SpherInvariantsFactoryEnv;
 typedef radmat::TheSpherInvariantsFactory Factory;
@@ -54,6 +55,7 @@ namespace radmat
 
     bool registerAll(void)
     {
+      printer_function<debug_print_reg_all>(__PRETTY_FUNCTION__); 
       bool success = true; 
 
       if( !!! registered )
@@ -93,6 +95,25 @@ namespace radmat
         success &= do_reg<J3m_6>();
         success &= do_reg<J3p_7>(); 
         success &= do_reg<J3m_7>();
+
+        success &= do_reg<J4p_1>(); 
+        success &= do_reg<J4m_1>();
+        success &= do_reg<J4p_2>(); 
+        success &= do_reg<J4m_2>();
+        success &= do_reg<J4p_3>(); 
+        success &= do_reg<J4m_3>();
+        success &= do_reg<J4p_4>(); 
+        success &= do_reg<J4m_4>();
+        success &= do_reg<J4p_5>(); 
+        success &= do_reg<J4m_5>();
+        success &= do_reg<J4p_6>(); 
+        success &= do_reg<J4m_6>();
+        success &= do_reg<J4p_7>(); 
+        success &= do_reg<J4m_7>();
+        success &= do_reg<J4p_8>(); 
+        success &= do_reg<J4m_8>();
+        success &= do_reg<J4p_9>(); 
+        success &= do_reg<J4m_9>();
 
         registered = true; 
       }

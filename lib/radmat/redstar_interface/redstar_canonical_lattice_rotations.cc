@@ -6,7 +6,7 @@
 
 * Creation Date : 09-12-2013
 
-* Last Modified : Tue 10 Dec 2013 12:39:26 PM EST
+* Last Modified : Sun 23 Feb 2014 10:35:08 AM EST
 
 * Created By : shultz
 
@@ -19,6 +19,7 @@ _._._._._._._._._._._._._._._._._._._._._.*/
 #include "radmat/utils/handle.h"
 #include "hadron/irrep_util.h"
 #include <exception>
+#include "radmat/utils/printer.h"
 
 namespace radmat
 {
@@ -100,6 +101,7 @@ namespace radmat
 
     bool registerAll(void)
     {
+      printer_function<debug_print_reg_all>(__PRETTY_FUNCTION__);
       bool success = true; 
       
       if(!!! local_registration )

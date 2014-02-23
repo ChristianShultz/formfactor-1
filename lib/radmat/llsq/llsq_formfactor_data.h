@@ -6,6 +6,7 @@
 #include <map>
 #include <string>
 #include "ensem/ensem.h"
+#include "radmat/utils/printer.h"
 
 namespace radmat
 {
@@ -24,15 +25,17 @@ namespace radmat
     LLSQFormFactorData_t() 
     {
       Qsq.resize(1); 
-      Qsq = SEMBLE::toScalar(double(0.)); 
     }
 
     LLSQFormFactorData_t(const LLSQFormFactorData_t &d)
-      : Qsq(d.Qsq) , mappy(d.mappy)
-    { }
+    { 
+      Qsq = d.Qsq; 
+      mappy = d.mappy; 
+    }
 
     void insert( const std::string &s, const SEMBLE::SembleVector<T> &v)
     {
+
       if(mappy.find(s) != mappy.end())
       {
         std::cerr << __PRETTY_FUNCTION__ << "double insert error" << std::endl;

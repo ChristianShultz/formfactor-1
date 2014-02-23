@@ -6,7 +6,7 @@
 
  * Creation Date : 01-08-2012
 
- * Last Modified : Fri 21 Feb 2014 03:52:31 PM EST
+ * Last Modified : Sun 23 Feb 2014 05:22:37 PM EST
 
  * Created By : shultz
 
@@ -28,6 +28,7 @@
 #include <complex>
 #include "radmat/utils/splash.h"
 #include "radmat/utils/pow2assert.h"
+#include "radmat/utils/printer.h"
 #include "adat/handle.h"
 
 
@@ -38,11 +39,37 @@ namespace radmat
 
   namespace 
   {
+
+    template<typename T>
+      std::string to_string( T t )
+      {
+        std::stringstream ss; 
+        ss << t ;
+        return ss.str(); 
+      }
+
+
+    struct to_ensem_printer
+    {
+      static void print(const std::string &s)
+      {} 
+      //      { std::cout << s << std::endl; }
+    };
+
+    struct dimension_printer
+    {
+      static void print(const std::string &s)
+      {}
+      //      { std::cout << s << std::endl; }
+    };
+
     template<typename T> 
       typename SEMBLE::PromoteEnsemVec<T>::Type
       to_ensem(const SEMBLE::SembleVector<T> &in)
       {
         typename SEMBLE::PromoteEnsemVec<T>::Type out;
+        printer_function<to_ensem_printer>( "B=" + to_string(in.getB())); 
+        printer_function<to_ensem_printer>( "N=" + to_string(in.getN())); 
         out.resize(in.getB());
         out.resizeObs(in.getN());
         for(int elem = 0; elem < in.getN(); ++elem)
@@ -61,6 +88,11 @@ namespace radmat
   {
     const unsigned int sz = data.size();
     const int nbins = data.esize();
+
+    printer_function<dimension_printer>(
+        "fit dimensions, nff = " + to_string(sz)
+        + " nbins = " + to_string(nbins) );   
+
     ff.reDim(nbins,sz);
     Q2 = data.Q2();
 
@@ -93,7 +125,6 @@ namespace radmat
 
     EnsemData corrData(time,data);
 
-
     ADAT::Handle<FitComparator> fitComp = constructThreePointFitComparator(fitProps);
     // NB: I Have assumed that no chopping has gone on in the data
     rHandle<FitThreePoint> fitCorr (new FitThreePoint(corrData,tsnk,tsrc,
@@ -104,12 +135,15 @@ namespace radmat
     write(jack.str(),data);
 
     // require unique fit names -- they are class names 
-    // so this is a paranoia check 
-    POW2_ASSERT( fit_index.find(ffid) != fit_index.end());
+    // so this is a paranoia check -- we dont want to find it!!!
+    POW2_ASSERT( fit_index.find(ffid) == fit_index.end());
 
     // this grows the map effectively incrementing the index!
     int index = fit_index.size(); 
-    fit_index[ffid] = index; 
+    fit_index.insert(std::make_pair(ffid,index)); 
+
+    printer_function<dimension_printer>(
+        "inserting a fit into index " + to_string(index));
 
     ff.loadEnsemElement(index,fitCorr->getFF());
     write(fit.str(),fitCorr->getFF()); 

@@ -6,7 +6,7 @@
 
  * Creation Date : 21-02-2014
 
- * Last Modified : Fri 21 Feb 2014 04:26:30 PM EST
+ * Last Modified : Sun 23 Feb 2014 05:06:42 PM EST
 
  * Created By : shultz
 
@@ -26,6 +26,7 @@
 #include <complex>
 #include "radmat/utils/splash.h"
 #include "radmat/utils/pow2assert.h"
+#include "radmat/utils/printer.h"
 #include "adat/handle.h"
 
 
@@ -36,6 +37,38 @@ namespace radmat
 
   namespace 
   {
+    // swapping in empty functions should make the compiler 
+    // optimize these print statements away.. plus its fun
+    struct dimension_printer
+    {
+      static void print(const std::string &msg)
+      {}
+      //      { std::cout << msg << std::endl; }
+    };
+
+    struct inp_dimension_printer
+    {
+      static void print(const std::string &msg)
+      {}
+      //      { std::cout << msg << std::endl; }
+    };
+
+    struct ret_dimension_printer
+    {
+      static void print(const std::string &msg)
+      {}
+      //      { std::cout << msg << std::endl; }
+    };
+
+    template<typename T>
+      std::string to_string( T t )
+      {
+        std::stringstream ss; 
+        ss << t ;
+        return ss.str(); 
+      }
+
+
 
     enum PHASE
     {
@@ -118,9 +151,57 @@ namespace radmat
           return phase_pair(ZERO,real);
         }
 
+
+
         // something unexpected happened
         if ( isnan(const_real) || isnan(const_imag))
         {
+          // the fitter seems to fail on ensembles with zero variance??
+          // 
+          // with svd resetting it is very easy to get an ensemble 
+          // with mean zero and variance zero thus we have to 
+          // work harder which makes christian cranky since its sunday 
+
+          // guard zero variance here.. 
+          // this is completely nuts, someone needs to update the stupid fitter
+
+          // need to use assignment operator, no builtin ensem constructors
+          SEMBLE::SembleVector<double> foor; foor = real; 
+          SEMBLE::SembleVector<double> fooi; fooi = imag; 
+
+          // pull down the copies, grab the variance using semble
+          // then compare it to zero, if the test passes check for 
+          // either the real part or the imag part being explicitly 
+          // zero, then return the other with the correct phase
+          itpp::Vec<double> bar( foor.getN() ), bazr,bazi; 
+          bar.zeros(); 
+          bazr = foor.variance(); 
+          bazi = fooi.variance(); 
+
+          if( bazr == bar ) 
+            if( bazi == bar )
+            {
+              bazr = foor.mean(); 
+              bazi = fooi.mean(); 
+              if ( ( bazr == bar ) && ( bazi == bar ) )
+                return phase_pair(ZERO,real); 
+              if ( bazr == bar )
+                return bazi(0) > 0 ? phase_pair(IP,imag) : phase_pair(IM,imag);
+              if( bazi == bar )
+                return bazr(0) > 0 ? phase_pair(RP,real) : phase_pair(RM,real); 
+            }
+
+          // otherwise die one function up since this is stupid 
+
+          SPLASH("encountered nan: check bad_corr.nan.jack, bad_corr.nan.ax for the correlator"); 
+
+          AxisPlot plot; 
+          plot.addEnsemData(ENSEM::real(in),"\\sq",1);
+          plot.addEnsemData(ENSEM::imag(in),"\\sq",2);
+          plot.sendToFile("bad_corr.nan.ax");
+
+          ENSEM::write("bad_corr.nan.jack",in); 
+
           return phase_pair(ERROR,real); 
         }
 
@@ -166,11 +247,15 @@ namespace radmat
       find_phase( const SEMBLE::SembleVector<std::complex<double> > &d)
       {
         ENSEM::EnsemVectorComplex e; 
+        int bns = d.getB(); 
         int sz = d.getN(); 
+        e.resize(bns); 
         e.resizeObs(sz); 
         for(int i = 0; i < sz; ++i)
           ENSEM::pokeObs( e, d.getEnsemElement(i) , i);
 
+        // run the fits on the central 70% of the correlator, this 
+        // is a completely arbitrary choice 
         return convert_to_real( e, int(sz*0.15) , int(sz*0.85) ); 
       }
 
@@ -181,7 +266,13 @@ namespace radmat
         std::map<std::string,phase_pair> ret; 
         LLSQComplexFormFactorData_t::const_iterator it; 
         for(it = d.begin(); it != d.end(); ++it)
-          ret.insert( std::pair<std::string,phase_pair>(it->first, find_phase(it->second) ) ); 
+        {
+          printer_function<inp_dimension_printer>(
+              "input " +  it->first 
+              + " N " + to_string( it->second.getN() )
+              + " B " + to_string( it->second.getB() ) ); 
+          ret.insert( std::make_pair(it->first, find_phase(it->second) ) ); 
+        }
 
         return ret; 
       }
@@ -194,6 +285,7 @@ namespace radmat
         if( it->second.first == ERROR )
         {
           std::cout << __PRETTY_FUNCTION__ << ": error encountered, exiting" << std::endl;
+          std::cout << it->first << " was bad" << std::endl;
           exit(1); 
         }
 
@@ -205,37 +297,68 @@ namespace radmat
 
       // so it was something
       if( expectedA == RP )
-        expectedB == RM; 
+        expectedB = RM; 
       if( expectedA == RM )
-        expectedB == RP; 
+        expectedB = RP; 
       if( expectedA == IP )
-        expectedB == IM; 
+        expectedB = IM; 
       if( expectedA == IM )
-        expectedB == IP; 
+        expectedB = IP; 
 
       // check that they are all either real , imag , or zero
       for(it = mappy.begin(); it != mappy.end(); ++it)
+      {
+        printer_function<dimension_printer>( "check_phases" + it->first 
+            + " numElem = " + to_string(it->second.second.numElem()) 
+            + " size = " + to_string(it->second.second.size()) ); 
         if( (it->second.first != expectedA )
             &&(it->second.first != expectedB) 
             &&(it->second.first != ZERO) )
         {
           std::cout << __PRETTY_FUNCTION__ 
-            << ": error encountered, unexpected phases, exiting" << std::endl;
+            << "\nerror: encountered, unexpected phases, exiting" << std::endl;
+          std::cout << "expected " << expectedA << " " << expectedB 
+            << " or " << ZERO << " got " << it->second.first << std::endl;
+          std::cout << "keys \nRP->" << RP 
+            << "\nRM->" << RM
+            << "\nIP->" << IP
+            << "\nIM->" << IM
+            << "\nZZ->" << ZERO 
+            << std::endl;
           exit(1); 
         }
+      }
     }
 
     // run checks then push the result into the return data
     LLSQRealFormFactorData_t
       do_work_local(const LLSQComplexFormFactorData_t &d)
       {
+        printer_function<inp_dimension_printer>("entering rephase"); 
+
         std::map<std::string, phase_pair> mappy = find_phases(d); 
         check_phases(mappy); 
 
+        printer_function<ret_dimension_printer>(
+            " map size " + to_string(mappy.size()) ); 
+
         LLSQRealFormFactorData_t ret; 
+
+        // update momentum transfer        
+        ret.Qsq = d.Q2(); 
+
+        // load elements for fit
         std::map<std::string,phase_pair>::const_iterator it; 
         for(it = mappy.begin(); it != mappy.end(); ++it)
-          ret.mappy[it->first] = it->second.first; 
+        {
+          printer_function<ret_dimension_printer>( 
+              "output " + it->first 
+              + " numElem " + to_string(it->second.second.numElem()) 
+              + " size " + to_string(it->second.second.size()));  
+          ret.mappy[it->first] = it->second.second; 
+        }
+
+        printer_function<ret_dimension_printer>("exiting rephase");
 
         return ret; 
       }

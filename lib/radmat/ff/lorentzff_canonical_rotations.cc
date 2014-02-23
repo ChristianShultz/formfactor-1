@@ -5,7 +5,7 @@
  * Purpose :
 
 
- * Last Modified : Wed 18 Dec 2013 11:37:25 AM EST
+ * Last Modified : Sun 23 Feb 2014 10:22:51 AM EST
 
  * Created By : shultz
 
@@ -17,6 +17,7 @@
 #include "formfac/formfac_qsq.h"
 #include "io/adat_xmlio.h"
 #include "radmat/utils/pow2assert.h"
+#include "radmat/utils/printer.h"
 #include "itpp/itbase.h"
 #include <sstream>
 #include <exception>
@@ -267,6 +268,7 @@ namespace radmat
 
     bool registerAll(void)
     {
+      printer_function<debug_print_reg_all>(__PRETTY_FUNCTION__); 
       bool success = true; 
 
       if ( !!! local_registration)

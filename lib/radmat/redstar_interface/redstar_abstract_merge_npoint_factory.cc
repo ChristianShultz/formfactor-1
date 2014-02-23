@@ -6,7 +6,7 @@
 
 * Creation Date : 12-11-2013
 
-* Last Modified : Tue 10 Dec 2013 07:14:07 PM EST
+* Last Modified : Sun 23 Feb 2014 10:37:08 AM EST
 
 * Created By : shultz
 
@@ -18,6 +18,7 @@ _._._._._._._._._._._._._._._._._._._._._.*/
 #include "radmat/utils/stringify.h"
 
 #include "redstar_merge_vector_current_npoint.h"
+#include "radmat/utils/printer.h"
 
 
 namespace FacEnv = radmat::TheRedstarAbstractMergeNPtFactoryEnv;
@@ -28,7 +29,7 @@ namespace radmat
 
   namespace TheRedstarAbstractMergeNPtFactoryEnv
   {
-    volatile bool local_registration = false; 
+     bool local_registration = false; 
 
     namespace
     {
@@ -52,6 +53,7 @@ namespace radmat
 
     bool registerAll(void)
     {
+      printer_function<debug_print_reg_all>(__PRETTY_FUNCTION__); 
       bool success = true; 
       if ( !!! local_registration ) 
       {

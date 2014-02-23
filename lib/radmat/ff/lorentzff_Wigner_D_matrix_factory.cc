@@ -6,7 +6,7 @@
 
  * Creation Date : 14-12-2013
 
- * Last Modified : Tue 24 Dec 2013 03:58:18 PM EST
+ * Last Modified : Sun 23 Feb 2014 10:29:11 AM EST
 
  * Created By : shultz
 
@@ -20,6 +20,7 @@
 #include "semble/semble_meta.h"
 #include <sstream>
 #include <exception> 
+#include "radmat/utils/printer.h"
 
 
 namespace radmat
@@ -157,6 +158,7 @@ namespace radmat
 
     bool registerAll(const int Jmax)
     {
+      printer_function<debug_print_reg_all>(__PRETTY_FUNCTION__); 
       bool success = true; 
 
       if(!!! local_registration)

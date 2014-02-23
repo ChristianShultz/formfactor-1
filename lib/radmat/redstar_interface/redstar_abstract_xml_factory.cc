@@ -6,7 +6,7 @@
 
 * Creation Date : 12-11-2013
 
-* Last Modified : Tue 10 Dec 2013 07:14:37 PM EST
+* Last Modified : Sun 23 Feb 2014 10:38:05 AM EST
 
 * Created By : shultz
 
@@ -16,6 +16,7 @@ _._._._._._._._._._._._._._._._._._._._._.*/
 #include "redstar_abstract_xml_factory.h"
 #include "radmat/utils/pow2assert.h"
 #include "radmat/utils/stringify.h"
+#include "radmat/utils/printer.h"
 
 #include "redstar_single_particle_meson_block.h"
 #include "redstar_unimproved_vector_current.h"
@@ -31,7 +32,7 @@ namespace radmat
 
   namespace TheRedstarAbstractXMLFactoryEnv
   {
-    volatile bool local_registration = false; 
+    bool local_registration = false; 
 
     namespace
     {
@@ -60,6 +61,7 @@ namespace radmat
 
     bool registerAll(void)
     {
+      printer_function<debug_print_reg_all>(__PRETTY_FUNCTION__); 
       bool success = true; 
       if ( !!! local_registration ) 
       {

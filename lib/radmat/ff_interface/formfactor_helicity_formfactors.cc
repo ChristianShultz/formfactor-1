@@ -6,7 +6,7 @@
 
  * Creation Date : 22-02-2014
 
- * Last Modified : Sat 22 Feb 2014 04:53:09 PM EST
+ * Last Modified : Sun 23 Feb 2014 12:17:46 PM EST
 
  * Created By : shultz
 
@@ -21,24 +21,39 @@
 #include "radmat/ff/lorentzff_formfactor_factory.h"
 #include "radmat/utils/stringify.h"
 #include "radmat/utils/pow2assert.h"
+#include "radmat/utils/printer.h"
 #include <sstream>
 #include <algorithm>
 
 #define CHECK_HELICITY_EXPLICIT
 
+typedef radmat::TheFormFactorInjectionRecipeCookbook Cookbook; 
+typedef radmat::TheFormFactorInjectionRecipeFactory Factory; 
+
 namespace radmat
 {
 
-  // sanity
-#ifdef CHECK_HELICITY_EXPLICIT
   namespace
   {
+  // sanity
+#ifdef CHECK_HELICITY_EXPLICIT
     bool check_helicity(const int h, const int row, const int J)
     {
       return h == J - row + 1; 
     }
-  }
 #endif
+
+    struct print_elem_reg
+    {
+      static void print(const std::string &msg)
+      {std::cout << msg << std::endl;}
+    };
+
+    struct dont_print_elem_reg
+    {
+      static void print(const std::string &msg) {}
+    };
+  }
 
   // use whatever is in the lorentzff_canonical_cont_spin decomp
   itpp::Mat<std::complex<double> >
@@ -95,9 +110,50 @@ namespace radmat
 
       // reg function
       typedef std::pair<rHandle<SpherRep_p> , rHandle<SpherRep_p> > rep_pair;
+
+      FormFactorRecipe_t* gen_recipe( const std::string &s, const rep_pair &reps )
+      {
+        rHandle<LorentzFFAbsBase_t> mat; 
+        mat = radmat::LorentzffFormFactorDecompositionFactoryEnv::callFactory(s); 
+        return new HelicityFormFactorRecipe_t(mat,reps.first,reps.second); 
+      }
+      
+      FFAbsBase_t* callback( const std::string &recipe_id )
+      {
+        PtrRecipeHolder::map_t::iterator r;  
+        
+        r = Cookbook::Instance().mappy.find(recipe_id); 
+        bool success = true; 
+
+        if( r == Cookbook::Instance().mappy.end() )
+        {
+          printer_function<console_print>( "missed " + recipe_id); 
+          throw std::string("recipe_error"); 
+        }
+        
+        if( r->second->id() != radmat::Stringify<HelicityFormFactorRecipe_t>())
+        {
+          printer_function<console_print>( "expected a " + Stringify<HelicityFormFactorRecipe_t>());
+          printer_function<console_print>( "got a " + r->second->id());
+          throw std::string("recipe_error"); 
+        }
+
+        HelicityFormFactorRecipe_t *ptr = dynamic_cast<HelicityFormFactorRecipe_t*>( r->second ); 
+        rHandle<FormFactorRecipe_t> recipe( new HelicityFormFactorRecipe_t(*ptr) ); 
+        
+        return new HelicityFormFactor( recipe ); 
+      }
+
       bool do_reg( const std::string &s, const rep_pair &r)
       {
-        return true; 
+        // the actual string is between the <> eg  <reg_id>
+        printer_function<dont_print_elem_reg>(std::string("regged <") + s + std::string(">"));
+        Cookbook::Instance().mappy.insert(std::make_pair(s, gen_recipe(s,r)) ); 
+        bool b = true; 
+        b = Factory::Instance().registerObject(s,callback);  
+        if( !!! b ) 
+          printer_function<console_print>( s + " failed to register" ); 
+        return b; 
       }
 
     } // anonomyous
@@ -122,6 +178,7 @@ namespace radmat
     // pump the factory 
     bool registerAll()
     {
+      printer_function<debug_print_reg_all>(__PRETTY_FUNCTION__); 
       bool success = true; 
 
       if ( !!! registered )
@@ -135,6 +192,8 @@ namespace radmat
         std::vector<std::string> ff_allowed_spin_keys; 
         std::vector<rHandle<SpherRep_p> > cont_rep_keys; 
         std::vector<rHandle<SpherRep_p> >::const_iterator i,j; 
+
+        cont_rep_keys = get_all_cont_reps();
 
         for( i = cont_rep_keys.begin(); i != cont_rep_keys.end(); ++i)
           for( j = cont_rep_keys.begin(); j != cont_rep_keys.end(); ++j)
@@ -156,10 +215,7 @@ namespace radmat
           if( std::find( ff_allowed_spin_keys.begin(), 
                 ff_allowed_spin_keys.end(), 
                 it->first) != ff_allowed_spin_keys.end() )
-          {
-            std::cout << "found " << it->first << std::endl;
             success &= do_reg( it->first, it->second ); 
-          }
 
         registered = true; 
       }

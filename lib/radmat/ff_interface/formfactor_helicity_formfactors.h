@@ -21,11 +21,12 @@ namespace radmat
   REGISTER_STRINGIFY_TYPE( HelicityFormFactorRecipe_t ); 
 
   struct HelicityFormFactorRecipe_t
+    : public FormFactorRecipe_t
   {
     typedef rHandle<LorentzFFAbsBase_t> mat_h; 
     typedef rHandle<SpherRep_p> rep_h; 
 
-    HelicityFormFactorRecipe_t(mat_h &f, rep_h &l, rep_h &r)
+    HelicityFormFactorRecipe_t(const mat_h &f, const rep_h &l, const rep_h &r)
       : mat(f) , lefty(l) , righty(r)
     {}
 
@@ -68,8 +69,8 @@ namespace radmat
   {
     typedef FormFactorBase_t::recipe_h recipe_h;  
 
-    HelicityFormFactor( const recipe_h & recipe_)
-      : FormFactorBase_t(recipe)
+    HelicityFormFactor( const recipe_h & r)
+      : FormFactorBase_t(r)
     { }
 
     HelicityFormFactor& operator=(const HelicityFormFactor &o)

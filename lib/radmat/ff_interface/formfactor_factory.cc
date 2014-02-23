@@ -1,16 +1,16 @@
 /* -.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.
 
-* File Name : formfactor_factory.cc
+ * File Name : formfactor_factory.cc
 
-* Purpose :
+ * Purpose :
 
-* Creation Date : 22-02-2014
+ * Creation Date : 22-02-2014
 
-* Last Modified : Sat 22 Feb 2014 04:25:41 PM EST
+ * Last Modified : Sun 23 Feb 2014 11:51:35 AM EST
 
-* Created By : shultz
+ * Created By : shultz
 
-_._._._._._._._._._._._._._._._._._._._._.*/
+ _._._._._._._._._._._._._._._._._._._._._.*/
 
 
 
@@ -20,6 +20,7 @@ _._._._._._._._._._._._._._._._._._._._._.*/
 #include <string>
 #include <complex>
 #include <exception>
+#include "radmat/utils/printer.h"
 
 namespace FacEnv = radmat::FormFactorDecompositionFactoryEnv;
 typedef radmat::TheFormFactorInjectionRecipeFactory Factory;
@@ -31,63 +32,72 @@ namespace radmat
   namespace FormFactorDecompositionFactoryEnv
   {
 
-    bool registered = false;
+
+    namespace
+    {
+      void splash_keys(void) 
+      {
+        std::vector<std::string> keys = FacEnv::all_keys(); 
+        std::vector<std::string>::const_iterator k; 
+        std::cout << __PRETTY_FUNCTION__ << ": available keys" << std::endl;
+        for(k = keys.begin(); k != keys.end(); ++k)
+          std::cout << *k << std::endl;
+
+      }
+
+      bool registered = false;
+    } // anonomyous 
 
     // make it blow up if anything goes wrong by wrapping another 
     // call around the factory.createObj method
     rHandle<FFAbsBase_t > 
       callFactory(const std::string &matElemID)
-    {
-      FormFactorRecipe_t *foo;
-      foo = NULL;
-      try
       {
-        foo = Factory::Instance().createObject(matElemID);
-      }
-      catch(std::exception &e)
-      {
-        std::cout << "elem - " << matElemID << std::endl;
-        std::cout << __PRETTY_FUNCTION__ << e.what(); 
-        throw e; 
-      }
-      catch(std::string &s)
-      {
-        std::cout << "elem - " << matElemID << std::endl;
-        std::cout << __PRETTY_FUNCTION__ << s << std::endl;
-        throw s;
-      }
-      catch(...)
-      {
-        std::cout << "elem - " << matElemID << std::endl;
-        std::cout << __PRETTY_FUNCTION__ << ": some error" << std::endl;
-        POW2_ASSERT(false); 
-      }
+        FFAbsBase_t *foo;
+        foo = NULL;
+        try
+        {
+          foo = Factory::Instance().createObject(matElemID,matElemID);
+        }
+        catch(std::exception &e)
+        {
+          std::cout << "tried to find - " << matElemID << std::endl;
+          std::cout << __PRETTY_FUNCTION__ << e.what(); 
+          splash_keys();
+          throw e; 
+        }
+        catch(std::string &s)
+        {
+          std::cout << "tried to find - " << matElemID << std::endl;
+          std::cout << __PRETTY_FUNCTION__ << s << std::endl;
+          splash_keys();
+          throw s;
+        }
+        catch(...)
+        {
+          std::cout << "tried to find  - " << matElemID << std::endl;
+          std::cout << __PRETTY_FUNCTION__ << ": some error" << std::endl;
+          splash_keys();
+          POW2_ASSERT(false); 
+        }
 
-      // not a null pointer
-      POW2_ASSERT(foo);
-      rHandle<FormFactorRecipe_t > recipe(foo);
-      if( recipe->id() == ::radmat::Stringify<HelicityFormFactorRecipe_t>() )
-      {
-        return rHandle<FFAbsBase_t>( new HelicityFormFactor(recipe) ); 
+        // not a null pointer
+        POW2_ASSERT(foo);
+        return rHandle<FFAbsBase_t>(foo); 
       }
-      else
-      {
-        throw std::string("unknown recipe"); 
-        exit(1); 
-      }
-    }
 
     // dump all keys in the factory
     std::vector<std::string> 
       all_keys(void)
-    {
-      return Factory::Instance().keys(); 
-    }
+      {
+        return Factory::Instance().keys(); 
+      }
 
 
     // register the factory "inventory"
     bool registerAll( void )
     {
+      printer_function<debug_print_reg_all>(__PRETTY_FUNCTION__); 
       bool success = true;
 
       if(!!!registered)

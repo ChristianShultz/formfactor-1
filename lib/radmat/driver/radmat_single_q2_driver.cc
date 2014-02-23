@@ -6,7 +6,7 @@
 
  * Creation Date : 25-02-2013
 
- * Last Modified : Fri 21 Feb 2014 02:47:56 PM EST
+ * Last Modified : Sun 23 Feb 2014 03:30:46 PM EST
 
  * Created By : shultz
 
@@ -18,6 +18,7 @@
 #include "radmat/llsq/llsq_multi_data_serialize.h"
 #include "radmat/llsq/llsq_formfactor_data.h"
 #include "radmat/ff/lorentzff_canonical_rotations.h"
+#include "radmat/utils/printer.h"
 #include "semble/semble_semble.h"
 #include "ensem/ensem.h"
 #include <sstream>
@@ -31,6 +32,22 @@ namespace radmat
 
   namespace 
   {
+    struct dimension_printer
+    {
+      static void print(const std::string &msg)
+      {}
+//      { std::cout << msg << std::endl; }
+    };
+
+    template<typename T>
+      std::string to_string( T t )
+      {
+        std::stringstream ss; 
+        ss << t ;
+        return ss.str(); 
+      }
+  
+
     template<typename T>
       typename SEMBLE::PromoteEnsemVec<T>::Type
       get_ensem_row(const int row, const SEMBLE::SembleMatrix<T> &in)
@@ -193,6 +210,13 @@ namespace radmat
     check_exit_solved_llsq(); 
     SEMBLE::SembleMatrix<std::complex<double> > FF_of_t = linear_system.peek_FF(); 
     LLSQComplexFormFactorData_t tmp; 
+
+    printer_function<dimension_printer>( "FF_of_t B="
+        + to_string( FF_of_t.getB() ) );
+    printer_function<dimension_printer>( "FF_of_t N="
+        + to_string( FF_of_t.getN() ) );
+    printer_function<dimension_printer>( "FF_of_tM=" 
+        + to_string( FF_of_t.getM() ) );
 
     // load up data
     for(int row = 0; row < FF_of_t.getN(); ++row)

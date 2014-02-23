@@ -11,6 +11,7 @@
 #include "adat/objfactory.h"
 #include "radmat/utils/pow2assert.h"
 #include "semble/semble_linear_algebra.h"
+#include "radmat/utils/printer.h"
 
 namespace FacEnv = radmat::LLSQSolverFactoryEnv;
 typedef radmat::TheLLSQSolverFactory Factory;
@@ -187,6 +188,7 @@ namespace radmat
 
     bool registerAll(void)
     {
+      printer_function<debug_print_reg_all>(__PRETTY_FUNCTION__); 
 
       bool success = true;
 

@@ -3,6 +3,8 @@
 
 #include <complex>
 #include <string>
+#include <algorithm>
+#include <functional>
 
 /**
   @file stringify.h
@@ -15,6 +17,40 @@
 namespace radmat
 {
 
+  struct StringifyChopper
+  {
+    std::string& l_trim( std::string &s )
+    {
+      s.erase(
+          s.begin(), 
+          std::find_if(
+            s.begin(),
+            s.end(),
+            std::not1(std::ptr_fun<int,int>(std::isspace))
+            )
+          );
+      return s; 
+    }
+  
+    std::string& r_trim( std::string &s )
+    {
+      s.erase( 
+          std::find_if(
+            s.rbegin(),
+            s.rend(),
+            std::not1(std::ptr_fun<int,int>(std::isspace))).base(),
+          s.end()
+          );
+      return s; 
+    }
+
+    std::string trim( std::string s  )
+    {
+      return l_trim(r_trim(s)); 
+    }
+
+  };
+
 
   struct StringifyBase
   {
@@ -22,6 +58,7 @@ namespace radmat
     virtual ~StringifyBase() {}
     virtual std::string name() const = 0; 
   }; 
+
 
   template<class T>
     struct StringifyType : public StringifyBase
@@ -31,11 +68,14 @@ namespace radmat
 
 
   // only specializations may be instatiated
+  //   guard against preprocessor whitespace via 
+  //   this stupid chopper thing
   template<typename T>
     std::string Stringify(void)
     {
       StringifyType<T> f;
-      return f.name(); 
+      StringifyChopper chop; 
+      return chop.trim( f.name() ); 
     }
 
 

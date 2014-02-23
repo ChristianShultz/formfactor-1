@@ -6,7 +6,7 @@
 
  * Creation Date : 12-10-2012
 
- * Last Modified : Tue 10 Dec 2013 12:34:42 PM EST
+ * Last Modified : Sun 23 Feb 2014 10:39:41 AM EST
 
  * Created By : shultz
 
@@ -19,6 +19,7 @@
 #include "radmat/utils/pow2assert.h"
 #include "radmat/utils/handle.h"
 #include "radmat/utils/polarization_tensors.h"
+#include "radmat/utils/printer.h"
 
 #include "hadron/subduce_tables_factory.h"
 #include "semble/semble_meta.h"
@@ -365,6 +366,7 @@ namespace radmat
 
     bool registerAll(void)
     {
+      printer_function<debug_print_reg_all>(__PRETTY_FUNCTION__); 
       bool success = true; 
 
       if(!!! local_reg )

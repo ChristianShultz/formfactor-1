@@ -56,6 +56,8 @@ namespace radmat
   struct J2m {};
   struct J3p {};  
   struct J3m {};
+  struct J4p {};  
+  struct J4m {};  
 
   REGISTER_STRINGIFY_TYPE( J0p ); 
   REGISTER_STRINGIFY_TYPE( J0m ); 
@@ -65,6 +67,8 @@ namespace radmat
   REGISTER_STRINGIFY_TYPE( J2m ); 
   REGISTER_STRINGIFY_TYPE( J3p ); 
   REGISTER_STRINGIFY_TYPE( J3m ); 
+  REGISTER_STRINGIFY_TYPE( J4p ); 
+  REGISTER_STRINGIFY_TYPE( J4m ); 
 
   // one based rows like in adat
   // row = J - h + 1 
@@ -72,47 +76,71 @@ namespace radmat
 
   // J0 reps
   // <id , spin , row , parity> 
-  struct J0p_1 : public SpherRep<J0p,0,1,1> { virtual ~J0p_1() {} };
+  struct J0p_1 : public SpherRep<J0p,0,1,1>  { virtual ~J0p_1() {} };
   struct J0m_1 : public SpherRep<J0m,0,1,-1> { virtual ~J0m_1() {} };
 
   // J1 reps
   // <id , spin , row , parity> 
-  struct J1p_1 : public SpherRep<J1p,1,1,1> { virtual ~J1p_1() {} };
+  struct J1p_1 : public SpherRep<J1p,1,1,1>  { virtual ~J1p_1() {} };
   struct J1m_1 : public SpherRep<J1m,1,1,-1> { virtual ~J1m_1() {} };
-  struct J1p_2 : public SpherRep<J1p,1,2,1> { virtual ~J1p_2() {} };
+  struct J1p_2 : public SpherRep<J1p,1,2,1>  { virtual ~J1p_2() {} };
   struct J1m_2 : public SpherRep<J1m,1,2,-1> { virtual ~J1m_2() {} };
-  struct J1p_3 : public SpherRep<J1p,1,3,1> { virtual ~J1p_3() {} };
+  struct J1p_3 : public SpherRep<J1p,1,3,1>  { virtual ~J1p_3() {} };
   struct J1m_3 : public SpherRep<J1m,1,3,-1> { virtual ~J1m_3() {} };
 
   // J2 reps
   // <id , spin , row , parity> 
-  struct J2p_1 : public SpherRep<J2p,2,1,1> { virtual ~J2p_1() {} };
-  struct J2m_1 : public SpherRep<J2p,2,1,-1> { virtual ~J2m_1() {} };
-  struct J2p_2 : public SpherRep<J2p,2,2,1> { virtual ~J2p_2() {} };
-  struct J2m_2 : public SpherRep<J2p,2,2,-1> { virtual ~J2m_2() {} };
-  struct J2p_3 : public SpherRep<J2p,2,3,1> { virtual ~J2p_3() {} };
-  struct J2m_3 : public SpherRep<J2p,2,3,-1> { virtual ~J2m_3() {} };
-  struct J2p_4 : public SpherRep<J2p,2,4,1> { virtual ~J2p_4() {} };
-  struct J2m_4 : public SpherRep<J2p,2,4,-1> { virtual ~J2m_4() {} };
-  struct J2p_5 : public SpherRep<J2p,2,5,1> { virtual ~J2p_5() {} };
-  struct J2m_5 : public SpherRep<J2p,2,5,-1> { virtual ~J2m_5() {} };
+  struct J2p_1 : public SpherRep<J2p,2,1,1>  { virtual ~J2p_1() {} };
+  struct J2m_1 : public SpherRep<J2m,2,1,-1> { virtual ~J2m_1() {} };
+  struct J2p_2 : public SpherRep<J2p,2,2,1>  { virtual ~J2p_2() {} };
+  struct J2m_2 : public SpherRep<J2m,2,2,-1> { virtual ~J2m_2() {} };
+  struct J2p_3 : public SpherRep<J2p,2,3,1>  { virtual ~J2p_3() {} };
+  struct J2m_3 : public SpherRep<J2m,2,3,-1> { virtual ~J2m_3() {} };
+  struct J2p_4 : public SpherRep<J2p,2,4,1>  { virtual ~J2p_4() {} };
+  struct J2m_4 : public SpherRep<J2m,2,4,-1> { virtual ~J2m_4() {} };
+  struct J2p_5 : public SpherRep<J2p,2,5,1>  { virtual ~J2p_5() {} };
+  struct J2m_5 : public SpherRep<J2m,2,5,-1> { virtual ~J2m_5() {} };
 
   // J3 reps
   // <id , spin , row , parity> 
-  struct J3p_1 : public SpherRep<J3p,3,1,1> { virtual ~J3p_1() {} };
-  struct J3m_1 : public SpherRep<J3p,3,1,-1> { virtual ~J3m_1() {} };
-  struct J3p_2 : public SpherRep<J3p,3,2,1> { virtual ~J3p_2() {} };
-  struct J3m_2 : public SpherRep<J3p,3,2,-1> { virtual ~J3m_2() {} };
-  struct J3p_3 : public SpherRep<J3p,3,3,1> { virtual ~J3p_3() {} };
-  struct J3m_3 : public SpherRep<J3p,3,3,-1> { virtual ~J3m_3() {} };
-  struct J3p_4 : public SpherRep<J3p,3,4,1> { virtual ~J3p_4() {} };
-  struct J3m_4 : public SpherRep<J3p,3,4,-1> { virtual ~J3m_4() {} };
-  struct J3p_5 : public SpherRep<J3p,3,5,1> { virtual ~J3p_5() {} };
-  struct J3m_5 : public SpherRep<J3p,3,5,-1> { virtual ~J3m_5() {} };
-  struct J3p_6 : public SpherRep<J3p,3,6,1> { virtual ~J3p_6() {} };
-  struct J3m_6 : public SpherRep<J3p,3,6,-1> { virtual ~J3m_6() {} };
-  struct J3p_7 : public SpherRep<J3p,3,7,1> { virtual ~J3p_7() {} };
-  struct J3m_7 : public SpherRep<J3p,3,7,-1> { virtual ~J3m_7() {} };
+  struct J3p_1 : public SpherRep<J3p,3,1,1>  { virtual ~J3p_1() {} };
+  struct J3m_1 : public SpherRep<J3m,3,1,-1> { virtual ~J3m_1() {} };
+  struct J3p_2 : public SpherRep<J3p,3,2,1>  { virtual ~J3p_2() {} };
+  struct J3m_2 : public SpherRep<J3m,3,2,-1> { virtual ~J3m_2() {} };
+  struct J3p_3 : public SpherRep<J3p,3,3,1>  { virtual ~J3p_3() {} };
+  struct J3m_3 : public SpherRep<J3m,3,3,-1> { virtual ~J3m_3() {} };
+  struct J3p_4 : public SpherRep<J3p,3,4,1>  { virtual ~J3p_4() {} };
+  struct J3m_4 : public SpherRep<J3m,3,4,-1> { virtual ~J3m_4() {} };
+  struct J3p_5 : public SpherRep<J3p,3,5,1>  { virtual ~J3p_5() {} };
+  struct J3m_5 : public SpherRep<J3m,3,5,-1> { virtual ~J3m_5() {} };
+  struct J3p_6 : public SpherRep<J3p,3,6,1>  { virtual ~J3p_6() {} };
+  struct J3m_6 : public SpherRep<J3m,3,6,-1> { virtual ~J3m_6() {} };
+  struct J3p_7 : public SpherRep<J3p,3,7,1>  { virtual ~J3p_7() {} };
+  struct J3m_7 : public SpherRep<J3m,3,7,-1> { virtual ~J3m_7() {} };
+
+
+  // J4 reps
+  // <id , spin , row , parity> 
+  struct J4p_1 : public SpherRep<J4p,4,1,1>  { virtual ~J4p_1() {} };
+  struct J4m_1 : public SpherRep<J4m,4,1,-1> { virtual ~J4m_1() {} };
+  struct J4p_2 : public SpherRep<J4p,4,2,1>  { virtual ~J4p_2() {} };
+  struct J4m_2 : public SpherRep<J4m,4,2,-1> { virtual ~J4m_2() {} };
+  struct J4p_3 : public SpherRep<J4p,4,3,1>  { virtual ~J4p_3() {} };
+  struct J4m_3 : public SpherRep<J4m,4,3,-1> { virtual ~J4m_3() {} };
+  struct J4p_4 : public SpherRep<J4p,4,4,1>  { virtual ~J4p_4() {} };
+  struct J4m_4 : public SpherRep<J4m,4,4,-1> { virtual ~J4m_4() {} };
+  struct J4p_5 : public SpherRep<J4p,4,5,1>  { virtual ~J4p_5() {} };
+  struct J4m_5 : public SpherRep<J4m,4,5,-1> { virtual ~J4m_5() {} };
+  struct J4p_6 : public SpherRep<J4p,4,6,1>  { virtual ~J4p_6() {} };
+  struct J4m_6 : public SpherRep<J4m,4,6,-1> { virtual ~J4m_6() {} };
+  struct J4p_7 : public SpherRep<J4p,4,7,1>  { virtual ~J4p_7() {} };
+  struct J4m_7 : public SpherRep<J4m,4,7,-1> { virtual ~J4m_7() {} };
+  struct J4p_8 : public SpherRep<J4p,4,8,1>  { virtual ~J4p_8() {} };
+  struct J4m_8 : public SpherRep<J4m,4,8,-1> { virtual ~J4m_8() {} };
+  struct J4p_9 : public SpherRep<J4p,4,9,1>  { virtual ~J4p_9() {} };
+  struct J4m_9 : public SpherRep<J4m,4,9,-1> { virtual ~J4m_9() {} };
+
+
 
   // factory to hold them all
   typedef Util::SingletonHolder<

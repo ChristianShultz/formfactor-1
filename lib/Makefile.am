@@ -96,6 +96,7 @@ nobase_include_HEADERS =   \
 													 radmat/utils/perThreadStorage.h    \
 													 radmat/utils/polarization_tensors.h    \
 													 radmat/utils/pow2assert.h    \
+													 radmat/utils/printer.h			\
 													 radmat/utils/splash.h    \
 													 radmat/utils/stringify.h    \
 													 radmat/utils/tensor.h    \

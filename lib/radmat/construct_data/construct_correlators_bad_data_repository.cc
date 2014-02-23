@@ -6,7 +6,7 @@
 
  * Creation Date : 01-11-2013
 
- * Last Modified : Wed 13 Nov 2013 04:39:05 PM EST
+ * Last Modified : Sun 23 Feb 2014 04:02:46 PM EST
 
  * Created By : shultz
 
@@ -96,13 +96,13 @@ namespace radmat
 
   void BuildCorrsLocalBadDataRepo_t::dump_baddies(void) const
   {
-    std::cout << __func__ << ": printing missing xml " << std::endl;
 
     std::vector<Hadron::KeyHadronNPartNPtCorr_t> bcv = merge_bad_data_npt();
     std::vector<RadmatExtendedKeyHadronNPartIrrep_t> bnv =  merge_bad_data_norm();
 
     if(!!!bcv.empty())
     {
+      std::cout << __func__ << ": printing missing three-point xml " << std::endl;
       ADATXML::XMLBufferWriter corrs;
       ADATXML::Array<Hadron::KeyHadronNPartNPtCorr_t> bc;
 
@@ -130,6 +130,7 @@ namespace radmat
 
     if(!!!bnv.empty())
     {
+      std::cout << __func__ << ": printing missing state info xml " << std::endl;
       ADATXML::XMLBufferWriter norms;
       ADATXML::Array<RadmatExtendedKeyHadronNPartIrrep_t> bn;
 
