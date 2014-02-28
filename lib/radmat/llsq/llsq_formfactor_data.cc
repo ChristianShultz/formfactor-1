@@ -6,7 +6,7 @@
 
  * Creation Date : 21-02-2014
 
- * Last Modified : Sun 23 Feb 2014 05:06:42 PM EST
+ * Last Modified : Wed 26 Feb 2014 05:12:32 PM EST
 
  * Created By : shultz
 
@@ -60,6 +60,26 @@ namespace radmat
       //      { std::cout << msg << std::endl; }
     };
 
+    struct mean_printer
+    {
+      static void print(const std::string &s)
+      { std::cout << s << std::endl;}
+    };
+
+    struct case_printer
+    {
+      static void print(const std::string &s)
+      { std::cout << s << std::endl;}
+    };
+
+    struct ensem_printer
+    {
+      static void print(const std::string &s)
+      {
+        std::cout << s << std::endl;
+      }
+    };
+
     template<typename T>
       std::string to_string( T t )
       {
@@ -102,14 +122,54 @@ namespace radmat
         real = ENSEM::real(in);
         imag = ENSEM::imag(in);
 
+        // check code
+        std::stringstream ssr,ssi;
+        ssr << "tl " << tlow << " th " << thigh;
+        ssi << "tl " << tlow << " th " << thigh;
+
+        for(int i = 0; i < in.numElem(); ++i)
+        {
+          ssr << " " << SEMBLE::toScalar( ENSEM::mean( ENSEM::peekObs(real,i)));
+          ssi << " " << SEMBLE::toScalar( ENSEM::mean( ENSEM::peekObs(imag,i)));
+        }
+
+        printer_function<ensem_printer>("real - " + ssr.str());
+        printer_function<ensem_printer>("imag - " + ssi.str());
+        printer_function<ensem_printer>("in.numElem() " + to_string(in.numElem()));
+        printer_function<ensem_printer>("in.size() " + to_string(in.size()));
+
+        // time variable, make ensem data 
         std::vector<double> t;
         for(int i = 0; i < in.numElem(); ++i)
           t.push_back(double(i)); 
 
         EnsemData ereal(t,real),eimag(t,imag); 
-        ereal.hideDataAboveX(thigh - 0.1); 
+        ereal.hideDataAboveX(thigh + 0.1); 
         eimag.hideDataBelowX(tlow -0.1); 
 
+ 
+//        // the fitting is acting up, check that we get out what 
+//        // we put into the ensem data -- passes
+//        ENSEM::EnsemVectorReal insanityi, insanityr; 
+//        insanityr = ereal.getAllYData(); 
+//        insanityi = eimag.getAllYData(); 
+//
+//        ssr.str("");
+//        ssr.clear();
+//        ssi.str("");
+//        ssi.clear(); 
+//
+//        for(int i = 0; i < in.numElem(); ++i)
+//        {
+//          ssr << " " << SEMBLE::toScalar( ENSEM::mean( ENSEM::peekObs(real,i)));
+//          ssi << " " << SEMBLE::toScalar( ENSEM::mean( ENSEM::peekObs(imag,i)));
+//        }
+//
+//        printer_function<ensem_printer>("insanity real - " + ssr.str());
+//        printer_function<ensem_printer>("insanity imag - " + ssi.str());
+
+
+        // do fits
         ADAT::Handle<FitFunction> freal(new ThreePointConstant), fimag(new ThreePointConstant);  
         JackFit fit_real(ereal,freal), fit_imag(eimag,fimag); 
 
@@ -127,16 +187,46 @@ namespace radmat
         double const_real_var = fit_real.getAvgFitParError(0);
         double const_imag_var = fit_imag.getAvgFitParError(0);
 
+
+//        // the fitting is acting up, check that we get out what 
+//        // we put into the ensem data -- also passes 
+//        insanityr = fit_real.data.getAllYData(); 
+//        insanityi = fit_real.data.getAllYData(); 
+//
+//        ssr.str("");
+//        ssr.clear();
+//        ssi.str("");
+//        ssi.clear(); 
+//
+//        for(int i = 0; i < in.numElem(); ++i)
+//        {
+//          ssr << " " << SEMBLE::toScalar( ENSEM::mean( ENSEM::peekObs(real,i)));
+//          ssi << " " << SEMBLE::toScalar( ENSEM::mean( ENSEM::peekObs(imag,i)));
+//        }
+//
+//        printer_function<ensem_printer>("insanity2 real - " + ssr.str());
+//        printer_function<ensem_printer>("insanity2 imag - " + ssi.str());
+//
+
+
         // is the constant consistent with zero?
-        if( fabs(const_real) - 3.*fabs(const_real_var) < 0.)
+        if( fabs(const_real) - 3.*sqrt(fabs(const_real_var)) < 0.)
         {
+          printer_function<case_printer>("real is consistent with zero");
+          printer_function<case_printer>("real = " + to_string(const_real) 
+              + "+/-" + to_string(sqrt(fabs(const_real_var)))); 
+          printer_function<case_printer>("imag = " + to_string(const_imag) 
+              + "+/-" + to_string(sqrt(fabs(const_imag_var)))); 
           if (const_imag > 0. )
             return phase_pair(IP,imag); 
           return phase_pair(IM,imag);
         }
 
-        if( fabs(const_imag) - 3.*fabs(const_imag_var) < 0.)
+        if( fabs(const_imag) - 3.*sqrt(fabs(const_imag_var)) < 0.)
         {
+          printer_function<case_printer>("imag is consistent with zero");
+          printer_function<case_printer>("imag = " + to_string(const_imag) 
+              + "+/-" + to_string(sqrt(fabs(const_imag_var)))); 
           if( const_real > 0. )
             return phase_pair(RP,real); 
           return phase_pair(RM,real);
@@ -147,6 +237,7 @@ namespace radmat
         //    assume a FF of O(1)
         if( (const_real < 2e-2) && (const_imag < 2e-2) ) 
         {
+          printer_function<case_printer>("ff is consistent with zero");
           // doesn't matter, both are zero to precision  
           return phase_pair(ZERO,real);
         }
@@ -181,6 +272,7 @@ namespace radmat
           if( bazr == bar ) 
             if( bazi == bar )
             {
+              printer_function<case_printer>("zero variance encountered"); 
               bazr = foor.mean(); 
               bazi = fooi.mean(); 
               if ( ( bazr == bar ) && ( bazi == bar ) )
@@ -214,16 +306,31 @@ namespace radmat
 
         double phase = fit_phase ; 
 
+        printer_function<case_printer>("general cases encountered"); 
+
         if( (phase < 0.174528) && (phase > -0.174708) ) // +/- 10 degree about 0 in rad
+        {
+          printer_function<case_printer>("RP encountered"); 
           return phase_pair(RP,real);
+        }
         else if( (phase > 1.39622) && (phase < 1.74528)) // 90deg
+        {
+          printer_function<case_printer>("IP encountered"); 
           return phase_pair(IP,imag);
+        }
         else if( (phase > 2.96697) || (phase < -2.96715))  //180deg // this is atan2 specific, it returns (-pi,pi)
+        {
+          printer_function<case_printer>("RM encountered"); 
           return phase_pair(RM,real);
-        else if( (phase > -1.74546) && (phase < -1.3964)) // 270 de/doFit
+        }
+        else if( (phase > -1.74546) && (phase < -1.3964)) // 270 deg
+        {
+          printer_function<case_printer>("IM encountered"); 
           return phase_pair(IM,imag);
+        }
         else
         {
+          printer_function<case_printer>("unknown phase encountered"); 
           std::cout << "The calculated phase was " << phase*180./3.14159 << " (deg)" << std::endl;
           std::cout << "rl = " << const_real << " im = " << const_imag << std::endl;
           std::cout << "used tlow = " << tlow << " thigh = " << thigh << std::endl; 
@@ -271,6 +378,10 @@ namespace radmat
               "input " +  it->first 
               + " N " + to_string( it->second.getN() )
               + " B " + to_string( it->second.getB() ) ); 
+
+          printer_function<mean_printer>(
+              "input_corr " +  it->first 
+              + to_string( it->second.mean() ) ); 
           ret.insert( std::make_pair(it->first, find_phase(it->second) ) ); 
         }
 
@@ -357,6 +468,13 @@ namespace radmat
               + " size " + to_string(it->second.second.size()));  
           ret.mappy[it->first] = it->second.second; 
         }
+
+        // possibly print output result
+        LLSQRealFormFactorData_t::const_iterator pit; 
+        for(pit = ret.begin(); pit != ret.end(); ++pit)
+          printer_function<mean_printer>(
+              "output_corr " +  pit->first 
+              + to_string( pit->second.mean() ) ); 
 
         printer_function<ret_dimension_printer>("exiting rephase");
 

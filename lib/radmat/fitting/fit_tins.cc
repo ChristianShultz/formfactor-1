@@ -6,7 +6,7 @@
 
  * Creation Date : 01-08-2012
 
- * Last Modified : Sun 23 Feb 2014 05:22:37 PM EST
+ * Last Modified : Wed 26 Feb 2014 03:27:16 PM EST
 
  * Created By : shultz
 
@@ -52,7 +52,7 @@ namespace radmat
     struct to_ensem_printer
     {
       static void print(const std::string &s)
-      {} 
+            {} 
       //      { std::cout << s << std::endl; }
     };
 
@@ -70,6 +70,7 @@ namespace radmat
         typename SEMBLE::PromoteEnsemVec<T>::Type out;
         printer_function<to_ensem_printer>( "B=" + to_string(in.getB())); 
         printer_function<to_ensem_printer>( "N=" + to_string(in.getN())); 
+        printer_function<to_ensem_printer>( "in.mean()=" + to_string(in.mean())); 
         out.resize(in.getB());
         out.resizeObs(in.getN());
         for(int elem = 0; elem < in.getN(); ++elem)

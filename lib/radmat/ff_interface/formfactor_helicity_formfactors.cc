@@ -6,7 +6,7 @@
 
  * Creation Date : 22-02-2014
 
- * Last Modified : Sun 23 Feb 2014 12:17:46 PM EST
+ * Last Modified : Wed 26 Feb 2014 01:39:28 PM EST
 
  * Created By : shultz
 
@@ -35,11 +35,11 @@ namespace radmat
 
   namespace
   {
-  // sanity
+    // sanity
 #ifdef CHECK_HELICITY_EXPLICIT
     bool check_helicity(const int h, const int row, const int J)
     {
-      return h == J - row + 1; 
+      return h == ( J - row + 1 ); 
     }
 #endif
 
@@ -63,15 +63,15 @@ namespace radmat
     {
       FormFactorBase_t::recipe_h recipe = FormFactorBase_t::get_recipe(); 
       POW2_ASSERT( recipe->id() == Stringify<HelicityFormFactorRecipe_t>() ); 
-      const HelicityFormFactorRecipe_t * r;
-      r = dynamic_cast< const HelicityFormFactorRecipe_t* >( recipe.get_ptr() );
+      const HelicityFormFactorRecipe_t * helicity_recipe;
+      helicity_recipe = dynamic_cast< const HelicityFormFactorRecipe_t* >( recipe.get_ptr() );
 
 #ifdef CHECK_HELICITY_EXPLICIT
-      check_helicity( lefty.second, r->left_row() , r->left_spin() ); 
-      check_helicity( righty.second, r->right_row(), r->right_spin() ); 
+      check_helicity( lefty.second, helicity_recipe->left_row() , helicity_recipe->left_spin() ); 
+      check_helicity( righty.second, helicity_recipe->right_row(), helicity_recipe->right_spin() ); 
 #endif
 
-      return r->mat->operator()(lefty,righty,mom_fac); 
+      return helicity_recipe->mat->operator()(lefty,righty,mom_fac); 
     }
 
 
@@ -117,11 +117,11 @@ namespace radmat
         mat = radmat::LorentzffFormFactorDecompositionFactoryEnv::callFactory(s); 
         return new HelicityFormFactorRecipe_t(mat,reps.first,reps.second); 
       }
-      
+
       FFAbsBase_t* callback( const std::string &recipe_id )
       {
         PtrRecipeHolder::map_t::iterator r;  
-        
+
         r = Cookbook::Instance().mappy.find(recipe_id); 
         bool success = true; 
 
@@ -130,7 +130,7 @@ namespace radmat
           printer_function<console_print>( "missed " + recipe_id); 
           throw std::string("recipe_error"); 
         }
-        
+
         if( r->second->id() != radmat::Stringify<HelicityFormFactorRecipe_t>())
         {
           printer_function<console_print>( "expected a " + Stringify<HelicityFormFactorRecipe_t>());
@@ -140,7 +140,7 @@ namespace radmat
 
         HelicityFormFactorRecipe_t *ptr = dynamic_cast<HelicityFormFactorRecipe_t*>( r->second ); 
         rHandle<FormFactorRecipe_t> recipe( new HelicityFormFactorRecipe_t(*ptr) ); 
-        
+
         return new HelicityFormFactor( recipe ); 
       }
 

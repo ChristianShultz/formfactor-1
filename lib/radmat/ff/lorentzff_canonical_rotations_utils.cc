@@ -6,7 +6,7 @@
 
  * Creation Date : 10-12-2013
 
- * Last Modified : Fri 10 Jan 2014 12:04:57 AM EST
+ * Last Modified : Wed 26 Feb 2014 09:50:49 AM EST
 
  * Created By : shultz
 
@@ -408,7 +408,7 @@ namespace radmat
   double determinant(const RotationMatrix_t * R)
   {
     Tensor<double,4> levi = levi_civita<double,4>(); 
-    double sum; 
+    double sum = 0.; 
 
     for(int i = 0; i < 4; ++i)
       for(int j = 0; j < 4; ++j)
