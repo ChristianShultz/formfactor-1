@@ -2,7 +2,6 @@
 #define LORENTZFF_CANONICAL_RHORHO_H 
 
 
-#include "lorentzff_canonical_frame_formfactor.h"
 #include "lorentzff_canonical_frame_formfacs_rotation_manager.h"
 #include "lorentzff_polarization_embedding.h"
 #include "radmat/utils/levi_civita.h"
@@ -22,13 +21,17 @@ namespace radmat
   //////////////////////////////////////////////////////////////////
   //////////////////////////////////////////////////////////////////
 
-  struct RhoRhoG1impl
-    : public FormFacRotationManager<RhoRhoG1impl, std::complex<double> >,
+  struct RhoRhoG1; 
+  REGISTER_STRINGIFY_TYPE( RhoRhoG1 ); 
+
+
+  struct RhoRhoG1
+    : public FormFacRotationManager<RhoRhoG1, std::complex<double> , 1, 1>,
     public leftSpinPTensor<1> , 
     public rightSpinPTensor<1>
   {
     typedef std::complex<double> Data_t;
-    virtual ~RhoRhoG1impl() {}
+    virtual ~RhoRhoG1() {}
 
     virtual std::string
       ff_impl() const
@@ -58,24 +61,19 @@ namespace radmat
       }
   };
 
-  struct RhoRhoG1; 
-  REGISTER_STRINGIFY_TYPE( RhoRhoG1 ); 
-
-  struct RhoRhoG1 : public canonicalFrameFormFactor<1,1,RhoRhoG1impl>
-  {
-    virtual ~RhoRhoG1() {}
-    virtual std::string id() const { return Stringify<RhoRhoG1>() ;}
-  };
-
-
   //////////////////////////////////////////////////////////////////
   //////////////////////////////////////////////////////////////////
-  struct RhoRhoG2impl : public FormFacRotationManager<RhoRhoG2impl, std::complex<double> >,
-  public leftSpinPTensor<1> , 
-  public rightSpinPTensor<1>
+
+  struct RhoRhoG2; 
+  REGISTER_STRINGIFY_TYPE( RhoRhoG2 ); 
+
+  struct RhoRhoG2 
+    : public FormFacRotationManager<RhoRhoG2, std::complex<double> , 1 , 1>,
+    public leftSpinPTensor<1> , 
+    public rightSpinPTensor<1>
   {
     typedef std::complex<double> Data_t;
-    virtual ~RhoRhoG2impl() {}
+    virtual ~RhoRhoG2() {}
     virtual std::string 
       ff_impl() const
       {
@@ -120,23 +118,19 @@ namespace radmat
   };
 
 
-  struct RhoRhoG2; 
-  REGISTER_STRINGIFY_TYPE( RhoRhoG2 ); 
-
-  struct RhoRhoG2 : public canonicalFrameFormFactor<1,1,RhoRhoG2impl>
-  {
-    virtual ~RhoRhoG2() {}
-    virtual std::string id() const { return Stringify<RhoRhoG2>(); }
-  };
-
   //////////////////////////////////////////////////////////////////
   //////////////////////////////////////////////////////////////////
-  struct RhoRhoG3impl : public FormFacRotationManager<RhoRhoG3impl, std::complex<double> >,
-  public leftSpinPTensor<1> , 
-  public rightSpinPTensor<1>
+
+  struct RhoRhoG3; 
+  REGISTER_STRINGIFY_TYPE(RhoRhoG3); 
+
+  struct RhoRhoG3 
+    : public FormFacRotationManager<RhoRhoG3, std::complex<double> , 1, 1>,
+    public leftSpinPTensor<1> , 
+    public rightSpinPTensor<1>
   {
     typedef std::complex<double> Data_t;
-    virtual ~RhoRhoG3impl() {}
+    virtual ~RhoRhoG3() {}
     virtual std::string
       ff_impl() const
       {
@@ -171,16 +165,6 @@ namespace radmat
         return  - ( (val_a.value() * val_b.value() ) / (2.*mass.value()) ) * ret; 
       }
   };
-
-  struct RhoRhoG3; 
-  REGISTER_STRINGIFY_TYPE(RhoRhoG3); 
-
-  struct RhoRhoG3 : public canonicalFrameFormFactor<1,1,RhoRhoG3impl>
-  {
-    virtual ~RhoRhoG3() {}
-    virtual std::string id() const { return Stringify<RhoRhoG3>(); }
-  };
-
 
   //////////////////////////////////////////////////////////////////
   //////////////////////////////////////////////////////////////////

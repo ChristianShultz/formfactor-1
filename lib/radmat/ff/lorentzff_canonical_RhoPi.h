@@ -8,19 +8,21 @@
 #include "radmat/utils/stringify.h"
 #include "lorentzff_polarization_embedding.h"
 #include "lorentzff_canonical_frame_formfacs_rotation_manager.h"
-#include "lorentzff_canonical_frame_formfactor.h"
 
 namespace radmat
 {
 
 
-    struct RhoPiF1impl
-      : public FormFacRotationManager<RhoPiF1impl,std::complex<double> >,
+    struct RhoPiF1;
+    REGISTER_STRINGIFY_TYPE( RhoPiF1 ); 
+
+    struct RhoPiF1
+      : public FormFacRotationManager<RhoPiF1,std::complex<double>, 1 , 0 >,
       public leftSpinPTensor<1>
     {
       typedef std::complex<double> Data_t; 
 
-      virtual ~RhoPiF1impl() {}
+      virtual ~RhoPiF1() {}
 
       virtual std::string ff_impl(void) const
       {
@@ -73,16 +75,6 @@ namespace radmat
                 pplus , 2 , 0 ),
               epsilon , 1 , 0 );
         }
-    };
-
-    struct RhoPiF1;
-    REGISTER_STRINGIFY_TYPE( RhoPiF1 ); 
-
-    struct RhoPiF1
-      : public canonicalFrameFormFactor<1,0,RhoPiF1impl>
-    {
-      virtual ~RhoPiF1() {}
-      virtual std::string id() const { return Stringify<RhoPiF1>(); }
     };
 
 

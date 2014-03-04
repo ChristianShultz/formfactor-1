@@ -6,20 +6,22 @@
 #include "radmat/utils/levi_civita.h"
 #include "radmat/utils/pow2assert.h"
 #include "lorentzff_canonical_frame_formfacs_rotation_manager.h"
-#include "lorentzff_canonical_frame_formfactor.h"
 
 
 namespace radmat
 {
 
+  struct PiRhoF1; 
+  REGISTER_STRINGIFY_TYPE( PiRhoF1 ); 
+
 
   // actual implementation of the kinematic factor
-  struct PiRhoF1impl
-    : public FormFacRotationManager<PiRhoF1impl, std::complex<double> > , 
+  struct PiRhoF1
+    : public FormFacRotationManager<PiRhoF1, std::complex<double> , 0 , 1 > , 
     public rightSpinPTensor<1>
   {
     typedef std::complex<double> Data_t; 
-    virtual ~PiRhoF1impl() {}
+    virtual ~PiRhoF1() {}
 
     virtual std::string
       ff_impl(void) const
@@ -70,17 +72,6 @@ namespace radmat
               pplus , 2 , 0 ),
             epsilon , 1 , 0 );
       }
-  };
-
-  struct PiRhoF1; 
-  REGISTER_STRINGIFY_TYPE( PiRhoF1 ); 
-
-  // holder class for canonical frame interface
-  struct PiRhoF1
-    : public canonicalFrameFormFactor<0,1,PiRhoF1impl>
-  {
-    virtual ~PiRhoF1() {}
-    virtual std::string id() const { return Stringify<PiRhoF1>(); }
   };
 
 

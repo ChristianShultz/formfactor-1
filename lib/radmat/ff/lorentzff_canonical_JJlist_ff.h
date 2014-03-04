@@ -4,6 +4,7 @@
 
 #include "lorentzff_canonical_frame_formfacs_rotation_manager.h"
 #include "radmat/utils/obj_expr_t.h"
+#include "radmat/utils/stringify.h"
 #include <complex>
 #include <iostream>
 
@@ -59,8 +60,32 @@ namespace radmat
       return fop; 
     }
 
+
+  template<int J_l, int j_r>
+    struct JJFFimpl; 
+
+  REGISTER_STRINGIFY_TYPE2( JJFFimpl<0,0> );
+  REGISTER_STRINGIFY_TYPE2( JJFFimpl<1,0> );
+  REGISTER_STRINGIFY_TYPE2( JJFFimpl<2,0> );
+  REGISTER_STRINGIFY_TYPE2( JJFFimpl<3,0> );
+  REGISTER_STRINGIFY_TYPE2( JJFFimpl<0,1> );
+  REGISTER_STRINGIFY_TYPE2( JJFFimpl<1,1> );
+  REGISTER_STRINGIFY_TYPE2( JJFFimpl<2,1> );
+  REGISTER_STRINGIFY_TYPE2( JJFFimpl<3,1> );
+  REGISTER_STRINGIFY_TYPE2( JJFFimpl<0,2> );
+  REGISTER_STRINGIFY_TYPE2( JJFFimpl<1,2> );
+  REGISTER_STRINGIFY_TYPE2( JJFFimpl<2,2> );
+  REGISTER_STRINGIFY_TYPE2( JJFFimpl<3,2> );
+  REGISTER_STRINGIFY_TYPE2( JJFFimpl<0,3> );
+  REGISTER_STRINGIFY_TYPE2( JJFFimpl<1,3> );
+  REGISTER_STRINGIFY_TYPE2( JJFFimpl<2,3> );
+  REGISTER_STRINGIFY_TYPE2( JJFFimpl<3,3> );
+
+
+
+  template<int j_l, int j_r> 
   struct JJFFimpl
-    : public FormFacRotationManager<JJFFimpl, canIdx_t>
+    : public FormFacRotationManager<JJFFimpl<j_l,j_r>, canIdx_t, j_l, j_r>
   {
     typedef canIdx_t Data_t; 
     virtual ~JJFFimpl() {}

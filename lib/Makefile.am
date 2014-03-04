@@ -34,7 +34,6 @@ nobase_include_HEADERS =   \
 													 radmat/ff_interface/formfactor_spherical_invariants.h    \
 													 radmat/ff/lorentzff_canonical_cont_spin_formfactors.h    \
 													 radmat/ff/lorentzff_canonical_frame_formfacs_rotation_manager.h    \
-													 radmat/ff/lorentzff_canonical_frame_formfactor.h    \
 													 radmat/ff/lorentzff_canonical_JJlist_ff.h    \
 													 radmat/ff/lorentzff_canonical_PiPi.h    \
 													 radmat/ff/lorentzff_canonical_PiPiStar.h    \
@@ -55,6 +54,7 @@ nobase_include_HEADERS =   \
 													 radmat/ff/lorentzff_RhoPi.h    \
 													 radmat/ff/lorentzff_Wigner_D_matrix_embedding.h    \
 													 radmat/ff/lorentzff_Wigner_D_matrix_factory.h    \
+													 radmat/ff/lorentzff_Wigner_D_matrix_manager.h    \
 													 radmat/fitting/fit_tins.h    \
 													 radmat/llsq/llsq_chisq.h    \
 													 radmat/llsq/llsq_formfactor_data.h    \
@@ -96,14 +96,12 @@ nobase_include_HEADERS =   \
 													 radmat/utils/perThreadStorage.h    \
 													 radmat/utils/polarization_tensors.h    \
 													 radmat/utils/pow2assert.h    \
-													 radmat/utils/printer.h			\
+													 radmat/utils/printer.h    \
 													 radmat/utils/splash.h    \
 													 radmat/utils/stringify.h    \
 													 radmat/utils/tensor.h    \
 													 radmat/utils/type_computations.h    \
 													 radmat/utils/utils.h    
-
-
 
 # the lib
 lib_LIBRARIES = libradmat.a
@@ -126,13 +124,13 @@ libradmat_a_SOURCES =	\
 											radmat/ff_interface/formfactor_factory.cc    \
 											radmat/ff_interface/formfactor_helicity_formfactors.cc    \
 											radmat/ff_interface/formfactor_spherical_invariants.cc    \
-											radmat/ff/lorentzff_canonical_frame_formfacs_rotation_manager.cc    \
 											radmat/ff/lorentzff_canonical_rotations.cc    \
 											radmat/ff/lorentzff_canonical_rotations_checker.cc    \
 											radmat/ff/lorentzff_canonical_rotations_utils.cc    \
 											radmat/ff/lorentzff_formfactor_factory.cc    \
 											radmat/ff/lorentzff_formfac_utils.cc    \
 											radmat/ff/lorentzff_Wigner_D_matrix_factory.cc    \
+											radmat/ff/lorentzff_Wigner_D_matrix_manager.cc    \
 											radmat/fitting/fit_tins.cc    \
 											radmat/llsq/llsq_chisq.cc    \
 											radmat/llsq/llsq_formfactor_data.cc    \

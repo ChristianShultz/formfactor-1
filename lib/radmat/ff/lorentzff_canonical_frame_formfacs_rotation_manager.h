@@ -1,7 +1,9 @@
 #ifndef LORENTZFF_CANONICAL_FRAME_FORMFACS_ROTATION_MANAGER_H
 #define LORENTZFF_CANONICAL_FRAME_FORMFACS_ROTATION_MANAGER_H 
 
+#include "formfactor_abs_base_cfg.h"
 #include "lorentzff_Wigner_D_matrix_factory.h"
+#include "lorentzff_Wigner_D_matrix_manager.h"
 #include "lorentzff_canonical_rotations_utils.h"
 #include "lorentzff_canonical_rotations.h"
 #include "lorentzff_formfac_utils.h"
@@ -10,80 +12,18 @@
 #include <complex>
 #include <sstream>
 
+
+// this does not use the following headder but put it in so all 
+// lorentzff_canonical classes see it
+#include "lorentzff_formfactor_abs_base_cfg.h"
+
 namespace radmat
 {
 
-  // most positive helicity is mapped to zero
-  struct DMatrixManager
-  {
-    typedef radmat::LatticeRotationEnv::FrameOrientation_t
-      FrameOrientation_t; 
-
-    virtual ~DMatrixManager(void) {}
-
-    virtual std::string 
-      string_mom(const mom_t &p) const
-    {
-      std::stringstream ss; 
-      ss << p[0] << p[1] << p[2] ;
-      return ss.str(); 
-    }
-
-    virtual FrameOrientation_t 
-      get_frame(const mom_t &l, 
-          const mom_t &r) const ;
-
-    virtual void 
-      check_throw_frame_err(const RotationMatrix_t* Rtriad, 
-          const FrameOrientation_t &) const; 
-
-    virtual WignerMatrix_t* 
-      get_can_mat(const mom_t &p, 
-          const int J) const;
-
-    virtual void 
-      conjugate(WignerMatrix_t * D) const;
-
-    virtual void 
-      transpose(WignerMatrix_t *D) const; 
-
-    virtual void
-      dagger(WignerMatrix_t *D) const; 
-
-    virtual void 
-      clean(WignerMatrix_t *D, 
-          const double thresh=1e-6) const;  
-
-    virtual RotationMatrix_t*
-      triad_rotation_matrix(const mom_t &l, 
-          const mom_t &r) const; 
-
-    virtual WignerMatrix_t*
-      triad_rotation_wigner_matrix(const RotationMatrix_t *R, 
-          const mom_t &l, 
-          const mom_t &r, 
-          const int J) const;
-
-    virtual WignerMatrix_t*
-      left_wigner_matrix(const RotationMatrix_t *R, 
-          const mom_t &l, 
-          const mom_t &r, 
-          const int J,
-          bool print=false) const; 
-
-    virtual WignerMatrix_t*
-      right_wigner_matrix(const RotationMatrix_t *R,
-          const mom_t &l, 
-          const mom_t &r, 
-          const int J,
-          bool print = false) const; 
-  }; 
-
-
-
-  template<class DerivedFF, typename Data_t>
+  template<class DerivedFF, typename Data_t, int J_left , int J_right>
     struct FormFacRotationManager
-    : public DMatrixManager
+    : public FFAbsBlockBase_t<Data_t>,
+    public DMatrixManager
   {
     typedef DMatrixManager::FrameOrientation_t FrameOrientation_t; 
     typedef Tensor<double,1> p4_t; 
@@ -95,7 +35,6 @@ namespace radmat
       {
         return std::pair<mom_t,mom_t>(get_space_mom(l,kick),get_space_mom(r,kick)); 
       }
-
 
     virtual std::pair<p4_t,p4_t>
       can_mom(const RotationMatrix_t *R,
@@ -160,27 +99,33 @@ namespace radmat
         return out; 
       }
 
-    virtual Tensor<Data_t,1>
-      operator()(const p4_t &l, 
-          const p4_t &r, 
-          const double kick, 
-          const int Jl, 
-          const int Jr, 
-          const int hl, 
-          const int hr) const
+
+    virtual Tensor<Data_t,1> 
+      operator()(const MomRowPair_t &lefty, 
+          const MomRowPair_t &righty, 
+          const double mom_fac ) const 
       {
-        std::pair<mom_t,mom_t> moms = pair_mom(l,r,kick);  
+        return canonicalize(lefty,righty,mom_fac); 
+      }
+
+
+    virtual Tensor<Data_t,1>
+      canonicalize(const MomRowPair_t &lefty,
+          const MomRowPair_t &righty, 
+          const double kick) const
+      {
+        std::pair<mom_t,mom_t> moms = pair_mom(lefty.first,righty.first,kick);  
         RotationMatrix_t *R = triad_rotation_matrix(moms.first,moms.second); 
-        std::pair<p4_t,p4_t> can_moms = can_mom(R,l,r,kick); 
-        WignerMatrix_t * Wl = left_wigner_matrix(R,moms.first,moms.second,Jl);
-        WignerMatrix_t * Wr = right_wigner_matrix(R,moms.first,moms.second,Jr);
+        std::pair<p4_t,p4_t> can_moms = can_mom(R,lefty.first,righty.first,kick); 
+        WignerMatrix_t * Wl = left_wigner_matrix(R,moms.first,moms.second,J_left);
+        WignerMatrix_t * Wr = right_wigner_matrix(R,moms.first,moms.second,J_right);
 
         Tensor<Data_t,1> sum( (TensorShape<1>())[4] , Data_t() ); 
 
-        int left_h = Jl - hl; 
-        int right_h = Jr - hr; 
-        int left_bound = 2*Jl +1; 
-        int right_bound = 2*Jr +1; 
+        int left_h = J_left - lefty.second; 
+        int right_h = J_right - righty.second; 
+        int left_bound = 2*J_left +1; 
+        int right_bound = 2*J_right +1; 
 
         for(int lh = 0; lh < left_bound; ++lh)
           for(int rh = 0; rh < right_bound; ++rh)
@@ -188,7 +133,7 @@ namespace radmat
             std::complex<double> weight = ( (*Wl)[left_h][lh] * (*Wr)[rh][right_h] ); // D matrix phase
             if( std::norm(weight) > 1e-6) 
             {
-              Tensor<Data_t, 1> tmp = impl(can_moms.first,can_moms.second,kick,Jl-lh,Jr-rh); 
+              Tensor<Data_t, 1> tmp = impl(can_moms.first,can_moms.second,kick,J_left-lh,J_right-rh); 
               for(int i = 0; i < 4; ++i)
                 sum[i] = sum[i] + weight * tmp[i] ; // do by hand for overloads
             }
@@ -203,7 +148,7 @@ namespace radmat
         return ret; 
       }
 
-    // derived classes implement impl 
+    // derived classes implement impl, ff_impl, id_impl 
     virtual Tensor<Data_t, 1> 
       impl(const p4_t &l, const p4_t &r, const double kick, const int hl, const int hr) const
       {
@@ -215,6 +160,11 @@ namespace radmat
       {
         return static_cast<const DerivedFF*>(this)->ff_impl(); 
       }
+
+    virtual std::string id() const 
+    {
+      return Stringify<DerivedFF>(); 
+    }
 
   }; 
 

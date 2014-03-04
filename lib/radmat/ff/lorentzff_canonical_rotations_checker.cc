@@ -6,7 +6,7 @@
 
  * Creation Date : 24-12-2013
 
- * Last Modified : Tue 24 Dec 2013 05:31:35 PM EST
+ * Last Modified : Tue 04 Mar 2014 02:21:21 PM EST
 
  * Created By : shultz
 
@@ -234,22 +234,20 @@ namespace radmat
         return false; 
       }
 
+  
 
     ////////////////////////////////////////////////
+    
+    template<int Jl, int Jr>
     bool 
       do_work(const map_holder *mappy, 
-          const KEY &k, 
-          const int Jl, 
-          const int Jr)
+          const KEY &k)
       {
-        JJFFimpl foo;
-        Tensor<canIdx_t,1> tens = foo( cook_p_tens(0.216,k.left,0.11), 
-            cook_p_tens(0.216,k.right,0.11), 
-            0.11,
-            Jl,
-            Jr,
-            k.h_left,
-            k.h_right); 
+        JJFFimpl<Jl,Jr> foo; 
+        Tensor<canIdx_t,1> tens = foo.canonicalize(
+            std::make_pair( cook_p_tens(0.216,k.left,0.11), k.h_left), 
+            std::make_pair( cook_p_tens(0.216,k.right,0.11), k.h_right),
+            0.11);
 
         canIdx_t chk = tens[ k.jmu ]; 
 
@@ -282,6 +280,48 @@ namespace radmat
 
         return success; 
       }
+
+    bool  do_work(const map_holder *mappy, const KEY &k, const int Jl, const int Jr)
+    {
+      if( (Jl == 0) && (Jr == 0) )
+        return do_work<0,0>(mappy,k); 
+      else if( (Jl == 1) && (Jr == 0) )
+        return do_work<1,0>(mappy,k); 
+      else if( (Jl == 2) && (Jr == 0) )
+        return do_work<2,0>(mappy,k); 
+      else if( (Jl == 3) && (Jr == 0) )
+        return do_work<3,0>(mappy,k); 
+      else if( (Jl == 0) && (Jr == 1) )
+        return do_work<0,1>(mappy,k); 
+      else if( (Jl == 1) && (Jr == 1) )
+        return do_work<1,1>(mappy,k); 
+      else if( (Jl == 2) && (Jr == 1) )
+        return do_work<2,1>(mappy,k); 
+      else if( (Jl == 3) && (Jr == 1) )
+        return do_work<3,1>(mappy,k); 
+      else if( (Jl == 0) && (Jr == 2) )
+        return do_work<0,2>(mappy,k); 
+      else if( (Jl == 1) && (Jr == 2) )
+        return do_work<1,2>(mappy,k); 
+      else if( (Jl == 2) && (Jr == 2) )
+        return do_work<2,2>(mappy,k); 
+      else if( (Jl == 3) && (Jr == 2) )
+        return do_work<3,2>(mappy,k); 
+      else if( (Jl == 0) && (Jr == 3) )
+        return do_work<0,3>(mappy,k); 
+      else if( (Jl == 1) && (Jr == 3) )
+        return do_work<1,3>(mappy,k); 
+      else if( (Jl == 2) && (Jr == 3) )
+        return do_work<2,3>(mappy,k); 
+      else if( (Jl == 3) && (Jr == 3) )
+        return do_work<3,3>(mappy,k); 
+      else
+      {
+        std::cerr << "unsuported spin" << std::endl;
+        exit(1); 
+      }
+    }
+
 
 
     ////////////////////////////////////////////////

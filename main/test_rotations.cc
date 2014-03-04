@@ -6,7 +6,7 @@
 
 * Creation Date : 11-12-2013
 
-* Last Modified : Thu 09 Jan 2014 08:56:14 PM EST
+* Last Modified : Tue 04 Mar 2014 02:37:17 PM EST
 
 * Created By : shultz
 
@@ -467,12 +467,12 @@ void get_JJ11_ff_sum(int argc, char *argv[])
 
 
 
-  radmat::JJFFimpl foo;
+  radmat::JJFFimpl<1,1> foo;
 
   double kick = 0.11;
   radmat::Tensor<double,1> pf = init_4tens(0.216,m1[0],m1[1],m1[2],kick); 
   radmat::Tensor<double,1> pi = init_4tens(0.216,m2[0],m2[1],m2[2],kick); 
-  std::cout << foo(pf,pi,kick,1,1,hl,hr) << std::endl; 
+  std::cout << foo(std::make_pair(pf,hl),std::make_pair(pi,hr),kick) << std::endl; 
 
 }
 

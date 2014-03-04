@@ -91,13 +91,13 @@ am_libradmat_a_OBJECTS =  \
 	formfactor_factory.$(OBJEXT) \
 	formfactor_helicity_formfactors.$(OBJEXT) \
 	formfactor_spherical_invariants.$(OBJEXT) \
-	lorentzff_canonical_frame_formfacs_rotation_manager.$(OBJEXT) \
 	lorentzff_canonical_rotations.$(OBJEXT) \
 	lorentzff_canonical_rotations_checker.$(OBJEXT) \
 	lorentzff_canonical_rotations_utils.$(OBJEXT) \
 	lorentzff_formfactor_factory.$(OBJEXT) \
 	lorentzff_formfac_utils.$(OBJEXT) \
-	lorentzff_Wigner_D_matrix_factory.$(OBJEXT) fit_tins.$(OBJEXT) \
+	lorentzff_Wigner_D_matrix_factory.$(OBJEXT) \
+	lorentzff_Wigner_D_matrix_manager.$(OBJEXT) fit_tins.$(OBJEXT) \
 	llsq_chisq.$(OBJEXT) llsq_formfactor_data.$(OBJEXT) \
 	llsq_gen_system.$(OBJEXT) llsq_multi_driver.$(OBJEXT) \
 	llsq_solvers.$(OBJEXT) \
@@ -267,7 +267,6 @@ nobase_include_HEADERS = \
 													 radmat/ff_interface/formfactor_spherical_invariants.h    \
 													 radmat/ff/lorentzff_canonical_cont_spin_formfactors.h    \
 													 radmat/ff/lorentzff_canonical_frame_formfacs_rotation_manager.h    \
-													 radmat/ff/lorentzff_canonical_frame_formfactor.h    \
 													 radmat/ff/lorentzff_canonical_JJlist_ff.h    \
 													 radmat/ff/lorentzff_canonical_PiPi.h    \
 													 radmat/ff/lorentzff_canonical_PiPiStar.h    \
@@ -288,6 +287,7 @@ nobase_include_HEADERS = \
 													 radmat/ff/lorentzff_RhoPi.h    \
 													 radmat/ff/lorentzff_Wigner_D_matrix_embedding.h    \
 													 radmat/ff/lorentzff_Wigner_D_matrix_factory.h    \
+													 radmat/ff/lorentzff_Wigner_D_matrix_manager.h    \
 													 radmat/fitting/fit_tins.h    \
 													 radmat/llsq/llsq_chisq.h    \
 													 radmat/llsq/llsq_formfactor_data.h    \
@@ -329,7 +329,7 @@ nobase_include_HEADERS = \
 													 radmat/utils/perThreadStorage.h    \
 													 radmat/utils/polarization_tensors.h    \
 													 radmat/utils/pow2assert.h    \
-													 radmat/utils/printer.h			\
+													 radmat/utils/printer.h    \
 													 radmat/utils/splash.h    \
 													 radmat/utils/stringify.h    \
 													 radmat/utils/tensor.h    \
@@ -356,13 +356,13 @@ libradmat_a_SOURCES = \
 											radmat/ff_interface/formfactor_factory.cc    \
 											radmat/ff_interface/formfactor_helicity_formfactors.cc    \
 											radmat/ff_interface/formfactor_spherical_invariants.cc    \
-											radmat/ff/lorentzff_canonical_frame_formfacs_rotation_manager.cc    \
 											radmat/ff/lorentzff_canonical_rotations.cc    \
 											radmat/ff/lorentzff_canonical_rotations_checker.cc    \
 											radmat/ff/lorentzff_canonical_rotations_utils.cc    \
 											radmat/ff/lorentzff_formfactor_factory.cc    \
 											radmat/ff/lorentzff_formfac_utils.cc    \
 											radmat/ff/lorentzff_Wigner_D_matrix_factory.cc    \
+											radmat/ff/lorentzff_Wigner_D_matrix_manager.cc    \
 											radmat/fitting/fit_tins.cc    \
 											radmat/llsq/llsq_chisq.cc    \
 											radmat/llsq/llsq_formfactor_data.cc    \
@@ -486,7 +486,7 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/llsq_multi_driver.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/llsq_solvers.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/lorentzff_Wigner_D_matrix_factory.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/lorentzff_canonical_frame_formfacs_rotation_manager.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/lorentzff_Wigner_D_matrix_manager.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/lorentzff_canonical_rotations.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/lorentzff_canonical_rotations_checker.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/lorentzff_canonical_rotations_utils.Po@am__quote@
@@ -755,20 +755,6 @@ formfactor_spherical_invariants.obj: radmat/ff_interface/formfactor_spherical_in
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCXX_FALSE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o formfactor_spherical_invariants.obj `if test -f 'radmat/ff_interface/formfactor_spherical_invariants.cc'; then $(CYGPATH_W) 'radmat/ff_interface/formfactor_spherical_invariants.cc'; else $(CYGPATH_W) '$(srcdir)/radmat/ff_interface/formfactor_spherical_invariants.cc'; fi`
 
-lorentzff_canonical_frame_formfacs_rotation_manager.o: radmat/ff/lorentzff_canonical_frame_formfacs_rotation_manager.cc
-@am__fastdepCXX_TRUE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT lorentzff_canonical_frame_formfacs_rotation_manager.o -MD -MP -MF $(DEPDIR)/lorentzff_canonical_frame_formfacs_rotation_manager.Tpo -c -o lorentzff_canonical_frame_formfacs_rotation_manager.o `test -f 'radmat/ff/lorentzff_canonical_frame_formfacs_rotation_manager.cc' || echo '$(srcdir)/'`radmat/ff/lorentzff_canonical_frame_formfacs_rotation_manager.cc
-@am__fastdepCXX_TRUE@	$(am__mv) $(DEPDIR)/lorentzff_canonical_frame_formfacs_rotation_manager.Tpo $(DEPDIR)/lorentzff_canonical_frame_formfacs_rotation_manager.Po
-@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='radmat/ff/lorentzff_canonical_frame_formfacs_rotation_manager.cc' object='lorentzff_canonical_frame_formfacs_rotation_manager.o' libtool=no @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCXX_FALSE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o lorentzff_canonical_frame_formfacs_rotation_manager.o `test -f 'radmat/ff/lorentzff_canonical_frame_formfacs_rotation_manager.cc' || echo '$(srcdir)/'`radmat/ff/lorentzff_canonical_frame_formfacs_rotation_manager.cc
-
-lorentzff_canonical_frame_formfacs_rotation_manager.obj: radmat/ff/lorentzff_canonical_frame_formfacs_rotation_manager.cc
-@am__fastdepCXX_TRUE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT lorentzff_canonical_frame_formfacs_rotation_manager.obj -MD -MP -MF $(DEPDIR)/lorentzff_canonical_frame_formfacs_rotation_manager.Tpo -c -o lorentzff_canonical_frame_formfacs_rotation_manager.obj `if test -f 'radmat/ff/lorentzff_canonical_frame_formfacs_rotation_manager.cc'; then $(CYGPATH_W) 'radmat/ff/lorentzff_canonical_frame_formfacs_rotation_manager.cc'; else $(CYGPATH_W) '$(srcdir)/radmat/ff/lorentzff_canonical_frame_formfacs_rotation_manager.cc'; fi`
-@am__fastdepCXX_TRUE@	$(am__mv) $(DEPDIR)/lorentzff_canonical_frame_formfacs_rotation_manager.Tpo $(DEPDIR)/lorentzff_canonical_frame_formfacs_rotation_manager.Po
-@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='radmat/ff/lorentzff_canonical_frame_formfacs_rotation_manager.cc' object='lorentzff_canonical_frame_formfacs_rotation_manager.obj' libtool=no @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCXX_FALSE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o lorentzff_canonical_frame_formfacs_rotation_manager.obj `if test -f 'radmat/ff/lorentzff_canonical_frame_formfacs_rotation_manager.cc'; then $(CYGPATH_W) 'radmat/ff/lorentzff_canonical_frame_formfacs_rotation_manager.cc'; else $(CYGPATH_W) '$(srcdir)/radmat/ff/lorentzff_canonical_frame_formfacs_rotation_manager.cc'; fi`
-
 lorentzff_canonical_rotations.o: radmat/ff/lorentzff_canonical_rotations.cc
 @am__fastdepCXX_TRUE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT lorentzff_canonical_rotations.o -MD -MP -MF $(DEPDIR)/lorentzff_canonical_rotations.Tpo -c -o lorentzff_canonical_rotations.o `test -f 'radmat/ff/lorentzff_canonical_rotations.cc' || echo '$(srcdir)/'`radmat/ff/lorentzff_canonical_rotations.cc
 @am__fastdepCXX_TRUE@	$(am__mv) $(DEPDIR)/lorentzff_canonical_rotations.Tpo $(DEPDIR)/lorentzff_canonical_rotations.Po
@@ -852,6 +838,20 @@ lorentzff_Wigner_D_matrix_factory.obj: radmat/ff/lorentzff_Wigner_D_matrix_facto
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='radmat/ff/lorentzff_Wigner_D_matrix_factory.cc' object='lorentzff_Wigner_D_matrix_factory.obj' libtool=no @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCXX_FALSE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o lorentzff_Wigner_D_matrix_factory.obj `if test -f 'radmat/ff/lorentzff_Wigner_D_matrix_factory.cc'; then $(CYGPATH_W) 'radmat/ff/lorentzff_Wigner_D_matrix_factory.cc'; else $(CYGPATH_W) '$(srcdir)/radmat/ff/lorentzff_Wigner_D_matrix_factory.cc'; fi`
+
+lorentzff_Wigner_D_matrix_manager.o: radmat/ff/lorentzff_Wigner_D_matrix_manager.cc
+@am__fastdepCXX_TRUE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT lorentzff_Wigner_D_matrix_manager.o -MD -MP -MF $(DEPDIR)/lorentzff_Wigner_D_matrix_manager.Tpo -c -o lorentzff_Wigner_D_matrix_manager.o `test -f 'radmat/ff/lorentzff_Wigner_D_matrix_manager.cc' || echo '$(srcdir)/'`radmat/ff/lorentzff_Wigner_D_matrix_manager.cc
+@am__fastdepCXX_TRUE@	$(am__mv) $(DEPDIR)/lorentzff_Wigner_D_matrix_manager.Tpo $(DEPDIR)/lorentzff_Wigner_D_matrix_manager.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='radmat/ff/lorentzff_Wigner_D_matrix_manager.cc' object='lorentzff_Wigner_D_matrix_manager.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o lorentzff_Wigner_D_matrix_manager.o `test -f 'radmat/ff/lorentzff_Wigner_D_matrix_manager.cc' || echo '$(srcdir)/'`radmat/ff/lorentzff_Wigner_D_matrix_manager.cc
+
+lorentzff_Wigner_D_matrix_manager.obj: radmat/ff/lorentzff_Wigner_D_matrix_manager.cc
+@am__fastdepCXX_TRUE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT lorentzff_Wigner_D_matrix_manager.obj -MD -MP -MF $(DEPDIR)/lorentzff_Wigner_D_matrix_manager.Tpo -c -o lorentzff_Wigner_D_matrix_manager.obj `if test -f 'radmat/ff/lorentzff_Wigner_D_matrix_manager.cc'; then $(CYGPATH_W) 'radmat/ff/lorentzff_Wigner_D_matrix_manager.cc'; else $(CYGPATH_W) '$(srcdir)/radmat/ff/lorentzff_Wigner_D_matrix_manager.cc'; fi`
+@am__fastdepCXX_TRUE@	$(am__mv) $(DEPDIR)/lorentzff_Wigner_D_matrix_manager.Tpo $(DEPDIR)/lorentzff_Wigner_D_matrix_manager.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='radmat/ff/lorentzff_Wigner_D_matrix_manager.cc' object='lorentzff_Wigner_D_matrix_manager.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o lorentzff_Wigner_D_matrix_manager.obj `if test -f 'radmat/ff/lorentzff_Wigner_D_matrix_manager.cc'; then $(CYGPATH_W) 'radmat/ff/lorentzff_Wigner_D_matrix_manager.cc'; else $(CYGPATH_W) '$(srcdir)/radmat/ff/lorentzff_Wigner_D_matrix_manager.cc'; fi`
 
 fit_tins.o: radmat/fitting/fit_tins.cc
 @am__fastdepCXX_TRUE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT fit_tins.o -MD -MP -MF $(DEPDIR)/fit_tins.Tpo -c -o fit_tins.o `test -f 'radmat/fitting/fit_tins.cc' || echo '$(srcdir)/'`radmat/fitting/fit_tins.cc

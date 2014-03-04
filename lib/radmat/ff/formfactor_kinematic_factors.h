@@ -6,6 +6,7 @@
 #include "semble/semble_matrix.h"
 #include "semble/semble_algebra.h"
 #include "semble/semble_meta.h"
+#include "radmat/utils/printer.h"
 #include <utility>
 #include <sstream>
 #include <string>
@@ -58,6 +59,13 @@ namespace radmat
     std::string LG_id;  
     int row;          
   }; 
+
+
+  struct debug_print_FFKI
+  {
+    static void print(const std::string &msg) 
+    { std::cout << msg << std::endl;}
+  };
 
 
   // the kinematic invariants that go into the calculation
@@ -127,6 +135,13 @@ namespace radmat
       // this also checks size of righty vs size of lefty
       POW2_ASSERT_DEBUG( (nbins == lefty.E.size()) && (nfacs > 0) );
 
+      std::stringstream ss; 
+      ss << " l " << ENSEM::toDouble( ENSEM::mean( lefty.E ) ) 
+        << " " << lefty.p[0] << " "  << lefty.p[1] << " " << lefty.p[2] << " "
+        << " r " << ENSEM::toDouble( ENSEM::mean( righty.E ) ) 
+        << " " <<  righty.p[0] << " "  << righty.p[1] << " " << righty.p[2];
+      printer_function<debug_print_FFKI>( ss.str() ); 
+
       // the matrix to be returned
       KinematicFactorMatrix KF(nbins,4,nfacs);
       KF.zeros();
@@ -137,8 +152,10 @@ namespace radmat
 
       // loop over cfgs and use the wrapper to operator()
       for(int bin = 0; bin < nbins; bin++)
+      {
         KF[bin] = m_KFacGen->wrapper( lefty.E.elem(bin) , lefty.p , lefty.row,
             righty.E.elem(bin) , righty.p , righty.row , inv.mom_factor);
+      }
 
       // scale up return matrix
       KF.rescaleSembleUp();

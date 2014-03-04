@@ -27,16 +27,14 @@ namespace radmat
   //
   // a decomposition is a list of functors
 
-  struct FFAbsBlockBase_t;
-  REGISTER_STRINGIFY_TYPE(FFAbsBlockBase_t); 
-
+  template<typename T> 
   struct FFAbsBlockBase_t
   {
     virtual ~FFAbsBlockBase_t() {}
-    virtual std::string ff() const {return Stringify<FFAbsBlockBase_t>();}
+    virtual std::string ff() const {return "FFAbsBlockBase_t";}
     virtual std::string id() const = 0; // the derived class name
 
-    virtual Tensor<std::complex<double> , 1> 
+    virtual Tensor<T, 1> 
       operator()( const MomRowPair_t &lefty, 
           const MomRowPair_t &righty,
           const double mom_fac) const = 0; 

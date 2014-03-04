@@ -6,17 +6,19 @@
 #include "radmat/utils/pow2assert.h"
 #include "radmat/utils/stringify.h"
 #include "lorentzff_canonical_frame_formfacs_rotation_manager.h"
-#include "lorentzff_canonical_frame_formfactor.h"
 #include <complex>
 
 namespace radmat
 {
 
+  struct PiPiStarF1;
+  REGISTER_STRINGIFY_TYPE( PiPiStarF1 ); 
+
   // only one ff
-  struct PiPiStarF1impl
-    : public FormFacRotationManager<PiPiStarF1impl, std::complex<double> >
+  struct PiPiStarF1
+    : public FormFacRotationManager<PiPiStarF1, std::complex<double> , 0 , 0  >
   {
-    virtual ~PiPiStarF1impl() {}
+    virtual ~PiPiStarF1() {}
 
     virtual  std::string ff_impl(void) const
     {
@@ -48,16 +50,6 @@ namespace radmat
       }
   };
 
-
-  struct PiPiStarF1;
-  REGISTER_STRINGIFY_TYPE( PiPiStarF1 ); 
-
-  struct PiPiStarF1
-    : public canonicalFrameFormFactor<0,0,PiPiStarF1impl>
-  {
-    virtual ~PiPiStarF1() {} 
-    std::string id() const { return Stringify<PiPiStarF1>(); }
-  };
 
 
 

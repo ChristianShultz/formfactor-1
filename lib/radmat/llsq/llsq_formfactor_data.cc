@@ -6,7 +6,7 @@
 
  * Creation Date : 21-02-2014
 
- * Last Modified : Wed 26 Feb 2014 05:12:32 PM EST
+ * Last Modified : Tue 04 Mar 2014 02:51:57 PM EST
 
  * Created By : shultz
 
@@ -63,21 +63,22 @@ namespace radmat
     struct mean_printer
     {
       static void print(const std::string &s)
-      { std::cout << s << std::endl;}
+      {}
+      // { std::cout << s << std::endl;}
     };
 
     struct case_printer
     {
       static void print(const std::string &s)
-      { std::cout << s << std::endl;}
+      {}
+     // { std::cout << s << std::endl;}
     };
 
     struct ensem_printer
     {
       static void print(const std::string &s)
-      {
-        std::cout << s << std::endl;
-      }
+      {}
+      // {std::cout << s << std::endl;}
     };
 
     template<typename T>

@@ -5,19 +5,20 @@
 #include "lorentzff_polarization_embedding.h"
 #include "radmat/utils/pow2assert.h"
 #include "lorentzff_canonical_frame_formfacs_rotation_manager.h"
-#include "lorentzff_canonical_frame_formfactor.h"
 #include "radmat/utils/stringify.h"
 #include <complex>
 
 namespace radmat
 {
 
+  struct PiPiF1; 
+  REGISTER_STRINGIFY_TYPE( PiPiF1 ); 
 
   // only one ff
-  struct PiPiF1impl
-    : public FormFacRotationManager<PiPiF1impl, std::complex<double> >
+  struct PiPiF1
+    : public FormFacRotationManager<PiPiF1, std::complex<double>, 0 , 0 >
   {
-    virtual ~PiPiF1impl() {}
+    virtual ~PiPiF1() {}
 
     virtual  std::string ff_impl(void) const
     {
@@ -34,16 +35,6 @@ namespace radmat
       {
         return convertTensorUnderlyingType<std::complex<double>,double,1>( pPlus(p_f,p_i) );
       }
-  };
-
-  struct PiPiF1; 
-  REGISTER_STRINGIFY_TYPE( PiPiF1 ); 
-
-  struct PiPiF1
-    : public canonicalFrameFormFactor<0,0,PiPiF1impl>
-  {
-    virtual ~PiPiF1() {} 
-    virtual std::string id() const {return Stringify<PiPiF1>();}
   };
 
 

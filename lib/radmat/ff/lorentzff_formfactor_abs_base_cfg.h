@@ -25,7 +25,7 @@ namespace radmat
   // shove this into a SembleMatrix bin by bin to deal with the ensemble stats.
 
   // this will be polymorphic with different named classes corresponding to 
-  // different quantum numbers, ie: PiPi  <-->   < 0+ | j_mu | 0+ >
+  // different quantum numbers, ie: PiPi  <-->   < 0- | j_mu | 0- >
 
   struct LorentzFFAbsBase_t; 
   REGISTER_STRINGIFY_TYPE( LorentzFFAbsBase_t );
@@ -34,8 +34,8 @@ namespace radmat
     : public FFAbsBase_t
   {
     // save some typing
-    typedef FFAbsBlockBase_t BBType;
-    typedef rHandle< FFAbsBlockBase_t > BBHandle_t;
+    typedef FFAbsBlockBase_t<std::complex<double> > BBType;
+    typedef rHandle< BBType > BBHandle_t;
     typedef std::list< BBHandle_t > LorentzFFAbs_list;
 
     // this will be useful when we derive

@@ -1,18 +1,21 @@
 /* -.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.
 
- * File Name : lorentzff_canonical_frame_formfacs_rotation_manager.cc
+* File Name : lorentzff_Wigner_D_matrix_manager.cc
 
- * Purpose :
+* Purpose :
 
- * Creation Date : 18-12-2013
+* Creation Date : 04-03-2014
 
- * Last Modified : Fri 21 Feb 2014 09:45:57 AM EST
+* Last Modified : Tue 04 Mar 2014 01:04:26 PM EST
 
- * Created By : shultz
+* Created By : shultz
 
- _._._._._._._._._._._._._._._._._._._._._.*/
+_._._._._._._._._._._._._._._._._._._._._.*/
 
-#include "lorentzff_canonical_frame_formfacs_rotation_manager.h"
+
+
+
+#include "lorentzff_Wigner_D_matrix_manager.h"
 #include "lorentzff_formfac_utils.h"
 #include "hadron/clebsch.h"
 #include "radmat/utils/pow2assert.h"
