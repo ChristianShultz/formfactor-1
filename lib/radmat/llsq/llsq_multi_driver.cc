@@ -6,7 +6,7 @@
 
  * Creation Date : 22-02-2013
 
- * Last Modified : Tue 04 Mar 2014 03:12:43 PM EST
+ * Last Modified : Tue 04 Mar 2014 04:31:35 PM EST
 
  * Created By : shultz
 
@@ -493,17 +493,22 @@ namespace radmat
 
 
     std::stringstream ss, A,Ainv, x; 
-    std::stringstream unity; 
+    std::stringstream unity, Kstr,Kistr; 
     ss << path;
     A << ss.str() << "K.mean";
     Ainv << ss.str() << "Kinv.mean"; 
     unity << ss.str() <<  "Kinv_x_K.mean"; 
     x << ss.str() << "ff_";
+    Kstr << ss.str() << "K_row_";
+    Kistr << ss.str() << "Kinv_row_";
+
 
     my_writer_mean(A.str(),K);
     my_writer_mean(Ainv.str(),Kinv);
     my_writer_mean(unity.str(),Kinv*K); 
     my_writer_rows(x.str(), FF_t); 
+    my_writer_rows(Kstr.str(),K); 
+    my_writer_rows(Kistr.str(),Kinv); 
 
     std::string pth = path + std::string("solver.log"); 
     std::ofstream out( pth.c_str() ); 

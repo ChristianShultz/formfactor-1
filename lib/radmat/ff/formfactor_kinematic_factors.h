@@ -64,7 +64,8 @@ namespace radmat
   struct debug_print_FFKI
   {
     static void print(const std::string &msg) 
-    { std::cout << msg << std::endl;}
+    {}
+    // { std::cout << msg << std::endl;}
   };
 
 
@@ -135,20 +136,28 @@ namespace radmat
       // this also checks size of righty vs size of lefty
       POW2_ASSERT_DEBUG( (nbins == lefty.E.size()) && (nfacs > 0) );
 
-      std::stringstream ss; 
-      ss << " l " << ENSEM::toDouble( ENSEM::mean( lefty.E ) ) 
-        << " " << lefty.p[0] << " "  << lefty.p[1] << " " << lefty.p[2] << " "
-        << " r " << ENSEM::toDouble( ENSEM::mean( righty.E ) ) 
-        << " " <<  righty.p[0] << " "  << righty.p[1] << " " << righty.p[2];
-      printer_function<debug_print_FFKI>( ss.str() ); 
+//      // debug
+//      std::stringstream ss; 
+//      ss << " l " << ENSEM::toDouble( ENSEM::mean( lefty.E ) ) 
+//        << " " << lefty.p[0] << " "  << lefty.p[1] << " " << lefty.p[2] << " "
+//        << " r " << ENSEM::toDouble( ENSEM::mean( righty.E ) ) 
+//        << " " <<  righty.p[0] << " "  << righty.p[1] << " " << righty.p[2];
+//      printer_function<debug_print_FFKI>( ss.str() ); 
 
       // the matrix to be returned
       KinematicFactorMatrix KF(nbins,4,nfacs);
       KF.zeros();
 
       // scale down the energies, momentum have zero variance 
-      ENSEM::rescaleEnsemDown( lefty.E );
-      ENSEM::rescaleEnsemDown( righty.E ); 
+      //   NB: need to use assignment here
+      lefty.E =  ENSEM::rescaleEnsemDown( inv.lefty.E );
+      righty.E = ENSEM::rescaleEnsemDown( inv.righty.E ); 
+
+//      // debug 
+//      std::stringstream sss; 
+//      sss << " pre variance " << ENSEM::toDouble( ENSEM::variance( inv.lefty.E ) ) 
+//        << " post vairance " << ENSEM::toDouble( ENSEM::variance( lefty.E ) ) ;
+//      printer_function<debug_print_FFKI>( sss.str() ); 
 
       // loop over cfgs and use the wrapper to operator()
       for(int bin = 0; bin < nbins; bin++)
