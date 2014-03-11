@@ -155,6 +155,7 @@ namespace radmat
   namespace SpherInvariantsFactoryEnv
   {
     bool registerAll( void );
+    // nb keys are class names
     rHandle<SpherRep_p> callFactory(const std::string &id);
     std::vector<std::string> all_keys(void); 
   }

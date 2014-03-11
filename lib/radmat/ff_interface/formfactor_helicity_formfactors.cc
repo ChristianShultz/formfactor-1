@@ -6,7 +6,7 @@
 
  * Creation Date : 22-02-2014
 
- * Last Modified : Wed 26 Feb 2014 01:39:28 PM EST
+ * Last Modified : Tue 11 Mar 2014 11:18:36 AM EDT
 
  * Created By : shultz
 
@@ -46,13 +46,10 @@ namespace radmat
     struct print_elem_reg
     {
       static void print(const std::string &msg)
-      {std::cout << msg << std::endl;}
+//      {}
+            {std::cout << "helicity form factors " << msg << std::endl;}
     };
 
-    struct dont_print_elem_reg
-    {
-      static void print(const std::string &msg) {}
-    };
   }
 
   // use whatever is in the lorentzff_canonical_cont_spin decomp
@@ -67,8 +64,10 @@ namespace radmat
       helicity_recipe = dynamic_cast< const HelicityFormFactorRecipe_t* >( recipe.get_ptr() );
 
 #ifdef CHECK_HELICITY_EXPLICIT
-      check_helicity( lefty.second, helicity_recipe->left_row() , helicity_recipe->left_spin() ); 
-      check_helicity( righty.second, helicity_recipe->right_row(), helicity_recipe->right_spin() ); 
+      bool success = true; 
+      success &= check_helicity( lefty.second, helicity_recipe->left_row() , helicity_recipe->left_spin() ); 
+      success &= check_helicity( righty.second, helicity_recipe->right_row(), helicity_recipe->right_spin() ); 
+      POW2_ASSERT(success); 
 #endif
 
       return helicity_recipe->mat->operator()(lefty,righty,mom_fac); 
@@ -82,6 +81,29 @@ namespace radmat
     // local utility
     namespace
     { 
+
+      // snarf (or slurp?) all spherical reps
+      std::vector<rHandle<SpherRep_p> > 
+        get_all_cont_reps()
+        {
+          std::vector<std::string> keys;
+          std::vector<std::string>::const_iterator it; 
+          std::vector<rHandle<SpherRep_p> > vals; 
+
+          keys = ::radmat::SpherInvariantsFactoryEnv::all_keys(); 
+          for(it = keys.begin(); it != keys.end(); ++it)
+          {
+            printer_function<print_elem_reg>("grabbed a " + *it ); 
+            vals.push_back( 
+                ::radmat::SpherInvariantsFactoryEnv::callFactory(*it) ); 
+          }
+
+          return vals;
+        }
+
+      // reg function
+      typedef std::pair<rHandle<SpherRep_p> , rHandle<SpherRep_p> > rep_pair;
+
       // build the id from the lorentz spin factory, 
       // this is a class name like J0pJ3m
       std::string build_lorentz_spin_id(const rHandle<SpherRep_p> &lefty, 
@@ -92,25 +114,12 @@ namespace radmat
         return ss.str(); 
       }
 
-      // snarf (or slurp?) all continuum reps
-      std::vector<rHandle<SpherRep_p> > 
-        get_all_cont_reps()
-        {
-          std::vector<std::string> keys;
-          std::vector<std::string>::const_iterator it; 
-          std::vector<rHandle<SpherRep_p> > vals; 
+      std::string build_lorentz_spin_id(const rep_pair &reps)
+      {
+        return build_lorentz_spin_id(reps.first,reps.second); 
+      }
 
-          keys = ::radmat::SpherInvariantsFactoryEnv::all_keys(); 
-          for(it = keys.begin(); it != keys.end(); ++it)
-            vals.push_back( 
-                ::radmat::SpherInvariantsFactoryEnv::callFactory(*it) ); 
-
-          return vals;
-        }
-
-      // reg function
-      typedef std::pair<rHandle<SpherRep_p> , rHandle<SpherRep_p> > rep_pair;
-
+      // generate a recipe
       FormFactorRecipe_t* gen_recipe( const std::string &s, const rep_pair &reps )
       {
         rHandle<LorentzFFAbsBase_t> mat; 
@@ -144,13 +153,14 @@ namespace radmat
         return new HelicityFormFactor( recipe ); 
       }
 
-      bool do_reg( const std::string &s, const rep_pair &r)
+      bool do_reg( const std::string &s, const rep_pair &r, const std::string &tran_or_diag)
       {
-        // the actual string is between the <> eg  <reg_id>
-        printer_function<dont_print_elem_reg>(std::string("regged <") + s + std::string(">"));
-        Cookbook::Instance().mappy.insert(std::make_pair(s, gen_recipe(s,r)) ); 
+        // the reg id contains the row information and differs from the lorentz string id
+        std::string reg_id = tran_or_diag + "," + build_id(r.first,r.second); 
+        printer_function<print_elem_reg>(std::string("regged <") + reg_id + std::string(">"));
+        Cookbook::Instance().mappy.insert(std::make_pair(reg_id, gen_recipe(s,r)) ); 
         bool b = true; 
-        b = Factory::Instance().registerObject(s,callback);  
+        b = Factory::Instance().registerObject(reg_id,callback);  
         if( !!! b ) 
           printer_function<console_print>( s + " failed to register" ); 
         return b; 
@@ -165,7 +175,7 @@ namespace radmat
         const rHandle<SpherRep_p> &righty)
     {
       std::stringstream ss; 
-      ss << lefty->reg_id() << "__" << righty->reg_id();
+      ss << lefty->reg_id() << "," << righty->reg_id();
       return ss.str(); 
     }
 
@@ -198,12 +208,9 @@ namespace radmat
         for( i = cont_rep_keys.begin(); i != cont_rep_keys.end(); ++i)
           for( j = cont_rep_keys.begin(); j != cont_rep_keys.end(); ++j)
           {
-            std::string s = build_lorentz_spin_id(*i,*j); 
+            std::string s = build_id(*i,*j); 
             ff_spin_keys.insert( 
-                value_type( s + std::string( "_tran"), rep_pair(*i,*j) )); 
-            if( i == j )
-              ff_spin_keys.insert( 
-                  value_type( s + std::string( "_diag"), rep_pair(*i,*j) )); 
+                value_type( s , rep_pair(*i,*j) )); 
           }
 
         // snarf some more keys
@@ -212,10 +219,20 @@ namespace radmat
 
         // if it is allowed stick it into the map that radmat uses 
         for( it = ff_spin_keys.begin(); it != ff_spin_keys.end(); ++it)
+        {
+          std::string tran_id = build_lorentz_spin_id( it->second ) + std::string("_tran");
+          std::string diag_id = build_lorentz_spin_id( it->second ) + std::string("_diag");
+
           if( std::find( ff_allowed_spin_keys.begin(), 
                 ff_allowed_spin_keys.end(), 
-                it->first) != ff_allowed_spin_keys.end() )
-            success &= do_reg( it->first, it->second ); 
+                tran_id) != ff_allowed_spin_keys.end() )
+            success &= do_reg(tran_id, it->second,"tran"); 
+
+          if( std::find( ff_allowed_spin_keys.begin(), 
+                ff_allowed_spin_keys.end(), 
+                diag_id) != ff_allowed_spin_keys.end() )
+            success &= do_reg(diag_id, it->second,"diag"); 
+        }
 
         registered = true; 
       }

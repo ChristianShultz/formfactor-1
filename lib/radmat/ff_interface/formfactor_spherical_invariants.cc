@@ -6,7 +6,7 @@
 
 * Creation Date : 22-02-2014
 
-* Last Modified : Sun 23 Feb 2014 10:31:02 AM EST
+* Last Modified : Tue 11 Mar 2014 10:58:04 AM EDT
 
 * Created By : shultz
 
@@ -27,31 +27,44 @@ namespace radmat
   {
     
 
-    bool registered = false; 
+    namespace
+    {
 
-    template<class T, class U> 
-      T* upCast(void)
-      { 
-        T *t = new U(); 
-        POW2_ASSERT(t);
-        return t; 
-      }
-
-    template<typename Derived>
-      bool
-      do_reg(void)
+      struct reg_printer
       {
-        Derived d; 
-        bool reg = Factory::Instance().registerObject( 
-            d.reg_id() , upCast<SpherRep_p,Derived> ); 
+        static void print(const std::string &msg)
+        {}
+        //        { std::cout << "spherical invariants, regged " << msg << std::endl; }
+      };
 
-        if( !!! reg )
-          std::cout << __PRETTY_FUNCTION__ 
-            << ": reg error for " << d.reg_id() << std::endl;
+      bool registered = false; 
 
-        return reg; 
-      }
+      template<class T, class U> 
+        T* upCast(void)
+        { 
+          T *t = new U(); 
+          POW2_ASSERT(t);
+          return t; 
+        }
 
+      template<typename Derived>
+        bool
+        do_reg(void)
+        {
+          Derived d; 
+          bool reg = Factory::Instance().registerObject( 
+              d.reg_id() , upCast<SpherRep_p,Derived> ); 
+
+          printer_function<reg_printer>(d.reg_id()); 
+
+          if( !!! reg )
+            std::cout << __PRETTY_FUNCTION__ 
+              << ": reg error for " << d.reg_id() << std::endl;
+
+          return reg; 
+        }
+
+    } // anonomyous 
 
     bool registerAll(void)
     {
@@ -159,9 +172,9 @@ namespace radmat
     // dump all keys in the factory
     std::vector<std::string> 
       all_keys(void)
-    {
-      return Factory::Instance().keys(); 
-    }
+      {
+        return Factory::Instance().keys(); 
+      }
 
 
 
