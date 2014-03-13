@@ -6,7 +6,7 @@
 
 * Creation Date : 22-02-2014
 
-* Last Modified : Tue 11 Mar 2014 10:58:04 AM EDT
+* Last Modified : Wed 12 Mar 2014 09:52:40 AM EDT
 
 * Created By : shultz
 
@@ -16,8 +16,8 @@ _._._._._._._._._._._._._._._._._._._._._.*/
 #include "radmat/utils/pow2assert.h"
 #include "radmat/utils/printer.h"
 
-namespace FacEnv = radmat::SpherInvariantsFactoryEnv;
-typedef radmat::TheSpherInvariantsFactory Factory;
+namespace FacEnv = radmat::FormFactorInvariantsFactoryEnv;
+typedef radmat::TheFormFactorInvariantsFactory Factory;
 
 
 namespace radmat
@@ -37,6 +37,13 @@ namespace radmat
         //        { std::cout << "spherical invariants, regged " << msg << std::endl; }
       };
 
+      struct key_printer
+      {
+        static void print(const std::string &msg)
+        {}
+//        {std::cout << __PRETTY_FUNCTION__<<  "  " << msg << std::endl;}
+      };
+
       bool registered = false; 
 
       template<class T, class U> 
@@ -53,7 +60,7 @@ namespace radmat
         {
           Derived d; 
           bool reg = Factory::Instance().registerObject( 
-              d.reg_id() , upCast<SpherRep_p,Derived> ); 
+              d.reg_id() , upCast<FFRep_p,Derived> ); 
 
           printer_function<reg_printer>(d.reg_id()); 
 
@@ -139,7 +146,7 @@ namespace radmat
     // call around the factory.createObj method
     rHandle<SpherRep_p > callFactory(const std::string &matElemID)
     {
-      SpherRep_p *foo;
+      FFRep_p *foo;
       foo = NULL;
       try
       {
@@ -166,14 +173,27 @@ namespace radmat
 
       // not a null pointer
       POW2_ASSERT(foo);
-      return rHandle<SpherRep_p >(foo);
+      POW2_ASSERT( foo->rep_type() == ::radmat::Stringify<SpherRep_p>() ); 
+      return rHandle<SpherRep_p >( dynamic_cast<SpherRep_p*>(foo) );
     }
 
-    // dump all keys in the factory
+    // dump all SpherRep_p keys in the factory
     std::vector<std::string> 
       all_keys(void)
       {
-        return Factory::Instance().keys(); 
+        std::vector<std::string> sph_keys; 
+        std::vector<std::string> all_keys = Factory::Instance().keys(); 
+        std::vector<std::string>::const_iterator it; 
+
+        for(it = all_keys.begin(); it != all_keys.end(); ++it )
+        {
+          printer_function<key_printer>(*it);
+          rHandle<FFRep_p> r = FormFactorInvariantsFactoryEnv::callFactory(*it); 
+          if( r->rep_type() == ::radmat::Stringify<SpherRep_p>() )
+            sph_keys.push_back(*it); 
+        }
+
+        return sph_keys; 
       }
 
 

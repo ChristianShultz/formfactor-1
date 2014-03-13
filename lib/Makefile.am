@@ -27,6 +27,7 @@ nobase_include_HEADERS =   \
 													 radmat/ff/formfactor_kinematic_factors.h    \
 													 radmat/ff/formfactor_utils.h    \
 													 radmat/ff_interface/formfactor_cubic_formfactors.h    \
+													 radmat/ff_interface/formfactor_cubic_invariants.h    \
 													 radmat/ff_interface/formfactor_factory.h    \
 													 radmat/ff_interface/formfactor.h    \
 													 radmat/ff_interface/formfactor_helicity_formfactors.h    \
@@ -103,6 +104,7 @@ nobase_include_HEADERS =   \
 													 radmat/utils/type_computations.h    \
 													 radmat/utils/utils.h    
 
+
 # the lib
 lib_LIBRARIES = libradmat.a
 
@@ -121,8 +123,10 @@ libradmat_a_SOURCES =	\
 											radmat/driver/radmat_driver_props.cc    \
 											radmat/driver/radmat_single_q2_driver.cc    \
 											radmat/ff_interface/formfactor_cubic_formfactors.cc    \
+											radmat/ff_interface/formfactor_cubic_invariants.cc    \
 											radmat/ff_interface/formfactor_factory.cc    \
 											radmat/ff_interface/formfactor_helicity_formfactors.cc    \
+											radmat/ff_interface/formfactor_invariants.cc    \
 											radmat/ff_interface/formfactor_spherical_invariants.cc    \
 											radmat/ff/lorentzff_canonical_rotations.cc    \
 											radmat/ff/lorentzff_canonical_rotations_checker.cc    \

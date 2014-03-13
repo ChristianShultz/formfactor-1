@@ -6,7 +6,7 @@
 
 * Creation Date : 01-10-2013
 
-* Last Modified : Thu 20 Feb 2014 01:53:50 PM EST
+* Last Modified : Tue 11 Mar 2014 01:03:09 PM EDT
 
 * Created By : shultz
 
@@ -61,6 +61,9 @@ namespace radmat
       E_i = o.E_i;
       mom_fac = o.mom_fac;
       file_id = o.file_id;  
+      have_reps = o.have_reps;
+      lefty = o.lefty;
+      righty = o.righty; 
     }
     return *this;
   }
@@ -146,6 +149,7 @@ namespace radmat
     ENSEM::read(bin,t.E_f);
     ENSEM::read(bin,t.E_i);
     ADATIO::read(bin,t.mom_fac); 
+    t.have_reps = false; 
   }
 
 

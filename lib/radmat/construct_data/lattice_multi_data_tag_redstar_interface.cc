@@ -6,7 +6,7 @@
 
  * Creation Date : 12-11-2013
 
- * Last Modified : Thu 20 Feb 2014 11:48:26 AM EST
+ * Last Modified : Tue 11 Mar 2014 05:10:07 PM EDT
 
  * Created By : shultz
 
@@ -17,6 +17,9 @@
 #include "radmat/utils/mink_qsq.h"
 #include "radmat/utils/pow2assert.h"
 #include "radmat/ff/lorentzff_canonical_rotations.h"
+#include "radmat/ff_interface/formfactor_invariants.h"
+#include "radmat/ff_interface/formfactor_spherical_invariants.h"
+#include "radmat/ff_interface/formfactor_helicity_formfactors.h"
 #include <sstream>
 
 #define PARALLEL_TAG_REDSTAR_DATA
@@ -30,6 +33,35 @@ namespace radmat
   namespace 
   {
 
+    // cook up the sphericial representation ( spin parity helicity ) -- the id 
+    rHandle<FFRep_p> pull_rep(const int J, const bool parity, const int hel)
+    {
+      std::stringstream id;
+      id << "J" << J; 
+      if( parity )
+        id << "p";
+      else
+        id << "m";
+      id << "_r" << J - hel + 1; 
+
+      return FormFactorInvariantsFactoryEnv::callFactory(id.str()); 
+    }
+
+
+    // build the id for the spherical representation of the decomposition (spin,parity,helicity)
+    std::string build_elem_id(const std::string diag_or_tran, 
+        const rHandle<FFRep_p> &lefty,
+        const rHandle<FFRep_p> &righty)
+    {
+      const SpherRep_p *l = dynamic_cast<const SpherRep_p*>(lefty.get_ptr());
+      const SpherRep_p *r = dynamic_cast<const SpherRep_p*>(righty.get_ptr());
+      
+      rHandle<SpherRep_p> tl = SpherInvariantsFactoryEnv::callFactory(l->reg_id());
+      rHandle<SpherRep_p> tr = SpherInvariantsFactoryEnv::callFactory(r->reg_id());
+
+      return diag_or_tran + "," + HelicityFormFactorDecompositionFactoryEnv::build_id(tl,tr); 
+    }
+
     // intermediary data storage
     struct 
       data_store
@@ -37,12 +69,15 @@ namespace radmat
         std::string file_id;
         int jmu; 
         int hf,hi; 
+        int Jf,Ji;
+        bool pf,pi; 
         std::string mat_elem_id; 
         ADATXML::Array<int> p_f;
         ADATXML::Array<int> p_i; 
       };
 
-    // actually makes the tag
+    // actually makes the tag -- cubic tags get made later
+    // this is all in terms of spin and helicity
     LatticeMultiDataTag
       generate_tag(const data_store &d,
           const double mom_factor, 
@@ -55,12 +90,17 @@ namespace radmat
         ret.jmu = d.jmu; 
         ret.hf = d.hf; 
         ret.hi = d.hi; 
-        ret.mat_elem_id = d.mat_elem_id; 
         ret.p_f = d.p_f;
         ret.p_i = d.p_i; 
         ret.mom_fac = mom_factor; 
         ret.set_qsq_label(
             Mink_qsq(ret.p_f,msnk,ret.p_i,msrc,ret.mom_fac));
+
+        ret.lefty = pull_rep(d.Jf,d.pf,d.hf);
+        ret.righty = pull_rep(d.Ji,d.pi,d.hi); 
+        ret.mat_elem_id = build_elem_id(d.mat_elem_id,ret.lefty,ret.righty); 
+
+        ret.have_reps = true; 
 
         return ret; 
       }
@@ -118,7 +158,11 @@ namespace radmat
         ret.file_id = ss.str(); 
         ret.jmu = ins->lorentz;
         ret.hf = snk->H; 
+        ret.Jf = snk->J;
+        ret.pf = snk->parity; 
         ret.hi = src->H; 
+        ret.Ji = src->J;
+        ret.pi = src->parity;
         ret.p_f = snk->mom;
         ret.p_i = src->mom; 
         ret.mat_elem_id = elem_id; 
@@ -150,7 +194,11 @@ namespace radmat
         ret.file_id = ss.str(); 
         ret.jmu = ins->lorentz;
         ret.hf = snk->H; 
+        ret.Jf = snk->J;
+        ret.pf = snk->parity; 
         ret.hi = src->H; 
+        ret.Ji = src->J;
+        ret.pi = src->parity; 
         ret.p_f = snk->mom;
         ret.p_i = src->mom; 
         ret.mat_elem_id = elem_id;

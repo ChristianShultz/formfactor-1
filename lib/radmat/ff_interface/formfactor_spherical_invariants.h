@@ -1,21 +1,23 @@
-#ifndef FORMFACTOR_CONTINUUM_INVARIANTS_H
-#define FORMFACTOR_CONTINUUM_INVARIANTS_H 
+#ifndef FORMFACTOR_SPHERICAL_INVARIANTS_H
+#define FORMFACTOR_SPHERICAL_INVARIANTS_H 
 
 #include "formfactor_invariants.h"
 #include "radmat/utils/stringify.h"
 #include "radmat/utils/handle.h"
-#include "adat/singleton.h"
-#include "adat/objfactory.h"
 #include <string>
 #include <sstream> 
 
 namespace radmat
 {
+  struct SpherRep_p; 
+  REGISTER_STRINGIFY_TYPE(SpherRep_p); 
+
   // base class 
   struct SpherRep_p
     : public FFRep_p
   {
     virtual ~SpherRep_p() {}
+    virtual std::string rep_type(void) const {return Stringify<SpherRep_p>();}
     virtual std::string rep_id(void) const = 0; 
     virtual int rep_row(void) const = 0; 
     virtual int rep_parity(void) const = 0; 
@@ -24,7 +26,7 @@ namespace radmat
     virtual std::string reg_id(void) const = 0;
   }; 
 
-// template instantion of parameters 
+  // template instantion of parameters 
   template<typename T, int spin,  int row, int parity> 
     struct SpherRep
     : public SpherRep_p
@@ -142,20 +144,9 @@ namespace radmat
 
 
 
-  // factory to hold them all
-  typedef Util::SingletonHolder<
-    Util::ObjectFactory<SpherRep_p,
-			std::string,
-			void,
-			SpherRep_p* (*)(void),
-			Util::StringFactoryError> >
-  TheSpherInvariantsFactory;
-
-
   namespace SpherInvariantsFactoryEnv
   {
     bool registerAll( void );
-    // nb keys are class names
     rHandle<SpherRep_p> callFactory(const std::string &id);
     std::vector<std::string> all_keys(void); 
   }
@@ -166,4 +157,4 @@ namespace radmat
 
 
 
-#endif /* FORMFACTOR_CONTINUUM_INVARIANTS_H */
+#endif /* FORMFACTOR_SPHERICAL_INVARIANTS_H */

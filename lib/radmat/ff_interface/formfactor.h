@@ -49,7 +49,7 @@ namespace radmat
     typedef rHandle<FormFactorRecipe_t> recipe_h; 
 
     FormFactorBase_t( const recipe_h recipe_)
-     :  recipe(recipe_)
+      :  recipe(recipe_)
     { } 
 
     FormFactorBase_t(const FormFactorBase_t &o)
@@ -66,7 +66,7 @@ namespace radmat
       {
         return generate_ffs(lefty,righty,mom_fac); 
       }
-     
+
     // may need to be re implemented in derived
     virtual int nFacs() const { return recipe->nFacs(); }
     virtual std::string ff() const { return recipe->ff(); }

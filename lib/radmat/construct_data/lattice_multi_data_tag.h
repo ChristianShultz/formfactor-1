@@ -2,6 +2,8 @@
 #define LATTICE_MULIT_DATA_TAG_H 
 
 
+#include "radmat/ff_interface/formfactor_invariants.h"
+#include "radmat/utils/handle.h"
 #include "ensem/ensem.h"
 #include "io/adat_xmlio.h"
 #include <complex>
@@ -59,6 +61,13 @@ namespace radmat
     ENSEM::EnsemReal E_f;
     ENSEM::EnsemReal E_i;
     double mom_fac; 
+
+
+    // these guys don't get written to binary.. too hard 
+  
+    bool have_reps;  
+    rHandle<FFRep_p> lefty,righty;
+
   };
 
 

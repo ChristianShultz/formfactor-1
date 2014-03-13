@@ -88,8 +88,10 @@ am_libradmat_a_OBJECTS =  \
 	radmat_driver_props.$(OBJEXT) \
 	radmat_single_q2_driver.$(OBJEXT) \
 	formfactor_cubic_formfactors.$(OBJEXT) \
+	formfactor_cubic_invariants.$(OBJEXT) \
 	formfactor_factory.$(OBJEXT) \
 	formfactor_helicity_formfactors.$(OBJEXT) \
+	formfactor_invariants.$(OBJEXT) \
 	formfactor_spherical_invariants.$(OBJEXT) \
 	lorentzff_canonical_rotations.$(OBJEXT) \
 	lorentzff_canonical_rotations_checker.$(OBJEXT) \
@@ -260,6 +262,7 @@ nobase_include_HEADERS = \
 													 radmat/ff/formfactor_kinematic_factors.h    \
 													 radmat/ff/formfactor_utils.h    \
 													 radmat/ff_interface/formfactor_cubic_formfactors.h    \
+													 radmat/ff_interface/formfactor_cubic_invariants.h    \
 													 radmat/ff_interface/formfactor_factory.h    \
 													 radmat/ff_interface/formfactor.h    \
 													 radmat/ff_interface/formfactor_helicity_formfactors.h    \
@@ -353,8 +356,10 @@ libradmat_a_SOURCES = \
 											radmat/driver/radmat_driver_props.cc    \
 											radmat/driver/radmat_single_q2_driver.cc    \
 											radmat/ff_interface/formfactor_cubic_formfactors.cc    \
+											radmat/ff_interface/formfactor_cubic_invariants.cc    \
 											radmat/ff_interface/formfactor_factory.cc    \
 											radmat/ff_interface/formfactor_helicity_formfactors.cc    \
+											radmat/ff_interface/formfactor_invariants.cc    \
 											radmat/ff_interface/formfactor_spherical_invariants.cc    \
 											radmat/ff/lorentzff_canonical_rotations.cc    \
 											radmat/ff/lorentzff_canonical_rotations_checker.cc    \
@@ -474,8 +479,10 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/construct_correlators_xml.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/fit_tins.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/formfactor_cubic_formfactors.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/formfactor_cubic_invariants.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/formfactor_factory.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/formfactor_helicity_formfactors.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/formfactor_invariants.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/formfactor_spherical_invariants.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/harmonic.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/lattice_multi_data_tag.Po@am__quote@
@@ -713,6 +720,20 @@ formfactor_cubic_formfactors.obj: radmat/ff_interface/formfactor_cubic_formfacto
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCXX_FALSE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o formfactor_cubic_formfactors.obj `if test -f 'radmat/ff_interface/formfactor_cubic_formfactors.cc'; then $(CYGPATH_W) 'radmat/ff_interface/formfactor_cubic_formfactors.cc'; else $(CYGPATH_W) '$(srcdir)/radmat/ff_interface/formfactor_cubic_formfactors.cc'; fi`
 
+formfactor_cubic_invariants.o: radmat/ff_interface/formfactor_cubic_invariants.cc
+@am__fastdepCXX_TRUE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT formfactor_cubic_invariants.o -MD -MP -MF $(DEPDIR)/formfactor_cubic_invariants.Tpo -c -o formfactor_cubic_invariants.o `test -f 'radmat/ff_interface/formfactor_cubic_invariants.cc' || echo '$(srcdir)/'`radmat/ff_interface/formfactor_cubic_invariants.cc
+@am__fastdepCXX_TRUE@	$(am__mv) $(DEPDIR)/formfactor_cubic_invariants.Tpo $(DEPDIR)/formfactor_cubic_invariants.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='radmat/ff_interface/formfactor_cubic_invariants.cc' object='formfactor_cubic_invariants.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o formfactor_cubic_invariants.o `test -f 'radmat/ff_interface/formfactor_cubic_invariants.cc' || echo '$(srcdir)/'`radmat/ff_interface/formfactor_cubic_invariants.cc
+
+formfactor_cubic_invariants.obj: radmat/ff_interface/formfactor_cubic_invariants.cc
+@am__fastdepCXX_TRUE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT formfactor_cubic_invariants.obj -MD -MP -MF $(DEPDIR)/formfactor_cubic_invariants.Tpo -c -o formfactor_cubic_invariants.obj `if test -f 'radmat/ff_interface/formfactor_cubic_invariants.cc'; then $(CYGPATH_W) 'radmat/ff_interface/formfactor_cubic_invariants.cc'; else $(CYGPATH_W) '$(srcdir)/radmat/ff_interface/formfactor_cubic_invariants.cc'; fi`
+@am__fastdepCXX_TRUE@	$(am__mv) $(DEPDIR)/formfactor_cubic_invariants.Tpo $(DEPDIR)/formfactor_cubic_invariants.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='radmat/ff_interface/formfactor_cubic_invariants.cc' object='formfactor_cubic_invariants.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o formfactor_cubic_invariants.obj `if test -f 'radmat/ff_interface/formfactor_cubic_invariants.cc'; then $(CYGPATH_W) 'radmat/ff_interface/formfactor_cubic_invariants.cc'; else $(CYGPATH_W) '$(srcdir)/radmat/ff_interface/formfactor_cubic_invariants.cc'; fi`
+
 formfactor_factory.o: radmat/ff_interface/formfactor_factory.cc
 @am__fastdepCXX_TRUE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT formfactor_factory.o -MD -MP -MF $(DEPDIR)/formfactor_factory.Tpo -c -o formfactor_factory.o `test -f 'radmat/ff_interface/formfactor_factory.cc' || echo '$(srcdir)/'`radmat/ff_interface/formfactor_factory.cc
 @am__fastdepCXX_TRUE@	$(am__mv) $(DEPDIR)/formfactor_factory.Tpo $(DEPDIR)/formfactor_factory.Po
@@ -740,6 +761,20 @@ formfactor_helicity_formfactors.obj: radmat/ff_interface/formfactor_helicity_for
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='radmat/ff_interface/formfactor_helicity_formfactors.cc' object='formfactor_helicity_formfactors.obj' libtool=no @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCXX_FALSE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o formfactor_helicity_formfactors.obj `if test -f 'radmat/ff_interface/formfactor_helicity_formfactors.cc'; then $(CYGPATH_W) 'radmat/ff_interface/formfactor_helicity_formfactors.cc'; else $(CYGPATH_W) '$(srcdir)/radmat/ff_interface/formfactor_helicity_formfactors.cc'; fi`
+
+formfactor_invariants.o: radmat/ff_interface/formfactor_invariants.cc
+@am__fastdepCXX_TRUE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT formfactor_invariants.o -MD -MP -MF $(DEPDIR)/formfactor_invariants.Tpo -c -o formfactor_invariants.o `test -f 'radmat/ff_interface/formfactor_invariants.cc' || echo '$(srcdir)/'`radmat/ff_interface/formfactor_invariants.cc
+@am__fastdepCXX_TRUE@	$(am__mv) $(DEPDIR)/formfactor_invariants.Tpo $(DEPDIR)/formfactor_invariants.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='radmat/ff_interface/formfactor_invariants.cc' object='formfactor_invariants.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o formfactor_invariants.o `test -f 'radmat/ff_interface/formfactor_invariants.cc' || echo '$(srcdir)/'`radmat/ff_interface/formfactor_invariants.cc
+
+formfactor_invariants.obj: radmat/ff_interface/formfactor_invariants.cc
+@am__fastdepCXX_TRUE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT formfactor_invariants.obj -MD -MP -MF $(DEPDIR)/formfactor_invariants.Tpo -c -o formfactor_invariants.obj `if test -f 'radmat/ff_interface/formfactor_invariants.cc'; then $(CYGPATH_W) 'radmat/ff_interface/formfactor_invariants.cc'; else $(CYGPATH_W) '$(srcdir)/radmat/ff_interface/formfactor_invariants.cc'; fi`
+@am__fastdepCXX_TRUE@	$(am__mv) $(DEPDIR)/formfactor_invariants.Tpo $(DEPDIR)/formfactor_invariants.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='radmat/ff_interface/formfactor_invariants.cc' object='formfactor_invariants.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o formfactor_invariants.obj `if test -f 'radmat/ff_interface/formfactor_invariants.cc'; then $(CYGPATH_W) 'radmat/ff_interface/formfactor_invariants.cc'; else $(CYGPATH_W) '$(srcdir)/radmat/ff_interface/formfactor_invariants.cc'; fi`
 
 formfactor_spherical_invariants.o: radmat/ff_interface/formfactor_spherical_invariants.cc
 @am__fastdepCXX_TRUE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT formfactor_spherical_invariants.o -MD -MP -MF $(DEPDIR)/formfactor_spherical_invariants.Tpo -c -o formfactor_spherical_invariants.o `test -f 'radmat/ff_interface/formfactor_spherical_invariants.cc' || echo '$(srcdir)/'`radmat/ff_interface/formfactor_spherical_invariants.cc
