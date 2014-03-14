@@ -6,7 +6,7 @@
 
 * Creation Date : 22-02-2014
 
-* Last Modified : Wed 12 Mar 2014 09:52:40 AM EDT
+* Last Modified : Thu 13 Mar 2014 10:12:07 AM EDT
 
 * Created By : shultz
 
@@ -60,13 +60,13 @@ namespace radmat
         {
           Derived d; 
           bool reg = Factory::Instance().registerObject( 
-              d.reg_id() , upCast<FFRep_p,Derived> ); 
+              d.rep_id() , upCast<FFRep_p,Derived> ); 
 
-          printer_function<reg_printer>(d.reg_id()); 
+          printer_function<reg_printer>(d.rep_id()); 
 
           if( !!! reg )
             std::cout << __PRETTY_FUNCTION__ 
-              << ": reg error for " << d.reg_id() << std::endl;
+              << ": reg error for " << d.rep_id() << std::endl;
 
           return reg; 
         }
@@ -80,60 +80,20 @@ namespace radmat
 
       if( !!! registered )
       {
-        success &= do_reg<J0p_1>(); 
-        success &= do_reg<J0m_1>();
+        success &= do_reg<J0pRep_t>(); 
+        success &= do_reg<J0mRep_t>();
 
-        success &= do_reg<J1p_1>(); 
-        success &= do_reg<J1m_1>();
-        success &= do_reg<J1p_2>(); 
-        success &= do_reg<J1m_2>();
-        success &= do_reg<J1p_3>(); 
-        success &= do_reg<J1m_3>();
+        success &= do_reg<J1pRep_t>(); 
+        success &= do_reg<J1mRep_t>();
 
-        success &= do_reg<J2p_1>(); 
-        success &= do_reg<J2m_1>();
-        success &= do_reg<J2p_2>(); 
-        success &= do_reg<J2m_2>();
-        success &= do_reg<J2p_3>(); 
-        success &= do_reg<J2m_3>();
-        success &= do_reg<J2p_4>(); 
-        success &= do_reg<J2m_4>();
-        success &= do_reg<J2p_5>(); 
-        success &= do_reg<J2m_5>();
+        success &= do_reg<J2pRep_t>(); 
+        success &= do_reg<J2mRep_t>();
 
-        success &= do_reg<J3p_1>(); 
-        success &= do_reg<J3m_1>();
-        success &= do_reg<J3p_2>(); 
-        success &= do_reg<J3m_2>();
-        success &= do_reg<J3p_3>(); 
-        success &= do_reg<J3m_3>();
-        success &= do_reg<J3p_4>(); 
-        success &= do_reg<J3m_4>();
-        success &= do_reg<J3p_5>(); 
-        success &= do_reg<J3m_5>();
-        success &= do_reg<J3p_6>(); 
-        success &= do_reg<J3m_6>();
-        success &= do_reg<J3p_7>(); 
-        success &= do_reg<J3m_7>();
+        success &= do_reg<J3pRep_t>(); 
+        success &= do_reg<J3mRep_t>();
 
-        success &= do_reg<J4p_1>(); 
-        success &= do_reg<J4m_1>();
-        success &= do_reg<J4p_2>(); 
-        success &= do_reg<J4m_2>();
-        success &= do_reg<J4p_3>(); 
-        success &= do_reg<J4m_3>();
-        success &= do_reg<J4p_4>(); 
-        success &= do_reg<J4m_4>();
-        success &= do_reg<J4p_5>(); 
-        success &= do_reg<J4m_5>();
-        success &= do_reg<J4p_6>(); 
-        success &= do_reg<J4m_6>();
-        success &= do_reg<J4p_7>(); 
-        success &= do_reg<J4m_7>();
-        success &= do_reg<J4p_8>(); 
-        success &= do_reg<J4m_8>();
-        success &= do_reg<J4p_9>(); 
-        success &= do_reg<J4m_9>();
+        success &= do_reg<J4pRep_t>(); 
+        success &= do_reg<J4mRep_t>();
 
         registered = true; 
       }

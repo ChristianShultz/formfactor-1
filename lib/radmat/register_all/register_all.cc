@@ -6,7 +6,7 @@
 
  * Creation Date : 10-12-2013
 
- * Last Modified : Sun 23 Feb 2014 10:45:47 AM EST
+ * Last Modified : Fri 14 Mar 2014 11:58:33 AM EDT
 
  * Created By : shultz
 
@@ -16,7 +16,7 @@
 #include "radmat/ff/lorentzff_canonical_rotations.h"
 #include "radmat/ff/lorentzff_Wigner_D_matrix_factory.h"
 #include "radmat/ff/lorentzff_formfactor_factory.h"
-#include "radmat/ff_interface/formfactor_spherical_invariants.h"
+#include "radmat/ff_interface/formfactor_invariants.h"
 #include "radmat/ff_interface/formfactor_factory.h"
 #include "radmat/llsq/llsq_solvers.h"
 #include "radmat/redstar_interface/redstar_abstract_merge_npoint_factory.h"
@@ -51,8 +51,8 @@ namespace radmat
           success &= radmat::InvertSubductionEnv::registerAll(); 
           // build lorentz helicity decompositions
           success &= radmat::LorentzffFormFactorDecompositionFactoryEnv::registerAll(); 
-          // build spherical reps 
-          success &= radmat::SpherInvariantsFactoryEnv::registerAll(); 
+          // build  reps 
+          success &= radmat::FormFactorInvariantsFactoryEnv::registerAll(); 
           // build radmat's internal decompositions
           success &= radmat::FormFactorDecompositionFactoryEnv::registerAll(); 
           // build llsq solution classes

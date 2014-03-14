@@ -61,6 +61,7 @@ namespace radmat
   {
     ThreePointCorrXMLIni_t threePointCorrXMLIni;
     radmatDBProp_t radmatDBProp;
+    std::string matElemMode; 
     std::string matElemID;
     double xi;
     int L_s;   

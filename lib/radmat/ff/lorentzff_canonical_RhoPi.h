@@ -24,7 +24,7 @@ namespace radmat
 
       virtual ~RhoPiF1() {}
 
-      virtual std::string ff_impl(void) const
+      virtual std::string ff_impl() const
       {
         std::string s;
         s += "F_1(Q^2) \\epsilon^{\\mu,\\nu,\\rho,\\sigma}\\epsilon^{*}_{\\nu}";
@@ -79,7 +79,7 @@ namespace radmat
 
 
     template<int embedl, int embedr>
-      LorentzFFAbsBase_t::LorentzFFAbs_list RhoPiGenList(void)
+      LorentzFFAbsBase_t::LorentzFFAbs_list RhoPiGenList()
       {
         LorentzFFAbsBase_t::LorentzFFAbs_list retRhoPi;
         LorentzFFAbsBase_t::BBType *blockPtr;
@@ -98,7 +98,7 @@ namespace radmat
   template<int embedl, int embedr>
     struct RhoPi : public LorentzFFAbsBase_t
   {
-    RhoPi(void) 
+    RhoPi() 
       : LorentzFFAbsBase_t(radmat::RhoPiGenList<embedl,embedr>())
     {   }
 
@@ -115,9 +115,9 @@ namespace radmat
 
     virtual ~RhoPi() {}
 
-    virtual std::string id(void) { return Stringify< RhoPi<embedl,embedr> >(); }
-    virtual int left_spin(void) const { return embedl; }
-    virtual int right_spin(void) const { return embedr; }
+    virtual std::string reg_id() { return Stringify< RhoPi<embedl,embedr> >(); }
+    virtual int left_spin() const { return embedl; }
+    virtual int right_spin() const { return embedr; }
 
     private:
     RhoPi(const LorentzFFAbsBase_t::LorentzFFAbs_list &);

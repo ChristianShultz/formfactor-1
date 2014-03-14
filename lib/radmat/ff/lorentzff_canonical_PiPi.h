@@ -20,7 +20,7 @@ namespace radmat
   {
     virtual ~PiPiF1() {}
 
-    virtual  std::string ff_impl(void) const
+    virtual  std::string ff_impl() const
     {
       return std::string(" F_1(Q^2) p_+^{\\mu} ");
     }
@@ -45,7 +45,7 @@ namespace radmat
 
   // generate a list for the PiPi constructor
   template<int embedl, int embedr>
-    LorentzFFAbsBase_t::LorentzFFAbs_list PiPiGenList(void)
+    LorentzFFAbsBase_t::LorentzFFAbs_list PiPiGenList()
     {
       LorentzFFAbsBase_t::LorentzFFAbs_list retPiPi;
       LorentzFFAbsBase_t::BBType *blockPtr;
@@ -70,7 +70,7 @@ namespace radmat
   template<int embedl, int embedr>
     struct PiPi : public LorentzFFAbsBase_t
   {
-    PiPi(void)
+    PiPi()
       : LorentzFFAbsBase_t(radmat::PiPiGenList<embedl,embedr>())  
     {  } 
 
@@ -89,9 +89,9 @@ namespace radmat
 
     virtual ~PiPi() {} 
 
-    virtual std::string id(void) const { return Stringify< PiPi<embedl,embedr> >(); }
-    virtual int left_spin(void) const {return embedl;}
-    virtual int right_spin(void) const {return embedr;}
+    virtual std::string reg_id() const { return Stringify< PiPi<embedl,embedr> >(); }
+    virtual int left_spin() const {return embedl;}
+    virtual int right_spin() const {return embedr;}
 
 
     private:

@@ -93,6 +93,7 @@ am_libradmat_a_OBJECTS =  \
 	formfactor_helicity_formfactors.$(OBJEXT) \
 	formfactor_invariants.$(OBJEXT) \
 	formfactor_spherical_invariants.$(OBJEXT) \
+	formfactor_subduced_formfactors.$(OBJEXT) \
 	lorentzff_canonical_rotations.$(OBJEXT) \
 	lorentzff_canonical_rotations_checker.$(OBJEXT) \
 	lorentzff_canonical_rotations_utils.$(OBJEXT) \
@@ -268,6 +269,7 @@ nobase_include_HEADERS = \
 													 radmat/ff_interface/formfactor_helicity_formfactors.h    \
 													 radmat/ff_interface/formfactor_invariants.h    \
 													 radmat/ff_interface/formfactor_spherical_invariants.h    \
+													 radmat/ff_interface/formfactor_subduced_formfactors.h    \
 													 radmat/ff/lorentzff_canonical_cont_spin_formfactors.h    \
 													 radmat/ff/lorentzff_canonical_frame_formfacs_rotation_manager.h    \
 													 radmat/ff/lorentzff_canonical_JJlist_ff.h    \
@@ -361,6 +363,7 @@ libradmat_a_SOURCES = \
 											radmat/ff_interface/formfactor_helicity_formfactors.cc    \
 											radmat/ff_interface/formfactor_invariants.cc    \
 											radmat/ff_interface/formfactor_spherical_invariants.cc    \
+											radmat/ff_interface/formfactor_subduced_formfactors.cc    \
 											radmat/ff/lorentzff_canonical_rotations.cc    \
 											radmat/ff/lorentzff_canonical_rotations_checker.cc    \
 											radmat/ff/lorentzff_canonical_rotations_utils.cc    \
@@ -484,6 +487,7 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/formfactor_helicity_formfactors.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/formfactor_invariants.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/formfactor_spherical_invariants.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/formfactor_subduced_formfactors.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/harmonic.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/lattice_multi_data_tag.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/lattice_multi_data_tag_redstar_interface.Po@am__quote@
@@ -789,6 +793,20 @@ formfactor_spherical_invariants.obj: radmat/ff_interface/formfactor_spherical_in
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='radmat/ff_interface/formfactor_spherical_invariants.cc' object='formfactor_spherical_invariants.obj' libtool=no @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCXX_FALSE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o formfactor_spherical_invariants.obj `if test -f 'radmat/ff_interface/formfactor_spherical_invariants.cc'; then $(CYGPATH_W) 'radmat/ff_interface/formfactor_spherical_invariants.cc'; else $(CYGPATH_W) '$(srcdir)/radmat/ff_interface/formfactor_spherical_invariants.cc'; fi`
+
+formfactor_subduced_formfactors.o: radmat/ff_interface/formfactor_subduced_formfactors.cc
+@am__fastdepCXX_TRUE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT formfactor_subduced_formfactors.o -MD -MP -MF $(DEPDIR)/formfactor_subduced_formfactors.Tpo -c -o formfactor_subduced_formfactors.o `test -f 'radmat/ff_interface/formfactor_subduced_formfactors.cc' || echo '$(srcdir)/'`radmat/ff_interface/formfactor_subduced_formfactors.cc
+@am__fastdepCXX_TRUE@	$(am__mv) $(DEPDIR)/formfactor_subduced_formfactors.Tpo $(DEPDIR)/formfactor_subduced_formfactors.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='radmat/ff_interface/formfactor_subduced_formfactors.cc' object='formfactor_subduced_formfactors.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o formfactor_subduced_formfactors.o `test -f 'radmat/ff_interface/formfactor_subduced_formfactors.cc' || echo '$(srcdir)/'`radmat/ff_interface/formfactor_subduced_formfactors.cc
+
+formfactor_subduced_formfactors.obj: radmat/ff_interface/formfactor_subduced_formfactors.cc
+@am__fastdepCXX_TRUE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT formfactor_subduced_formfactors.obj -MD -MP -MF $(DEPDIR)/formfactor_subduced_formfactors.Tpo -c -o formfactor_subduced_formfactors.obj `if test -f 'radmat/ff_interface/formfactor_subduced_formfactors.cc'; then $(CYGPATH_W) 'radmat/ff_interface/formfactor_subduced_formfactors.cc'; else $(CYGPATH_W) '$(srcdir)/radmat/ff_interface/formfactor_subduced_formfactors.cc'; fi`
+@am__fastdepCXX_TRUE@	$(am__mv) $(DEPDIR)/formfactor_subduced_formfactors.Tpo $(DEPDIR)/formfactor_subduced_formfactors.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='radmat/ff_interface/formfactor_subduced_formfactors.cc' object='formfactor_subduced_formfactors.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o formfactor_subduced_formfactors.obj `if test -f 'radmat/ff_interface/formfactor_subduced_formfactors.cc'; then $(CYGPATH_W) 'radmat/ff_interface/formfactor_subduced_formfactors.cc'; else $(CYGPATH_W) '$(srcdir)/radmat/ff_interface/formfactor_subduced_formfactors.cc'; fi`
 
 lorentzff_canonical_rotations.o: radmat/ff/lorentzff_canonical_rotations.cc
 @am__fastdepCXX_TRUE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT lorentzff_canonical_rotations.o -MD -MP -MF $(DEPDIR)/lorentzff_canonical_rotations.Tpo -c -o lorentzff_canonical_rotations.o `test -f 'radmat/ff/lorentzff_canonical_rotations.cc' || echo '$(srcdir)/'`radmat/ff/lorentzff_canonical_rotations.cc

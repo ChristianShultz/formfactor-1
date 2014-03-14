@@ -6,7 +6,7 @@
 
  * Creation Date : 22-02-2014
 
- * Last Modified : Wed 12 Mar 2014 09:11:03 AM EDT
+ * Last Modified : Fri 14 Mar 2014 11:46:34 AM EDT
 
  * Created By : shultz
 
@@ -25,7 +25,6 @@
 #include <sstream>
 #include <algorithm>
 
-#define CHECK_HELICITY_EXPLICIT
 
 typedef radmat::TheFormFactorInjectionRecipeCookbook Cookbook; 
 typedef radmat::TheFormFactorInjectionRecipeFactory Factory; 
@@ -35,19 +34,12 @@ namespace radmat
 
   namespace
   {
-    // sanity
-#ifdef CHECK_HELICITY_EXPLICIT
-    bool check_helicity(const int h, const int row, const int J)
-    {
-      return h == ( J - row + 1 ); 
-    }
-#endif
 
     struct print_elem_reg
     {
       static void print(const std::string &msg)
-//      {}
-            {std::cout << "helicity form factors " << msg << std::endl;}
+      {}
+      //      {std::cout << "helicity form factors " << msg << std::endl;}
     };
 
   }
@@ -62,13 +54,6 @@ namespace radmat
       POW2_ASSERT( recipe->id() == Stringify<HelicityFormFactorRecipe_t>() ); 
       const HelicityFormFactorRecipe_t * helicity_recipe;
       helicity_recipe = dynamic_cast< const HelicityFormFactorRecipe_t* >( recipe.get_ptr() );
-
-#ifdef CHECK_HELICITY_EXPLICIT
-      bool success = true; 
-      success &= check_helicity( lefty.second, helicity_recipe->left_row() , helicity_recipe->left_spin() ); 
-      success &= check_helicity( righty.second, helicity_recipe->right_row(), helicity_recipe->right_spin() ); 
-      POW2_ASSERT(success); 
-#endif
 
       return helicity_recipe->mat->operator()(lefty,righty,mom_fac); 
     }
@@ -153,14 +138,12 @@ namespace radmat
         return new HelicityFormFactor( recipe ); 
       }
 
-      bool do_reg( const std::string &s, const rep_pair &r, const std::string &tran_or_diag)
+      bool do_reg( const std::string &s, const rep_pair &r)
       {
-        // the reg id contains the row information and differs from the lorentz string id
-        std::string reg_id = tran_or_diag + "," + build_id(r.first,r.second); 
-        printer_function<print_elem_reg>(std::string("regged <") + reg_id + std::string(">"));
-        Cookbook::Instance().mappy.insert(std::make_pair(reg_id, gen_recipe(s,r)) ); 
+        printer_function<print_elem_reg>(std::string("regged <") + s + std::string(">"));
+        Cookbook::Instance().mappy.insert(std::make_pair(s, gen_recipe(s,r)) ); 
         bool b = true; 
-        b = Factory::Instance().registerObject(reg_id,callback);  
+        b = Factory::Instance().registerObject(s,callback);  
         if( !!! b ) 
           printer_function<console_print>( s + " failed to register" ); 
         return b; 
@@ -170,12 +153,12 @@ namespace radmat
 
 
 
-    // the factory reg id for helicity form factors
+    // the factory reg id for helicity form factors -- up to the diag/tran bit
     std::string build_id( const rHandle<SpherRep_p> &lefty, 
         const rHandle<SpherRep_p> &righty)
     {
       std::stringstream ss; 
-      ss << lefty->reg_id() << "," << righty->reg_id();
+      ss << lefty->rep_id()  << righty->rep_id();
       return ss.str(); 
     }
 
@@ -226,12 +209,12 @@ namespace radmat
           if( std::find( ff_allowed_spin_keys.begin(), 
                 ff_allowed_spin_keys.end(), 
                 tran_id) != ff_allowed_spin_keys.end() )
-            success &= do_reg(tran_id, it->second,"tran"); 
+            success &= do_reg(tran_id, it->second); 
 
           if( std::find( ff_allowed_spin_keys.begin(), 
                 ff_allowed_spin_keys.end(), 
                 diag_id) != ff_allowed_spin_keys.end() )
-            success &= do_reg(diag_id, it->second,"diag"); 
+            success &= do_reg(diag_id, it->second); 
         }
 
         registered = true; 

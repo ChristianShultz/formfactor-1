@@ -6,7 +6,7 @@
 
 * Creation Date : 25-04-2013
 
-* Last Modified : Wed 13 Nov 2013 05:25:28 PM EST
+* Last Modified : Fri 14 Mar 2014 12:28:14 PM EDT
 
 * Created By : shultz
 
@@ -101,6 +101,7 @@ namespace radmat
     std::stringstream ss;
     ss << "threePointCorrXMLIni = " << prop.threePointCorrXMLIni
       << "\nradmatDBProp = "  << prop.radmatDBProp
+      << "\nmatElemMode = " << prop.matElemMode
       << "\nmatElemID = " << prop.matElemID
       << " xi = " << prop.xi << " L_s = " << prop.L_s;  
     return ss.str();
@@ -117,6 +118,7 @@ namespace radmat
     ADATXML::XMLReader ptop(xml,path);
     doXMLRead(ptop,"threePointCorrXMLIni",prop.threePointCorrXMLIni,__PRETTY_FUNCTION__);
     doXMLRead(ptop,"radmatDBProp",prop.radmatDBProp,__PRETTY_FUNCTION__);
+    doXMLRead(ptop,"matElemMode",prop.matElemMode,__PRETTY_FUNCTION__); 
     doXMLRead(ptop,"matElemID",prop.matElemID,__PRETTY_FUNCTION__);
     doXMLRead(ptop,"xi",prop.xi,__PRETTY_FUNCTION__);
     doXMLRead(ptop,"L_s",prop.L_s,__PRETTY_FUNCTION__);

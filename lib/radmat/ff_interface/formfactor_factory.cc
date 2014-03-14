@@ -6,7 +6,7 @@
 
  * Creation Date : 22-02-2014
 
- * Last Modified : Sun 23 Feb 2014 11:51:35 AM EST
+ * Last Modified : Thu 13 Mar 2014 01:28:50 PM EDT
 
  * Created By : shultz
 
@@ -16,6 +16,7 @@
 
 #include "formfactor_factory.h"
 #include "formfactor_helicity_formfactors.h"
+#include "formfactor_subduced_formfactors.h"
 #include "formfactor_cubic_formfactors.h"
 #include <string>
 #include <complex>
@@ -103,6 +104,7 @@ namespace radmat
       if(!!!registered)
       {
         success &= ::radmat::HelicityFormFactorDecompositionFactoryEnv::registerAll(); 
+        success &= ::radmat::SubducedFormFactorDecompositionFactoryEnv::registerAll(); 
         success &= ::radmat::CubicFormFactorDecompositionFactoryEnv::registerAll(); 
         registered = true;
       }

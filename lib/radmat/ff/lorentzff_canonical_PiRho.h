@@ -24,7 +24,7 @@ namespace radmat
     virtual ~PiRhoF1() {}
 
     virtual std::string
-      ff_impl(void) const
+      ff_impl() const
       {
         std::string s; 
         s = "F_1(Q^2) \\epsilon^{\\mu,\\nu,\\rho,\\sigma}\\epsilon_{\\nu}";
@@ -80,7 +80,7 @@ namespace radmat
   //  use an embedding so we can play with subduction later
   //
   template< int embedl , int embedr  > 
-    LorentzFFAbsBase_t::LorentzFFAbs_list PiRhoGenList(void)
+    LorentzFFAbsBase_t::LorentzFFAbs_list PiRhoGenList()
     {
       LorentzFFAbsBase_t::LorentzFFAbs_list retCanonicalPiRho;
       LorentzFFAbsBase_t::BBType *blockPtr;
@@ -102,7 +102,7 @@ namespace radmat
   template<int embedl, int embedr>
     struct PiRho : public LorentzFFAbsBase_t
   {
-    PiRho(void)
+    PiRho()
       : LorentzFFAbsBase_t(radmat::PiRhoGenList<embedl,embedr>())
     {  }
 
@@ -119,9 +119,9 @@ namespace radmat
 
     virtual ~PiRho() {}
 
-    virtual std::string id(void) const { return Stringify<PiRho<embedl,embedr> >(); }
-    virtual int left_spin(void) const { return embedl; }
-    virtual int right_spin(void) const { return embedr; }
+    virtual std::string reg_id() const { return Stringify<PiRho<embedl,embedr> >(); }
+    virtual int left_spin() const { return embedl; }
+    virtual int right_spin() const { return embedr; }
 
     private:
     PiRho(const LorentzFFAbsBase_t::LorentzFFAbs_list &);

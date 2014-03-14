@@ -170,7 +170,7 @@ namespace radmat
   //////////////////////////////////////////////////////////////////
 
   template<int embedl, int embedr>
-    LorentzFFAbsBase_t::LorentzFFAbs_list RhoRhoGenList(void)
+    LorentzFFAbsBase_t::LorentzFFAbs_list RhoRhoGenList()
     {
       LorentzFFAbsBase_t::LorentzFFAbs_list retRhoRho; 
       LorentzFFAbsBase_t::BBType *g1 , *g2, *g3; 
@@ -209,7 +209,7 @@ namespace radmat
   template<int embedl, int embedr>
     struct RhoRho : public LorentzFFAbsBase_t
   {
-    RhoRho(void)
+    RhoRho()
       : LorentzFFAbsBase_t(radmat::RhoRhoGenList<embedl,embedr>())
     { }
 
@@ -227,9 +227,9 @@ namespace radmat
 
     virtual ~RhoRho() {}
 
-    virtual std::string id(void) const { return Stringify< RhoRho<embedl,embedr> >(); }
-    virtual int left_spin(void) const { return embedl; }
-    virtual int right_spin(void) const { return embedr; }
+    virtual std::string reg_id() const { return Stringify< RhoRho<embedl,embedr> >(); }
+    virtual int left_spin() const { return embedl; }
+    virtual int right_spin() const { return embedr; }
 
     private: 
     RhoRho(const LorentzFFAbsBase_t::LorentzFFAbs_list &); 

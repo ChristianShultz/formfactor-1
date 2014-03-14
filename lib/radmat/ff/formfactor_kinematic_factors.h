@@ -7,6 +7,7 @@
 #include "semble/semble_algebra.h"
 #include "semble/semble_meta.h"
 #include "radmat/utils/printer.h"
+#include "radmat/utils/stringify.h"
 #include <utility>
 #include <sstream>
 #include <string>
@@ -122,11 +123,11 @@ namespace radmat
       : m_KFacGen(KFacGen) 
     {  }
 
-    ~FFKinematicFactors_t(void) {} // handle cleans itself up
+    virtual ~FFKinematicFactors_t(void) {} // handle cleans itself up
 
     // basically generate the 4 X (n multipole) matrix of kinematic factors, 
     // the row index is the lorentz index of the lattice matrix element
-    KinematicFactorMatrix genFactors(const FFKinematicInvariants &inv)
+    virtual KinematicFactorMatrix genFactors(const FFKinematicInvariants &inv)
     {
       FFSingleKinematicInvariants lefty(inv.lefty),righty(inv.righty); 
 
@@ -172,8 +173,8 @@ namespace radmat
       return KF;
     }
 
-    int nFacs(void) const {return m_KFacGen->nFacs();}
-    std::map<int,std::string> ff_ids(void) const {return m_KFacGen->ff_ids();}
+    virtual int nFacs(void) const {return m_KFacGen->nFacs();}
+    virtual std::map<int,std::string> ff_ids(void) const {return m_KFacGen->ff_ids();}
 
     // hide ctor    
     private:

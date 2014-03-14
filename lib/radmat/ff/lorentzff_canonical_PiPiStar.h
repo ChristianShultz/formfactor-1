@@ -20,7 +20,7 @@ namespace radmat
   {
     virtual ~PiPiStarF1() {}
 
-    virtual  std::string ff_impl(void) const
+    virtual  std::string ff_impl() const
     {
       return std::string("F_1(Q^2)\\left(- p_+^{\\mu}\frac{Q^2}{m_{\\pi*}^2 -m_{\\pi}^2} + p_-\\right)");
     }
@@ -55,7 +55,7 @@ namespace radmat
 
   // generate a list for the PiPiStar constructor
   template<int embedl, int embedr>
-    LorentzFFAbsBase_t::LorentzFFAbs_list PiPiStarGenList(void)
+    LorentzFFAbsBase_t::LorentzFFAbs_list PiPiStarGenList()
     {
       LorentzFFAbsBase_t::LorentzFFAbs_list retPiPiStar;
       LorentzFFAbsBase_t::BBType *blockPtr;
@@ -78,7 +78,7 @@ namespace radmat
   template<int embedl, int embedr>
     struct PiPiStar : public LorentzFFAbsBase_t
   {
-    PiPiStar(void)
+    PiPiStar()
       : LorentzFFAbsBase_t(radmat::PiPiStarGenList<embedl,embedr>())  
     {  } 
 
@@ -95,9 +95,9 @@ namespace radmat
       : LorentzFFAbsBase_t(o)
     {  }
 
-    virtual std::string id(void) const { return Stringify< PiPiStar<embedl,embedr> >(); }
-    virtual int left_spin(void) const {return embedl;}
-    virtual int right_spin(void) const {return embedr;}
+    virtual std::string reg_id() const { return Stringify< PiPiStar<embedl,embedr> >(); }
+    virtual int left_spin() const {return embedl;}
+    virtual int right_spin() const {return embedr;}
 
     private:
     // I'm not sure if these could inherit so we will hide them as well

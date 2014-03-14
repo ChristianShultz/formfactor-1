@@ -33,6 +33,7 @@ nobase_include_HEADERS =   \
 													 radmat/ff_interface/formfactor_helicity_formfactors.h    \
 													 radmat/ff_interface/formfactor_invariants.h    \
 													 radmat/ff_interface/formfactor_spherical_invariants.h    \
+													 radmat/ff_interface/formfactor_subduced_formfactors.h    \
 													 radmat/ff/lorentzff_canonical_cont_spin_formfactors.h    \
 													 radmat/ff/lorentzff_canonical_frame_formfacs_rotation_manager.h    \
 													 radmat/ff/lorentzff_canonical_JJlist_ff.h    \
@@ -104,7 +105,6 @@ nobase_include_HEADERS =   \
 													 radmat/utils/type_computations.h    \
 													 radmat/utils/utils.h    
 
-
 # the lib
 lib_LIBRARIES = libradmat.a
 
@@ -128,6 +128,7 @@ libradmat_a_SOURCES =	\
 											radmat/ff_interface/formfactor_helicity_formfactors.cc    \
 											radmat/ff_interface/formfactor_invariants.cc    \
 											radmat/ff_interface/formfactor_spherical_invariants.cc    \
+											radmat/ff_interface/formfactor_subduced_formfactors.cc    \
 											radmat/ff/lorentzff_canonical_rotations.cc    \
 											radmat/ff/lorentzff_canonical_rotations_checker.cc    \
 											radmat/ff/lorentzff_canonical_rotations_utils.cc    \

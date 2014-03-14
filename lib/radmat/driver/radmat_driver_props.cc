@@ -6,7 +6,7 @@
 
  * Creation Date : 29-11-2012
 
- * Last Modified : Thu 21 Nov 2013 06:19:23 PM EST
+ * Last Modified : Fri 14 Mar 2014 12:27:01 PM EDT
 
  * Created By : shultz
 
@@ -68,8 +68,7 @@ namespace radmat
       std::vector<int> version_list; 
       std::vector<int>::const_iterator it; 
       bool found = false; 
-      version_list.push_back(1);
-      version_list.push_back(2); 
+      version_list.push_back(3); 
 
       for( it = version_list.begin(); it != version_list.end(); ++it)
         if ( *it == v ) 
@@ -98,10 +97,7 @@ namespace radmat
     doXMLRead(ptop,"chisq",prop.chisq,__PRETTY_FUNCTION__);
     doXMLRead(ptop,"threePointIni",prop.threePointIni,__PRETTY_FUNCTION__);
     doXMLRead(ptop,"maxThread",prop.maxThread,__PRETTY_FUNCTION__);
-    if ( prop.version >= 2 ) 
       doXMLRead(ptop,"tolerance",prop.tolerance,__PRETTY_FUNCTION__); 
-    else
-      prop.tolerance = 1e-7; 
 
     // NB: we square the mass here!
     double pole_mass; 

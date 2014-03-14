@@ -18,7 +18,6 @@ namespace radmat
     virtual ~FFRep_p() {}
     virtual std::string rep_type(void) const {return Stringify<FFRep_p>();}
     virtual std::string rep_id(void) const = 0; 
-    virtual int rep_row(void) const = 0; 
   };
 
 

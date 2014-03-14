@@ -49,13 +49,13 @@ namespace radmat
         bool 
         do_reg(void)
         {
-          std::string reg_id = Stringify<Derived>(); 
+          Derived d; 
           bool reg = Factory::Instance().registerObject(
-              reg_id, upCast<FFAbsBase_t,Derived> ); 
+              d.reg_id(), upCast<FFAbsBase_t,Derived> ); 
 
           if ( !!! reg ) 
           {
-            std::cout << __PRETTY_FUNCTION__ << ": reg error for " << reg_id << std::endl;
+            std::cout << __PRETTY_FUNCTION__ << ": reg error for " << d.reg_id() << std::endl;
           } 
           return reg; 
         }

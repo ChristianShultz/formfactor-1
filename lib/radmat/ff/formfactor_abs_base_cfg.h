@@ -64,8 +64,6 @@ namespace radmat
     virtual std::string ff(void) const = 0; 
     virtual std::map<int,std::string> ff_ids(void) const = 0; 
     virtual std::string id() const { return Stringify<FFAbsBase_t>(); }
-    virtual int left_spin() const = 0; 
-    virtual int right_spin() const = 0; 
 
     virtual itpp::Mat<std::complex<double> > 
       operator()( const MomRowPair_t &lefty, 

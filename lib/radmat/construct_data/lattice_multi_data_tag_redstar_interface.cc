@@ -6,7 +6,7 @@
 
  * Creation Date : 12-11-2013
 
- * Last Modified : Tue 11 Mar 2014 05:10:07 PM EDT
+ * Last Modified : Thu 13 Mar 2014 10:29:04 AM EDT
 
  * Created By : shultz
 
@@ -34,7 +34,7 @@ namespace radmat
   {
 
     // cook up the sphericial representation ( spin parity helicity ) -- the id 
-    rHandle<FFRep_p> pull_rep(const int J, const bool parity, const int hel)
+    rHandle<FFRep_p> pull_rep(const int J, const bool parity)
     {
       std::stringstream id;
       id << "J" << J; 
@@ -42,24 +42,8 @@ namespace radmat
         id << "p";
       else
         id << "m";
-      id << "_r" << J - hel + 1; 
 
       return FormFactorInvariantsFactoryEnv::callFactory(id.str()); 
-    }
-
-
-    // build the id for the spherical representation of the decomposition (spin,parity,helicity)
-    std::string build_elem_id(const std::string diag_or_tran, 
-        const rHandle<FFRep_p> &lefty,
-        const rHandle<FFRep_p> &righty)
-    {
-      const SpherRep_p *l = dynamic_cast<const SpherRep_p*>(lefty.get_ptr());
-      const SpherRep_p *r = dynamic_cast<const SpherRep_p*>(righty.get_ptr());
-      
-      rHandle<SpherRep_p> tl = SpherInvariantsFactoryEnv::callFactory(l->reg_id());
-      rHandle<SpherRep_p> tr = SpherInvariantsFactoryEnv::callFactory(r->reg_id());
-
-      return diag_or_tran + "," + HelicityFormFactorDecompositionFactoryEnv::build_id(tl,tr); 
     }
 
     // intermediary data storage
@@ -96,9 +80,9 @@ namespace radmat
         ret.set_qsq_label(
             Mink_qsq(ret.p_f,msnk,ret.p_i,msrc,ret.mom_fac));
 
-        ret.lefty = pull_rep(d.Jf,d.pf,d.hf);
-        ret.righty = pull_rep(d.Ji,d.pi,d.hi); 
-        ret.mat_elem_id = build_elem_id(d.mat_elem_id,ret.lefty,ret.righty); 
+        ret.lefty = pull_rep(d.Jf,d.pf);
+        ret.righty = pull_rep(d.Ji,d.pi); 
+        ret.mat_elem_id = d.mat_elem_id;
 
         ret.have_reps = true; 
 

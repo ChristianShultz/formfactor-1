@@ -6,7 +6,7 @@
 
  * Creation Date : 12-03-2014
 
- * Last Modified : Wed 12 Mar 2014 12:15:51 PM EDT
+ * Last Modified : Fri 14 Mar 2014 11:56:42 AM EDT
 
  * Created By : shultz
 
@@ -39,7 +39,8 @@ namespace radmat
       struct key_printer
       {
         static void print(const std::string &msg)
-        { std::cout << "cubic invariants, pulled " << msg << std::endl; }
+        {}
+//        { std::cout << "cubic invariants, pulled " << msg << std::endl; }
       };
 
       template<class T, class U> 
@@ -55,12 +56,12 @@ namespace radmat
         {
           Derived d; 
           bool reg = Factory::Instance().registerObject(
-              d.reg_id(), upCast<FFRep_p,Derived> );
+              d.rep_id(), upCast<FFRep_p,Derived> );
 
-          printer_function<reg_printer>(d.reg_id());
+          printer_function<reg_printer>(d.rep_id());
 
           if(!!!reg)
-            printer_function<console_print>( d.reg_id() + " failed to register "); 
+            printer_function<console_print>( d.rep_id() + " failed to register "); 
 
           return reg; 
         }
@@ -70,53 +71,39 @@ namespace radmat
       {
         bool success = true; 
 
-        // OH
-        success &= do_reg<A1Rep_r1>(); 
-        success &= do_reg<A2Rep_r1>(); 
-        success &= do_reg<T1Rep_r1>(); 
-        success &= do_reg<T1Rep_r2>(); 
-        success &= do_reg<T1Rep_r3>(); 
-        success &= do_reg<T2Rep_r1>(); 
-        success &= do_reg<T2Rep_r2>(); 
-        success &= do_reg<T2Rep_r3>(); 
-        success &= do_reg<ERep_r1>(); 
-        success &= do_reg<ERep_r2>(); 
+        success &= do_reg<A1Rep_t>(); 
+        success &= do_reg<A2Rep_t>(); 
+        success &= do_reg<T1Rep_t>(); 
+        success &= do_reg<T2Rep_t>(); 
+        success &= do_reg<ERep_t >(); 
 
-        //D4
-        success &= do_reg<H0D4A1Rep_r1>(); 
-        success &= do_reg<H0D4A2Rep_r1>(); 
-        success &= do_reg<H1D4E2Rep_r1>(); 
-        success &= do_reg<H1D4E2Rep_r2>(); 
-        success &= do_reg<H2D4B1Rep_r1>(); 
-        success &= do_reg<H2D4B2Rep_r1>(); 
-        success &= do_reg<H3D4E2Rep_r1>(); 
-        success &= do_reg<H3D4E2Rep_r2>(); 
-        success &= do_reg<H4D4A1Rep_r1>(); 
-        success &= do_reg<H4D4A2Rep_r1>(); 
+        success &= do_reg<H0D4A1Rep_t>(); 
+        success &= do_reg<H0D4A2Rep_t>(); 
+        success &= do_reg<H1D4E2Rep_t>(); 
+        success &= do_reg<H2D4B1Rep_t>(); 
+        success &= do_reg<H2D4B2Rep_t>(); 
+        success &= do_reg<H3D4E2Rep_t>(); 
+        success &= do_reg<H4D4A1Rep_t>(); 
+        success &= do_reg<H4D4A2Rep_t>(); 
 
-        //D2
-        success &= do_reg<H0D2A1Rep_r1>(); 
-        success &= do_reg<H0D2A2Rep_r1>(); 
-        success &= do_reg<H1D2B1Rep_r1>(); 
-        success &= do_reg<H1D2B2Rep_r1>(); 
-        success &= do_reg<H2D2A1Rep_r1>(); 
-        success &= do_reg<H2D2A2Rep_r1>(); 
-        success &= do_reg<H3D2B1Rep_r1>(); 
-        success &= do_reg<H3D2B2Rep_r1>(); 
-        success &= do_reg<H4D2A1Rep_r1>(); 
-        success &= do_reg<H4D2A2Rep_r1>(); 
+        success &= do_reg<H0D2A1Rep_t>(); 
+        success &= do_reg<H0D2A2Rep_t>(); 
+        success &= do_reg<H1D2B1Rep_t>(); 
+        success &= do_reg<H1D2B2Rep_t>(); 
+        success &= do_reg<H2D2A1Rep_t>(); 
+        success &= do_reg<H2D2A2Rep_t>(); 
+        success &= do_reg<H3D2B1Rep_t>(); 
+        success &= do_reg<H3D2B2Rep_t>(); 
+        success &= do_reg<H4D2A1Rep_t>(); 
+        success &= do_reg<H4D2A2Rep_t>(); 
 
-        //D3
-        success &= do_reg<H0D3A1Rep_r1>(); 
-        success &= do_reg<H0D3A2Rep_r1>(); 
-        success &= do_reg<H1D3E2Rep_r1>(); 
-        success &= do_reg<H1D3E2Rep_r2>(); 
-        success &= do_reg<H2D3E2Rep_r1>(); 
-        success &= do_reg<H2D3E2Rep_r2>(); 
-        success &= do_reg<H3D3A1Rep_r1>(); 
-        success &= do_reg<H3D3A2Rep_r1>(); 
-        success &= do_reg<H4D3E2Rep_r1>(); 
-        success &= do_reg<H4D3E2Rep_r2>(); 
+        success &= do_reg<H0D3A1Rep_t>(); 
+        success &= do_reg<H0D3A2Rep_t>(); 
+        success &= do_reg<H1D3E2Rep_t>(); 
+        success &= do_reg<H2D3E2Rep_t>(); 
+        success &= do_reg<H3D3A1Rep_t>(); 
+        success &= do_reg<H3D3A2Rep_t>(); 
+        success &= do_reg<H4D3E2Rep_t>(); 
 
         return success ;
       }
@@ -134,7 +121,7 @@ namespace radmat
       bool success = true; 
       if( !!! local_registration)
       {
-        success = do_reg_work(); 
+        success &= do_reg_work(); 
         local_registration = true; 
       }
       return success; 

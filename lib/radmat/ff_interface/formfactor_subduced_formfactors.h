@@ -2,8 +2,8 @@
 #define FORMFACTOR_SUBDUCED_FORMFACTORS_H 
 
 #include "formfactor.h"
-#include "radmat/utils/obj_expr_t.h"
-#include "ensem/ensem.h"
+#include "formfactor_helicity_formfactors.h"
+#include "formfactor_cubic_invariants.h"
 
 
 namespace radmat
@@ -14,39 +14,45 @@ namespace radmat
   struct SubducedFormFactorRecipe_t
     : public FormFactorRecipe_t
   {
-    typedef rHandle<LorentzFFAbsBase_t> mat_h;
+    typedef HelicityFormFactorRecipe_t h_rep;   
 
-    SubducedFormFactorRecipe_t(const mat_h &m, const rHandle<CubicRep_p> &l, const rHandle<CubicRep_p> &r)
-      : mat(m) , lefty(l) , righty(r)
+    SubducedFormFactorRecipe_t(const h_rep &m, 
+        const rHandle<CubicRep_p> &l, 
+        const rHandle<CubicRep_p> &r,
+        const std::string &left_table_id,
+        const std::string &right_table_id)
+      : hel(m) , lefty(l) , righty(r) , lt(left_table_id) , rt(right_table_id)
     { }
 
     SubducedFormFactorRecipe_t(const SubducedFormFactorRecipe_t &o)
-      : mat(o.mat) , lefty(o.lefty) , righty(o.righty)
+      : hel(o.hel) , lefty(o.lefty) , righty(o.righty) , lt(o.lt) , rt(o.rt)
     { }
 
     SubducedFormFactorRecipe_t& operator=(const SubducedFormFactorRecipe_t &o)
     {
       if(this != &o)
       {
-        mat = o.mat; 
+        hel = o.hel; 
         lefty = o.lefty; 
         righty = o.righty; 
+        lt = o.lt;
+        rt = o.rt; 
       }
       return *this;
     }
 
     virtual ~SubducedFormFactorRecipe_t() {}
 
-    virtual int nFacs() const { return mat->nFacs(); }
-    virtual std::string ff() const { return mat->id(); }
-    std::map<int,std::string> ff_ids() const {return mat->ff_ids();}
-    virtual int right_spin() const { return mat->right_spin(); }
-    virtual int left_spin() const { return mat->left_spin(); }
-    virtual int right_row() const { return righty->rep_row(); }
-    virtual int left_row() const { return lefty->rep_row(); }
+    virtual int nFacs() const { return hel.nFacs(); }
+    virtual std::string ff() const { return hel.id(); }
+    std::map<int,std::string> ff_ids() const {return hel.ff_ids();}
+    virtual rHandle<FFRep_p> left_rep() const { return FormFactorRecipe_t::call(lefty->rep_id());}
+    virtual rHandle<FFRep_p> right_rep() const { return FormFactorRecipe_t::call(righty->rep_id());}
+    virtual std::string id() const { return Stringify<SubducedFormFactorRecipe_t>(); }
 
-    mat_h mat; 
+    h_rep hel; 
     rHandle<CubicRep_p> lefty,righty ; 
+    std::string lt,rt; 
   }; 
 
 
@@ -74,6 +80,8 @@ namespace radmat
     }
 
     virtual ~SubducedFormFactor() {}
+
+    virtual std::string id() const { return Stringify<SubducedFormFactor>(); }
 
     virtual itpp::Mat<std::complex<double> > 
       generate_ffs(const MomRowPair_t &lefty, 

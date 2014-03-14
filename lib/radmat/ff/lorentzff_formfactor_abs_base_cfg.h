@@ -86,7 +86,7 @@ namespace radmat
     }
 
     // matrix elem id
-    virtual std::string id() const { return Stringify<LorentzFFAbsBase_t>(); }
+    virtual std::string reg_id() const { return Stringify<LorentzFFAbsBase_t>(); }
     virtual int left_spin() const = 0; 
     virtual int right_spin() const = 0; 
 

@@ -50,11 +50,10 @@ namespace radmat
     virtual int nFacs() const { return mat->nFacs(); }
     virtual std::string ff() const { return mat->id(); }
     virtual std::map<int,std::string> ff_ids() const { return mat->ff_ids(); }
-    virtual int right_spin() const { return mat->right_spin(); }
-    virtual int left_spin() const { return mat->left_spin(); }
-    virtual int right_row() const { return righty->rep_row(); }
-    virtual int left_row() const { return lefty->rep_row(); }
+    virtual rHandle<FFRep_p> left_rep() const { return FormFactorRecipe_t::call(lefty->rep_id()); }
+    virtual rHandle<FFRep_p> right_rep() const { return FormFactorRecipe_t::call(righty->rep_id()); }
     virtual std::string id() const { return Stringify<HelicityFormFactorRecipe_t>(); }
+    virtual std::string reg_id() const { return mat->reg_id(); } // use the same names as in lorentzff
 
     rHandle<LorentzFFAbsBase_t> mat; 
     rHandle<SpherRep_p> lefty, righty; 
