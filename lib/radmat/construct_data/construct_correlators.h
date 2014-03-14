@@ -28,7 +28,7 @@ namespace radmat
       have_ini = true;
       m_ini = ini; 
 
-      print_redstar(m_ini.threePointCorrXMLIni.redstar); 
+  //    print_redstar(m_ini.threePointCorrXMLIni.redstar); 
     }
 
     void print_redstar(const AbstractMergeNamedObject &); 

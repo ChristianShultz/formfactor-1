@@ -6,7 +6,7 @@
 
  * Creation Date : 04-12-2012
 
- * Last Modified : Thu 20 Feb 2014 01:55:44 PM EST
+ * Last Modified : Fri 14 Mar 2014 12:58:22 PM EDT
 
  * Created By : shultz
 
@@ -274,7 +274,85 @@ namespace radmat
         return ret;  
       }
 
+    ///////////////////////////////////////////////////////
+    ///////////////////////////////////////////////////////
+    // (another) brain 
+    std::vector<rHandle<LLSQLatticeMultiData> >
+      do_work_rotation_groups_subduce(const ThreePointCorrIni_t &ini)
+      {
+#ifdef TIME_CONSTRUCT_ALL_CORRS
+        Util::StopWatch snoop;
+        snoop.start(); 
+#endif
 
+        // the return data 
+        std::vector<rHandle<LLSQLatticeMultiData> > ret; 
+
+
+        double p_factor = mom_factor(ini.xi,ini.L_s); 
+        std::string elem_id = ini.matElemID; 
+        const radmatDBProp_t *db_prop = &ini.radmatDBProp; 
+        const ThreePointCorrXMLIni_t *three_pt = &ini.threePointCorrXMLIni; 
+
+        std::vector<TaggedEnsemRedstarNPtBlock> unsorted_elems; 
+        unsorted_elems = tag_lattice_xml(
+            &(three_pt->redstar), 
+            p_factor, 
+            three_pt->maSink, 
+            three_pt->maSource, 
+            elem_id); 
+//
+//        std::map<std::string,std::vector<TaggedEnsemRedstarNPtBlock> > sorted_elems;
+//        std::map<std::string,std::vector<TaggedEnsemRedstarNPtBlock> >::const_iterator it;
+//        sorted_elems = sort_tagged_corrs_by_Q2_and_rotation_group(unsorted_elems); 
+//
+//        std::vector<std::pair<std::string,std::vector<TaggedEnsemRedstarNPtBlock> > > loop_data; 
+//
+//        for(it = sorted_elems.begin(); it != sorted_elems.end(); ++it)
+//          loop_data.push_back(std::pair<std::string,std::vector<TaggedEnsemRedstarNPtBlock> >(it->first,it->second)); 
+//
+//
+//        std::vector<triplet<bool, rHandle<LLSQLatticeMultiData>, std::string > > lattice_data; 
+//        DatabaseInterface_t db(*db_prop) ; 
+//
+//        lattice_data = build_llsq_corrs(loop_data,three_pt->sink_id, three_pt->source_id, 
+//            three_pt->renormalization, db); 
+//
+//        // stop and dump anything that we may be missing 
+//        ::radmat::BAD_DATA_REPO::dump_bad_data();
+//
+//        std::vector<triplet<bool,rHandle<LLSQLatticeMultiData>,std::string > >::const_iterator dcheck; 
+//
+//        for(dcheck = lattice_data.begin(); dcheck != lattice_data.end(); ++dcheck) 
+//        {
+//          // this is a have some data flag
+//          if( !!! dcheck->first )
+//          {
+//            std::cout << __func__ << ": dropping Q2 = " << dcheck->third 
+//              << " because it has 0 elems" << std::endl;  
+//            continue;    
+//          }
+//          ret.push_back(dcheck->second); 
+//        }
+
+#ifdef TIME_CONSTRUCT_ALL_CORRS
+        snoop.stop(); 
+        std::cout << " ** time to build all correlators " << snoop.getTimeInSeconds() << " seconds" << std::endl;
+        std::cout << " ** returning " << ret.size() << " possible Q2 points " << std::endl; 
+#endif
+        return ret;  
+
+      }
+
+    ///////////////////////////////////////////////////////
+    ///////////////////////////////////////////////////////
+    // (another) brain 
+    std::vector<rHandle<LLSQLatticeMultiData> >
+      do_work_rotation_groups_cubic(const ThreePointCorrIni_t &ini)
+      {
+        std::cout << __PRETTY_FUNCTION__ << " is a stub " << std::endl;
+        __builtin_trap(); 
+      }
 
   } // anonomyous 
 
@@ -327,7 +405,24 @@ namespace radmat
   std::vector<rHandle<LLSQLatticeMultiData> >
     ConstructCorrelators::construct_multi_correlators(void) const
     {
-      return do_work_rotation_groups(m_ini); 
+      typedef std::vector<rHandle<LLSQLatticeMultiData> > (*ptr)( const ThreePointCorrIni_t & ); 
+      std::map<std::string,ptr> options_map; 
+      options_map.insert(std::make_pair("lorentz",&do_work_rotation_groups));
+      options_map.insert(std::make_pair("subduce",&do_work_rotation_groups_subduce));
+      options_map.insert(std::make_pair("cubic",&do_work_rotation_groups_cubic));
+      
+      std::map<std::string,ptr>::const_iterator it; 
+      it = options_map.find( m_ini.matElemMode ); 
+      if( it == options_map.end() )
+      {
+        std::cout << "error: unsupported mode " << m_ini.matElemMode << std::endl;
+        std::cout << "try one of the following " << std::endl;
+        for(it = options_map.begin(); it != options_map.end(); ++it)
+          std::cout << it->first << std::endl;
+      }
+
+      ptr foo = options_map[m_ini.matElemMode];
+      return foo(m_ini); 
     }
 
 

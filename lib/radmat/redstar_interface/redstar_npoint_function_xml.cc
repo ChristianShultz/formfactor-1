@@ -6,7 +6,7 @@
 
  * Creation Date : 12-11-2013
 
- * Last Modified : Tue 10 Dec 2013 07:15:05 PM EST
+ * Last Modified : Fri 14 Mar 2014 01:13:32 PM EDT
 
  * Created By : shultz
 
@@ -97,12 +97,12 @@ namespace radmat
     // auto fill size info 
     npt.N = npt.npoint.size(); 
 
-        std::cout << __PRETTY_FUNCTION__ << "\n    : read \n" << std::endl; 
-        for(int i =0; i < npt.N; ++i)
-          std::cout << "\nnpt[" << i << "]: " << npt.npoint[i].object_name 
-            << " -> " << npt.npoint[i].param->type() 
-            << "\n      " << npt.npoint[i].param->write() 
-            << std::endl;
+   //     std::cout << __PRETTY_FUNCTION__ << "\n    : read \n" << std::endl; 
+   //     for(int i =0; i < npt.N; ++i)
+   //       std::cout << "\nnpt[" << i << "]: " << npt.npoint[i].object_name 
+   //         << " -> " << npt.npoint[i].param->type() 
+   //         << "\n      " << npt.npoint[i].param->write() 
+   //         << std::endl;
 
   }
 
