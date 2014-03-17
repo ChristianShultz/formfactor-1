@@ -10,6 +10,7 @@ nobase_include_HEADERS =   \
 													 radmat/construct_data/construct_correlators_bad_data_repository.h    \
 													 radmat/construct_data/construct_correlators.h    \
 													 radmat/construct_data/construct_correlators_utils.h    \
+													 radmat/construct_data/construct_correlators_subduce_utils.h    \
 													 radmat/construct_data/construct_correlators_xml.h    \
 													 radmat/construct_data/construct_data.h    \
 													 radmat/construct_data/lattice_multi_data_object.h    \
@@ -113,6 +114,7 @@ libradmat_a_SOURCES =	\
 											radmat/construct_data/construct_correlators_bad_data_repository.cc    \
 											radmat/construct_data/construct_correlators.cc    \
 											radmat/construct_data/construct_correlators_utils.cc    \
+											radmat/construct_data/construct_correlators_subduce_utils.cc    \
 											radmat/construct_data/construct_correlators_xml.cc    \
 											radmat/construct_data/lattice_multi_data_tag.cc    \
 											radmat/construct_data/lattice_multi_data_tag_redstar_interface.cc    \

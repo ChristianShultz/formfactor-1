@@ -6,7 +6,7 @@
 
  * Creation Date : 13-03-2014
 
- * Last Modified : Fri 14 Mar 2014 11:50:28 AM EDT
+ * Last Modified : Mon 17 Mar 2014 01:19:41 PM EDT
 
  * Created By : shultz
 
@@ -41,34 +41,14 @@ namespace radmat
       static void print(const std::string &msg)
       { std::cout << "subduce_table_printer " + msg << std::endl; }
     };
-  
 
-    struct SubduceTableMap
-    {
-      typedef std::pair<std::complex<double> , int > sub_chunk;
-      typedef std::vector<sub_chunk> sub_list; 
-      typedef std::vector<sub_list> irrep_sub_table; 
-      typedef std::map<std::string,irrep_sub_table*> map_t; 
-
-      ~SubduceTableMap() 
-      {
-        map_t::iterator it; 
-        for(it = mappy.begin(); it != mappy.end(); ++it)
-          delete it->second; 
-      }
-
-      map_t mappy; 
-    };
-
-    // local map 
-    SubduceTableMap TheSmarterSubduceTableMap; 
 
     const SubduceTableMap::irrep_sub_table* 
       query_subduce_table(const std::string &table_id)
       {
         SubduceTableMap::map_t::const_iterator it; 
-        it = TheSmarterSubduceTableMap.mappy.find(table_id);
-        if( it == TheSmarterSubduceTableMap.mappy.end() )
+        it = TheSmarterSubduceTableMap::Instance().mappy.find(table_id);
+        if( it == TheSmarterSubduceTableMap::Instance().mappy.end() )
         {
           printer_function<console_print>( "missed subduce table " + table_id ); 
           throw std::string("missed subduce table"); 
@@ -82,11 +62,11 @@ namespace radmat
         const rHandle<SpherRep_p> &cont, 
         const rHandle<CubicRep_p> &cub)
     {
-      SubduceTableMap::irrep_sub_table* ret = new SubduceTableMap::irrep_sub_table(); 
+      SubduceTableMap::irrep_sub_table::sub_table tab; 
       Hadron::SubduceTable* sub = Hadron::TheSubduceTableFactory::Instance().createObject(table_id); 
       std::complex<double> zero(0.,0.);
 
-      ret->resize( cub->dim() ); 
+      tab.resize( cub->dim() ); 
 
       for(int row = 0; row < cub->dim(); ++row )
       {
@@ -100,10 +80,12 @@ namespace radmat
 
           entry.push_back(std::make_pair(weight,cont->rep_spin() - lambda) ); 
         }
-        (*ret)[row] = entry; 
+        tab[row] = entry; 
       }
 
       delete sub; 
+
+      SubduceTableMap::irrep_sub_table* ret = new SubduceTableMap::irrep_sub_table(tab,cont,cub); 
       return ret; 
     }
 
@@ -111,14 +93,14 @@ namespace radmat
       subduce_flight(const std::string &table_id, 
         const rHandle<SpherRep_p> &cont, 
         const rHandle<CubicRep_p> &cub)
-    {
-      SubduceTableMap::irrep_sub_table* ret = new SubduceTableMap::irrep_sub_table(); 
+      { 
+      SubduceTableMap::irrep_sub_table::sub_table tab; 
       Hadron::SubduceTable* sub = Hadron::TheSubduceTableFactory::Instance().createObject(table_id); 
       const CubicRepFlight_p * cubb;
       cubb = dynamic_cast< const CubicRepFlight_p *> ( cub.get_ptr() ); 
       std::complex<double> zero(0.,0.);
       double eta_p = double(cont->rep_eta_p()); 
-      ret->resize( cub->dim() ); 
+      tab.resize( cub->dim() ); 
       int helicity = cubb->helicity();
 
 
@@ -127,7 +109,7 @@ namespace radmat
         SubduceTableMap::sub_list entry;
         std::complex<double> weight = SEMBLE::toScalar( (*sub)(1,1) );
         entry.push_back( std::make_pair( weight, helicity)); 
-        (*ret)[0] = entry;
+        tab[0] = entry;
       }
       else
       {
@@ -140,11 +122,13 @@ namespace radmat
           entry.push_back(std::make_pair(weightp,helicity));
           entry.push_back(std::make_pair( eta_p * weightm , -helicity ) ); 
 
-          (*ret)[row] = entry; 
+          tab[row] = entry; 
         }
       }
 
       delete sub;
+
+      SubduceTableMap::irrep_sub_table* ret = new SubduceTableMap::irrep_sub_table(tab,cont,cub); 
       return ret; 
     }
 
@@ -160,16 +144,16 @@ namespace radmat
     {
       std::string map_id = make_subduce_table_map_id(cont,cub); 
 
-      if( TheSmarterSubduceTableMap.mappy.find(table_id)
-          != TheSmarterSubduceTableMap.mappy.end() )
+      if( TheSmarterSubduceTableMap::Instance().mappy.find(map_id)
+          == TheSmarterSubduceTableMap::Instance().mappy.end() )
       {
         printer_function<subduce_table_printer>( "made a " + map_id ); 
 
         if( cub->rep_g() == Stringify<Oh>() )
-          TheSmarterSubduceTableMap.mappy.insert(
+          TheSmarterSubduceTableMap::Instance().mappy.insert(
               std::make_pair( map_id , subduce_rest(table_id, cont , cub ) ) ); 
         else
-          TheSmarterSubduceTableMap.mappy.insert(
+          TheSmarterSubduceTableMap::Instance().mappy.insert(
               std::make_pair( map_id , subduce_flight(table_id, cont , cub ) ) ); 
       }
     }
@@ -229,8 +213,8 @@ namespace radmat
       //     -- this call eventually descends all the way down to the 
       //     lorentzff_canonical classes, these classes know about how
       //     to transform under rotations so all the hard work is hidden 
-      for( l = (*l_table)[left_row].begin(); l != (*l_table)[left_row].end(); ++l)
-        for( r = (*r_table)[right_row].begin(); r != (*r_table)[right_row].end(); ++r)
+      for( l = l_table->sub[left_row].begin(); l != l_table->sub[left_row].end(); ++l)
+        for( r = r_table->sub[right_row].begin(); r != r_table->sub[right_row].end(); ++r)
          ret += ( ( std::conj(l->first) * r->first ) 
                 * recipe->hel.mat->operator()( std::make_pair( lefty.first , l->second),
                       std::make_pair( righty.first , r->second ),
@@ -250,19 +234,22 @@ namespace radmat
       struct helicity_recipe_printer
       {
         static void print(const std::string &s)
-        { std::cout << "subduced form factors, found a " << s << std::endl;}
+        {}
+      //  { std::cout << "subduced form factors, found a " << s << std::endl;}
       };
 
       struct subduce_printer
       {
         static void print(const std::string &s)
-        { std::cout << "found subduction table " << s << std::endl;}
+        {}
+      //  { std::cout << "found subduction table " << s << std::endl;}
       };
 
       struct subduce_reg_printer
       {
         static void print(const std::string &s)
-        { std::cout << "subduced form factors, regging  " << s << std::endl;}
+        {}
+      //  { std::cout << "subduced form factors, regging  " << s << std::endl;}
       };
 
 

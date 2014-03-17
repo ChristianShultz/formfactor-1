@@ -6,7 +6,7 @@
 
  * Creation Date : 12-11-2013
 
- * Last Modified : Thu 13 Mar 2014 10:29:04 AM EDT
+ * Last Modified : Mon 17 Mar 2014 01:35:33 PM EDT
 
  * Created By : shultz
 
@@ -34,7 +34,7 @@ namespace radmat
   {
 
     // cook up the sphericial representation ( spin parity helicity ) -- the id 
-    rHandle<FFRep_p> pull_rep(const int J, const bool parity)
+    std::string pull_rep(const int J, const bool parity)
     {
       std::stringstream id;
       id << "J" << J; 
@@ -43,7 +43,7 @@ namespace radmat
       else
         id << "m";
 
-      return FormFactorInvariantsFactoryEnv::callFactory(id.str()); 
+      return id.str(); 
     }
 
     // intermediary data storage
@@ -51,10 +51,10 @@ namespace radmat
       data_store
       {
         std::string file_id;
-        int jmu; 
+        int Jg,jmu; 
         int hf,hi; 
         int Jf,Ji;
-        bool pf,pi; 
+        bool pf,pi,pgamma; 
         std::string mat_elem_id; 
         ADATXML::Array<int> p_f;
         ADATXML::Array<int> p_i; 
@@ -76,12 +76,14 @@ namespace radmat
         ret.hi = d.hi; 
         ret.p_f = d.p_f;
         ret.p_i = d.p_i; 
+        ret.q = ret.p_f - ret.p_i; 
         ret.mom_fac = mom_factor; 
         ret.set_qsq_label(
             Mink_qsq(ret.p_f,msnk,ret.p_i,msrc,ret.mom_fac));
 
         ret.lefty = pull_rep(d.Jf,d.pf);
         ret.righty = pull_rep(d.Ji,d.pi); 
+        ret.gamma = pull_rep(d.Jg,d.pgamma);
         ret.mat_elem_id = d.mat_elem_id;
 
         ret.have_reps = true; 
@@ -141,6 +143,16 @@ namespace radmat
 
         ret.file_id = ss.str(); 
         ret.jmu = ins->lorentz;
+        if( ret.jmu == 4 )
+        {
+          ret.Jg = 0;
+          ret.pgamma = true;
+        }
+        else
+        {
+          ret.Jg = 1; 
+          ret.pgamma = false; 
+        }
         ret.hf = snk->H; 
         ret.Jf = snk->J;
         ret.pf = snk->parity; 
@@ -177,6 +189,16 @@ namespace radmat
 
         ret.file_id = ss.str(); 
         ret.jmu = ins->lorentz;
+        if( ret.jmu == 4 )
+        {
+          ret.Jg = 0;
+          ret.pgamma = true;
+        }
+        else
+        {
+          ret.Jg = 1; 
+          ret.pgamma = false; 
+        }
         ret.hf = snk->H; 
         ret.Jf = snk->J;
         ret.pf = snk->parity; 

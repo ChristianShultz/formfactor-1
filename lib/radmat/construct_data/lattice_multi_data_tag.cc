@@ -6,7 +6,7 @@
 
 * Creation Date : 01-10-2013
 
-* Last Modified : Tue 11 Mar 2014 01:03:09 PM EDT
+* Last Modified : Mon 17 Mar 2014 01:37:30 PM EDT
 
 * Created By : shultz
 
@@ -57,12 +57,14 @@ namespace radmat
       mat_elem_id = o.mat_elem_id;
       p_f = o.p_f;
       p_i = o.p_i;
+      q = o.q; 
       E_f = o.E_f;
       E_i = o.E_i;
       mom_fac = o.mom_fac;
       file_id = o.file_id;  
       have_reps = o.have_reps;
       lefty = o.lefty;
+      gamma = o.gamma;
       righty = o.righty; 
     }
     return *this;
@@ -84,12 +86,12 @@ namespace radmat
     std::cout << file_id << " " << jmu << " " << mat_elem_id << std::endl;  
   }
 
-  std::string LatticeMultiDataTag::splash_tag(void) const
+  std::string LatticeMultiDataTag::unique_tag(void) const
   {
     std::stringstream ss; 
-    ss << "f = " << file_id << " mu = " << jmu << " id = " << mat_elem_id; 
-    ss << " Q2 = " << SEMBLE::toScalar(ENSEM::mean(Q2())) << " "; 
-    ss << mom_string() << " " << E_string() <<  std::endl;
+    ss << lefty << ",p" << p_f[0] << p_f[1] << p_f[2] << ",r" << hf;
+    ss << "." << gamma << ",p" << q[0] << q[1] << q[2] << ",r" << jmu;
+    ss << "." << righty << ",p" << p_i[0] << p_i[1] << p_i[2] << ",r" << hi;
     return ss.str();
   }
 
@@ -134,6 +136,10 @@ namespace radmat
     ENSEM::write(bin,t.E_f);
     ENSEM::write(bin,t.E_i);
     ADATIO::write(bin,t.mom_fac); 
+    ADATIO::write(bin,t.have_reps);
+    ADATIO::writeDesc(bin,t.lefty);
+    ADATIO::writeDesc(bin,t.gamma);
+    ADATIO::writeDesc(bin,t.righty);
   }
 
 
@@ -149,7 +155,10 @@ namespace radmat
     ENSEM::read(bin,t.E_f);
     ENSEM::read(bin,t.E_i);
     ADATIO::read(bin,t.mom_fac); 
-    t.have_reps = false; 
+    ADATIO::read(bin,t.have_reps);
+    ADATIO::readDesc(bin,t.lefty);
+    ADATIO::readDesc(bin,t.gamma);
+    ADATIO::readDesc(bin,t.righty);
   }
 
 

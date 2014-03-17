@@ -90,6 +90,46 @@ namespace radmat
 
   }; 
 
+  // the one map 
+  struct SubduceTableMap
+  {
+    typedef std::pair<std::complex<double> , int > sub_chunk;
+    typedef std::vector<sub_chunk> sub_list; 
+
+    // hold the cont representation, the lattice representation, 
+    // and the table that subduces from cont to lat
+    //    -- build the subduction info into the table radmat uses 
+    struct irrep_sub_table
+    {
+      typedef std::vector<sub_list> sub_table; 
+      typedef rHandle<SpherRep_p> cont_rep;
+      typedef rHandle<CubicRep_p> lat_rep; 
+
+      irrep_sub_table( const sub_table &s, const cont_rep &c , const lat_rep &l)
+        : sub(s) , cont(c) , lat(l)
+      { }
+
+      sub_table sub; 
+      cont_rep cont; 
+      lat_rep lat; 
+    };
+
+    typedef std::map<std::string,irrep_sub_table*> map_t; 
+
+    ~SubduceTableMap() 
+    {
+      map_t::iterator it; 
+      for(it = mappy.begin(); it != mappy.end(); ++it)
+        delete it->second; 
+    }
+
+    map_t mappy; 
+  };
+
+
+  typedef Util::SingletonHolder< SubduceTableMap > TheSmarterSubduceTableMap; 
+
+
 
   namespace SubducedFormFactorDecompositionFactoryEnv
   {

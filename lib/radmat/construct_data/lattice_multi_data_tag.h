@@ -46,7 +46,7 @@ namespace radmat
     double get_qsq_label(void) const {return qsq_label;}
 
     //! splash it to the screen
-    std::string splash_tag(void) const;
+    std::string unique_tag(void) const;
 
     // tags
 
@@ -58,15 +58,13 @@ namespace radmat
     std::string mat_elem_id; 
     ADATXML::Array<int> p_f;
     ADATXML::Array<int> p_i;
+    ADATXML::Array<int> q; 
     ENSEM::EnsemReal E_f;
     ENSEM::EnsemReal E_i;
     double mom_fac; 
 
-
-    // these guys don't get written to binary.. too hard 
-  
     bool have_reps;  
-    rHandle<FFRep_p> lefty,righty;
+    std::string lefty,gamma,righty; 
 
   };
 

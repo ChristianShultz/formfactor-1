@@ -6,7 +6,7 @@
 
  * Creation Date : 04-12-2012
 
- * Last Modified : Fri 14 Mar 2014 12:58:22 PM EDT
+ * Last Modified : Fri 14 Mar 2014 04:16:21 PM EDT
 
  * Created By : shultz
 
@@ -16,6 +16,7 @@
 
 #include "construct_correlators.h"
 #include "construct_correlators_utils.h"
+#include "construct_correlators_subduce_utils.h"
 #include "construct_correlators_bad_data_repository.h"
 #include "adat/adat_stopwatch.h"
 #include "adat/map_obj.h"
@@ -280,14 +281,14 @@ namespace radmat
     std::vector<rHandle<LLSQLatticeMultiData> >
       do_work_rotation_groups_subduce(const ThreePointCorrIni_t &ini)
       {
+
 #ifdef TIME_CONSTRUCT_ALL_CORRS
         Util::StopWatch snoop;
         snoop.start(); 
 #endif
 
-        // the return data 
+        // return variable 
         std::vector<rHandle<LLSQLatticeMultiData> > ret; 
-
 
         double p_factor = mom_factor(ini.xi,ini.L_s); 
         std::string elem_id = ini.matElemID; 
@@ -301,6 +302,13 @@ namespace radmat
             three_pt->maSink, 
             three_pt->maSource, 
             elem_id); 
+
+        // move from the O(3) + 1 symmetry versions to the cubic version 
+        std::vector<TaggedEnsemRedstarNPtBlock> cubic_variants;
+        cubic_variants = retag_subduced_lattice_xml( unsorted_elems ); 
+
+        std::cout << __PRETTY_FUNCTION__ << "::::" << unsorted_elems.size() << std::endl;
+
 //
 //        std::map<std::string,std::vector<TaggedEnsemRedstarNPtBlock> > sorted_elems;
 //        std::map<std::string,std::vector<TaggedEnsemRedstarNPtBlock> >::const_iterator it;
