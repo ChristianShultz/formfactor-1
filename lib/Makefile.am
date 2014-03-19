@@ -16,9 +16,17 @@ nobase_include_HEADERS =   \
 													 radmat/construct_data/lattice_multi_data_object.h    \
 													 radmat/construct_data/lattice_multi_data_tag.h    \
 													 radmat/construct_data/lattice_multi_data_tag_redstar_interface.h    \
+													 radmat/construct_data/make_head.csh    \
 													 radmat/construct_data/radmat_database_interface.h    \
 													 radmat/construct_data/radmat_overlap_key_val_db.h    \
+													 radmat/data_representation/data_representation_cubic_groups.h    \
+													 radmat/data_representation/data_representation_factory.h    \
+													 radmat/data_representation/data_representation.h    \
+													 radmat/data_representation/data_representation_lorentz_groups.h    \
+													 radmat/data_representation/data_representation_primitive_rep.h    \
+													 radmat/data_representation/make_head.csh    \
 													 radmat/driver/driver.h    \
+													 radmat/driver/make_head.csh    \
 													 radmat/driver/radmat_driver_aux.h    \
 													 radmat/driver/radmat_driver.h    \
 													 radmat/driver/radmat_driver_props.h    \
@@ -26,15 +34,14 @@ nobase_include_HEADERS =   \
 													 radmat/ff/ff.h    \
 													 radmat/ff/formfactor_abs_base_cfg.h    \
 													 radmat/ff/formfactor_utils.h    \
+													 radmat/ff_interface/ff_interface.h    \
 													 radmat/ff_interface/formfactor_cubic_formfactors.h    \
-													 radmat/ff_interface/formfactor_cubic_invariants.h    \
 													 radmat/ff_interface/formfactor_factory.h    \
 													 radmat/ff_interface/formfactor.h    \
 													 radmat/ff_interface/formfactor_helicity_formfactors.h    \
-													 radmat/ff_interface/formfactor_invariants.h    \
 													 radmat/ff_interface/formfactor_kinematic_factors.h    \
-													 radmat/ff_interface/formfactor_spherical_invariants.h    \
 													 radmat/ff_interface/formfactor_subduced_formfactors.h    \
+													 radmat/ff_interface/make_head.csh    \
 													 radmat/ff_interface/photon_subduction.h    \
 													 radmat/ff/lorentzff_canonical_cont_spin_formfactors.h    \
 													 radmat/ff/lorentzff_canonical_frame_formfacs_rotation_manager.h    \
@@ -59,6 +66,7 @@ nobase_include_HEADERS =   \
 													 radmat/ff/lorentzff_Wigner_D_matrix_embedding.h    \
 													 radmat/ff/lorentzff_Wigner_D_matrix_factory.h    \
 													 radmat/ff/lorentzff_Wigner_D_matrix_manager.h    \
+													 radmat/ff/make_head.csh    \
 													 radmat/fitting/fit_tins.h    \
 													 radmat/llsq/llsq_chisq.h    \
 													 radmat/llsq/llsq_formfactor_data.h    \
@@ -71,7 +79,9 @@ nobase_include_HEADERS =   \
 													 radmat/llsq/llsq_solver.h    \
 													 radmat/llsq/llsq_solvers.h    \
 													 radmat/llsq/llsq_zero_filter.h    \
+													 radmat/llsq/make_head.csh    \
 													 radmat/redstar_interface/abstract_named_object.h    \
+													 radmat/redstar_interface/make_head.csh    \
 													 radmat/redstar_interface/redstar_abstract_block_base.h    \
 													 radmat/redstar_interface/redstar_abstract_merge_npoint_factory.h    \
 													 radmat/redstar_interface/redstar_abstract_merge_npoint.h    \
@@ -95,6 +105,7 @@ nobase_include_HEADERS =   \
 													 radmat/utils/handle.h    \
 													 radmat/utils/harmonic.h    \
 													 radmat/utils/levi_civita.h    \
+													 radmat/utils/make_head.csh    \
 													 radmat/utils/map_obj.h    \
 													 radmat/utils/mink_qsq.h    \
 													 radmat/utils/obj_expr_t.h    \
@@ -122,17 +133,17 @@ libradmat_a_SOURCES =	\
 											radmat/construct_data/lattice_multi_data_tag_redstar_interface.cc    \
 											radmat/construct_data/radmat_database_interface.cc    \
 											radmat/construct_data/radmat_overlap_key_val_db.cc    \
+											radmat/data_representation/data_representation_cubic_groups.cc    \
+											radmat/data_representation/data_representation_factory.cc    \
+											radmat/data_representation/data_representation_lorentz_groups.cc    \
 											radmat/driver/radmat_driver_aux.cc    \
 											radmat/driver/radmat_driver.cc    \
 											radmat/driver/radmat_driver_props.cc    \
 											radmat/driver/radmat_single_q2_driver.cc    \
 											radmat/ff_interface/formfactor_cubic_formfactors.cc    \
-											radmat/ff_interface/formfactor_cubic_invariants.cc    \
 											radmat/ff_interface/formfactor_factory.cc    \
 											radmat/ff_interface/formfactor_helicity_formfactors.cc    \
-											radmat/ff_interface/formfactor_invariants.cc    \
 											radmat/ff_interface/formfactor_kinematic_factors.cc    \
-											radmat/ff_interface/formfactor_spherical_invariants.cc    \
 											radmat/ff_interface/formfactor_subduced_formfactors.cc    \
 											radmat/ff_interface/photon_subduction.cc    \
 											radmat/ff/lorentzff_canonical_rotations.cc    \

@@ -2,7 +2,6 @@
 #define LATTICE_MULIT_DATA_TAG_H 
 
 
-#include "radmat/ff_interface/formfactor_invariants.h"
 #include "radmat/utils/handle.h"
 #include "ensem/ensem.h"
 #include "io/adat_xmlio.h"

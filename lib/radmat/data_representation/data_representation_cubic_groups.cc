@@ -1,30 +1,33 @@
 /* -.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.
 
- * File Name : formfactor_cubic_invariants.cc
+* File Name : data_representation_cubic_groups.cc
 
- * Purpose :
+* Purpose :
 
- * Creation Date : 12-03-2014
+* Creation Date : 19-03-2014
 
- * Last Modified : Fri 14 Mar 2014 11:56:42 AM EDT
+* Last Modified : Wed 19 Mar 2014 11:56:20 AM EDT
 
- * Created By : shultz
+* Created By : shultz
 
- _._._._._._._._._._._._._._._._._._._._._.*/
+_._._._._._._._._._._._._._._._._._._._._.*/
 
-
-#include "formfactor_cubic_invariants.h"
+#include "data_representation_cubic_groups.h"
+#include "data_representation_factory.h"
 #include "radmat/utils/pow2assert.h"
 #include "radmat/utils/printer.h"
 
 
-namespace FacEnv = radmat::FormFactorInvariantsFactoryEnv;
-typedef radmat::TheFormFactorInvariantsFactory Factory;
+namespace FacEnv = radmat::DataRepresentationFactoryEnv
+typedef radmat::TheDataRepresentationFactory Factory; 
+
+
+
 
 namespace radmat
 {
 
-  namespace CubicInvariantsFactoryEnv
+  namespace CubicRepresentationFactoryEnv
   {
 
     namespace
@@ -33,14 +36,14 @@ namespace radmat
       struct reg_printer
       {
         static void print(const std::string &msg)
-        { std::cout << "cubic invariants, regged " << msg << std::endl; }
+        { std::cout << "cubic reps, regged " << msg << std::endl; }
       };
 
       struct key_printer
       {
         static void print(const std::string &msg)
         {}
-//        { std::cout << "cubic invariants, pulled " << msg << std::endl; }
+//        { std::cout << "cubic reps, pulled " << msg << std::endl; }
       };
 
       template<class T, class U> 
@@ -56,7 +59,7 @@ namespace radmat
         {
           Derived d; 
           bool reg = Factory::Instance().registerObject(
-              d.rep_id(), upCast<FFRep_p,Derived> );
+              d.rep_id(), upCast<Rep_p,Derived> );
 
           printer_function<reg_printer>(d.rep_id());
 
@@ -130,42 +133,42 @@ namespace radmat
 
     // make it blow up if anything goes wrong by wrapping another 
     // call around the factory.createObj method
-    rHandle<CubicRep_p > callFactory(const std::string &matElemID)
+    rHandle<CubicRep> callFactory(const std::string &id)
     {
-      FFRep_p *foo;
+      Rep_p *foo;
       foo = NULL;
       try
       {
-        foo = Factory::Instance().createObject(matElemID);
+        foo = Factory::Instance().createObject(id);
       }
       catch(std::exception &e)
       {
-        std::cout << "elem - " << matElemID << std::endl;
+        std::cout << "id - " << id << std::endl;
         std::cout << __PRETTY_FUNCTION__ << e.what(); 
         throw e; 
       }
       catch(std::string &s)
       {
-        std::cout << "elem - " << matElemID << std::endl;
+        std::cout << "id - " << id << std::endl;
         std::cout << __PRETTY_FUNCTION__ << s << std::endl;
         throw s;
       }
       catch(...)
       {
-        std::cout << "elem - " << matElemID << std::endl;
+        std::cout << "id - " << id << std::endl;
         std::cout << __PRETTY_FUNCTION__ << ": some error" << std::endl;
         POW2_ASSERT(false); 
       }
 
       // not a null pointer
       POW2_ASSERT(foo);
-      POW2_ASSERT( foo->rep_type() == ::radmat::Stringify<CubicRep_p>() ); 
-      return rHandle<CubicRep_p >( dynamic_cast<CubicRep_p*>(foo) );
+      POW2_ASSERT( foo->rep_type() == ::radmat::Stringify<CubicRep_t>() ); 
+      return rHandle<CubicRep>( dynamic_cast<CubicRep*>(foo) );
     }
 
-    // dump all SpherRep_p keys in the factory
+    // dump all CubicRep keys in the factory
     std::vector<std::string> 
-      all_keys(void)
+      cubic_keys(void)
       {
         std::vector<std::string> cubic_keys; 
         std::vector<std::string> all_keys = Factory::Instance().keys(); 
@@ -175,14 +178,14 @@ namespace radmat
         {
           printer_function<key_printer>(*it);
           rHandle<FFRep_p> r = FormFactorInvariantsFactoryEnv::callFactory(*it); 
-          if( r->rep_type() == ::radmat::Stringify<CubicRep_p>() )
+          if( r->rep_type() == ::radmat::Stringify<CubicRep>() )
             cubic_keys.push_back(*it); 
         }
 
         return cubic_keys; 
       }
 
-  } // CubicInvariantsFactoryEnv
+  } // CubicRepresentationFactoryEnv
 
 } // radmat
 

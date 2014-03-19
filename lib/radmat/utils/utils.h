@@ -1,22 +1,20 @@
 #ifndef UTILS_H
-#define UTILS_H 
-
-
-#include "radmat/utils/aux.h"
-#include "radmat/utils/debug_handler.h"
-#include "radmat/utils/handle.h"
-#include "radmat/utils/harmonic.h"
-#include "radmat/utils/levi_civita.h"
-#include "radmat/utils/map_obj.h"
-#include "radmat/utils/mink_qsq.h"
-#include "radmat/utils/obj_expr_t.h"
-#include "radmat/utils/perThreadStorage.h"
-#include "radmat/utils/polarization_tensors.h"
-#include "radmat/utils/pow2assert.h"
-#include "radmat/utils/splash.h"
-#include "radmat/utils/stringify.h"
-#include "radmat/utils/tensor.h"
-#include "radmat/utils/type_computations.h"
-#include "radmat/utils/utils.h"
-
-#endif /* UTILS_H */
+#define UTILS_H
+#include "aux.h"
+#include "debug_handler.h"
+#include "handle.h"
+#include "harmonic.h"
+#include "levi_civita.h"
+#include "map_obj.h"
+#include "mink_qsq.h"
+#include "obj_expr_t.h"
+#include "perThreadStorage.h"
+#include "polarization_tensors.h"
+#include "pow2assert.h"
+#include "printer.h"
+#include "splash.h"
+#include "stringify.h"
+#include "tensor.h"
+#include "type_computations.h"
+#include "utils.h"
+#endif

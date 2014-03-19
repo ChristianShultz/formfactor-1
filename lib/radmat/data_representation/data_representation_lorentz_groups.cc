@@ -1,29 +1,29 @@
 /* -.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.
 
-* File Name : formfactor_continuum_invariants.cc
+* File Name : data_representation_lorentz_groups.cc
 
 * Purpose :
 
-* Creation Date : 22-02-2014
+* Creation Date : 19-03-2014
 
-* Last Modified : Mon 17 Mar 2014 05:54:46 PM EDT
+* Last Modified : Wed 19 Mar 2014 12:02:32 PM EDT
 
 * Created By : shultz
 
 _._._._._._._._._._._._._._._._._._._._._.*/
 
-#include "formfactor_spherical_invariants.h"
+#include "data_representation_lorrentz_groups.h"
 #include "radmat/utils/pow2assert.h"
 #include "radmat/utils/printer.h"
 
-namespace FacEnv = radmat::FormFactorInvariantsFactoryEnv;
-typedef radmat::TheFormFactorInvariantsFactory Factory;
+namespace FacEnv = radmat::DataRepresentationFactoryEnv;
+typedef radmat::TheDataRepresentationFactory Factory;
 
 
 namespace radmat
 {
 
-  namespace SpherInvariantsFactoryEnv
+  namespace SpherRepresentationFactoryEnv
   {
     
 
@@ -34,7 +34,7 @@ namespace radmat
       {
         static void print(const std::string &msg)
         {}
-        //        { std::cout << "spherical invariants, regged " << msg << std::endl; }
+        //        { std::cout << "spher rep, regged " << msg << std::endl; }
       };
 
       struct key_printer
@@ -60,7 +60,7 @@ namespace radmat
         {
           Derived d; 
           bool reg = Factory::Instance().registerObject( 
-              d.rep_id() , upCast<FFRep_p,Derived> ); 
+              d.rep_id() , upCast<Rep_p,Derived> ); 
 
           printer_function<reg_printer>(d.rep_id()); 
 
@@ -95,9 +95,6 @@ namespace radmat
         success &= do_reg<J4pRep_t>(); 
         success &= do_reg<J4mRep_t>();
 
-        success &= do_reg<lorentzJ0pRep_t>(); 
-        success &= do_reg<lorentzJ1mRep_t>(); 
-
         registered = true; 
       }
 
@@ -107,42 +104,42 @@ namespace radmat
 
     // make it blow up if anything goes wrong by wrapping another 
     // call around the factory.createObj method
-    rHandle<SpherRep_p > callFactory(const std::string &matElemID)
+    rHandle<SpherRep> callFactory(const std::string &id)
     {
       FFRep_p *foo;
       foo = NULL;
       try
       {
-        foo = Factory::Instance().createObject(matElemID);
+        foo = Factory::Instance().createObject(id);
       }
       catch(std::exception &e)
       {
-        std::cout << "elem - " << matElemID << std::endl;
+        std::cout << "id - " << id << std::endl;
         std::cout << __PRETTY_FUNCTION__ << e.what(); 
         throw e; 
       }
       catch(std::string &s)
       {
-        std::cout << "elem - " << matElemID << std::endl;
+        std::cout << "id - " << id << std::endl;
         std::cout << __PRETTY_FUNCTION__ << s << std::endl;
         throw s;
       }
       catch(...)
       {
-        std::cout << "elem - " << matElemID << std::endl;
+        std::cout << "id - " << id << std::endl;
         std::cout << __PRETTY_FUNCTION__ << ": some error" << std::endl;
         POW2_ASSERT(false); 
       }
 
       // not a null pointer
       POW2_ASSERT(foo);
-      POW2_ASSERT( foo->rep_type() == ::radmat::Stringify<SpherRep_p>() ); 
-      return rHandle<SpherRep_p >( dynamic_cast<SpherRep_p*>(foo) );
+      POW2_ASSERT( foo->rep_type() == ::radmat::Stringify<LorentzRep_t>() ); 
+      return rHandle<SpherRep>( dynamic_cast<SpherRep*>(foo) );
     }
 
     // dump all SpherRep_p keys in the factory
     std::vector<std::string> 
-      all_keys(void)
+      spher_keys(void)
       {
         std::vector<std::string> sph_keys; 
         std::vector<std::string> all_keys = Factory::Instance().keys(); 
@@ -151,8 +148,8 @@ namespace radmat
         for(it = all_keys.begin(); it != all_keys.end(); ++it )
         {
           printer_function<key_printer>(*it);
-          rHandle<FFRep_p> r = FormFactorInvariantsFactoryEnv::callFactory(*it); 
-          if( r->rep_type() == ::radmat::Stringify<SpherRep_p>() )
+          rHandle<FFRep_p> r = DataRepresentationFactoryEnv::callFactory(*it); 
+          if( r->rep_type() == ::radmat::Stringify<LorentzRep_t>() )
             sph_keys.push_back(*it); 
         }
 
@@ -161,7 +158,7 @@ namespace radmat
 
 
 
-  } // SpherInvariantsFactoryEnv
+  } // SpherRepresentationFactoryEnv
 
 } // radmat
 
