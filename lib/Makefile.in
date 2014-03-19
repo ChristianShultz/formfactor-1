@@ -78,8 +78,8 @@ libradmat_a_LIBADD =
 am_libradmat_a_OBJECTS =  \
 	construct_correlators_bad_data_repository.$(OBJEXT) \
 	construct_correlators.$(OBJEXT) \
-	construct_correlators_utils.$(OBJEXT) \
 	construct_correlators_subduce_utils.$(OBJEXT) \
+	construct_correlators_utils.$(OBJEXT) \
 	construct_correlators_xml.$(OBJEXT) \
 	lattice_multi_data_tag.$(OBJEXT) \
 	lattice_multi_data_tag_redstar_interface.$(OBJEXT) \
@@ -93,8 +93,10 @@ am_libradmat_a_OBJECTS =  \
 	formfactor_factory.$(OBJEXT) \
 	formfactor_helicity_formfactors.$(OBJEXT) \
 	formfactor_invariants.$(OBJEXT) \
+	formfactor_kinematic_factors.$(OBJEXT) \
 	formfactor_spherical_invariants.$(OBJEXT) \
 	formfactor_subduced_formfactors.$(OBJEXT) \
+	photon_subduction.$(OBJEXT) \
 	lorentzff_canonical_rotations.$(OBJEXT) \
 	lorentzff_canonical_rotations_checker.$(OBJEXT) \
 	lorentzff_canonical_rotations_utils.$(OBJEXT) \
@@ -246,8 +248,8 @@ AM_CXXFLAGS = -I@top_srcdir@/lib		\
 nobase_include_HEADERS = \
 													 radmat/construct_data/construct_correlators_bad_data_repository.h    \
 													 radmat/construct_data/construct_correlators.h    \
-													 radmat/construct_data/construct_correlators_utils.h    \
 													 radmat/construct_data/construct_correlators_subduce_utils.h    \
+													 radmat/construct_data/construct_correlators_utils.h    \
 													 radmat/construct_data/construct_correlators_xml.h    \
 													 radmat/construct_data/construct_data.h    \
 													 radmat/construct_data/lattice_multi_data_object.h    \
@@ -262,7 +264,6 @@ nobase_include_HEADERS = \
 													 radmat/driver/radmat_single_q2_driver.h    \
 													 radmat/ff/ff.h    \
 													 radmat/ff/formfactor_abs_base_cfg.h    \
-													 radmat/ff/formfactor_kinematic_factors.h    \
 													 radmat/ff/formfactor_utils.h    \
 													 radmat/ff_interface/formfactor_cubic_formfactors.h    \
 													 radmat/ff_interface/formfactor_cubic_invariants.h    \
@@ -270,8 +271,10 @@ nobase_include_HEADERS = \
 													 radmat/ff_interface/formfactor.h    \
 													 radmat/ff_interface/formfactor_helicity_formfactors.h    \
 													 radmat/ff_interface/formfactor_invariants.h    \
+													 radmat/ff_interface/formfactor_kinematic_factors.h    \
 													 radmat/ff_interface/formfactor_spherical_invariants.h    \
 													 radmat/ff_interface/formfactor_subduced_formfactors.h    \
+													 radmat/ff_interface/photon_subduction.h    \
 													 radmat/ff/lorentzff_canonical_cont_spin_formfactors.h    \
 													 radmat/ff/lorentzff_canonical_frame_formfacs_rotation_manager.h    \
 													 radmat/ff/lorentzff_canonical_JJlist_ff.h    \
@@ -322,6 +325,7 @@ nobase_include_HEADERS = \
 													 radmat/redstar_interface/redstar_merge_vector_current_npoint.h    \
 													 radmat/redstar_interface/redstar_npoint_function_xml.h    \
 													 radmat/redstar_interface/redstar_photon_polarization_tensor.h    \
+													 radmat/redstar_interface/redstar_photon_props.h    \
 													 radmat/redstar_interface/redstar_single_particle_meson_block.h    \
 													 radmat/redstar_interface/redstar_unimproved_vector_current.h    \
 													 radmat/register_all/register_all.h    \
@@ -349,8 +353,8 @@ lib_LIBRARIES = libradmat.a
 libradmat_a_SOURCES = \
 											radmat/construct_data/construct_correlators_bad_data_repository.cc    \
 											radmat/construct_data/construct_correlators.cc    \
-											radmat/construct_data/construct_correlators_utils.cc    \
 											radmat/construct_data/construct_correlators_subduce_utils.cc    \
+											radmat/construct_data/construct_correlators_utils.cc    \
 											radmat/construct_data/construct_correlators_xml.cc    \
 											radmat/construct_data/lattice_multi_data_tag.cc    \
 											radmat/construct_data/lattice_multi_data_tag_redstar_interface.cc    \
@@ -365,8 +369,10 @@ libradmat_a_SOURCES = \
 											radmat/ff_interface/formfactor_factory.cc    \
 											radmat/ff_interface/formfactor_helicity_formfactors.cc    \
 											radmat/ff_interface/formfactor_invariants.cc    \
+											radmat/ff_interface/formfactor_kinematic_factors.cc    \
 											radmat/ff_interface/formfactor_spherical_invariants.cc    \
 											radmat/ff_interface/formfactor_subduced_formfactors.cc    \
+											radmat/ff_interface/photon_subduction.cc    \
 											radmat/ff/lorentzff_canonical_rotations.cc    \
 											radmat/ff/lorentzff_canonical_rotations_checker.cc    \
 											radmat/ff/lorentzff_canonical_rotations_utils.cc    \
@@ -490,6 +496,7 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/formfactor_factory.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/formfactor_helicity_formfactors.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/formfactor_invariants.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/formfactor_kinematic_factors.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/formfactor_spherical_invariants.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/formfactor_subduced_formfactors.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/harmonic.Po@am__quote@
@@ -508,6 +515,7 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/lorentzff_formfac_utils.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/lorentzff_formfactor_factory.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/mink_qsq.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/photon_subduction.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/polarization_tensors.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/pow2assert.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/radmat_database_interface.Po@am__quote@
@@ -574,20 +582,6 @@ construct_correlators.obj: radmat/construct_data/construct_correlators.cc
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCXX_FALSE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o construct_correlators.obj `if test -f 'radmat/construct_data/construct_correlators.cc'; then $(CYGPATH_W) 'radmat/construct_data/construct_correlators.cc'; else $(CYGPATH_W) '$(srcdir)/radmat/construct_data/construct_correlators.cc'; fi`
 
-construct_correlators_utils.o: radmat/construct_data/construct_correlators_utils.cc
-@am__fastdepCXX_TRUE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT construct_correlators_utils.o -MD -MP -MF $(DEPDIR)/construct_correlators_utils.Tpo -c -o construct_correlators_utils.o `test -f 'radmat/construct_data/construct_correlators_utils.cc' || echo '$(srcdir)/'`radmat/construct_data/construct_correlators_utils.cc
-@am__fastdepCXX_TRUE@	$(am__mv) $(DEPDIR)/construct_correlators_utils.Tpo $(DEPDIR)/construct_correlators_utils.Po
-@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='radmat/construct_data/construct_correlators_utils.cc' object='construct_correlators_utils.o' libtool=no @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCXX_FALSE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o construct_correlators_utils.o `test -f 'radmat/construct_data/construct_correlators_utils.cc' || echo '$(srcdir)/'`radmat/construct_data/construct_correlators_utils.cc
-
-construct_correlators_utils.obj: radmat/construct_data/construct_correlators_utils.cc
-@am__fastdepCXX_TRUE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT construct_correlators_utils.obj -MD -MP -MF $(DEPDIR)/construct_correlators_utils.Tpo -c -o construct_correlators_utils.obj `if test -f 'radmat/construct_data/construct_correlators_utils.cc'; then $(CYGPATH_W) 'radmat/construct_data/construct_correlators_utils.cc'; else $(CYGPATH_W) '$(srcdir)/radmat/construct_data/construct_correlators_utils.cc'; fi`
-@am__fastdepCXX_TRUE@	$(am__mv) $(DEPDIR)/construct_correlators_utils.Tpo $(DEPDIR)/construct_correlators_utils.Po
-@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='radmat/construct_data/construct_correlators_utils.cc' object='construct_correlators_utils.obj' libtool=no @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCXX_FALSE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o construct_correlators_utils.obj `if test -f 'radmat/construct_data/construct_correlators_utils.cc'; then $(CYGPATH_W) 'radmat/construct_data/construct_correlators_utils.cc'; else $(CYGPATH_W) '$(srcdir)/radmat/construct_data/construct_correlators_utils.cc'; fi`
-
 construct_correlators_subduce_utils.o: radmat/construct_data/construct_correlators_subduce_utils.cc
 @am__fastdepCXX_TRUE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT construct_correlators_subduce_utils.o -MD -MP -MF $(DEPDIR)/construct_correlators_subduce_utils.Tpo -c -o construct_correlators_subduce_utils.o `test -f 'radmat/construct_data/construct_correlators_subduce_utils.cc' || echo '$(srcdir)/'`radmat/construct_data/construct_correlators_subduce_utils.cc
 @am__fastdepCXX_TRUE@	$(am__mv) $(DEPDIR)/construct_correlators_subduce_utils.Tpo $(DEPDIR)/construct_correlators_subduce_utils.Po
@@ -601,6 +595,20 @@ construct_correlators_subduce_utils.obj: radmat/construct_data/construct_correla
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='radmat/construct_data/construct_correlators_subduce_utils.cc' object='construct_correlators_subduce_utils.obj' libtool=no @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCXX_FALSE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o construct_correlators_subduce_utils.obj `if test -f 'radmat/construct_data/construct_correlators_subduce_utils.cc'; then $(CYGPATH_W) 'radmat/construct_data/construct_correlators_subduce_utils.cc'; else $(CYGPATH_W) '$(srcdir)/radmat/construct_data/construct_correlators_subduce_utils.cc'; fi`
+
+construct_correlators_utils.o: radmat/construct_data/construct_correlators_utils.cc
+@am__fastdepCXX_TRUE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT construct_correlators_utils.o -MD -MP -MF $(DEPDIR)/construct_correlators_utils.Tpo -c -o construct_correlators_utils.o `test -f 'radmat/construct_data/construct_correlators_utils.cc' || echo '$(srcdir)/'`radmat/construct_data/construct_correlators_utils.cc
+@am__fastdepCXX_TRUE@	$(am__mv) $(DEPDIR)/construct_correlators_utils.Tpo $(DEPDIR)/construct_correlators_utils.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='radmat/construct_data/construct_correlators_utils.cc' object='construct_correlators_utils.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o construct_correlators_utils.o `test -f 'radmat/construct_data/construct_correlators_utils.cc' || echo '$(srcdir)/'`radmat/construct_data/construct_correlators_utils.cc
+
+construct_correlators_utils.obj: radmat/construct_data/construct_correlators_utils.cc
+@am__fastdepCXX_TRUE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT construct_correlators_utils.obj -MD -MP -MF $(DEPDIR)/construct_correlators_utils.Tpo -c -o construct_correlators_utils.obj `if test -f 'radmat/construct_data/construct_correlators_utils.cc'; then $(CYGPATH_W) 'radmat/construct_data/construct_correlators_utils.cc'; else $(CYGPATH_W) '$(srcdir)/radmat/construct_data/construct_correlators_utils.cc'; fi`
+@am__fastdepCXX_TRUE@	$(am__mv) $(DEPDIR)/construct_correlators_utils.Tpo $(DEPDIR)/construct_correlators_utils.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='radmat/construct_data/construct_correlators_utils.cc' object='construct_correlators_utils.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o construct_correlators_utils.obj `if test -f 'radmat/construct_data/construct_correlators_utils.cc'; then $(CYGPATH_W) 'radmat/construct_data/construct_correlators_utils.cc'; else $(CYGPATH_W) '$(srcdir)/radmat/construct_data/construct_correlators_utils.cc'; fi`
 
 construct_correlators_xml.o: radmat/construct_data/construct_correlators_xml.cc
 @am__fastdepCXX_TRUE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT construct_correlators_xml.o -MD -MP -MF $(DEPDIR)/construct_correlators_xml.Tpo -c -o construct_correlators_xml.o `test -f 'radmat/construct_data/construct_correlators_xml.cc' || echo '$(srcdir)/'`radmat/construct_data/construct_correlators_xml.cc
@@ -798,6 +806,20 @@ formfactor_invariants.obj: radmat/ff_interface/formfactor_invariants.cc
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCXX_FALSE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o formfactor_invariants.obj `if test -f 'radmat/ff_interface/formfactor_invariants.cc'; then $(CYGPATH_W) 'radmat/ff_interface/formfactor_invariants.cc'; else $(CYGPATH_W) '$(srcdir)/radmat/ff_interface/formfactor_invariants.cc'; fi`
 
+formfactor_kinematic_factors.o: radmat/ff_interface/formfactor_kinematic_factors.cc
+@am__fastdepCXX_TRUE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT formfactor_kinematic_factors.o -MD -MP -MF $(DEPDIR)/formfactor_kinematic_factors.Tpo -c -o formfactor_kinematic_factors.o `test -f 'radmat/ff_interface/formfactor_kinematic_factors.cc' || echo '$(srcdir)/'`radmat/ff_interface/formfactor_kinematic_factors.cc
+@am__fastdepCXX_TRUE@	$(am__mv) $(DEPDIR)/formfactor_kinematic_factors.Tpo $(DEPDIR)/formfactor_kinematic_factors.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='radmat/ff_interface/formfactor_kinematic_factors.cc' object='formfactor_kinematic_factors.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o formfactor_kinematic_factors.o `test -f 'radmat/ff_interface/formfactor_kinematic_factors.cc' || echo '$(srcdir)/'`radmat/ff_interface/formfactor_kinematic_factors.cc
+
+formfactor_kinematic_factors.obj: radmat/ff_interface/formfactor_kinematic_factors.cc
+@am__fastdepCXX_TRUE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT formfactor_kinematic_factors.obj -MD -MP -MF $(DEPDIR)/formfactor_kinematic_factors.Tpo -c -o formfactor_kinematic_factors.obj `if test -f 'radmat/ff_interface/formfactor_kinematic_factors.cc'; then $(CYGPATH_W) 'radmat/ff_interface/formfactor_kinematic_factors.cc'; else $(CYGPATH_W) '$(srcdir)/radmat/ff_interface/formfactor_kinematic_factors.cc'; fi`
+@am__fastdepCXX_TRUE@	$(am__mv) $(DEPDIR)/formfactor_kinematic_factors.Tpo $(DEPDIR)/formfactor_kinematic_factors.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='radmat/ff_interface/formfactor_kinematic_factors.cc' object='formfactor_kinematic_factors.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o formfactor_kinematic_factors.obj `if test -f 'radmat/ff_interface/formfactor_kinematic_factors.cc'; then $(CYGPATH_W) 'radmat/ff_interface/formfactor_kinematic_factors.cc'; else $(CYGPATH_W) '$(srcdir)/radmat/ff_interface/formfactor_kinematic_factors.cc'; fi`
+
 formfactor_spherical_invariants.o: radmat/ff_interface/formfactor_spherical_invariants.cc
 @am__fastdepCXX_TRUE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT formfactor_spherical_invariants.o -MD -MP -MF $(DEPDIR)/formfactor_spherical_invariants.Tpo -c -o formfactor_spherical_invariants.o `test -f 'radmat/ff_interface/formfactor_spherical_invariants.cc' || echo '$(srcdir)/'`radmat/ff_interface/formfactor_spherical_invariants.cc
 @am__fastdepCXX_TRUE@	$(am__mv) $(DEPDIR)/formfactor_spherical_invariants.Tpo $(DEPDIR)/formfactor_spherical_invariants.Po
@@ -825,6 +847,20 @@ formfactor_subduced_formfactors.obj: radmat/ff_interface/formfactor_subduced_for
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='radmat/ff_interface/formfactor_subduced_formfactors.cc' object='formfactor_subduced_formfactors.obj' libtool=no @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCXX_FALSE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o formfactor_subduced_formfactors.obj `if test -f 'radmat/ff_interface/formfactor_subduced_formfactors.cc'; then $(CYGPATH_W) 'radmat/ff_interface/formfactor_subduced_formfactors.cc'; else $(CYGPATH_W) '$(srcdir)/radmat/ff_interface/formfactor_subduced_formfactors.cc'; fi`
+
+photon_subduction.o: radmat/ff_interface/photon_subduction.cc
+@am__fastdepCXX_TRUE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT photon_subduction.o -MD -MP -MF $(DEPDIR)/photon_subduction.Tpo -c -o photon_subduction.o `test -f 'radmat/ff_interface/photon_subduction.cc' || echo '$(srcdir)/'`radmat/ff_interface/photon_subduction.cc
+@am__fastdepCXX_TRUE@	$(am__mv) $(DEPDIR)/photon_subduction.Tpo $(DEPDIR)/photon_subduction.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='radmat/ff_interface/photon_subduction.cc' object='photon_subduction.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o photon_subduction.o `test -f 'radmat/ff_interface/photon_subduction.cc' || echo '$(srcdir)/'`radmat/ff_interface/photon_subduction.cc
+
+photon_subduction.obj: radmat/ff_interface/photon_subduction.cc
+@am__fastdepCXX_TRUE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT photon_subduction.obj -MD -MP -MF $(DEPDIR)/photon_subduction.Tpo -c -o photon_subduction.obj `if test -f 'radmat/ff_interface/photon_subduction.cc'; then $(CYGPATH_W) 'radmat/ff_interface/photon_subduction.cc'; else $(CYGPATH_W) '$(srcdir)/radmat/ff_interface/photon_subduction.cc'; fi`
+@am__fastdepCXX_TRUE@	$(am__mv) $(DEPDIR)/photon_subduction.Tpo $(DEPDIR)/photon_subduction.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='radmat/ff_interface/photon_subduction.cc' object='photon_subduction.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o photon_subduction.obj `if test -f 'radmat/ff_interface/photon_subduction.cc'; then $(CYGPATH_W) 'radmat/ff_interface/photon_subduction.cc'; else $(CYGPATH_W) '$(srcdir)/radmat/ff_interface/photon_subduction.cc'; fi`
 
 lorentzff_canonical_rotations.o: radmat/ff/lorentzff_canonical_rotations.cc
 @am__fastdepCXX_TRUE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT lorentzff_canonical_rotations.o -MD -MP -MF $(DEPDIR)/lorentzff_canonical_rotations.Tpo -c -o lorentzff_canonical_rotations.o `test -f 'radmat/ff/lorentzff_canonical_rotations.cc' || echo '$(srcdir)/'`radmat/ff/lorentzff_canonical_rotations.cc

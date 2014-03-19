@@ -2,7 +2,7 @@
 #define LLSQ_GEN_SYSTEM_H_H_GUARD
 
 #include "radmat/ff_interface/formfactor_factory.h"
-#include "radmat/ff/formfactor_kinematic_factors.h"
+#include "radmat/ff_interface/formfactor_kinematic_factors.h"
 #include "io/adat_xmlio.h"
 #include "radmat/utils/splash.h"
 #include "semble/semble_vector.h"

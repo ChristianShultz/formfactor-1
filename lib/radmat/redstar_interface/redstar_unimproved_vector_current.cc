@@ -6,7 +6,7 @@
 
  * Creation Date : 11-11-2013
 
- * Last Modified : Wed 11 Dec 2013 08:39:39 PM EST
+ * Last Modified : Tue 18 Mar 2014 09:23:09 AM EDT
 
  * Created By : shultz
 
@@ -17,6 +17,7 @@
 #include "redstar_single_particle_meson_block.h"
 #include "redstar_photon_polarization_tensor.h"
 #include "redstar_invert_subduction.h"
+#include "redstar_photon_props.h"
 
 #include "semble/semble_meta.h"
 
@@ -130,7 +131,7 @@ namespace radmat
         back.parity = true; 
         back.mom = v.mom; 
         back.twoI_z = 0; 
-        back.creation_op = v.creation_op; 
+        back.creation_op = PHOTON_CREATE; 
         back.smearedP = v.smearedP;
         back.isProjected = false; 
         back.t_slice = v.t_slice; 
@@ -167,13 +168,13 @@ namespace radmat
         back.parity = false; 
         back.mom = v.mom; 
         back.twoI_z = 0; 
-        back.creation_op = v.creation_op; 
+        back.creation_op = PHOTON_CREATE; 
         back.smearedP = v.smearedP;
         back.isProjected = false; 
         back.t_slice = v.t_slice; 
 
         // the transformation that takes us from helicity to cartesian coords
-        itpp::Mat<std::complex<double> > M = invert2Cart(v.mom,v.creation_op); 
+        itpp::Mat<std::complex<double> > M = invert2Cart(v.mom,back.creation_op); 
         itpp::Vec<EnsemRedstarBlock> cart, hel(3); 
 
         // loop over any photon flavors
@@ -229,7 +230,7 @@ namespace radmat
   {
     std::stringstream ss; 
     ss << "lorentz= " << lorentz << " mom= " << doPrint( mom ) 
-      << " photons= " << doPrint( photons ) << " creation_op= " << creation_op 
+      << " photons= " << doPrint( photons ) << " creation_op = " << PHOTON_CREATE 
       << " smearedP= " << smearedP << " t_slice= " << t_slice; 
     return ss.str(); 
   }
@@ -287,7 +288,7 @@ namespace radmat
       tmp.photons.resize(psz); 
       for(int idx = 0; idx < psz; ++idx)
         tmp.photons[idx] = i.photons[idx]; 
-      tmp.creation_op = i.creation_op; 
+      tmp.creation_op = PHOTON_CREATE; 
       tmp.smearedP = i.smearedP; 
       tmp.t_slice = t_slice;
 
@@ -314,7 +315,7 @@ namespace radmat
     std::string toString(const RedstarUnimprovedVectorCurrentXML::insertion &i)
     {
       std::stringstream ss; 
-      ss << "active= " << i.active << " create= " << i.creation_op 
+      ss << "active= " << i.active << " create= " << PHOTON_CREATE
         << " smear= " << i.smearedP << " photons: ";
       for(int j = 0; j < i.photons.size(); ++j)
         ss << i.photons[j].coeff << "x" << i.photons[j].name << "   ";
@@ -345,7 +346,6 @@ namespace radmat
   {
     ADATXML::push(xml,path);
     ADATXML::write(xml,"active",i.active);
-    ADATXML::write(xml,"creation_op",i.creation_op);
     ADATXML::write(xml,"smearedP",i.smearedP); 
     write(xml,"photons",i.photons); 
     ADATXML::pop(xml);
@@ -366,7 +366,6 @@ namespace radmat
   {
     ADATXML::XMLReader ptop(xml,path); 
     doXMLRead(ptop,"active",i.active,__PRETTY_FUNCTION__); 
-    doXMLRead(ptop,"creation_op",i.creation_op,__PRETTY_FUNCTION__); 
     doXMLRead(ptop,"smearedP",i.smearedP,__PRETTY_FUNCTION__); 
     doXMLRead(ptop,"photons",i.photons,__PRETTY_FUNCTION__); 
   }

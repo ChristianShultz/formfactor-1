@@ -6,7 +6,7 @@
 
  * Creation Date : 22-02-2013
 
- * Last Modified : Tue 11 Mar 2014 05:08:21 PM EDT
+ * Last Modified : Tue 18 Mar 2014 11:33:06 AM EDT
 
  * Created By : shultz
 
@@ -19,7 +19,7 @@
 #include "llsq_multi_data_serialize.h"
 #include "llsq_solution.h"
 #include "radmat/utils/pow2assert.h"
-#include "radmat/ff/formfactor_kinematic_factors.h"
+#include "radmat/ff_interface/formfactor_kinematic_factors.h"
 #include "radmat/utils/printer.h"
 #include "ensem/ensem.h"
 #include <complex>
@@ -72,20 +72,6 @@ namespace radmat
       to_init = foo; 
     }
 
-    int remap_jmu_4_to_0(const int &i)
-    {
-      if ( i == 4 ) 
-        return 0; 
-      else if ( i < 4 && i > 0 ) 
-        return i;
-      else
-      {
-        std::cout << __PRETTY_FUNCTION__ << __FILE__ 
-          << "error index " << i << " is out of range" 
-          << std::endl; 
-        exit(1337);
-      }
-    }
 
     FFKinematicInvariants 
       makeMomInvariants(const LatticeMultiDataTag &t)
@@ -335,8 +321,7 @@ namespace radmat
     rHandle<LLSQLatticeMultiData> non_zero_data(new LLSQLatticeMultiData);
     rHandle<LLSQLatticeMultiData> check_singular( new LLSQLatticeMultiData); 
     std::vector<LatticeMultiDataTag> old_tags;
-    SEMBLE::SembleMatrix<std::complex<double> > Junk; 
-    SEMBLE::SembleVector<std::complex<double> > Zero; 
+    SEMBLE::SembleVector<std::complex<double> > Junk,Zero; 
     old_tags = lattice_data->tags(); 
 
     const unsigned int sz = old_tags.size(); 
@@ -350,20 +335,23 @@ namespace radmat
 
     FFKinematicFactors_t Kt( FormFactorDecompositionFactoryEnv::callFactory(old_tags.begin()->mat_elem_id) ); 
 
-    Junk = Kt.genFactors(makeMomInvariants(*old_tags.begin())); 
-    Zero = Junk.getRow(0);
+    Junk = Kt.genFactors(makeMomInvariants(*old_tags.begin()),
+        old_tags.begin()->gamma,
+        old_tags.begin()->gamma_sph,
+        old_tags.begin()->jmu); 
+    Zero = Junk;
     Zero.zeros(); 
 
     for(unsigned int elem = 0; elem < sz; ++elem)
     {
-      FFKinematicFactors_t KK( FormFactorDecompositionFactoryEnv::callFactory(old_tags[elem].mat_elem_id) ); 
-      SEMBLE::SembleMatrix<std::complex<double> > workM;
       SEMBLE::SembleVector<std::complex<double> > workV;
 
-      workM = KK.genFactors(makeMomInvariants(old_tags[elem]));
       workV = SEMBLE::round_to_zero(
-          workM.getRow(
-            remap_jmu_4_to_0(old_tags[elem].jmu)), tolerance);
+         Kt.genFactors( makeMomInvariants(old_tags[elem]),
+          old_tags[elem].gamma,
+          old_tags[elem].gamma_sph,
+          old_tags[elem].jmu), tolerance); 
+
 #if 0
       std::cout << __FILE__ << __func__ << "\n" << workM.mean() << std::endl;
       std::cout << __func__ << ": " << old_tags[elem].mat_elem_id
@@ -651,20 +639,21 @@ namespace radmat
     std::vector<LatticeMultiDataTag> tags = lattice_data->tags(); 
     std::vector<LatticeMultiDataTag>::const_iterator it; 
   
+    FFKinematicFactors_t KK( FormFactorDecompositionFactoryEnv::callFactory(it->mat_elem_id)); 
 
     for(it = tags.begin(); it != tags.end(); ++it)
     {
-      FFKinematicFactors_t KK( FormFactorDecompositionFactoryEnv::callFactory(it->mat_elem_id)); 
 
-      SEMBLE::SembleMatrix<std::complex<double> > work;
-      work = KK.genFactors(makeMomInvariants(*it));
+      SEMBLE::SembleVector<std::complex<double> > work;
+      work = KK.genFactors(makeMomInvariants(*it),
+          it->gamma,
+          it->gamma_sph,
+          it->jmu);
 
       if(it == tags.begin())
-        init_dim(K, work.getRow(
-              remap_jmu_4_to_0(it->jmu)));
+        init_dim(K,work); 
       else
-        K.append_row(work.getRow(
-              remap_jmu_4_to_0(it->jmu)));
+        K.append_row(work);
     }
 
     init_K = true; 

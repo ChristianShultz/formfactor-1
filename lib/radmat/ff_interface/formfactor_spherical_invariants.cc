@@ -6,7 +6,7 @@
 
 * Creation Date : 22-02-2014
 
-* Last Modified : Thu 13 Mar 2014 10:12:07 AM EDT
+* Last Modified : Mon 17 Mar 2014 05:54:46 PM EDT
 
 * Created By : shultz
 
@@ -94,6 +94,9 @@ namespace radmat
 
         success &= do_reg<J4pRep_t>(); 
         success &= do_reg<J4mRep_t>();
+
+        success &= do_reg<lorentzJ0pRep_t>(); 
+        success &= do_reg<lorentzJ1mRep_t>(); 
 
         registered = true; 
       }

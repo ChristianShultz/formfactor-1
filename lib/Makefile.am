@@ -9,8 +9,8 @@ AM_CXXFLAGS = 	-I@top_srcdir@/lib		\
 nobase_include_HEADERS =   \
 													 radmat/construct_data/construct_correlators_bad_data_repository.h    \
 													 radmat/construct_data/construct_correlators.h    \
-													 radmat/construct_data/construct_correlators_utils.h    \
 													 radmat/construct_data/construct_correlators_subduce_utils.h    \
+													 radmat/construct_data/construct_correlators_utils.h    \
 													 radmat/construct_data/construct_correlators_xml.h    \
 													 radmat/construct_data/construct_data.h    \
 													 radmat/construct_data/lattice_multi_data_object.h    \
@@ -25,7 +25,6 @@ nobase_include_HEADERS =   \
 													 radmat/driver/radmat_single_q2_driver.h    \
 													 radmat/ff/ff.h    \
 													 radmat/ff/formfactor_abs_base_cfg.h    \
-													 radmat/ff/formfactor_kinematic_factors.h    \
 													 radmat/ff/formfactor_utils.h    \
 													 radmat/ff_interface/formfactor_cubic_formfactors.h    \
 													 radmat/ff_interface/formfactor_cubic_invariants.h    \
@@ -33,8 +32,10 @@ nobase_include_HEADERS =   \
 													 radmat/ff_interface/formfactor.h    \
 													 radmat/ff_interface/formfactor_helicity_formfactors.h    \
 													 radmat/ff_interface/formfactor_invariants.h    \
+													 radmat/ff_interface/formfactor_kinematic_factors.h    \
 													 radmat/ff_interface/formfactor_spherical_invariants.h    \
 													 radmat/ff_interface/formfactor_subduced_formfactors.h    \
+													 radmat/ff_interface/photon_subduction.h    \
 													 radmat/ff/lorentzff_canonical_cont_spin_formfactors.h    \
 													 radmat/ff/lorentzff_canonical_frame_formfacs_rotation_manager.h    \
 													 radmat/ff/lorentzff_canonical_JJlist_ff.h    \
@@ -85,6 +86,7 @@ nobase_include_HEADERS =   \
 													 radmat/redstar_interface/redstar_merge_vector_current_npoint.h    \
 													 radmat/redstar_interface/redstar_npoint_function_xml.h    \
 													 radmat/redstar_interface/redstar_photon_polarization_tensor.h    \
+													 radmat/redstar_interface/redstar_photon_props.h    \
 													 radmat/redstar_interface/redstar_single_particle_meson_block.h    \
 													 radmat/redstar_interface/redstar_unimproved_vector_current.h    \
 													 radmat/register_all/register_all.h    \
@@ -113,8 +115,8 @@ lib_LIBRARIES = libradmat.a
 libradmat_a_SOURCES =	\
 											radmat/construct_data/construct_correlators_bad_data_repository.cc    \
 											radmat/construct_data/construct_correlators.cc    \
-											radmat/construct_data/construct_correlators_utils.cc    \
 											radmat/construct_data/construct_correlators_subduce_utils.cc    \
+											radmat/construct_data/construct_correlators_utils.cc    \
 											radmat/construct_data/construct_correlators_xml.cc    \
 											radmat/construct_data/lattice_multi_data_tag.cc    \
 											radmat/construct_data/lattice_multi_data_tag_redstar_interface.cc    \
@@ -129,8 +131,10 @@ libradmat_a_SOURCES =	\
 											radmat/ff_interface/formfactor_factory.cc    \
 											radmat/ff_interface/formfactor_helicity_formfactors.cc    \
 											radmat/ff_interface/formfactor_invariants.cc    \
+											radmat/ff_interface/formfactor_kinematic_factors.cc    \
 											radmat/ff_interface/formfactor_spherical_invariants.cc    \
 											radmat/ff_interface/formfactor_subduced_formfactors.cc    \
+											radmat/ff_interface/photon_subduction.cc    \
 											radmat/ff/lorentzff_canonical_rotations.cc    \
 											radmat/ff/lorentzff_canonical_rotations_checker.cc    \
 											radmat/ff/lorentzff_canonical_rotations_utils.cc    \

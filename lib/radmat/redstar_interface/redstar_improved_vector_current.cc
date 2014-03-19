@@ -6,7 +6,7 @@
 
  * Creation Date : 20-11-2013
 
- * Last Modified : Fri 21 Feb 2014 09:59:51 AM EST
+ * Last Modified : Tue 18 Mar 2014 09:25:40 AM EDT
 
  * Created By : shultz
 
@@ -17,6 +17,7 @@
 #include "redstar_cartesian_interface.h"
 #include "redstar_single_particle_meson_block.h"
 #include "redstar_invert_subduction.h"
+#include "redstar_photon_props.h"
 #include "semble/semble_meta.h"
 #include "adat/map_obj.h"
 #include "ensem/ensem.h"
@@ -103,7 +104,7 @@ namespace radmat
       doPrint(const RedstarImprovedVectorCurrentInsertion &f)
       {
         std::stringstream ss;
-        ss << "active= " << f.active << " creation_op= " << f.creation_op
+        ss << "active= " << f.active << " creation_op= " << PHOTON_CREATE
           << " smearedP= " << f.smearedP << "\nphotons:\n" << doPrint(f.photons); 
         return ss.str(); 
       }
@@ -153,7 +154,7 @@ namespace radmat
       std::stringstream ss; 
       ss << "lorentz= " << lorentz << " mom= " << doPrint( mom ) 
         << " psrc= " << doPrint(psrc) << " psnk= " << doPrint(psnk)
-        << " photons= " << doPrint( photons ) << " creation_op= " << creation_op 
+        << " photons= " << doPrint( photons ) << " creation_op= " << PHOTON_CREATE 
         << " smearedP= " << smearedP << " t_slice= " << t_slice
         << "\nipack:\n" << doPrint(ipack);
       return ss.str(); 
@@ -183,13 +184,13 @@ namespace radmat
         back.parity = false; 
         back.mom = v.mom; 
         back.twoI_z = 0; 
-        back.creation_op = v.creation_op; 
+        back.creation_op = PHOTON_CREATE; 
         back.smearedP = v.smearedP;
         back.isProjected = false; 
         back.t_slice = v.t_slice; 
 
         // the transformation that takes us from helicity to cartesian coords
-        itpp::Mat<std::complex<double> > M = invert2Cart(v.mom,v.creation_op); 
+        itpp::Mat<std::complex<double> > M = invert2Cart(v.mom,back.creation_op); 
         itpp::Vec<EnsemRedstarBlock> cart, hel(3); 
 
         // loop over any photon flavors
@@ -287,7 +288,7 @@ namespace radmat
         back.parity = true; 
         back.mom = v.mom; 
         back.twoI_z = 0; 
-        back.creation_op = v.creation_op; 
+        back.creation_op = PHOTON_CREATE; 
         back.smearedP = v.smearedP;
         back.isProjected = false; 
         back.t_slice = v.t_slice; 
@@ -408,13 +409,13 @@ namespace radmat
         back.parity = false; 
         back.mom = v.mom; 
         back.twoI_z = 0; 
-        back.creation_op = v.creation_op; 
+        back.creation_op = PHOTON_CREATE; 
         back.smearedP = v.smearedP;
         back.isProjected = false; 
         back.t_slice = v.t_slice; 
 
         // the transformation that takes us from helicity to cartesian coords
-        itpp::Mat<std::complex<double> > M = invert2Cart(v.mom,v.creation_op); 
+        itpp::Mat<std::complex<double> > M = invert2Cart(v.mom,back.creation_op); 
         itpp::Vec<EnsemRedstarBlock> cart, hel(3); 
 
         // loop over any photon flavors
@@ -741,7 +742,6 @@ namespace radmat
   {
     ADATXML::XMLReader ptop(xml,path); 
     doXMLRead(ptop,"active",f.active,__PRETTY_FUNCTION__);
-    doXMLRead(ptop,"creation_op",f.creation_op,__PRETTY_FUNCTION__);
     doXMLRead(ptop,"smearedP",f.smearedP,__PRETTY_FUNCTION__);
     doXMLRead(ptop,"photons",f.photons,__PRETTY_FUNCTION__);
   }
@@ -786,7 +786,6 @@ namespace radmat
   {
     ADATXML::push(xml,path);
     ADATXML::write(xml,"active",f.active);
-    ADATXML::write(xml,"creation_op",f.creation_op);
     ADATXML::write(xml,"smearedP",f.smearedP);
     ADATXML::write(xml,"photons",f.photons);
     ADATXML::pop(xml);

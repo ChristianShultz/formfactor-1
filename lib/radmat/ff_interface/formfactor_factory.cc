@@ -6,7 +6,7 @@
 
  * Creation Date : 22-02-2014
 
- * Last Modified : Thu 13 Mar 2014 01:28:50 PM EDT
+ * Last Modified : Mon 17 Mar 2014 03:55:10 PM EDT
 
  * Created By : shultz
 
@@ -51,10 +51,10 @@ namespace radmat
 
     // make it blow up if anything goes wrong by wrapping another 
     // call around the factory.createObj method
-    rHandle<FFAbsBase_t > 
+    rHandle<FormFactorBase_t > 
       callFactory(const std::string &matElemID)
       {
-        FFAbsBase_t *foo;
+        FormFactorBase_t *foo;
         foo = NULL;
         try
         {
@@ -84,7 +84,7 @@ namespace radmat
 
         // not a null pointer
         POW2_ASSERT(foo);
-        return rHandle<FFAbsBase_t>(foo); 
+        return rHandle<FormFactorBase_t>(foo); 
       }
 
     // dump all keys in the factory

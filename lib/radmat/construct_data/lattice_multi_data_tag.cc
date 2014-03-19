@@ -6,7 +6,7 @@
 
 * Creation Date : 01-10-2013
 
-* Last Modified : Mon 17 Mar 2014 01:37:30 PM EDT
+* Last Modified : Tue 18 Mar 2014 11:18:28 AM EDT
 
 * Created By : shultz
 
@@ -62,9 +62,9 @@ namespace radmat
       E_i = o.E_i;
       mom_fac = o.mom_fac;
       file_id = o.file_id;  
-      have_reps = o.have_reps;
       lefty = o.lefty;
       gamma = o.gamma;
+      gamma_sph = o.gamma_sph; 
       righty = o.righty; 
     }
     return *this;
@@ -136,10 +136,10 @@ namespace radmat
     ENSEM::write(bin,t.E_f);
     ENSEM::write(bin,t.E_i);
     ADATIO::write(bin,t.mom_fac); 
-    ADATIO::write(bin,t.have_reps);
     ADATIO::writeDesc(bin,t.lefty);
     ADATIO::writeDesc(bin,t.gamma);
     ADATIO::writeDesc(bin,t.righty);
+    ADATIO::writeDesc(bin,t.gamma_sph);
   }
 
 
@@ -155,10 +155,10 @@ namespace radmat
     ENSEM::read(bin,t.E_f);
     ENSEM::read(bin,t.E_i);
     ADATIO::read(bin,t.mom_fac); 
-    ADATIO::read(bin,t.have_reps);
     ADATIO::readDesc(bin,t.lefty);
     ADATIO::readDesc(bin,t.gamma);
     ADATIO::readDesc(bin,t.righty);
+    ADATIO::readDesc(bin,t.gamma_sph);
   }
 
 

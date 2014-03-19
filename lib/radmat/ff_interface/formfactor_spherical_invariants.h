@@ -80,6 +80,16 @@ namespace radmat
   struct J4mRep_t : public SpherRep<J4m,4,-1> { virtual ~J4mRep_t() {} };
 
 
+  struct lorentzJ0p {} ; 
+  struct lorentzJ1m {} ; 
+
+  REGISTER_STRINGIFY_TYPE( lorentzJ0p ); 
+  REGISTER_STRINGIFY_TYPE( lorentzJ1m ); 
+
+  struct lorentzJ0pRep_t : public SpherRep<lorentzJ0p,0,1> { virtual ~lorentzJ0pRep_t() {} };
+  struct lorentzJ1mRep_t : public SpherRep<lorentzJ1m,1,-1> { virtual ~lorentzJ1mRep_t() {} };
+
+
 
   namespace SpherInvariantsFactoryEnv
   {

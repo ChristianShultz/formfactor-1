@@ -6,7 +6,7 @@
 
  * Creation Date : 12-11-2013
 
- * Last Modified : Mon 17 Mar 2014 01:35:33 PM EDT
+ * Last Modified : Tue 18 Mar 2014 11:19:47 AM EDT
 
  * Created By : shultz
 
@@ -83,10 +83,14 @@ namespace radmat
 
         ret.lefty = pull_rep(d.Jf,d.pf);
         ret.righty = pull_rep(d.Ji,d.pi); 
-        ret.gamma = pull_rep(d.Jg,d.pgamma);
-        ret.mat_elem_id = d.mat_elem_id;
+        ret.gamma_sph = pull_rep(d.Jg,d.pgamma);
+        
+        if( ret.gamma_sph == Stringify<J0p>() )
+          ret.gamma = Stringify<lorentzJ0p>();
+        else 
+          ret.gamma = Stringify<lorentzJ1m>(); 
 
-        ret.have_reps = true; 
+        ret.mat_elem_id = d.mat_elem_id;
 
         return ret; 
       }

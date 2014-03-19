@@ -89,7 +89,7 @@ namespace radmat
   //////////////////////////////////////////////////////////////////
   // rows correspond to a helicity (+ 0 -)
   // cols are the cartesian coordinate (x,y,z)
-  // then M(row,col) = epsilon_cart(lambda)  -->  j^lambda = M * j^cartesian 
+  //         -->  j^lambda = M * j^cartesian 
   itpp::Mat<std::complex<double> > 
     eps3d(const ADATXML::Array<int> &mom ,
         const bool create)

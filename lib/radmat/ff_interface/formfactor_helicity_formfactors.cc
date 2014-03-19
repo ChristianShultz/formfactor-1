@@ -6,7 +6,7 @@
 
  * Creation Date : 22-02-2014
 
- * Last Modified : Fri 14 Mar 2014 11:46:34 AM EDT
+ * Last Modified : Mon 17 Mar 2014 03:55:53 PM EDT
 
  * Created By : shultz
 
@@ -112,7 +112,7 @@ namespace radmat
         return new HelicityFormFactorRecipe_t(mat,reps.first,reps.second); 
       }
 
-      FFAbsBase_t* callback( const std::string &recipe_id )
+      FormFactorBase_t* callback( const std::string &recipe_id )
       {
         PtrRecipeHolder::map_t::iterator r;  
 

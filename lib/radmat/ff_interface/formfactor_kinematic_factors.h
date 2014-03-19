@@ -1,7 +1,7 @@
 #ifndef FORMFACTOR_KINEMATIC_FACTORS_H
 #define FORMFACTOR_KINEMATIC_FACTORS_H 
 
-#include "formfactor_abs_base_cfg.h"
+#include "formfactor.h"
 #include "semble/semble_vector.h"
 #include "semble/semble_matrix.h"
 #include "semble/semble_algebra.h"
@@ -51,11 +51,13 @@ namespace radmat
       p[0] = mom_factor*mom[0]; 
       p[1] = mom_factor*mom[1];
       p[2] = mom_factor*mom[2]; 
+      int_mom = mom; 
       row = rrow; 
       LG_id = id;
     }
 
     Array<double> p; 
+    Array<int> int_mom; 
     ENSEM::EnsemReal E; 
     std::string LG_id;  
     int row;          
@@ -117,6 +119,7 @@ namespace radmat
     // save some typing
     typedef rHandle<FFAbsBase_t > FFBase_h;
     typedef SEMBLE::SembleMatrix<std::complex<double> > KinematicFactorMatrix;
+    typedef SEMBLE::SembleVector<std::complex<double> > KinematicFactorRow;
 
     // the only available constructor
     FFKinematicFactors_t(const FFBase_h &KFacGen)
@@ -125,9 +128,13 @@ namespace radmat
 
     virtual ~FFKinematicFactors_t(void) {} // handle cleans itself up
 
-    // basically generate the 4 X (n multipole) matrix of kinematic factors, 
-    // the row index is the lorentz index of the lattice matrix element
-    virtual KinematicFactorMatrix genFactors(const FFKinematicInvariants &inv)
+    // we need both the rep and cont_rep b/c everything about this is a pain in the ass 
+    // also, we have to distinguish btwn the temporal piece of the photon and 
+    // the helicity zero piece of the photon 
+    virtual KinematicFactorRow genFactors(const FFKinematicInvariants &inv,
+        const std::string &rep, 
+        const std::string &spher_rep,
+        const int row)
     {
       FFSingleKinematicInvariants lefty(inv.lefty),righty(inv.righty); 
 
@@ -137,14 +144,6 @@ namespace radmat
       // this also checks size of righty vs size of lefty
       POW2_ASSERT_DEBUG( (nbins == lefty.E.size()) && (nfacs > 0) );
 
-//      // debug
-//      std::stringstream ss; 
-//      ss << " l " << ENSEM::toDouble( ENSEM::mean( lefty.E ) ) 
-//        << " " << lefty.p[0] << " "  << lefty.p[1] << " " << lefty.p[2] << " "
-//        << " r " << ENSEM::toDouble( ENSEM::mean( righty.E ) ) 
-//        << " " <<  righty.p[0] << " "  << righty.p[1] << " " << righty.p[2];
-//      printer_function<debug_print_FFKI>( ss.str() ); 
-
       // the matrix to be returned
       KinematicFactorMatrix KF(nbins,4,nfacs);
       KF.zeros();
@@ -153,12 +152,6 @@ namespace radmat
       //   NB: need to use assignment here
       lefty.E =  ENSEM::rescaleEnsemDown( inv.lefty.E );
       righty.E = ENSEM::rescaleEnsemDown( inv.righty.E ); 
-
-//      // debug 
-//      std::stringstream sss; 
-//      sss << " pre variance " << ENSEM::toDouble( ENSEM::variance( inv.lefty.E ) ) 
-//        << " post vairance " << ENSEM::toDouble( ENSEM::variance( lefty.E ) ) ;
-//      printer_function<debug_print_FFKI>( sss.str() ); 
 
       // loop over cfgs and use the wrapper to operator()
       for(int bin = 0; bin < nbins; bin++)
@@ -170,8 +163,18 @@ namespace radmat
       // scale up return matrix
       KF.rescaleSembleUp();
 
-      return KF;
+      ADATXML::Array<int> q; 
+      q = lefty.int_mom - righty.int_mom;  
+
+      return gamma_rep(KF,rep,spher_rep,row,q);
     }
+
+    virtual KinematicFactorRow
+      gamma_rep(const KinematicFactorMatrix &, 
+        const std::string &rep, 
+        const std::string &spher_rep,
+        const int row,
+        const ADATXML::Array<int> &q) const; 
 
     virtual int nFacs(void) const {return m_KFacGen->nFacs();}
     virtual std::map<int,std::string> ff_ids(void) const {return m_KFacGen->ff_ids();}

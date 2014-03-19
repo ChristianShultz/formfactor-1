@@ -63,8 +63,8 @@ namespace radmat
     ENSEM::EnsemReal E_i;
     double mom_fac; 
 
-    bool have_reps;  
     std::string lefty,gamma,righty; 
+    std::string gamma_sph; 
 
   };
 

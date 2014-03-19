@@ -112,7 +112,6 @@ namespace radmat
     struct insertion
     {
       bool active; 
-      bool creation_op; 
       bool smearedP; 
       ADATXML::Array<pfrag> photons;  
     };

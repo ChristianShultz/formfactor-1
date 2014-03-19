@@ -41,10 +41,10 @@ namespace radmat
 
   // inject recipes upon instantiation 
   typedef Util::SingletonHolder<
-    Util::ObjectFactory<FFAbsBase_t,
+    Util::ObjectFactory<FormFactorBase_t,
     std::string,
     TYPELIST_1(const std::string &),
-    FFAbsBase_t* (*)(const std::string &),
+    FormFactorBase_t* (*)(const std::string &),
     Util::StringFactoryError> >
       TheFormFactorInjectionRecipeFactory;
 
@@ -53,7 +53,7 @@ namespace radmat
   namespace FormFactorDecompositionFactoryEnv
   {
     bool registerAll( void );
-    rHandle<FFAbsBase_t> callFactory(const std::string &matElemID);
+    rHandle<FormFactorBase_t> callFactory(const std::string &matElemID);
     std::vector<std::string> all_keys(void); 
   }
 

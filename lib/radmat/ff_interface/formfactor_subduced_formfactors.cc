@@ -6,7 +6,7 @@
 
  * Creation Date : 13-03-2014
 
- * Last Modified : Mon 17 Mar 2014 01:19:41 PM EDT
+ * Last Modified : Mon 17 Mar 2014 03:56:29 PM EDT
 
  * Created By : shultz
 
@@ -346,7 +346,7 @@ namespace radmat
         return new SubducedFormFactorRecipe_t(h_rep,lefty,righty,left_table,right_table); 
       }
 
-      FFAbsBase_t * callback(const std::string &recipe_id)
+      FormFactorBase_t * callback(const std::string &recipe_id)
       {
         PtrRecipeHolder::map_t::iterator r; 
         r = Cookbook::Instance().mappy.find(recipe_id); 
