@@ -6,7 +6,7 @@
 
  * Creation Date : 12-11-2013
 
- * Last Modified : Tue 18 Mar 2014 11:19:47 AM EDT
+ * Last Modified : Wed 19 Mar 2014 04:26:32 PM EDT
 
  * Created By : shultz
 
@@ -17,9 +17,7 @@
 #include "radmat/utils/mink_qsq.h"
 #include "radmat/utils/pow2assert.h"
 #include "radmat/ff/lorentzff_canonical_rotations.h"
-#include "radmat/ff_interface/formfactor_invariants.h"
-#include "radmat/ff_interface/formfactor_spherical_invariants.h"
-#include "radmat/ff_interface/formfactor_helicity_formfactors.h"
+#include "radmat/data_representation/data_representation.h"
 #include <sstream>
 
 #define PARALLEL_TAG_REDSTAR_DATA
@@ -86,9 +84,9 @@ namespace radmat
         ret.gamma_sph = pull_rep(d.Jg,d.pgamma);
         
         if( ret.gamma_sph == Stringify<J0p>() )
-          ret.gamma = Stringify<lorentzJ0p>();
+          ret.gamma = Stringify<J0p>();
         else 
-          ret.gamma = Stringify<lorentzJ1m>(); 
+          ret.gamma = Stringify<J1m>(); 
 
         ret.mat_elem_id = d.mat_elem_id;
 

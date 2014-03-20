@@ -6,7 +6,7 @@
 
  * Creation Date : 13-03-2014
 
- * Last Modified : Mon 17 Mar 2014 03:56:29 PM EDT
+ * Last Modified : Thu 20 Mar 2014 09:26:35 AM EDT
 
  * Created By : shultz
 
@@ -19,7 +19,7 @@
 #include "radmat/utils/stringify.h"
 #include "radmat/utils/pow2assert.h"
 #include "radmat/utils/printer.h"
-#include "hadron/subduce_tables_factory.h"
+#include "radmat/data_representation/data_representation.h"
 #include "semble/semble_meta.h"
 #include <sstream>
 #include <algorithm>
@@ -57,107 +57,6 @@ namespace radmat
         return it->second; 
       }
 
-    SubduceTableMap::irrep_sub_table*
-    subduce_rest(const std::string &table_id, 
-        const rHandle<SpherRep_p> &cont, 
-        const rHandle<CubicRep_p> &cub)
-    {
-      SubduceTableMap::irrep_sub_table::sub_table tab; 
-      Hadron::SubduceTable* sub = Hadron::TheSubduceTableFactory::Instance().createObject(table_id); 
-      std::complex<double> zero(0.,0.);
-
-      tab.resize( cub->dim() ); 
-
-      for(int row = 0; row < cub->dim(); ++row )
-      {
-        SubduceTableMap::sub_list entry; 
-        for(int lambda = 0; lambda < 2*cont->rep_spin() + 1; ++lambda)
-        {
-          // subduce tables are FORTRAN based 
-          std::complex<double> weight = SEMBLE::toScalar( (*sub)(row+1,lambda+1) ); 
-          if(weight == zero)
-            continue; 
-
-          entry.push_back(std::make_pair(weight,cont->rep_spin() - lambda) ); 
-        }
-        tab[row] = entry; 
-      }
-
-      delete sub; 
-
-      SubduceTableMap::irrep_sub_table* ret = new SubduceTableMap::irrep_sub_table(tab,cont,cub); 
-      return ret; 
-    }
-
-    SubduceTableMap::irrep_sub_table* 
-      subduce_flight(const std::string &table_id, 
-        const rHandle<SpherRep_p> &cont, 
-        const rHandle<CubicRep_p> &cub)
-      { 
-      SubduceTableMap::irrep_sub_table::sub_table tab; 
-      Hadron::SubduceTable* sub = Hadron::TheSubduceTableFactory::Instance().createObject(table_id); 
-      const CubicRepFlight_p * cubb;
-      cubb = dynamic_cast< const CubicRepFlight_p *> ( cub.get_ptr() ); 
-      std::complex<double> zero(0.,0.);
-      double eta_p = double(cont->rep_eta_p()); 
-      tab.resize( cub->dim() ); 
-      int helicity = cubb->helicity();
-
-
-      if ( helicity == 0 )
-      {
-        SubduceTableMap::sub_list entry;
-        std::complex<double> weight = SEMBLE::toScalar( (*sub)(1,1) );
-        entry.push_back( std::make_pair( weight, helicity)); 
-        tab[0] = entry;
-      }
-      else
-      {
-        for(int row = 0; row < cub->dim(); ++row)
-        {
-          SubduceTableMap::sub_list entry;
-          std::complex<double> weightp = SEMBLE::toScalar( (*sub)(row+1,1));
-          std::complex<double> weightm = SEMBLE::toScalar( (*sub)(row+1,2));
-          
-          entry.push_back(std::make_pair(weightp,helicity));
-          entry.push_back(std::make_pair( eta_p * weightm , -helicity ) ); 
-
-          tab[row] = entry; 
-        }
-      }
-
-      delete sub;
-
-      SubduceTableMap::irrep_sub_table* ret = new SubduceTableMap::irrep_sub_table(tab,cont,cub); 
-      return ret; 
-    }
-
-    std::string make_subduce_table_map_id(const rHandle<SpherRep_p> &cont, 
-        const rHandle<CubicRep_p> &cub)
-    {
-      return cont->rep_id() + cub->rep_id(); 
-    }
-
-    void add_subduce_table( const std::string &table_id, 
-        const rHandle<SpherRep_p> &cont, 
-        const rHandle<CubicRep_p> &cub)
-    {
-      std::string map_id = make_subduce_table_map_id(cont,cub); 
-
-      if( TheSmarterSubduceTableMap::Instance().mappy.find(map_id)
-          == TheSmarterSubduceTableMap::Instance().mappy.end() )
-      {
-        printer_function<subduce_table_printer>( "made a " + map_id ); 
-
-        if( cub->rep_g() == Stringify<Oh>() )
-          TheSmarterSubduceTableMap::Instance().mappy.insert(
-              std::make_pair( map_id , subduce_rest(table_id, cont , cub ) ) ); 
-        else
-          TheSmarterSubduceTableMap::Instance().mappy.insert(
-              std::make_pair( map_id , subduce_flight(table_id, cont , cub ) ) ); 
-      }
-    }
-
   } // anonomyous 
 
   // all the nasty comes together here 
@@ -184,8 +83,8 @@ namespace radmat
 
       // left and right representations to make the strings to 
       // call the factory 
-      rHandle<CubicRep_p> l_cub_rep , r_cub_rep;
-      rHandle<SpherRep_p> l_sph_rep , r_sph_rep; 
+      rHandle<CubicRep> l_cub_rep , r_cub_rep;
+      rHandle<LorentzRep> l_sph_rep , r_sph_rep; 
 
       l_cub_rep = recipe->lefty;
       r_cub_rep = recipe->righty;
@@ -248,10 +147,53 @@ namespace radmat
       struct subduce_reg_printer
       {
         static void print(const std::string &s)
-        {}
-      //  { std::cout << "subduced form factors, regging  " << s << std::endl;}
+        { std::cout << "subduced form factors, regging  " << s << std::endl;}
       };
 
+
+      std::vector<std::string> all_subduce_tables()
+      {
+        typedef TheSmarterSubduceTableMap SMAP; 
+        std::vector<std::string> ret;
+        SubduceTableMap::map_t::const_iterator it; 
+        for(it = SMAP::Instance().mappy.begin(); it != SMAP::Instance().mappy.end(); ++it)
+          ret.push_back(it->first); 
+
+        return ret; 
+      }
+
+      struct possible_sub_printer
+      {
+        static void print(const std::string &msg)
+        {std::cout << "possible subduction " << msg << std::endl;}
+      };
+
+
+      // handles are not thread safe and the map may be accessed concurrently breaking 
+      // the reference counting, return an independent handle to circumvent stupidity  
+      std::vector<std::pair<std::string,rHandle<CubicRep> > > 
+        possible_subductions(const rHandle<LorentzRep> &rep)
+        {
+          std::vector<std::pair<std::string,rHandle<CubicRep> > > ret; 
+          std::string comp = rep->rep_id();  
+          std::vector<std::string> all_tables = all_subduce_tables(); 
+          std::vector<std::string>::const_iterator it;
+
+          for(it = all_tables.begin(); it != all_tables.end(); ++it)
+            if( it->find(comp) != std::string::npos )
+            {
+              printer_function<possible_sub_printer>(comp + " matched to " + *it); 
+
+              const SubduceTableMap::irrep_sub_table * foo; 
+              foo = TheSmarterSubduceTableMap::Instance().mappy[*it]; 
+              CubicRep * rep; 
+              rep = foo->lat->clone(); 
+
+              ret.push_back(std::make_pair(comp,rHandle<CubicRep>(rep) ) ); 
+            }
+
+          return ret; 
+        }
 
       // loop the cookbook and pull out helicity recipes for subduction 
       std::vector<rHandle<HelicityFormFactorRecipe_t> > 
@@ -275,74 +217,12 @@ namespace radmat
           return ret; 
         }
 
-      std::vector<std::string> 
-        all_subduce_table_keys()
-        {
-          return Hadron::TheSubduceTableFactory::Instance().keys(); 
-        }
-
-      std::vector<std::string> 
-        spher_strings(const rHandle<SpherRep_p> &s)
-        {
-          std::vector<std::string> ret; 
-          std::stringstream ss; 
-          ss << "J" << s->rep_spin(); 
-          ret.push_back(ss.str());
-          ss.str("");
-
-          ss << "H0"; 
-          s->rep_eta_p() == 1 ? ss << "+" : ss << "-";
-          ret.push_back(ss.str());
-
-
-          for(int i = 1; i <= s->rep_spin(); ++i)
-          {
-            ss.str("");
-            ss << "H" << i; 
-            ret.push_back(ss.str()); 
-          }
-
-          return ret; 
-        };
-
-      // string is the subduce table key, rep is what radmat calls the rep 
-      //
-      // do a double loop over possible left and right part of subduce table
-      // keys to see if it exists 
-      std::vector<std::pair<std::string,rHandle<CubicRep_p> > >
-        possible_subductions( const rHandle<SpherRep_p> &s )
-        {
-          std::vector<std::pair<std::string,rHandle<CubicRep_p> > > ret; 
-          std::string delim = "->";
-          std::string tail = ",1";
-          std::vector<std::string> subduce_tables = all_subduce_table_keys();
-
-          std::vector<std::string> sph_strs = spher_strings(s);
-          std::vector<std::string> cub_strs = ::radmat::CubicInvariantsFactoryEnv::all_keys(); 
-          std::vector<std::string>::const_iterator sph_it,cub_it; 
-
-          for(sph_it = sph_strs.begin(); sph_it != sph_strs.end(); ++sph_it)
-            for(cub_it = cub_strs.begin(); cub_it != cub_strs.end(); ++cub_it)
-            {
-              std::string id = *sph_it + delim + *cub_it + tail; 
-              if( std::find( subduce_tables.begin(), subduce_tables.end(), id ) != subduce_tables.end() )
-              {
-                printer_function<subduce_printer>(id); 
-                ret.push_back(std::make_pair(id,::radmat::CubicInvariantsFactoryEnv::callFactory(*cub_it)));
-              }
-            }
-
-          return ret; 
-        }
-
       FormFactorRecipe_t* gen_recipe( const HelicityFormFactorRecipe_t &h_rep, 
-          const rHandle<CubicRep_p> &lefty,
-          const rHandle<CubicRep_p> &righty,
+          const rHandle<CubicRep> &lefty,
+          const rHandle<CubicRep> &righty,
           const std::string &left_table, 
           const std::string &right_table)
       {
-        add_subduce_table( left_table , h_rep.lefty , lefty );
-        add_subduce_table( right_table , h_rep.righty, righty); 
         return new SubducedFormFactorRecipe_t(h_rep,lefty,righty,left_table,right_table); 
       }
 
@@ -370,11 +250,14 @@ namespace radmat
         return new SubducedFormFactor( recipe ); 
       }
 
-
+      std::string build_id(const rHandle<CubicRep> &l, const rHandle<CubicRep> &r)
+      {
+        return l->rep_id() + "," + r->rep_id(); 
+      }
 
       bool do_reg( const rHandle<HelicityFormFactorRecipe_t> &h_rep, 
-          const std::pair<std::string,rHandle<CubicRep_p> > &lefty,
-          const std::pair<std::string,rHandle<CubicRep_p> > &righty)
+          const std::pair<std::string,rHandle<CubicRep> > &lefty,
+          const std::pair<std::string,rHandle<CubicRep> > &righty)
       {
         std::string reg_id = h_rep->reg_id() + "__" + build_id(lefty.second,righty.second); 
         printer_function<subduce_reg_printer>(reg_id); 
@@ -396,7 +279,7 @@ namespace radmat
     } // anonomyous 
 
 
-    std::string build_id(const rHandle<CubicRep_p> &lefty, const rHandle<CubicRep_p> &righty)
+    std::string build_id(const rHandle<CubicRep> &lefty, const rHandle<CubicRep_p> &righty)
     {
       return lefty->rep_id() + "," + righty->rep_id(); 
     }
@@ -420,8 +303,8 @@ namespace radmat
 
         for( h_recipe_it = h_recipies.begin(); h_recipe_it != h_recipies.end(); ++h_recipe_it)
         {
-          std::vector<std::pair<std::string,rHandle<CubicRep_p> > > lefty, righty;
-          std::vector<std::pair<std::string,rHandle<CubicRep_p> > >::const_iterator l, r;
+          std::vector<std::pair<std::string,rHandle<CubicRep> > > lefty, righty;
+          std::vector<std::pair<std::string,rHandle<CubicRep> > >::const_iterator l, r;
 
           lefty = possible_subductions( (*h_recipe_it)->lefty );
           righty = possible_subductions( (*h_recipe_it)->righty );

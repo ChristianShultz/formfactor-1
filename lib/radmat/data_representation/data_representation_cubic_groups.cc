@@ -6,7 +6,7 @@
 
 * Creation Date : 19-03-2014
 
-* Last Modified : Wed 19 Mar 2014 11:56:20 AM EDT
+* Last Modified : Wed 19 Mar 2014 06:27:59 PM EDT
 
 * Created By : shultz
 
@@ -18,7 +18,7 @@ _._._._._._._._._._._._._._._._._._._._._.*/
 #include "radmat/utils/printer.h"
 
 
-namespace FacEnv = radmat::DataRepresentationFactoryEnv
+namespace FacEnv = radmat::DataRepresentationFactoryEnv;
 typedef radmat::TheDataRepresentationFactory Factory; 
 
 
@@ -177,8 +177,8 @@ namespace radmat
         for(it = all_keys.begin(); it != all_keys.end(); ++it )
         {
           printer_function<key_printer>(*it);
-          rHandle<FFRep_p> r = FormFactorInvariantsFactoryEnv::callFactory(*it); 
-          if( r->rep_type() == ::radmat::Stringify<CubicRep>() )
+          rHandle<Rep_p> r = FacEnv::callFactory(*it); 
+          if( r->rep_type() == ::radmat::Stringify<CubicRep_t>() )
             cubic_keys.push_back(*it); 
         }
 

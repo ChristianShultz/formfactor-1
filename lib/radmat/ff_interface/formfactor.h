@@ -1,8 +1,8 @@
 #ifndef FORMFACTOR_H
 #define FORMFACTOR_H 
 
-#include "formfactor_invariants.h"
 #include "radmat/ff/formfactor_abs_base_cfg.h"
+#include "radmat/data_representation/data_representation.h"
 #include "radmat/utils/stringify.h"
 
 namespace radmat
@@ -23,11 +23,11 @@ namespace radmat
     virtual int nFacs() const = 0;
     virtual std::string ff() const = 0; 
     virtual std::map<int,std::string> ff_ids(void) const = 0; 
-    virtual rHandle<FFRep_p> left_rep() const = 0; 
-    virtual rHandle<FFRep_p> right_rep() const = 0; 
-    virtual rHandle<FFRep_p> call(const std::string &s) const
+    virtual rHandle<Rep_p> left_rep() const = 0; 
+    virtual rHandle<Rep_p> right_rep() const = 0; 
+    virtual rHandle<Rep_p> call(const std::string &s) const
     {
-      return ::radmat::FormFactorInvariantsFactoryEnv::callFactory(s);
+      return ::radmat::DataRepresentationFactoryEnv::callFactory(s);
     }
     virtual std::string id() const { return Stringify<FormFactorRecipe_t>(); }
   };
@@ -75,8 +75,8 @@ namespace radmat
     virtual std::string ff() const { return recipe->ff(); }
     virtual std::map<int,std::string> ff_ids() const { return recipe->ff_ids(); }
     virtual std::string id() const { return Stringify<FormFactorBase_t>(); }
-    virtual rHandle<FFRep_p> left_rep() const { return recipe->left_rep(); }
-    virtual rHandle<FFRep_p> right_rep() const { return recipe->right_rep(); }
+    virtual rHandle<Rep_p> left_rep() const { return recipe->left_rep(); }
+    virtual rHandle<Rep_p> right_rep() const { return recipe->right_rep(); }
 
     // must be implemented in derived
     virtual itpp::Mat<std::complex<double> >

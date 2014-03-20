@@ -6,7 +6,7 @@
 
  * Creation Date : 22-02-2014
 
- * Last Modified : Mon 17 Mar 2014 03:55:53 PM EDT
+ * Last Modified : Thu 20 Mar 2014 09:25:44 AM EDT
 
  * Created By : shultz
 
@@ -16,7 +16,7 @@
 #include "formfactor.h"
 #include "formfactor_helicity_formfactors.h"
 #include "formfactor_factory.h"
-#include "formfactor_spherical_invariants.h"
+#include "radmat/data_representation/data_representation.h"
 #include "radmat/ff/lorentzff_canonical_cont_spin_formfactors.h"
 #include "radmat/ff/lorentzff_formfactor_factory.h"
 #include "radmat/utils/stringify.h"
@@ -68,31 +68,31 @@ namespace radmat
     { 
 
       // snarf (or slurp?) all spherical reps
-      std::vector<rHandle<SpherRep_p> > 
+      std::vector<rHandle<LorentzRep> > 
         get_all_cont_reps()
         {
           std::vector<std::string> keys;
           std::vector<std::string>::const_iterator it; 
-          std::vector<rHandle<SpherRep_p> > vals; 
+          std::vector<rHandle<LorentzRep> > vals; 
 
-          keys = ::radmat::SpherInvariantsFactoryEnv::all_keys(); 
+          keys = ::radmat::LorentzRepresentationFactoryEnv::spher_keys(); 
           for(it = keys.begin(); it != keys.end(); ++it)
           {
             printer_function<print_elem_reg>("grabbed a " + *it ); 
             vals.push_back( 
-                ::radmat::SpherInvariantsFactoryEnv::callFactory(*it) ); 
+                ::radmat::LorentzRepresentationFactoryEnv::callFactory(*it) ); 
           }
 
           return vals;
         }
 
       // reg function
-      typedef std::pair<rHandle<SpherRep_p> , rHandle<SpherRep_p> > rep_pair;
+      typedef std::pair<rHandle<LorentzRep> , rHandle<LorentzRep> > rep_pair;
 
       // build the id from the lorentz spin factory, 
       // this is a class name like J0pJ3m
-      std::string build_lorentz_spin_id(const rHandle<SpherRep_p> &lefty, 
-          const rHandle<SpherRep_p> &righty)
+      std::string build_lorentz_spin_id(const rHandle<LorentzRep> &lefty, 
+          const rHandle<LorentzRep> &righty)
       {
         std::stringstream ss; 
         ss << lefty->rep_id() << righty->rep_id();
@@ -154,8 +154,8 @@ namespace radmat
 
 
     // the factory reg id for helicity form factors -- up to the diag/tran bit
-    std::string build_id( const rHandle<SpherRep_p> &lefty, 
-        const rHandle<SpherRep_p> &righty)
+    std::string build_id( const rHandle<LorentzRep> &lefty, 
+        const rHandle<LorentzRep> &righty)
     {
       std::stringstream ss; 
       ss << lefty->rep_id()  << righty->rep_id();
@@ -176,15 +176,15 @@ namespace radmat
 
       if ( !!! registered )
       {
-        typedef std::pair<rHandle<SpherRep_p> , rHandle<SpherRep_p> > rep_pair;
+        typedef std::pair<rHandle<LorentzRep> , rHandle<LorentzRep> > rep_pair;
         typedef std::map<std::string, rep_pair > map_t; 
         typedef map_t::value_type value_type; 
 
         map_t ff_spin_keys;
         map_t::const_iterator it; 
         std::vector<std::string> ff_allowed_spin_keys; 
-        std::vector<rHandle<SpherRep_p> > cont_rep_keys; 
-        std::vector<rHandle<SpherRep_p> >::const_iterator i,j; 
+        std::vector<rHandle<LorentzRep> > cont_rep_keys; 
+        std::vector<rHandle<LorentzRep> >::const_iterator i,j; 
 
         cont_rep_keys = get_all_cont_reps();
 

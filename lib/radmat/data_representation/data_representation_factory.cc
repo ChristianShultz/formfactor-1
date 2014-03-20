@@ -6,7 +6,7 @@
 
 * Creation Date : 19-03-2014
 
-* Last Modified : Wed 19 Mar 2014 11:40:03 AM EDT
+* Last Modified : Thu 20 Mar 2014 09:16:24 AM EDT
 
 * Created By : shultz
 
@@ -41,7 +41,7 @@ namespace radmat
       bool success = true; 
       if( !!! local_registration )
       {
-        success &= SpherRepresentationFactoryEnv::registerAll(); 
+        success &= LorentzRepresentationFactoryEnv::registerAll(); 
         success &= CubicRepresentationFactoryEnv::registerAll(); 
         local_registration = true; 
       }

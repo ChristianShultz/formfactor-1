@@ -3,7 +3,6 @@
 
 #include "formfactor.h"
 #include "formfactor_helicity_formfactors.h"
-#include "formfactor_cubic_invariants.h"
 
 
 namespace radmat
@@ -17,8 +16,8 @@ namespace radmat
     typedef HelicityFormFactorRecipe_t h_rep;   
 
     SubducedFormFactorRecipe_t(const h_rep &m, 
-        const rHandle<CubicRep_p> &l, 
-        const rHandle<CubicRep_p> &r,
+        const rHandle<CubicRep> &l, 
+        const rHandle<CubicRep> &r,
         const std::string &left_table_id,
         const std::string &right_table_id)
       : hel(m) , lefty(l) , righty(r) , lt(left_table_id) , rt(right_table_id)
@@ -46,12 +45,12 @@ namespace radmat
     virtual int nFacs() const { return hel.nFacs(); }
     virtual std::string ff() const { return hel.id(); }
     std::map<int,std::string> ff_ids() const {return hel.ff_ids();}
-    virtual rHandle<FFRep_p> left_rep() const { return FormFactorRecipe_t::call(lefty->rep_id());}
-    virtual rHandle<FFRep_p> right_rep() const { return FormFactorRecipe_t::call(righty->rep_id());}
+    virtual rHandle<Rep_p> left_rep() const { return FormFactorRecipe_t::call(lefty->rep_id());}
+    virtual rHandle<Rep_p> right_rep() const { return FormFactorRecipe_t::call(righty->rep_id());}
     virtual std::string id() const { return Stringify<SubducedFormFactorRecipe_t>(); }
 
     h_rep hel; 
-    rHandle<CubicRep_p> lefty,righty ; 
+    rHandle<CubicRep> lefty,righty ; 
     std::string lt,rt; 
   }; 
 
@@ -90,52 +89,12 @@ namespace radmat
 
   }; 
 
-  // the one map 
-  struct SubduceTableMap
-  {
-    typedef std::pair<std::complex<double> , int > sub_chunk;
-    typedef std::vector<sub_chunk> sub_list; 
-
-    // hold the cont representation, the lattice representation, 
-    // and the table that subduces from cont to lat
-    //    -- build the subduction info into the table radmat uses 
-    struct irrep_sub_table
-    {
-      typedef std::vector<sub_list> sub_table; 
-      typedef rHandle<SpherRep_p> cont_rep;
-      typedef rHandle<CubicRep_p> lat_rep; 
-
-      irrep_sub_table( const sub_table &s, const cont_rep &c , const lat_rep &l)
-        : sub(s) , cont(c) , lat(l)
-      { }
-
-      sub_table sub; 
-      cont_rep cont; 
-      lat_rep lat; 
-    };
-
-    typedef std::map<std::string,irrep_sub_table*> map_t; 
-
-    ~SubduceTableMap() 
-    {
-      map_t::iterator it; 
-      for(it = mappy.begin(); it != mappy.end(); ++it)
-        delete it->second; 
-    }
-
-    map_t mappy; 
-  };
-
-
-  typedef Util::SingletonHolder< SubduceTableMap > TheSmarterSubduceTableMap; 
-
-
 
   namespace SubducedFormFactorDecompositionFactoryEnv
   {
     bool registerAll(); 
-    std::string build_id(const rHandle<CubicRep_p> &lefty,
-        const rHandle<CubicRep_p> &righty); 
+    std::string build_id(const rHandle<CubicRep> &lefty,
+        const rHandle<CubicRep> &righty); 
   }
 
 

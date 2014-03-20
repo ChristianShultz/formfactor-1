@@ -6,7 +6,7 @@
 
 * Creation Date : 17-03-2014
 
-* Last Modified : Tue 18 Mar 2014 10:29:41 AM EDT
+* Last Modified : Wed 19 Mar 2014 05:54:38 PM EDT
 
 * Created By : shultz
 
@@ -17,7 +17,7 @@ _._._._._._._._._._._._._._._._._._._._._.*/
 #include "radmat/redstar_interface/redstar_cartesian_interface.h"
 #include "radmat/redstar_interface/redstar_photon_props.h"
 #include "formfactor_subduced_formfactors.h"
-#include "formfactor_spherical_invariants.h"
+#include "radmat/data_representation/data_representation.h"
 #include "itpp/itbase.h"
 
 
@@ -88,7 +88,7 @@ namespace radmat
           const int row, 
           const ADATXML::Array<int> &q)
       {
-        if(rep == Stringify<lorentzJ1m>() )
+        if(rep == Stringify<J1m>() )
           return generate_list(std::complex<double>(1.,0.),row); 
        
         std::string key = Stringify<J1m>() + rep;  
@@ -138,7 +138,7 @@ namespace radmat
           const int row, 
           const ADATXML::Array<int> &q)
       {
-        if(rep == Stringify<lorentzJ0p>() )
+        if(rep == Stringify<J0p>() )
           return generate_list(std::complex<double>(1.,0.),row); 
 
         std::string key = Stringify<J0p>() + rep;  

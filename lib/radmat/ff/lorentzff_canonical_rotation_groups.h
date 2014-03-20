@@ -82,10 +82,10 @@ namespace radmat
       {
         std::stringstream ss; 
         mom_t lab = p;
-        if(r->id() == Stringify<Oh>())
+        if(r->rep_id() == Stringify<Oh>())
           lab = rest_specialization(); 
 
-        ss << r->id() << "_" << lab[0] << lab[1] << lab[2];
+        ss << r->rep_id() << "_" << lab[0] << lab[1] << lab[2];
         return ss.str(); 
       }
 
@@ -96,9 +96,9 @@ namespace radmat
         std::pair<mom_t,mom_t> r;
         r.first = rep.l;
         r.second = rep.r; 
-        if( rep.lefty->id() == Stringify<Oh>())
+        if( rep.lefty->rep_id() == Stringify<Oh>())
           r.first = rest_specialization();
-        if( rep.righty->id() == Stringify<Oh>())
+        if( rep.righty->rep_id() == Stringify<Oh>())
           r.second = rest_specialization();
         return r; 
       }
@@ -109,9 +109,9 @@ namespace radmat
         std::pair<mom_t,mom_t> r;
         r.first = rep.l;
         r.second = rep.r; 
-        if( rep.lefty->id() == Stringify<Oh>())
+        if( rep.lefty->rep_id() == Stringify<Oh>())
           r.first = invert_rest_specialization(rep.l);
-        if( rep.righty->id() == Stringify<Oh>())
+        if( rep.righty->rep_id() == Stringify<Oh>())
           r.second = invert_rest_specialization(rep.r); 
         return r; 
       }
@@ -128,8 +128,8 @@ namespace radmat
 
       bool same_reps(const RepPair &r, const RepPair &rr) const
       {
-        return ( (r.lefty->id() == rr.lefty->id()) 
-            && (r.righty->id() == rr.righty->id())); 
+        return ( (r.lefty->rep_id() == rr.lefty->rep_id()) 
+            && (r.righty->rep_id() == rr.righty->rep_id())); 
       }
 
       // frames in which one particle is at rest have the 

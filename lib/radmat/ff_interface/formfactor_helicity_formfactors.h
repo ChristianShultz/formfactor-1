@@ -5,9 +5,7 @@
 
 
 #include "formfactor.h"
-#include "formfactor_helicity_formfactors.h"
 #include "formfactor_factory.h"
-#include "formfactor_spherical_invariants.h"
 #include "radmat/ff/lorentzff_formfactor_abs_base_cfg.h"
 #include "radmat/utils/stringify.h"
 #include "radmat/utils/handle.h"
@@ -24,7 +22,7 @@ namespace radmat
     : public FormFactorRecipe_t
   {
     typedef rHandle<LorentzFFAbsBase_t> mat_h; 
-    typedef rHandle<SpherRep_p> rep_h; 
+    typedef rHandle<LorentzRep> rep_h; 
 
     HelicityFormFactorRecipe_t(const mat_h &f, const rep_h &l, const rep_h &r)
       : mat(f) , lefty(l) , righty(r)
@@ -50,13 +48,13 @@ namespace radmat
     virtual int nFacs() const { return mat->nFacs(); }
     virtual std::string ff() const { return mat->id(); }
     virtual std::map<int,std::string> ff_ids() const { return mat->ff_ids(); }
-    virtual rHandle<FFRep_p> left_rep() const { return FormFactorRecipe_t::call(lefty->rep_id()); }
-    virtual rHandle<FFRep_p> right_rep() const { return FormFactorRecipe_t::call(righty->rep_id()); }
+    virtual rHandle<Rep_p> left_rep() const { return FormFactorRecipe_t::call(lefty->rep_id()); }
+    virtual rHandle<Rep_p> right_rep() const { return FormFactorRecipe_t::call(righty->rep_id()); }
     virtual std::string id() const { return Stringify<HelicityFormFactorRecipe_t>(); }
     virtual std::string reg_id() const { return mat->reg_id(); } // use the same names as in lorentzff
 
     rHandle<LorentzFFAbsBase_t> mat; 
-    rHandle<SpherRep_p> lefty, righty; 
+    rHandle<LorentzRep> lefty, righty; 
   };
 
 
@@ -93,8 +91,8 @@ namespace radmat
   namespace HelicityFormFactorDecompositionFactoryEnv
   {
     bool registerAll(void) ;
-    std::string build_id( const rHandle<SpherRep_p> &lefty,
-        const rHandle<SpherRep_p> &righty ); 
+    std::string build_id( const rHandle<LorentzRep> &lefty,
+        const rHandle<LorentzRep> &righty ); 
   }
 
 

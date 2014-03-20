@@ -6,7 +6,7 @@
 
  * Creation Date : 14-03-2014
 
- * Last Modified : Mon 17 Mar 2014 03:20:45 PM EDT
+ * Last Modified : Wed 19 Mar 2014 04:33:52 PM EDT
 
  * Created By : shultz
 
@@ -186,7 +186,7 @@ namespace radmat
             //   so we can deal with it one level higher and loop over the 
             //   possible stuff (rows and irreps)
             const SubduceTableMap::irrep_sub_table* tab = it->second; 
-            if( tab->lat->rep_g() == mom_rep->id() )
+            if( tab->lat->rep_group() == mom_rep->rep_id() )
               ret.push_back(tab); 
           }
         }
@@ -225,38 +225,38 @@ namespace radmat
       do_subduction( const std::map<std::string, cont_rep> &cont )
       {
         std::map<std::string,subduce_rep> ret; 
-        std::map<std::string,cont_rep>::const_iterator it; 
-        for(it = cont.begin(); it != cont.end(); ++it)
-        {
-          // split something like J1p,p000,r1 into 3 tokens on ","
-          std::vector<std::string> tokens = tokenize(it->first,",");
-          if( tokens.size() != 3 )
-          {
-            std::cout << __PRETTY_FUNCTION__ << ": token error" << std::endl;
-            exit(1);
-          }
+ //       std::map<std::string,cont_rep>::const_iterator it; 
+ //       for(it = cont.begin(); it != cont.end(); ++it)
+ //       {
+ //         // split something like J1p,p000,r1 into 3 tokens on ","
+ //         std::vector<std::string> tokens = tokenize(it->first,",");
+ //         if( tokens.size() != 3 )
+ //         {
+ //           std::cout << __PRETTY_FUNCTION__ << ": token error" << std::endl;
+ //           exit(1);
+ //         }
 
-          std::string cont_token = tokens[0]; 
-          std::vector<const SubduceTableMap::irrep_sub_table*> sub_table; 
-          std::vector<const SubduceTableMap::irrep_sub_table*>::const_iterator subduce_it; 
-          ADATXML::Array<int> mom = it->second.mom; 
-          sub_table = possible_subductions(cont_token,mom); 
-        
-          for(subduce_it = sub_table.begin(); subduce_it != sub_table.end(); ++subduce_it)
-          {
-            rHandle<CubicRep_p> lat_rep = (*subduce_it)->lat; 
-            for(int row = 1; row <= lat_rep->dim(); ++row)
-            {
-              std::stringstream id; 
-              id << lat_rep->rep_id() << ",p" << mom[0] << mom[1] << mom[2] << ",r" << row;
-              std::string tag = id.str(); 
-              ret[tag] = subduce_rep(cont_token,lat_rep->rep_id(),mom,row); 
-              printer_function<subduce_print_1>(tag); 
-            }
+ //         std::string cont_token = tokens[0]; 
+ //         std::vector<const SubduceTableMap::irrep_sub_table*> sub_table; 
+ //         std::vector<const SubduceTableMap::irrep_sub_table*>::const_iterator subduce_it; 
+ //         ADATXML::Array<int> mom = it->second.mom; 
+ //         sub_table = possible_subductions(cont_token,mom); 
+ //       
+ //         for(subduce_it = sub_table.begin(); subduce_it != sub_table.end(); ++subduce_it)
+ //         {
+ //           rHandle<CubicRep_p> lat_rep = (*subduce_it)->lat; 
+ //           for(int row = 1; row <= lat_rep->dim(); ++row)
+ //           {
+ //             std::stringstream id; 
+ //             id << lat_rep->rep_id() << ",p" << mom[0] << mom[1] << mom[2] << ",r" << row;
+ //             std::string tag = id.str(); 
+ //             ret[tag] = subduce_rep(cont_token,lat_rep->rep_id(),mom,row); 
+ //             printer_function<subduce_print_1>(tag); 
+ //           }
 
-          } // close subduce loop 
+ //         } // close subduce loop 
 
-        } // close cont map loop 
+ //       } // close cont map loop 
 
         return ret; 
       }

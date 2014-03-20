@@ -6,7 +6,7 @@
 
  * Creation Date : 10-12-2013
 
- * Last Modified : Wed 19 Mar 2014 12:04:40 PM EDT
+ * Last Modified : Wed 19 Mar 2014 06:31:32 PM EDT
 
  * Created By : shultz
 
@@ -14,6 +14,7 @@
 
 
 #include "radmat/data_representation/data_representation_factory.h"
+#include "radmat/data_representation/data_representation_subduction_map.h"
 #include "radmat/ff/lorentzff_canonical_rotations.h"
 #include "radmat/ff/lorentzff_Wigner_D_matrix_factory.h"
 #include "radmat/ff/lorentzff_formfactor_factory.h"
@@ -53,6 +54,8 @@ namespace radmat
           success &= radmat::LorentzffFormFactorDecompositionFactoryEnv::registerAll(); 
           // build  reps 
           success &= radmat::DataRepresentationFactoryEnv::registerAll(); 
+          // register all subduction tables
+          success &= radmat::TheSmarterSubduceTableMapFactoryEnv::registerAll();
           // build radmat's internal decompositions
           success &= radmat::FormFactorDecompositionFactoryEnv::registerAll(); 
           // build llsq solution classes

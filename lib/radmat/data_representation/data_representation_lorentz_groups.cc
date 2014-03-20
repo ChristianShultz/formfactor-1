@@ -6,13 +6,14 @@
 
 * Creation Date : 19-03-2014
 
-* Last Modified : Wed 19 Mar 2014 12:02:32 PM EDT
+* Last Modified : Thu 20 Mar 2014 09:22:45 AM EDT
 
 * Created By : shultz
 
 _._._._._._._._._._._._._._._._._._._._._.*/
 
-#include "data_representation_lorrentz_groups.h"
+#include "data_representation_factory.h"
+#include "data_representation_lorentz_groups.h"
 #include "radmat/utils/pow2assert.h"
 #include "radmat/utils/printer.h"
 
@@ -23,7 +24,7 @@ typedef radmat::TheDataRepresentationFactory Factory;
 namespace radmat
 {
 
-  namespace SpherRepresentationFactoryEnv
+  namespace LorentzRepresentationFactoryEnv
   {
     
 
@@ -33,8 +34,7 @@ namespace radmat
       struct reg_printer
       {
         static void print(const std::string &msg)
-        {}
-        //        { std::cout << "spher rep, regged " << msg << std::endl; }
+        { std::cout << "spher rep, regged " << msg << std::endl; }
       };
 
       struct key_printer
@@ -104,9 +104,9 @@ namespace radmat
 
     // make it blow up if anything goes wrong by wrapping another 
     // call around the factory.createObj method
-    rHandle<SpherRep> callFactory(const std::string &id)
+    rHandle<LorentzRep> callFactory(const std::string &id)
     {
-      FFRep_p *foo;
+      Rep_p *foo;
       foo = NULL;
       try
       {
@@ -134,10 +134,10 @@ namespace radmat
       // not a null pointer
       POW2_ASSERT(foo);
       POW2_ASSERT( foo->rep_type() == ::radmat::Stringify<LorentzRep_t>() ); 
-      return rHandle<SpherRep>( dynamic_cast<SpherRep*>(foo) );
+      return rHandle<LorentzRep>( dynamic_cast<LorentzRep*>(foo) );
     }
 
-    // dump all SpherRep_p keys in the factory
+    // dump all LorentzRep_p keys in the factory
     std::vector<std::string> 
       spher_keys(void)
       {
@@ -148,7 +148,7 @@ namespace radmat
         for(it = all_keys.begin(); it != all_keys.end(); ++it )
         {
           printer_function<key_printer>(*it);
-          rHandle<FFRep_p> r = DataRepresentationFactoryEnv::callFactory(*it); 
+          rHandle<Rep_p> r = DataRepresentationFactoryEnv::callFactory(*it); 
           if( r->rep_type() == ::radmat::Stringify<LorentzRep_t>() )
             sph_keys.push_back(*it); 
         }
@@ -158,7 +158,7 @@ namespace radmat
 
 
 
-  } // SpherRepresentationFactoryEnv
+  } // LorentzRepresentationFactoryEnv
 
 } // radmat
 

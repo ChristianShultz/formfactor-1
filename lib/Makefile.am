@@ -24,6 +24,7 @@ nobase_include_HEADERS =   \
 													 radmat/data_representation/data_representation.h    \
 													 radmat/data_representation/data_representation_lorentz_groups.h    \
 													 radmat/data_representation/data_representation_primitive_rep.h    \
+													 radmat/data_representation/data_representation_subduction_map.h    \
 													 radmat/data_representation/make_head.csh    \
 													 radmat/driver/driver.h    \
 													 radmat/driver/make_head.csh    \
@@ -67,7 +68,9 @@ nobase_include_HEADERS =   \
 													 radmat/ff/lorentzff_Wigner_D_matrix_factory.h    \
 													 radmat/ff/lorentzff_Wigner_D_matrix_manager.h    \
 													 radmat/ff/make_head.csh    \
+													 radmat/fitting/fitting.h    \
 													 radmat/fitting/fit_tins.h    \
+													 radmat/fitting/make_head.csh    \
 													 radmat/llsq/llsq_chisq.h    \
 													 radmat/llsq/llsq_formfactor_data.h    \
 													 radmat/llsq/llsq_gen_system.h    \
@@ -136,6 +139,7 @@ libradmat_a_SOURCES =	\
 											radmat/data_representation/data_representation_cubic_groups.cc    \
 											radmat/data_representation/data_representation_factory.cc    \
 											radmat/data_representation/data_representation_lorentz_groups.cc    \
+											radmat/data_representation/data_representation_subduction_map.cc    \
 											radmat/driver/radmat_driver_aux.cc    \
 											radmat/driver/radmat_driver.cc    \
 											radmat/driver/radmat_driver_props.cc    \

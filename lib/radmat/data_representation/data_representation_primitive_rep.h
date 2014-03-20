@@ -23,7 +23,7 @@ namespace radmat
     struct Rep_t
     : public Rep_p
     {
-      virtual ~Rep() {}
+      virtual ~Rep_t() {}
       virtual std::string rep_type(void) const { return Stringify<T>();}; 
     };
 
@@ -38,14 +38,14 @@ namespace radmat
   struct CubicRep_p 
   : public Rep_t<CubicRep_t> 
   {
-    virtual ~CubicRep_p {}
+    virtual ~CubicRep_p() {}
     virtual std::string rep_id() const = 0; 
   };
 
   struct LorentzRep_p 
   : public Rep_t<LorentzRep_t> 
   {
-    virtual ~LorentzRep_p{}
+    virtual ~LorentzRep_p() {}
     virtual std::string rep_id() const = 0; 
   }; 
 
