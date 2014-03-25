@@ -2,7 +2,7 @@
 #define LLSQ_SOLUTION_H 
 
 #include "semble/semble_meta.h"
-#include "radmat/construct_data/lattice_multi_data_tag.h"
+#include "radmat/data_representation/data_representation.h"
 #include "io/adat_xmlio.h"
 
 
@@ -15,17 +15,17 @@ namespace radmat
       FormFacSolutions() {}
 
       FormFacSolutions(const SEMBLE::SembleMatrix<T> &ff, 
-          const std::vector<LatticeMultiDataTag> &i)
+          const std::vector<ThreePointDataTag> &i)
         : FF_t(ff) , Ingredients(i) 
       { }
 
-      void append_ingredients(const LatticeMultiDataTag &t)
+      void append_ingredients(const ThreePointDataTag &t)
       {
         Ingredients.push_back(t); 
       }
 
       SEMBLE::SembleMatrix<T> FF_t; 
-      std::vector<LatticeMultiDataTag> Ingredients; 
+      std::vector<ThreePointDataTag> Ingredients; 
     }; 
 
   template<typename T> 

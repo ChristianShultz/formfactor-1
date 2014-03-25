@@ -7,4 +7,5 @@
 #include "data_representation_primitive_rep.h"
 #include "data_representation_subduction_map.h"
 #include "data_representation_three_point.h"
+#include "data_tag_three_point.h"
 #endif

@@ -6,7 +6,7 @@
 
  * Creation Date : 22-02-2013
 
- * Last Modified : Tue 18 Mar 2014 11:33:06 AM EDT
+ * Last Modified : Mon 24 Mar 2014 03:44:02 PM EDT
 
  * Created By : shultz
 
@@ -74,7 +74,7 @@ namespace radmat
 
 
     FFKinematicInvariants 
-      makeMomInvariants(const LatticeMultiDataTag &t)
+      makeMomInvariants(const ThreePointDataTag &t)
     {
 #ifdef DEBUG_AT_MAKE_MOM_INV_TAGS 
 
@@ -85,17 +85,21 @@ namespace radmat
 #endif
 
       return FFKinematicInvariants(
-            FFSingleKinematicInvariants(t.E_f, t.p_f, t.hf, t.mom_fac ) ,
-            FFSingleKinematicInvariants(t.E_i, t.p_i, t.hi, t.mom_fac ) ,
+            FFSingleKinematicInvariants(t.left_E, t.left_mom, 
+              t.left_row, t.mom_fac ) ,
+            FFSingleKinematicInvariants(t.right_E, t.right_mom, 
+              t.right_row, t.mom_fac ) ,
             t.mom_fac
           );
     }
 
 
-    std::string sort_string(const LatticeMultiDataTag &t)
+    std::string sort_string(const ThreePointDataTag &t)
     {
       std::stringstream ss; 
-      ss << t.p_f[0] <<  t.p_f[1] <<  t.p_f[2] <<  t.p_i[0] <<  t.p_i[1] <<  t.p_i[2] << t.jmu; 
+      ss << t.left_mom[0] << t.left_mom[1] << t.left_mom[2] 
+        << t.right_mom[1] << t.right_mom[1] << t.right_mom[2] 
+        << t.gamma_row; 
       return ss.str(); 
     }
 
@@ -141,7 +145,7 @@ namespace radmat
         }
       }
 
-    void my_writer_cont_expr(const std::string &fname, const std::vector<LatticeMultiDataTag> &tt)
+    void my_writer_cont_expr(const std::string &fname, const std::vector<ThreePointDataTag> &tt)
     {
       std::ofstream out(fname.c_str());
       for(unsigned int idx = 0; idx < tt.size(); ++idx)
@@ -190,7 +194,7 @@ namespace radmat
     {
       const int Lt = thigh - tlow; 
       SEMBLE::SembleMatrix<std::complex<double> > data = lattice_data->data();
-      std::vector<LatticeMultiDataTag> tags = lattice_data->tags(); 
+      std::vector<ThreePointDataTag> tags = lattice_data->tags(); 
       SEMBLE::SembleVector<std::complex<double> > thy = K * FF; 
       const int sz = tags.size(); 
       std::stringstream ss;
@@ -280,7 +284,7 @@ namespace radmat
   void LLSQMultiDriver_t::sort_data(void)
   {
     rHandle<LLSQLatticeMultiData> sorted_data(new LLSQLatticeMultiData); 
-    std::vector<LatticeMultiDataTag> tags = lattice_data->tags(); 
+    std::vector<ThreePointDataTag> tags = lattice_data->tags(); 
     std::map<std::string,std::vector<int> > elems;
     std::map<std::string,std::vector<int> >::iterator it; 
 
@@ -320,7 +324,7 @@ namespace radmat
 
     rHandle<LLSQLatticeMultiData> non_zero_data(new LLSQLatticeMultiData);
     rHandle<LLSQLatticeMultiData> check_singular( new LLSQLatticeMultiData); 
-    std::vector<LatticeMultiDataTag> old_tags;
+    std::vector<ThreePointDataTag> old_tags;
     SEMBLE::SembleVector<std::complex<double> > Junk,Zero; 
     old_tags = lattice_data->tags(); 
 
@@ -636,8 +640,8 @@ namespace radmat
   void LLSQMultiDriver_t::generate_kinematic_factors(void)
   {
     check_exit_lat(); 
-    std::vector<LatticeMultiDataTag> tags = lattice_data->tags(); 
-    std::vector<LatticeMultiDataTag>::const_iterator it; 
+    std::vector<ThreePointDataTag> tags = lattice_data->tags(); 
+    std::vector<ThreePointDataTag>::const_iterator it; 
   
     FFKinematicFactors_t KK( FormFactorDecompositionFactoryEnv::callFactory(it->mat_elem_id)); 
 

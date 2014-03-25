@@ -6,7 +6,7 @@
 
  * Creation Date : 04-12-2012
 
- * Last Modified : Fri 14 Mar 2014 04:16:21 PM EDT
+ * Last Modified : Mon 24 Mar 2014 12:40:49 PM EDT
 
  * Created By : shultz
 
@@ -16,8 +16,8 @@
 
 #include "construct_correlators.h"
 #include "construct_correlators_utils.h"
-#include "construct_correlators_subduce_utils.h"
 #include "construct_correlators_bad_data_repository.h"
+#include "radmat/utils/printer.h"
 #include "adat/adat_stopwatch.h"
 #include "adat/map_obj.h"
 #include <string>
@@ -137,80 +137,44 @@ namespace radmat
         return ret; 
       }
 
+// template xml handler 
+    template<typename T> 
+      std::vector<ThreePointData>
+      pull_data_xml_function( const ThreePointCorrIni_t &, 
+          const rHandle<AbsRedstarXMLInterface_t> &)
+      { __builtin_trap(); return std::vector<ThreePointData>(); }
 
-
-    ///////////////////////////////////////////////////////
-    ///////////////////////////////////////////////////////
-    // the brain 
-    std::vector<rHandle<LLSQLatticeMultiData> >
-      do_work(const ThreePointCorrIni_t &ini)
+    // handle a lorentz type 
+    template<>
+      std::vector<ThreePointData>
+      pull_data_xml_function<RedstarThreePointXMLLorentzHandler>( const ThreePointCorrIni_t &, 
+          const rHandle<AbsRedstarXMLInterface_t> &handle)
       {
-
-#ifdef TIME_CONSTRUCT_ALL_CORRS
-        Util::StopWatch snoop;
-        snoop.start(); 
-#endif
-
-        double p_factor = mom_factor(ini.xi,ini.L_s); 
-        std::string elem_id = ini.matElemID; 
-        const radmatDBProp_t *db_prop = &ini.radmatDBProp; 
-        const ThreePointCorrXMLIni_t *three_pt = &ini.threePointCorrXMLIni; 
-
-        std::vector<TaggedEnsemRedstarNPtBlock> unsorted_elems; 
-        unsorted_elems = tag_lattice_xml(
-            &(three_pt->redstar), 
-            p_factor, 
-            three_pt->maSink, 
-            three_pt->maSource, 
-            elem_id); 
-
-        std::map<double,std::vector<TaggedEnsemRedstarNPtBlock> > sorted_elems;
-        std::map<double,std::vector<TaggedEnsemRedstarNPtBlock> >::const_iterator it;
-        sorted_elems = sort_tagged_corrs_by_Q2(unsorted_elems); 
-
-        std::vector<std::pair<double,std::vector<TaggedEnsemRedstarNPtBlock> > > loop_data; 
-
-        for(it = sorted_elems.begin(); it != sorted_elems.end(); ++it)
-          loop_data.push_back(std::pair<double,std::vector<TaggedEnsemRedstarNPtBlock> >(it->first,it->second)); 
-
-
-        std::vector<triplet<bool, rHandle<LLSQLatticeMultiData>, double > > lattice_data; 
-        DatabaseInterface_t db(*db_prop) ; 
-
-        lattice_data = build_llsq_corrs(loop_data,three_pt->sink_id, three_pt->source_id, 
-            three_pt->renormalization, db); 
-
-        // stop and dump anything that we may be missing 
-        ::radmat::BAD_DATA_REPO::dump_bad_data();
-
-        std::vector<rHandle<LLSQLatticeMultiData> > ret; 
-        std::vector<triplet<bool,rHandle<LLSQLatticeMultiData>,double > >::const_iterator dcheck; 
-
-        for(dcheck = lattice_data.begin(); dcheck != lattice_data.end(); ++dcheck) 
-        {
-          // this is a have some data flag
-          if( !!! dcheck->first )
-          {
-            std::cout << __func__ << ": dropping Q2 = " << dcheck->third 
-              << " because it has 0 elems" << std::endl;  
-            continue;    
-          }
-          ret.push_back(dcheck->second); 
-        }
-
-
-
-#ifdef TIME_CONSTRUCT_ALL_CORRS
-        snoop.stop(); 
-        std::cout << " ** time to build all correlators " << snoop.getTimeInSeconds() << " seconds" << std::endl;
-        std::cout << " ** returning " << ret.size() << " possible Q2 points " << std::endl; 
-#endif
-        return ret;  
+        const RedstarThreePointXMLLorentzHandler *red; 
+        red = dynamic_cast<const RedstarThreePointXMLLorentzHandler*>(handle.get_ptr()); 
+        return red->handle_work(); 
       }
 
+
+    //////////////////////////////////////////////////////
+    // pull data out of the xml class
+    std::vector<ThreePointData> pull_data_xml(const ThreePointCorrIni_t &ini)
+    {
+      rHandle<AbsRedstarXMLInterface_t> red = ini.threePointCorrXMLIni.redstar; 
+
+      if( red->type() == Stringify<RedstarThreePointXMLLorentzHandler>() )
+        return pull_data_xml_function<RedstarThreePointXMLLorentzHandler>( ini, red ); 
+      else
+        printer_function<console_print>(" unknown type " + red->type() ); 
+
+      exit(1); 
+    }
+  
+
+
     ///////////////////////////////////////////////////////
     ///////////////////////////////////////////////////////
-    // the (other) brain 
+    // the  brain 
     std::vector<rHandle<LLSQLatticeMultiData> >
       do_work_rotation_groups(const ThreePointCorrIni_t &ini)
       {
@@ -226,8 +190,10 @@ namespace radmat
         const ThreePointCorrXMLIni_t *three_pt = &ini.threePointCorrXMLIni; 
 
         std::vector<TaggedEnsemRedstarNPtBlock> unsorted_elems; 
+
+        std::vector<ThreePointData> raw_data = pull_data_xml(ini); 
         unsorted_elems = tag_lattice_xml(
-            &(three_pt->redstar), 
+            raw_data,
             p_factor, 
             three_pt->maSink, 
             three_pt->maSource, 
@@ -275,92 +241,6 @@ namespace radmat
         return ret;  
       }
 
-    ///////////////////////////////////////////////////////
-    ///////////////////////////////////////////////////////
-    // (another) brain 
-    std::vector<rHandle<LLSQLatticeMultiData> >
-      do_work_rotation_groups_subduce(const ThreePointCorrIni_t &ini)
-      {
-
-#ifdef TIME_CONSTRUCT_ALL_CORRS
-        Util::StopWatch snoop;
-        snoop.start(); 
-#endif
-
-        // return variable 
-        std::vector<rHandle<LLSQLatticeMultiData> > ret; 
-
-        double p_factor = mom_factor(ini.xi,ini.L_s); 
-        std::string elem_id = ini.matElemID; 
-        const radmatDBProp_t *db_prop = &ini.radmatDBProp; 
-        const ThreePointCorrXMLIni_t *three_pt = &ini.threePointCorrXMLIni; 
-
-        std::vector<TaggedEnsemRedstarNPtBlock> unsorted_elems; 
-        unsorted_elems = tag_lattice_xml(
-            &(three_pt->redstar), 
-            p_factor, 
-            three_pt->maSink, 
-            three_pt->maSource, 
-            elem_id); 
-
-        // move from the O(3) + 1 symmetry versions to the cubic version 
-        std::vector<TaggedEnsemRedstarNPtBlock> cubic_variants;
-        cubic_variants = retag_subduced_lattice_xml( unsorted_elems ); 
-
-        std::cout << __PRETTY_FUNCTION__ << "::::" << unsorted_elems.size() << std::endl;
-
-//
-//        std::map<std::string,std::vector<TaggedEnsemRedstarNPtBlock> > sorted_elems;
-//        std::map<std::string,std::vector<TaggedEnsemRedstarNPtBlock> >::const_iterator it;
-//        sorted_elems = sort_tagged_corrs_by_Q2_and_rotation_group(unsorted_elems); 
-//
-//        std::vector<std::pair<std::string,std::vector<TaggedEnsemRedstarNPtBlock> > > loop_data; 
-//
-//        for(it = sorted_elems.begin(); it != sorted_elems.end(); ++it)
-//          loop_data.push_back(std::pair<std::string,std::vector<TaggedEnsemRedstarNPtBlock> >(it->first,it->second)); 
-//
-//
-//        std::vector<triplet<bool, rHandle<LLSQLatticeMultiData>, std::string > > lattice_data; 
-//        DatabaseInterface_t db(*db_prop) ; 
-//
-//        lattice_data = build_llsq_corrs(loop_data,three_pt->sink_id, three_pt->source_id, 
-//            three_pt->renormalization, db); 
-//
-//        // stop and dump anything that we may be missing 
-//        ::radmat::BAD_DATA_REPO::dump_bad_data();
-//
-//        std::vector<triplet<bool,rHandle<LLSQLatticeMultiData>,std::string > >::const_iterator dcheck; 
-//
-//        for(dcheck = lattice_data.begin(); dcheck != lattice_data.end(); ++dcheck) 
-//        {
-//          // this is a have some data flag
-//          if( !!! dcheck->first )
-//          {
-//            std::cout << __func__ << ": dropping Q2 = " << dcheck->third 
-//              << " because it has 0 elems" << std::endl;  
-//            continue;    
-//          }
-//          ret.push_back(dcheck->second); 
-//        }
-
-#ifdef TIME_CONSTRUCT_ALL_CORRS
-        snoop.stop(); 
-        std::cout << " ** time to build all correlators " << snoop.getTimeInSeconds() << " seconds" << std::endl;
-        std::cout << " ** returning " << ret.size() << " possible Q2 points " << std::endl; 
-#endif
-        return ret;  
-
-      }
-
-    ///////////////////////////////////////////////////////
-    ///////////////////////////////////////////////////////
-    // (another) brain 
-    std::vector<rHandle<LLSQLatticeMultiData> >
-      do_work_rotation_groups_cubic(const ThreePointCorrIni_t &ini)
-      {
-        std::cout << __PRETTY_FUNCTION__ << " is a stub " << std::endl;
-        __builtin_trap(); 
-      }
 
   } // anonomyous 
 
@@ -368,69 +248,13 @@ namespace radmat
   ///////////////////////////////////////////////////////
   ///////////////////////////////////////////////////////
 
-  namespace
-  {
-    void print_timeslice_info(const rHandle<AbsRedstarMergeNPt> &r)
-    {
-      ADATXML::Array<int>  tslice = r->timeslice_info(); 
-      for(int i = 0; i < tslice.size(); ++i)
-        std::cout << "npt[" << i << "] lives on timeslice " 
-          << tslice[i] << std::endl;  
-    }
-
-    void print_npoint_xml_info(const NPointXML & npt)
-    {
-      std::cout << "NPointXML" << std::endl; 
-      std::cout << "version  -> " << npt.version << std::endl; 
-      std::cout << "N        -> " << npt.N << std::endl; 
-      std::cout << "ensemble -> " << npt.ensemble << std::endl; 
-      for(int i =0; i < npt.npoint.size(); ++i)
-        std::cout << npt.npoint[i].object_name << ":\n"
-          << npt.npoint[i].param->write() << std::endl; 
-    }
-
-    void print_merge_npt_data_info(const AbsRedstarMergeNPtData_t & data)
-    {
-      std::cout << "AbsRedstarMergeNPtData_t " << std::endl; 
-      std::cout << "N_EnsemRedstarNPtBlocks = " << data.npoint.size() << std::endl; 
-    }
-  }
-
-  ///////////////////////////////////////////////////////
-  // print some of the xml info for debuggin 
-  void
-    ConstructCorrelators::print_redstar(const AbstractMergeNamedObject &r)
-    {
-      rHandle<AbsRedstarMergeNPt> rr = r.param; 
-      std::cout << __func__ << ": type -> " << rr->type() << std::endl; 
-      print_npoint_xml_info(rr->nptXML());
-      print_timeslice_info(rr); 
-      print_merge_npt_data_info(rr->data()); 
-    }
 
   ///////////////////////////////////////////////////////
   // construct lots of correlators
   std::vector<rHandle<LLSQLatticeMultiData> >
     ConstructCorrelators::construct_multi_correlators(void) const
     {
-      typedef std::vector<rHandle<LLSQLatticeMultiData> > (*ptr)( const ThreePointCorrIni_t & ); 
-      std::map<std::string,ptr> options_map; 
-      options_map.insert(std::make_pair("lorentz",&do_work_rotation_groups));
-      options_map.insert(std::make_pair("subduce",&do_work_rotation_groups_subduce));
-      options_map.insert(std::make_pair("cubic",&do_work_rotation_groups_cubic));
-      
-      std::map<std::string,ptr>::const_iterator it; 
-      it = options_map.find( m_ini.matElemMode ); 
-      if( it == options_map.end() )
-      {
-        std::cout << "error: unsupported mode " << m_ini.matElemMode << std::endl;
-        std::cout << "try one of the following " << std::endl;
-        for(it = options_map.begin(); it != options_map.end(); ++it)
-          std::cout << it->first << std::endl;
-      }
-
-      ptr foo = options_map[m_ini.matElemMode];
-      return foo(m_ini); 
+      return do_work_rotation_groups(m_ini); 
     }
 
 
@@ -450,8 +274,9 @@ namespace radmat
       const ThreePointCorrXMLIni_t *three_pt = &m_ini.threePointCorrXMLIni; 
 
       std::vector<TaggedEnsemRedstarNPtBlock> unsorted_elems; 
+      std::vector<ThreePointData> raw_data = pull_data_xml(m_ini); 
       unsorted_elems = tag_lattice_xml(
-          &(three_pt->redstar),
+          raw_data,
           p_factor, 
           three_pt->maSink, 
           three_pt->maSource, 

@@ -22,7 +22,6 @@
 #include "lorentzff_polarization_embedding.h"
 #include "lorentzff_polarization_embedding_old.h"
 #include "lorentzff_polarization_tensors.h"
-#include "lorentzff_RhoPi.h"
 #include "lorentzff_Wigner_D_matrix_embedding.h"
 #include "lorentzff_Wigner_D_matrix_factory.h"
 #include "lorentzff_Wigner_D_matrix_manager.h"

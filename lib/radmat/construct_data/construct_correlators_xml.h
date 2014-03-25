@@ -5,7 +5,7 @@
 
 #include "radmat_database_interface.h"
 #include "hadron/hadron_npart_npt_corr.h"
-#include "radmat/redstar_interface/redstar_merge_function_xml.h"
+#include "radmat/redstar_interface/redstar_interface.h"
 #include "io/adat_xmlio.h"
 #include <string>
 #include <iostream>
@@ -25,7 +25,7 @@ namespace radmat
     };
 
 
-    AbstractMergeNamedObject redstar; 
+    rHandle<RedstarThreePointXML> redstar; 
     std::string source_id; 
     std::string sink_id; 
     double maSource;

@@ -6,7 +6,7 @@
 
 * Creation Date : 12-11-2013
 
-* Last Modified : Sun 23 Feb 2014 10:38:05 AM EST
+* Last Modified : Thu 20 Mar 2014 11:25:38 AM EDT
 
 * Created By : shultz
 
@@ -66,8 +66,7 @@ namespace radmat
       if ( !!! local_registration ) 
       {
         success &= do_reg<RedstarSingleParticleMesonXML>();
-        success &= do_reg<RedstarUnimprovedVectorCurrentXML>(); 
-        success &= do_reg<RedstarImprovedVectorCurrentXML>(); 
+        success &= do_reg<RedstarVectorCurrentXML>(); 
         local_registration = true; 
       }
 

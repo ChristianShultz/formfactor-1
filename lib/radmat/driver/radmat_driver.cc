@@ -6,7 +6,7 @@
 
  * Creation Date : 25-02-2013
 
- * Last Modified : Fri 21 Feb 2014 09:54:35 AM EST
+ * Last Modified : Mon 24 Mar 2014 02:57:16 PM EDT
 
  * Created By : shultz
 
@@ -559,7 +559,7 @@ namespace radmat
     my_stopwatch.start(); 
 
     ADATXML::Array<int> timeslice_info;
-    timeslice_info = m_ini.threePointIni.threePointCorrXMLIni.redstar.param->timeslice_info(); 
+    timeslice_info = m_ini.threePointIni.threePointCorrXMLIni.redstar->timeslice_info(); 
     POW2_ASSERT(timeslice_info.size() == 3); 
     int tsrc,tsnk;
 

@@ -41,5 +41,6 @@ namespace radmat
       }
 
     };
+
 }
 #endif /* ABSTRACT_NAMED_OBJECT_H */

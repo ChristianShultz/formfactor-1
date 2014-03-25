@@ -6,7 +6,7 @@
 
  * Creation Date : 25-02-2013
 
- * Last Modified : Sun 23 Feb 2014 03:30:46 PM EST
+ * Last Modified : Mon 24 Mar 2014 03:26:19 PM EDT
 
  * Created By : shultz
 
@@ -326,8 +326,8 @@ namespace radmat
   {
     check_exit_linear_system(); 
     double qq = SEMBLE::toScalar(ENSEM::mean(Q2())); 
-    std::vector<LatticeMultiDataTag> tt = linear_system.peek_tags(); 
-    std::vector<LatticeMultiDataTag>::const_iterator it;
+    std::vector<ThreePointDataTag> tt = linear_system.peek_tags(); 
+    std::vector<ThreePointDataTag>::const_iterator it;
     std::stringstream ss;
 
     for(it = tt.begin(); it != tt.end(); ++it)
@@ -339,16 +339,16 @@ namespace radmat
   std::string RadmatSingleQ2Driver::rotation_group_label(void) const
   {
     // check_exit_linear_system(); 
-    std::vector<LatticeMultiDataTag> tt = linear_system.peek_tags(); 
-    std::vector<LatticeMultiDataTag>::const_iterator it;
+    std::vector<ThreePointDataTag> tt = linear_system.peek_tags(); 
+    std::vector<ThreePointDataTag>::const_iterator it;
   
     if( tt.empty() )
       return std::string(); 
 
     it = tt.begin(); 
-    std::string chk = radmat::LatticeRotationEnv::rotation_group_label(it->p_f,it->p_i); 
+    std::string chk = radmat::LatticeRotationEnv::rotation_group_label(it->left_mom,it->right_mom); 
     for(it = tt.begin(); it != tt.end(); ++it)
-      if( chk != radmat::LatticeRotationEnv::rotation_group_label(it->p_f,it->p_i) )
+      if( chk != radmat::LatticeRotationEnv::rotation_group_label(it->left_mom,it->right_mom) )
       {
         std::cout << __func__ << ": returning empty string since more "
           << " than one rotation group is present, unless one of the "

@@ -61,7 +61,7 @@ namespace radmat
     SEMBLE::SembleMatrix<T> peek_data(void) const 
     {check_exit_lat(); return lattice_data->data();}
 
-    std::vector<LatticeMultiDataTag> peek_tags(void) const 
+    std::vector<ThreePointDataTag> peek_tags(void) const 
     {check_exit_lat(); return lattice_data->tags();}
 
     ENSEM::EnsemReal Q2(void) const 

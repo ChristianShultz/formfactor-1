@@ -7,7 +7,7 @@
 #include "adat/singleton.h"
 #include "radmat/utils/handle.h"
 #include "io/adat_xmlio.h"
-#include "redstar_abstract_block_base.h"
+#include "redstar_abstract_xml_interface.h"
 #include <string>
 
 namespace radmat

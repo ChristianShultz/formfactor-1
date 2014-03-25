@@ -6,7 +6,7 @@
 
  * Creation Date : 13-11-2013
 
- * Last Modified : Fri 21 Feb 2014 09:58:07 AM EST
+ * Last Modified : Mon 24 Mar 2014 01:36:06 PM EDT
 
  * Created By : shultz
 
@@ -15,6 +15,7 @@
 
 #include "construct_correlators_utils.h"
 #include "construct_correlators_bad_data_repository.h"
+#include "radmat/data_representation/data_representation.h"
 #include "semble/semble_meta.h"
 #include "semble/semble_file_management.h"
 #include "adat/adat_stopwatch.h"
@@ -76,7 +77,7 @@ namespace radmat
 
         TaggedEnsemRedstarNPtBlock ret; 
 
-        ret.continuum_tag = b.continuum_tag; 
+        ret.data_tag = b.data_tag; 
 
         EnsemRedstarNPtBlock block = b.coeff_lattice_xml; 
         EnsemRedstarNPtBlock::const_iterator it; 
@@ -124,7 +125,7 @@ namespace radmat
         SEMBLE::SEMBLEIO::makeDirectoryPath(path.str()); 
         path << "/continuum_corr_ingredients";
         SEMBLE::SEMBLEIO::makeDirectoryPath(path.str());
-        path << "/" << ret.continuum_tag.file_id;
+        path << "/" << ret.data_tag.file_id;
 
         std::ofstream out(path.str().c_str()); 
         out << coeff_obj_list.str();
@@ -207,12 +208,12 @@ namespace radmat
             double Z = Z_V.RGE_prop;  
             ENSEM::Complex Z_c; 
 
-            if ( block->continuum_tag.mu() == 4 ) 
+            std::string g_rep = block->data_tag.origin_rep.g; 
+            if ( g_rep == Stringify<J0p>() ) 
             {
               Z_c = SEMBLE::toScalar(std::complex<double>(Z*Z_V.Z_t)); 
             }
-            else if ( (block->continuum_tag.mu() > 0)
-                && (block->continuum_tag.mu() < 4) )
+            else if ( g_rep == Stringify<J1m>() )
             {
               Z_c = SEMBLE::toScalar(std::complex<double>(Z*Z_V.Z_s)); 
             }
@@ -220,7 +221,7 @@ namespace radmat
             {
               std::cerr << __PRETTY_FUNCTION__ 
                 << ": Error, I don't know what lorentz index " 
-                << block->continuum_tag.mu() << " means " 
+                << g_rep << " means " 
                 << std::endl; 
               exit(1);  
             }
@@ -486,9 +487,9 @@ namespace radmat
         }
 
         // thingy 
-        LatticeMultiDataTag tag = block.continuum_tag;
-        tag.E_f = E_snk; 
-        tag.E_i = E_src; 
+        ThreePointDataTag tag = block.data_tag;
+        tag.left_E = E_snk; 
+        tag.right_E = E_src; 
 
         any_data |= success; 
 
@@ -633,9 +634,9 @@ namespace radmat
         }
 
         // thingy 
-        LatticeMultiDataTag tag = block.continuum_tag;
-        tag.E_f = E_snk; 
-        tag.E_i = E_src; 
+        ThreePointDataTag tag = block.data_tag;
+        tag.left_E = E_snk; 
+        tag.right_E = E_src; 
 
         any_data |= success; 
 

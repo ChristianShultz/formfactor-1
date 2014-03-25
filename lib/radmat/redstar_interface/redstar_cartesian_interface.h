@@ -3,7 +3,7 @@
 
 
 #include "itpp/itbase.h"
-#include "redstar_abstract_block_base.h"
+#include "redstar_particle_handler_utils.h"
 
 
 namespace radmat

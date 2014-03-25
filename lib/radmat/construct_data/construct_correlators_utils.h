@@ -3,7 +3,7 @@
 
 
 #include "construct_correlators_xml.h"
-#include "lattice_multi_data_tag_redstar_interface.h"
+#include "data_tag_redstar_interface.h"
 #include "lattice_multi_data_object.h"
 #include "hadron/hadron_npart_npt_corr.h"
 #include "radmat_database_interface.h"
@@ -52,14 +52,14 @@ namespace radmat
   struct ConstructCorrsMatrixElement
   {
     ConstructCorrsMatrixElement(const ENSEM::EnsemVectorComplex &d, 
-        const LatticeMultiDataTag &t,
+        const ThreePointDataTag &t,
         const bool s
         )
       : data(d) , tag(t) , success(s)
     {  }
 
     ENSEM::EnsemVectorComplex data; 
-    LatticeMultiDataTag tag; 
+    ThreePointDataTag tag; 
     bool success; 
   };
 

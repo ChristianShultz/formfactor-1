@@ -11,9 +11,9 @@ namespace radmat
     struct radMap
     {
       typedef std::map<K,V> data_t;
-      typedef data_t::const_iterator const_iterator;
-      typedef data_t::iterator iterator; 
-      typedef data_t::value_type value_type; 
+      typedef typename data_t::const_iterator const_iterator;
+      typedef typename data_t::iterator iterator; 
+      typedef typename data_t::value_type value_type; 
 
       bool exists(const K &k) const { return dat.find(k) == dat.end();}
       void insert(const K &k , const V &v) { dat[k] = value_type(k,v); }

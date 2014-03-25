@@ -9,13 +9,11 @@ AM_CXXFLAGS = 	-I@top_srcdir@/lib		\
 nobase_include_HEADERS =   \
 													 radmat/construct_data/construct_correlators_bad_data_repository.h    \
 													 radmat/construct_data/construct_correlators.h    \
-													 radmat/construct_data/construct_correlators_subduce_utils.h    \
 													 radmat/construct_data/construct_correlators_utils.h    \
 													 radmat/construct_data/construct_correlators_xml.h    \
 													 radmat/construct_data/construct_data.h    \
+													 radmat/construct_data/data_tag_redstar_interface.h    \
 													 radmat/construct_data/lattice_multi_data_object.h    \
-													 radmat/construct_data/lattice_multi_data_tag.h    \
-													 radmat/construct_data/lattice_multi_data_tag_redstar_interface.h    \
 													 radmat/construct_data/make_head.csh    \
 													 radmat/construct_data/radmat_database_interface.h    \
 													 radmat/construct_data/radmat_overlap_key_val_db.h    \
@@ -23,8 +21,12 @@ nobase_include_HEADERS =   \
 													 radmat/data_representation/data_representation_factory.h    \
 													 radmat/data_representation/data_representation.h    \
 													 radmat/data_representation/data_representation_lorentz_groups.h    \
+													 radmat/data_representation/data_representation_prim.h    \
 													 radmat/data_representation/data_representation_primitive_rep.h    \
 													 radmat/data_representation/data_representation_subduction_map.h    \
+													 radmat/data_representation/data_representation_three_point.h    \
+													 radmat/data_representation/data_tag_primitive.h    \
+													 radmat/data_representation/data_tag_three_point.h    \
 													 radmat/data_representation/make_head.csh    \
 													 radmat/driver/driver.h    \
 													 radmat/driver/make_head.csh    \
@@ -63,7 +65,6 @@ nobase_include_HEADERS =   \
 													 radmat/ff/lorentzff_polarization_embedding.h    \
 													 radmat/ff/lorentzff_polarization_embedding_old.h    \
 													 radmat/ff/lorentzff_polarization_tensors.h    \
-													 radmat/ff/lorentzff_RhoPi.h    \
 													 radmat/ff/lorentzff_Wigner_D_matrix_embedding.h    \
 													 radmat/ff/lorentzff_Wigner_D_matrix_factory.h    \
 													 radmat/ff/lorentzff_Wigner_D_matrix_manager.h    \
@@ -85,23 +86,22 @@ nobase_include_HEADERS =   \
 													 radmat/llsq/make_head.csh    \
 													 radmat/redstar_interface/abstract_named_object.h    \
 													 radmat/redstar_interface/make_head.csh    \
-													 radmat/redstar_interface/redstar_abstract_block_base.h    \
-													 radmat/redstar_interface/redstar_abstract_merge_npoint_factory.h    \
-													 radmat/redstar_interface/redstar_abstract_merge_npoint.h    \
 													 radmat/redstar_interface/redstar_abstract_xml_factory.h    \
+													 radmat/redstar_interface/redstar_abstract_xml_interface.h    \
 													 radmat/redstar_interface/redstar_canonical_lattice_rotations.h    \
 													 radmat/redstar_interface/redstar_canonical_rotations.h    \
 													 radmat/redstar_interface/redstar_cartesian_interface.h    \
-													 radmat/redstar_interface/redstar_improved_vector_current.h    \
 													 radmat/redstar_interface/redstar_interface.h    \
 													 radmat/redstar_interface/redstar_invert_subduction.h    \
-													 radmat/redstar_interface/redstar_merge_function_xml.h    \
-													 radmat/redstar_interface/redstar_merge_vector_current_npoint.h    \
-													 radmat/redstar_interface/redstar_npoint_function_xml.h    \
-													 radmat/redstar_interface/redstar_photon_polarization_tensor.h    \
+													 radmat/redstar_interface/redstar_particle_handler_utils.h    \
 													 radmat/redstar_interface/redstar_photon_props.h    \
-													 radmat/redstar_interface/redstar_single_particle_meson_block.h    \
-													 radmat/redstar_interface/redstar_unimproved_vector_current.h    \
+													 radmat/redstar_interface/redstar_single_particle_meson_xml_handler.h    \
+													 radmat/redstar_interface/redstar_single_particle_meson_xml_interface.h    \
+													 radmat/redstar_interface/redstar_three_point_utils.h    \
+													 radmat/redstar_interface/redstar_three_point_xml_handler.h    \
+													 radmat/redstar_interface/redstar_three_point_xml_interface.h    \
+													 radmat/redstar_interface/redstar_three_point_xml_lorentz_handler.h    \
+													 radmat/redstar_interface/redstar_vector_current_xml_interface.h    \
 													 radmat/register_all/register_all.h    \
 													 radmat/utils/aux.h    \
 													 radmat/utils/debug_handler.h    \
@@ -129,17 +129,17 @@ lib_LIBRARIES = libradmat.a
 libradmat_a_SOURCES =	\
 											radmat/construct_data/construct_correlators_bad_data_repository.cc    \
 											radmat/construct_data/construct_correlators.cc    \
-											radmat/construct_data/construct_correlators_subduce_utils.cc    \
 											radmat/construct_data/construct_correlators_utils.cc    \
 											radmat/construct_data/construct_correlators_xml.cc    \
-											radmat/construct_data/lattice_multi_data_tag.cc    \
-											radmat/construct_data/lattice_multi_data_tag_redstar_interface.cc    \
+											radmat/construct_data/data_tag_redstar_interface.cc    \
 											radmat/construct_data/radmat_database_interface.cc    \
 											radmat/construct_data/radmat_overlap_key_val_db.cc    \
 											radmat/data_representation/data_representation_cubic_groups.cc    \
 											radmat/data_representation/data_representation_factory.cc    \
 											radmat/data_representation/data_representation_lorentz_groups.cc    \
 											radmat/data_representation/data_representation_subduction_map.cc    \
+											radmat/data_representation/data_representation_three_point.cc    \
+											radmat/data_representation/data_tag_three_point.cc    \
 											radmat/driver/radmat_driver_aux.cc    \
 											radmat/driver/radmat_driver.cc    \
 											radmat/driver/radmat_driver_props.cc    \
@@ -163,18 +163,17 @@ libradmat_a_SOURCES =	\
 											radmat/llsq/llsq_gen_system.cc    \
 											radmat/llsq/llsq_multi_driver.cc    \
 											radmat/llsq/llsq_solvers.cc    \
-											radmat/redstar_interface/redstar_abstract_merge_npoint_factory.cc    \
 											radmat/redstar_interface/redstar_abstract_xml_factory.cc    \
 											radmat/redstar_interface/redstar_canonical_lattice_rotations.cc    \
 											radmat/redstar_interface/redstar_canonical_rotations.cc    \
 											radmat/redstar_interface/redstar_cartesian_interface.cc    \
-											radmat/redstar_interface/redstar_improved_vector_current.cc    \
 											radmat/redstar_interface/redstar_invert_subduction.cc    \
-											radmat/redstar_interface/redstar_merge_function_xml.cc    \
-											radmat/redstar_interface/redstar_merge_vector_current_npoint.cc    \
-											radmat/redstar_interface/redstar_npoint_function_xml.cc    \
-											radmat/redstar_interface/redstar_single_particle_meson_block.cc    \
-											radmat/redstar_interface/redstar_unimproved_vector_current.cc    \
+											radmat/redstar_interface/redstar_particle_handler_utils.cc    \
+											radmat/redstar_interface/redstar_single_particle_meson_xml_interface.cc    \
+											radmat/redstar_interface/redstar_three_point_utils.cc    \
+											radmat/redstar_interface/redstar_three_point_xml_interface.cc    \
+											radmat/redstar_interface/redstar_three_point_xml_lorentz_handler.cc    \
+											radmat/redstar_interface/redstar_vector_current_xml_interface.cc    \
 											radmat/register_all/register_all.cc    \
 											radmat/utils/aux.cc    \
 											radmat/utils/harmonic.cc    \

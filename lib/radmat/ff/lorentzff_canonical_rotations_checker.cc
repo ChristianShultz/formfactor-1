@@ -6,7 +6,7 @@
 
  * Creation Date : 24-12-2013
 
- * Last Modified : Tue 04 Mar 2014 02:21:21 PM EST
+ * Last Modified : Mon 24 Mar 2014 03:29:24 PM EDT
 
  * Created By : shultz
 
@@ -121,11 +121,11 @@ namespace radmat
 
       void init_map( const rHandle<LLSQLatticeMultiData> &d)
       {
-        std::vector<LatticeMultiDataTag> tags = d->tags(); 
+        std::vector<ThreePointDataTag> tags = d->tags(); 
 
         for(int i =0; i < tags.size(); ++i)
         {
-          KEY foo(tags[i].p_f, tags[i].p_i, tags[i].hf, tags[i].hi,tags[i].jmu); 
+          KEY foo(tags[i].left_mom, tags[i].right_mom, tags[i].left_row, tags[i].right_row,tags[i].gamma_row); 
           DATA e = d->get_row_ensem(i); 
           insert(foo,e); 
         }
