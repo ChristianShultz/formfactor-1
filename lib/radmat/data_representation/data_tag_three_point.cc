@@ -6,7 +6,7 @@
 
 * Creation Date : 24-03-2014
 
-* Last Modified : Mon 24 Mar 2014 11:10:09 AM EDT
+* Last Modified : Wed 26 Mar 2014 12:53:01 PM EDT
 
 * Created By : shultz
 
@@ -28,6 +28,28 @@ namespace radmat
     right_E = left_E;  
   }
 
+
+  ENSEM::EnsemReal 
+    ThreePointDataTag::Q2() const
+    {
+      ENSEM::EnsemReal Q0, Q1, Q2, Q3; 
+      ENSEM::Real zero,q1,q2,q3; 
+      zero = ENSEM::toDouble(0.); 
+      Q0 = (left_E - right_E) * (left_E - right_E); 
+      Q1 = zero*Q0;
+      Q2 = zero*Q0;
+      Q3 = zero*Q0;
+
+      q1 = ENSEM::toDouble( double( left_mom[0] - right_mom[0] ) ); 
+      q2 = ENSEM::toDouble( double( left_mom[1] - right_mom[1] ) ); 
+      q3 = ENSEM::toDouble( double( left_mom[2] - right_mom[1] ) ); 
+
+      Q1 = q1*q1; 
+      Q2 = q2*q2; 
+      Q3 = q3*q3; 
+
+      return -Q0 + Q1 + Q2 + Q2;
+    }
 
   void write(ADATIO::BinaryWriter &bin, const ThreePointDataTag &d)
   {

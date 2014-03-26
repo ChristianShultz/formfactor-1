@@ -6,7 +6,7 @@
 
  * Creation Date : 10-12-2013
 
- * Last Modified : Wed 19 Mar 2014 06:31:32 PM EDT
+ * Last Modified : Wed 26 Mar 2014 11:37:08 AM EDT
 
  * Created By : shultz
 
@@ -20,7 +20,6 @@
 #include "radmat/ff/lorentzff_formfactor_factory.h"
 #include "radmat/ff_interface/formfactor_factory.h"
 #include "radmat/llsq/llsq_solvers.h"
-#include "radmat/redstar_interface/redstar_abstract_merge_npoint_factory.h"
 #include "radmat/redstar_interface/redstar_abstract_xml_factory.h"
 #include "radmat/redstar_interface/redstar_canonical_lattice_rotations.h"
 #include "radmat/redstar_interface/redstar_canonical_rotations.h"
@@ -60,8 +59,6 @@ namespace radmat
           success &= radmat::FormFactorDecompositionFactoryEnv::registerAll(); 
           // build llsq solution classes
           success &= radmat::LLSQSolverFactoryEnv::registerAll(); 
-          // redstar xml 
-          success &= radmat::TheRedstarAbstractMergeNPtFactoryEnv::registerAll(); 
           // redstar xml
           success &= radmat::TheRedstarAbstractXMLFactoryEnv::registerAll(); 
           // redstar canonical rotations 

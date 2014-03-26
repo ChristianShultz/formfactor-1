@@ -2,6 +2,7 @@
 #define REDSTAR_VECTOR_CURRENT_XML_INTERFACE_H 
 
 #include "redstar_abstract_xml_interface.h"
+#include "radmat/utils/stringify.h"
 
 
   //
@@ -12,8 +13,6 @@
 
 namespace radmat
 {
-
-
 
   struct RedstarVectorCurrentXML;
   REGISTER_STRINGIFY_TYPE(RedstarVectorCurrentXML);
@@ -34,6 +33,7 @@ namespace radmat
     virtual std::string write(void) const; 
 
     // a photon fragment 
+    //      -- this is a weight times the op_name 
     struct pfrag
     {
       double coeff_r; 
@@ -54,6 +54,24 @@ namespace radmat
     insertion time; 
     insertion space; 
   };
+
+
+  void read(ADATXML::XMLReader &xml, 
+      const std::string &path, 
+      RedstarVectorCurrentXML::pfrag &); 
+
+  void read(ADATXML::XMLReader &xml, 
+      const std::string &path, 
+      RedstarVectorCurrentXML::insertion &); 
+
+  void write(ADATXML::XMLWriter &xml, 
+      const std::string &path, 
+      RedstarVectorCurrentXML::pfrag &); 
+
+  void write(ADATXML::XMLWriter &xml, 
+      const std::string &path, 
+      RedstarVectorCurrentXML::insertion &); 
+
 
 }
 

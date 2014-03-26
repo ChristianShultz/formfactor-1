@@ -1,7 +1,7 @@
 
 
 #include "redstar_cartesian_interface.h"
-#include "redstar_abstract_block_base.h"
+#include "redstar_particle_handler_utils.h"
 #include "radmat/utils/pow2assert.h"
 #include "radmat/utils/tensor.h"
 #include "redstar_photon_polarization_tensor.h"

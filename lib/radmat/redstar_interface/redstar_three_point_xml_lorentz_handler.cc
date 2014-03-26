@@ -6,7 +6,7 @@
 
 * Creation Date : 20-03-2014
 
-* Last Modified : Mon 24 Mar 2014 02:41:45 PM EDT
+* Last Modified : Wed 26 Mar 2014 11:19:44 AM EDT
 
 * Created By : shultz
 
@@ -22,8 +22,7 @@ namespace radmat
 
 
   std::vector<ThreePointData>
-    RedstarThreePointXMLLorentzHandler::handle_work(const std::string &left_id,
-        const std::string &right_id) const
+    RedstarThreePointXMLLorentzHandler::handle_work() 
     {
       ADATXML::Array<AbstractNamedObject<AbsRedstarXMLInterface_t> > xml_int; 
       std::string ensemble; 
@@ -45,12 +44,12 @@ namespace radmat
 
       std::vector<BlockData> left = generate_lorentz_block(lefty);
       std::vector<BlockData> gamma = generate_lorentz_block(gammay);
-      std::vector<BlockData> right = generate_lorentz_block(right); 
+      std::vector<BlockData> right = generate_lorentz_block(righty); 
 
       ADATXML::Array<int> timesliz(3); 
-      timesliz[0] = left->t_slice; 
-      timesliz[1] = gamma->t_slice; 
-      timesliz[2] = right->t_slice; 
+      timesliz[0] = lefty->t_slice; 
+      timesliz[1] = gammay->t_slice; 
+      timesliz[2] = righty->t_slice; 
 
       this->set_timeslice(timesliz); 
 

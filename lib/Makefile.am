@@ -95,7 +95,6 @@ nobase_include_HEADERS =   \
 													 radmat/redstar_interface/redstar_invert_subduction.h    \
 													 radmat/redstar_interface/redstar_particle_handler_utils.h    \
 													 radmat/redstar_interface/redstar_photon_props.h    \
-													 radmat/redstar_interface/redstar_single_particle_meson_xml_handler.h    \
 													 radmat/redstar_interface/redstar_single_particle_meson_xml_interface.h    \
 													 radmat/redstar_interface/redstar_three_point_utils.h    \
 													 radmat/redstar_interface/redstar_three_point_xml_handler.h    \

@@ -6,7 +6,7 @@
 
  * Creation Date : 25-04-2013
 
- * Last Modified : Mon 24 Mar 2014 10:16:02 AM EDT
+ * Last Modified : Wed 26 Mar 2014 11:15:11 AM EDT
 
  * Created By : shultz
 
@@ -37,41 +37,6 @@ namespace radmat
           exit(1);
         }
       }
-
-
-    void read(ADATXML::XMLReader &xml, 
-        const std::string &path, 
-        AbstractNamedObject<AbsRedstarXMLInterface_t> &p)
-    {
-      ADATXML::XMLReader ptop(xml,path); 
-      doXMLRead(ptop,"object_name",p.object_name,__PRETTY_FUNCTION__); 
-
-      try
-      {
-        p.param = TheRedstarAbstractXMLFactoryEnv::callFactory(p.object_name); 
-        std::cout << "constructed a " << p.object_name << std::endl;
-        p.param->read(ptop,std::string("param")); 
-      }
-      catch(std::exception &e)
-      {
-        std::cout << __PRETTY_FUNCTION__ 
-          << ": error, e " << e.what() << std::endl;
-        throw e; 
-      }
-      catch(std::string &s)
-      {
-        std::cout << __PRETTY_FUNCTION__ 
-          << ": error, s " << s << std::endl;
-      }
-      catch(...)
-      {
-        std::cout << __PRETTY_FUNCTION__ 
-          << ": some non standard error " << std::endl;
-        throw std::string("in") + std::string(__PRETTY_FUNCTION__); 
-      }
-    }
-
-
 
 
   } // namespace anonomyous 

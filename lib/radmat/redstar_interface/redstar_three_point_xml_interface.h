@@ -15,7 +15,6 @@ namespace radmat
   struct RedstarThreePointXML
     : public AbsRedstarXMLInterface_t
   {
-    RedstarThreePointXML(); 
     virtual ~RedstarThreePointXML() {}
 
     virtual std::string type() const
@@ -41,6 +40,9 @@ namespace radmat
     std::string ensemble; 
   }; 
 
+  void read(ADATXML::XMLReader &xml, 
+      const std::string &path, 
+      AbstractNamedObject<AbsRedstarXMLInterface_t> &); 
 
   namespace TheRedstarThreePointAbstractXMLFactoryEnv
   {

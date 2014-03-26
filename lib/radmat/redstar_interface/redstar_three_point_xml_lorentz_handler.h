@@ -11,6 +11,7 @@ namespace radmat
   REGISTER_STRINGIFY_TYPE( RedstarThreePointXMLLorentzHandler ); 
 
   struct RedstarThreePointXMLLorentzHandler
+    : public RedstarThreePointXMLHandler
   {
     virtual ~RedstarThreePointXMLLorentzHandler() {};
 
@@ -18,7 +19,7 @@ namespace radmat
     { return Stringify<RedstarThreePointXMLLorentzHandler>(); }
 
     virtual std::vector<ThreePointData>
-      handle_work() const; 
+      handle_work();
   }; 
   
 

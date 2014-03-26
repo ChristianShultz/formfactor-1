@@ -6,7 +6,7 @@
 
  * Creation Date : 04-12-2012
 
- * Last Modified : Mon 24 Mar 2014 12:40:49 PM EDT
+ * Last Modified : Wed 26 Mar 2014 11:23:35 AM EDT
 
  * Created By : shultz
 
@@ -141,17 +141,17 @@ namespace radmat
     template<typename T> 
       std::vector<ThreePointData>
       pull_data_xml_function( const ThreePointCorrIni_t &, 
-          const rHandle<AbsRedstarXMLInterface_t> &)
+           rHandle<AbsRedstarXMLInterface_t> &)
       { __builtin_trap(); return std::vector<ThreePointData>(); }
 
     // handle a lorentz type 
     template<>
       std::vector<ThreePointData>
       pull_data_xml_function<RedstarThreePointXMLLorentzHandler>( const ThreePointCorrIni_t &, 
-          const rHandle<AbsRedstarXMLInterface_t> &handle)
+          rHandle<AbsRedstarXMLInterface_t> &handle)
       {
-        const RedstarThreePointXMLLorentzHandler *red; 
-        red = dynamic_cast<const RedstarThreePointXMLLorentzHandler*>(handle.get_ptr()); 
+        RedstarThreePointXMLLorentzHandler *red; 
+        red = dynamic_cast<RedstarThreePointXMLLorentzHandler*>(handle.get_ptr()); 
         return red->handle_work(); 
       }
 

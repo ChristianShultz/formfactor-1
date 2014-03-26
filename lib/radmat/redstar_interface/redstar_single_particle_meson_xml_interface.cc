@@ -6,7 +6,7 @@
 
 * Creation Date : 20-03-2014
 
-* Last Modified : Thu 20 Mar 2014 11:24:07 AM EDT
+* Last Modified : Wed 26 Mar 2014 10:40:38 AM EDT
 
 * Created By : shultz
 
@@ -15,6 +15,9 @@ _._._._._._._._._._._._._._._._._._._._._.*/
 
 #include "redstar_single_particle_meson_xml_interface.h"
 #include "radmat/utils/pow2assert.h"
+#include "radmat/data_representation/data_representation_lorentz_groups.h"
+#include "formfac/formfac_qsq.h"
+#include "hadron/irrep_util.h"
 #include <exception>
 #include <iostream>
 #include <sstream>
@@ -40,6 +43,16 @@ namespace radmat
       }
 
 
+    // stringy mom
+    std::string canonical_stringmom(const ADATXML::Array<int> &inp)
+    {
+      ADATXML::Array<int> can = FF::canonicalOrder(inp);
+      std::stringstream ss;
+      ss << can[0] << can[1] << can[2];
+      return ss.str(); 
+    }
+
+
     // get the star
     ADATXML::Array<ADATXML::Array<int> > star_p(const ADATXML::Array<ADATXML::Array<int> > &pin)
     {
@@ -55,7 +68,7 @@ namespace radmat
 
       for(unsigned int elem = 0; elem < sz; ++elem)
       {
-        std::string p = stringmom(pin[elem]);
+        std::string p = canonical_stringmom(pin[elem]);
         it = seen.find(p);
         if (it == seen.end())
         {
@@ -81,6 +94,22 @@ namespace radmat
     }
 
 
+    std::string doPrint(const ADATXML::Array<int> &t)
+    {
+      std::stringstream ss; 
+      for(int i = 0; i < t.size(); ++i)
+        ss << " " << t[i];
+      return ss.str();  
+    } 
+
+    std::string doPrint(const ADATXML::Array< ADATXML::Array<int> > &t)
+    {
+      std::stringstream ss; 
+      for(int i = 0; i < t.size(); ++i)
+        ss << doPrint( t[i] ) << std::endl;
+      return ss.str();  
+    } 
+
 
 
   } // anonomyous 
@@ -91,7 +120,7 @@ namespace radmat
     RedstarSingleParticleMesonXML::write(void) const
     {
       std::stringstream ss; 
-      ss << "J= " << J << " H= " << doPrint(H) << " par= " << parity
+      ss << cont_rep << " H= " << doPrint(H) 
         << " fill_star= " << fill_star 
         << " twoI_z= " << twoI_z << " name = " << name 
         << " creation_op= " << creation_op << " smearedP= " << smearedP
@@ -116,34 +145,38 @@ namespace radmat
       doXMLRead(ptop,"t_slice",t_slice,__PRETTY_FUNCTION__);   
 
 
+      rHandle<LorentzRep> cont_rep_h;
+      cont_rep_h = LorentzRepresentationFactoryEnv::callFactory(cont_rep); 
+      int spin = cont_rep_h->rep_spin(); 
+
       if ( H.size() == 0) 
       {
-        H.resize(2*J + 1);
-        for(int h = -J; h < J+1; ++h)
-          H[h+J] = h; 
+        H.resize(2*spin + 1);
+        for(int h = -spin; h <= spin; ++h)
+          H[spin-h] = h; 
       }
 
       if(fill_star)
         mom = star_p(mom); 
     }
 
-  //! xml writer
-  void 
-    RedstarSingleParticleMesonXML::write(ADATXML::XMLWriter &xml, const std::string &path ) const
-    {
-      ADATXML::push(xml,path);
-      ADATXML::write(xml,"cont_rep",cont_rep);
-      ADATXML::write(xml,"H",H);
-      ADATXML::write(xml,"parity",parity);
-      ADATXML::write(xml,"mom",mom);
-      ADATXML::write(xml,"twoI_z",twoI_z);
-      ADATXML::write(xml,"name",name);
-      ADATXML::write(xml,"creation_op",creation_op);
-      ADATXML::write(xml,"smearedP",smearedP);
-      ADATXML::write(xml,"isProjected",isProjected); 
-      ADATXML::write(xml,"t_slice",t_slice);
-      ADATXML::pop(xml);
-    }
+//  //! xml writer
+//  void 
+//    RedstarSingleParticleMesonXML::write(ADATXML::XMLWriter &xml, const std::string &path ) const
+//    {
+//      ADATXML::push(xml,path);
+//      ADATXML::write(xml,"cont_rep",cont_rep);
+//      ADATXML::write(xml,"H",H);
+//      ADATXML::write(xml,"parity",parity);
+//      ADATXML::write(xml,"mom",mom);
+//      ADATXML::write(xml,"twoI_z",twoI_z);
+//      ADATXML::write(xml,"name",name);
+//      ADATXML::write(xml,"creation_op",creation_op);
+//      ADATXML::write(xml,"smearedP",smearedP);
+//      ADATXML::write(xml,"isProjected",isProjected); 
+//      ADATXML::write(xml,"t_slice",t_slice);
+//      ADATXML::pop(xml);
+//    }
 
 } // radmat
 

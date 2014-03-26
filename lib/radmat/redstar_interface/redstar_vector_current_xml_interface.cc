@@ -6,21 +6,18 @@
 
  * Creation Date : 20-03-2014
 
- * Last Modified : Thu 20 Mar 2014 12:03:13 PM EDT
+ * Last Modified : Wed 26 Mar 2014 11:35:04 AM EDT
 
  * Created By : shultz
 
  _._._._._._._._._._._._._._._._._._._._._.*/
 
 #include "redstar_vector_current_xml_interface.h"
+#include "redstar_photon_props.h"
 
-
-using namespace ADATXML; 
 
 namespace radmat
 {
-
-
 
   namespace
   {
@@ -52,49 +49,6 @@ namespace radmat
           << " + " << i.photons[j].coeff_i 
           << "i) x" << i.photons[j].name << "   ";
       return ss.str(); 
-    }
-
-
-    void write(ADATXML::XMLWriter &xml, 
-        const std::string &path,
-        const RedstarVectorCurrentPFrag &p)
-    {
-      ADATXML::push(xml,path);
-      ADATXML::write(xml,"coeff_r",p.coeff_r);
-      ADATXML::write(xml,"coeff_i",p.coeff_i); 
-      ADATXML::write(xml,"name",p.name); 
-      ADATXML::pop(xml);
-    }
-
-    void write(ADATXML::XMLWriter &xml,
-        const std::string &path, 
-        const RedstarVectorCurrentXML::insertion &i)
-    {
-      ADATXML::push(xml,path);
-      ADATXML::write(xml,"active",i.active);
-      ADATXML::write(xml,"smearedP",i.smearedP); 
-      write(xml,"photons",i.photons); 
-      ADATXML::pop(xml);
-    }
-
-    void read(ADATXML::XMLReader &xml, 
-        const std::string &path,
-        RedstarVectorCurrentPFrag &p)  
-    {
-      ADATXML::XMLReader ptop(xml,path); 
-      doXMLRead(ptop,"coeff_r",p.coeff_r,__PRETTY_FUNCTION__); 
-      doXMLRead(ptop,"coeff_i",p.coeff_i,__PRETTY_FUNCTION__); 
-      doXMLRead(ptop,"name",p.name,__PRETTY_FUNCTION__); 
-    }
-
-    void read(ADATXML::XMLReader &xml, 
-        const std::string &path,
-        RedstarVectorCurrentXML::insertion &i)  
-    {
-      ADATXML::XMLReader ptop(xml,path); 
-      doXMLRead(ptop,"active",i.active,__PRETTY_FUNCTION__); 
-      doXMLRead(ptop,"smearedP",i.smearedP,__PRETTY_FUNCTION__); 
-      doXMLRead(ptop,"photons",i.photons,__PRETTY_FUNCTION__); 
     }
 
 
@@ -130,6 +84,49 @@ namespace radmat
       ss << "\ntime:\n" << toString(time) << std::endl;
       ss << "\nspace:\n" << toString(space) << std::endl;
       return ss.str(); 
+    }
+
+
+    void write(ADATXML::XMLWriter &xml, 
+        const std::string &path,
+        const RedstarVectorCurrentXML::pfrag &p)
+    {
+      ADATXML::push(xml,path);
+      ADATXML::write(xml,"coeff_r",p.coeff_r);
+      ADATXML::write(xml,"coeff_i",p.coeff_i); 
+      ADATXML::write(xml,"name",p.name); 
+      ADATXML::pop(xml);
+    }
+
+    void write(ADATXML::XMLWriter &xml,
+        const std::string &path, 
+        const RedstarVectorCurrentXML::insertion &i)
+    {
+      ADATXML::push(xml,path);
+      ADATXML::write(xml,"active",i.active);
+      ADATXML::write(xml,"smearedP",i.smearedP); 
+      write(xml,"photons",i.photons); 
+      ADATXML::pop(xml);
+    }
+
+    void read(ADATXML::XMLReader &xml, 
+        const std::string &path,
+        RedstarVectorCurrentXML::pfrag &p)  
+    {
+      ADATXML::XMLReader ptop(xml,path); 
+      doXMLRead(ptop,"coeff_r",p.coeff_r,__PRETTY_FUNCTION__); 
+      doXMLRead(ptop,"coeff_i",p.coeff_i,__PRETTY_FUNCTION__); 
+      doXMLRead(ptop,"name",p.name,__PRETTY_FUNCTION__); 
+    }
+
+    void read(ADATXML::XMLReader &xml, 
+        const std::string &path,
+        RedstarVectorCurrentXML::insertion &i)  
+    {
+      ADATXML::XMLReader ptop(xml,path); 
+      doXMLRead(ptop,"active",i.active,__PRETTY_FUNCTION__); 
+      doXMLRead(ptop,"smearedP",i.smearedP,__PRETTY_FUNCTION__); 
+      doXMLRead(ptop,"photons",i.photons,__PRETTY_FUNCTION__); 
     }
 
 

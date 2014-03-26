@@ -6,7 +6,7 @@
 
  * Creation Date : 20-03-2014
 
- * Last Modified : Fri 21 Mar 2014 02:34:38 PM EDT
+ * Last Modified : Wed 26 Mar 2014 10:23:12 AM EDT
 
  * Created By : shultz
 
@@ -14,10 +14,16 @@
 
 #include "redstar_particle_handler_utils.h"
 #include "redstar_invert_subduction.h"
-#include "hadron/irrep_util"
+#include "redstar_cartesian_interface.h"
+#include "radmat/data_representation/data_representation.h"
+#include "radmat/utils/printer.h"
+#include "hadron/irrep_util.h"
+#include "ensem/ensem.h"
+#include "formfac/formfac_qsq.h"
 #include "hadron/ensem_filenames.h"
 #include "redstar_photon_props.h"
 #include "semble/semble_meta.h"
+#include "itpp/itbase.h"
 #include <math.h>
 
 namespace radmat
@@ -56,7 +62,8 @@ namespace radmat
     Hadron::KeyHadronNPartNPtCorr_t::NPoint_t
       make_npt( const std::string &name, 
           const ADATXML::Array<int> &mom,
-          const int twI_z,
+          const int row, 
+          const int twoI_z,
           const bool creation_op,
           const bool smearedP,
           const int t_slice )
@@ -88,7 +95,7 @@ namespace radmat
     EnsemRedstarBlock
       make_ensem_block( const std::string &name, 
           const ADATXML::Array<int> &mom,
-          const int twI_z,
+          const int twoI_z,
           const bool creation_op,
           const bool smearedP,
           const int t_slice,
@@ -122,7 +129,16 @@ namespace radmat
             name << stringy_mom(mom) << "_";
           name << it->m_obj.irrep; 
 
-          ret = ret + EnsemRedstarBlock::ListObj_t(it->m_coeff,npt); 
+          Hadron::KeyHadronNPartNPtCorr_t::NPoint_t npt; 
+          npt = make_npt( name.str(), 
+              mom, 
+              it->m_obj.row, 
+              twoI_z,
+              creation_op,
+              smearedP,
+              t_slice );
+
+            ret = ret + EnsemRedstarBlock::ListObj_t(it->m_coeff,npt); 
         }
 
         return ret; 
@@ -131,29 +147,36 @@ namespace radmat
     /////////////////////////
     /////////////////////////
 
-    std::vector<ADATXML::Array<int> > 
+    ADATXML::Array< ADATXML::Array<int> > 
       gen_acceptable_moms(const int pmin, const int pmax)
-    {
-      int pbound = int( ceil( sqrt(pmax) ) ); 
-      std::vector<ADATXML::Array<int> > ret; 
-      for(int x = -pbound, x <= pbound; ++x)
-        for(int y = -pbound, y <= pbound ; ++y)
-          for(int z = -pbound, z <= pbound; ++z)
-          {
-            int modp = x*x + y*y +z*z; 
-            if( modp >= pmin )
-              if( modp <= pmax )
-              {
-                ADATXML::Array<int> mom(3);
-                mom[0] = x;
-                mom[1] = y;
-                mom[2] = z;
-                ret.push_back(mom); 
-              }
-          }
+      {
+        // we dont know the size ahead of time 
+        int pbound = int( ceil( sqrt(pmax) ) ); 
+        std::vector<ADATXML::Array<int> > constuct;
+        constuct.reserve( pmax*pmax*pmax ); 
+        for(int x = -pbound; x <= pbound; ++x)
+          for(int y = -pbound; y <= pbound ; ++y)
+            for(int z = -pbound; z <= pbound; ++z)
+            {
+              int modp = x*x + y*y +z*z; 
+              if( modp >= pmin )
+                if( modp <= pmax )
+                {
+                  ADATXML::Array<int> mom(3);
+                  mom[0] = x;
+                  mom[1] = y;
+                  mom[2] = z;
+                  constuct.push_back(mom); 
+                }
+            }
 
-      return ret; 
-    }
+        int sz = constuct.size(); 
+        ADATXML::Array< ADATXML::Array<int> > ret(sz); 
+        for(int i = 0; i < sz; ++i)
+          ret[i] = constuct[i];
+
+        return ret; 
+      }
 
     /////////////////////////
     /////////////////////////
@@ -171,12 +194,12 @@ namespace radmat
         EnsemRedstarBlock::const_iterator little_it; 
 
         for(big_it = d.begin(); big_it != d.end(); ++big_it)
-          for(little_it = d->data.begin(); little_it != d->data.end(); ++little_it)
+          for(little_it = big_it->data.begin(); little_it != big_it->data.end(); ++little_it)
           {
-            seen[ ensemFileName[little_it->m_obj] ] = little_it->m_obj; 
+            seen[ Hadron::ensemFileName(little_it->m_obj.irrep) ] = little_it->m_obj; 
           }
 
-        ENSEM::Complex one(ENSEM::Real(1.),ENSEM::Real(0.)); 
+        ENSEM::Complex one( cmplx(ENSEM::Real(1.),ENSEM::Real(0.))); 
         std::map<std::string,key_t>::const_iterator it; 
         for(it = seen.begin(); it != seen.end(); ++it)
         {
@@ -205,15 +228,15 @@ namespace radmat
         for(int i = 0; i < sz; ++i)
         {
           RedstarVectorCurrentXML::pfrag phot = ins.photons[i]; 
-          ENSEM::Complex weight(ENSEM::Real(phot.coeff_r) , ENSEM::Real(phot.coeff_i) ); 
+          ENSEM::Complex weight( cmplx( ENSEM::Real(phot.coeff_r) , ENSEM::Real(phot.coeff_i) ) ); 
           ptr->name = phot.name; 
           std::vector<BlockData> d = generate_lorentz_block( ptr ); 
           std::vector<BlockData>::iterator update;
           for(update = d.begin(); update != d.end(); ++update)
-            updata->data = weight * update->data;
+            update->data = weight * update->data;
 
-          ret.reserve( ret.size() + d.size() )
-            ret.insert(ret.end(), d.begin(), d.end() ); 
+          ret.reserve( ret.size() + d.size() );
+          ret.insert(ret.end(), d.begin(), d.end() ); 
         }
 
         return ret; 
@@ -226,7 +249,7 @@ namespace radmat
       tag_block(const BlockData &d)
       {
         Hadron::KeyHadronNPartIrrep_t irrep; 
-        irrep = d.data.begin()->m_obj; 
+        irrep = d.data.begin()->m_obj.irrep; 
         std::stringstream ss; 
         ss << irrep.mom[0] << irrep.mom[1] << irrep.mom[2];
         ss << "h" << d.row; 
@@ -246,28 +269,28 @@ namespace radmat
         std::map<std::string,BlockData> merge_blocks; 
 
         // the unique momenta
-        std::vector<std::string, ADATXML::Array<int> > moms; 
+        std::map<std::string, ADATXML::Array<int> > moms; 
 
-        std::vector<BlockData>::const_iterator it; 
+        std::vector<BlockData>::const_iterator block_it; 
         std::map<std::string,BlockData>::iterator b; 
 
         // group them on helicities 
-        for(it = helicity3.begin(); it != helicity3.end(); ++it)
+        for(block_it = helicity3.begin(); block_it != helicity3.end(); ++block_it)
         {
-          std::pair<std::string,ADATXML::Array<int> > foo = tag_block(*it); 
+          std::pair<std::string,ADATXML::Array<int> > foo = tag_block(*block_it); 
           b = merge_blocks.find(foo.first); 
 
           // first time we see it add a momentum 
           if( b == merge_blocks.end() )
           {
-            merge_blocks.insert(std::make_pair(foo.first,*it));
+            merge_blocks.insert(std::make_pair(foo.first,*block_it));
             std::stringstream ss;
             ss << foo.second[0] << foo.second[1] << foo.second[3]; 
             moms.insert(std::make_pair(ss.str(),foo.second));  
           }
           else
           {
-            b->second.data = b->second.data + it->data; 
+            b->second.data = b->second.data + block_it->data; 
           }
         }
 
@@ -301,17 +324,17 @@ namespace radmat
     BlockData
       resum_ensem_redstar_block(const BlockData &d)
       {
-        Block ret; 
+        BlockData ret; 
         ret = d; 
 
-        EnesmRedstarBlock::const_iterator it; 
+        EnsemRedstarBlock::const_iterator it; 
         std::map<std::string, 
           std::pair<EnsemRedstarBlock::Coeff_t , EnsemRedstarBlock::Obj_t> > coeff_map; 
-        
+
         for( it = d.data.begin(); it != d.data.end(); ++it)
         {
           ENSEM::Complex coeff = it->m_coeff; 
-          std::string key = Hadron::ensemFileName(it->m_obj); 
+          std::string key = Hadron::ensemFileName(it->m_obj.irrep); 
 
           if( coeff_map.find(key) != coeff_map.end() )
             coeff += coeff_map[key].first; 
@@ -324,11 +347,11 @@ namespace radmat
         std::map<std::string,
           std::pair<EnsemRedstarBlock::Coeff_t , EnsemRedstarBlock::Obj_t> 
             >::const_iterator map_it; 
-        
+
         std::complex<double> zero(0.,0.); 
         for(map_it = coeff_map.begin(); map_it != coeff_map.end(); ++map_it)
           if( SEMBLE::toScalar(map_it->second.first) != zero) 
-          sum = sum + EnsemRedstarBlock::ListObj_t(map_it->second.first,map_it->second.second); 
+            sum = sum + EnsemRedstarBlock::ListObj_t(map_it->second.first,map_it->second.second); 
 
         // update the block
         ret.data = sum;
@@ -369,7 +392,7 @@ namespace radmat
       for(int p = 0; p < psz; ++p)
         for(int h = 0; h < hsz; ++h)
         {
-          EnsemRedstar block; 
+          EnsemRedstarBlock block; 
           block = make_ensem_block( ptr->name, 
               ptr->mom[p],
               ptr->twoI_z,
@@ -402,7 +425,7 @@ namespace radmat
     generate_lorentz_block( const RedstarVectorCurrentXML * const ptr)
     {
       std::vector<BlockData> ret; 
-      std::vector<ADATXML::Array<int> > moms;
+      ADATXML::Array< ADATXML::Array<int> > moms;
       moms = gen_acceptable_moms(ptr->pmin,ptr->pmax); 
 
       RedstarSingleParticleMesonXML * gamma = new RedstarSingleParticleMesonXML(); 
@@ -420,7 +443,7 @@ namespace radmat
         gamma->H = H; 
         gamma->cont_rep = "J0p"; 
         gamma->smearedP = ptr->time.smearedP; 
-        std::vector<BlockData> foo = generate_photon_blocks( gamma , time); 
+        std::vector<BlockData> foo = generate_photon_blocks( gamma , ptr->time); 
         ret.reserve( ret.size() + foo.size() ); 
         ret.insert( ret.end() , foo.begin() , foo.end() ); 
       }
@@ -433,7 +456,7 @@ namespace radmat
         gamma->H = H; 
         gamma->cont_rep = "J1m"; 
         gamma->smearedP = ptr->space.smearedP; 
-        std::vector<BlockData> foo = generate_photon_blocks( gamma , space); 
+        std::vector<BlockData> foo = generate_photon_blocks( gamma , ptr->space); 
         std::vector<BlockData> bar = move_to_lorentz4( foo ); 
 
         ret.reserve( ret.size() + bar.size() ); 
@@ -451,7 +474,7 @@ namespace radmat
       std::vector<BlockData> resum = resum_ensem_redstar_blocks(conv_lorentz_to_cubic_block(cont)); 
 
       // now go back through and apply the photon weights 
-      
+
       // first build a map of the weights 
       std::map<std::string,ENSEM::Complex> weights; 
       if(ptr->time.active)
@@ -460,8 +483,8 @@ namespace radmat
         {
           RedstarVectorCurrentXML::pfrag frag;
           frag = ptr->time.photons[i]; 
-          ENSEM::Complex weight( ENSEM::Real(frag.coeff_r) , ENSEM::Real(frag.coeff_i) ); 
-          weights.insert(std::make_pair(frag.name,weight) )
+          ENSEM::Complex weight( cmplx(ENSEM::Real(frag.coeff_r) , ENSEM::Real(frag.coeff_i) )); 
+          weights.insert(std::make_pair(frag.name,weight) );
         }
       }
       if(ptr->space.active)
@@ -470,8 +493,8 @@ namespace radmat
         {
           RedstarVectorCurrentXML::pfrag frag;
           frag = ptr->space.photons[i]; 
-          ENSEM::Complex weight( ENSEM::Real(frag.coeff_r) , ENSEM::Real(frag.coeff_i) ); 
-          weights.insert(std::make_pair(frag.name,weight) )
+          ENSEM::Complex weight( cmplx(ENSEM::Real(frag.coeff_r) , ENSEM::Real(frag.coeff_i)) ); 
+          weights.insert(std::make_pair(frag.name,weight) );
         }
       }
 
@@ -486,16 +509,16 @@ namespace radmat
         EnsemRedstarBlock update; 
         for( block_it = it->data.begin(); block_it != it->data.end(); ++block_it)
         {
-          std::string name = it->m_obj.irrep.ops[1].name; 
+          std::string name = block_it->m_obj.irrep.op.ops[1].name; 
           ENSEM::Complex weight; 
           bool found = false; 
 
           for( weight_it = weights.begin(); weight_it != weights.end(); ++weight_it)
           {
             // is there a partial match ( doesnt care about the subduce part )
-            if(name.find(weight_it.first) != std::string::npos)
+            if(name.find(weight_it->first) != std::string::npos)
             {
-              weight = weight_it.second; 
+              weight = weight_it->second; 
               found = true; 
               break; 
             }
@@ -504,7 +527,7 @@ namespace radmat
           // we should never ever see this 
           if( !!! found )
           {
-            printer_fucntion<console_print>("missing " + name ); 
+            printer_function<console_print>("missing " + name ); 
             throw std::string("photon weight error"); 
           } 
 

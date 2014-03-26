@@ -6,7 +6,7 @@
 
 * Creation Date : 12-11-2013
 
-* Last Modified : Thu 20 Mar 2014 11:25:38 AM EDT
+* Last Modified : Tue 25 Mar 2014 03:39:13 PM EDT
 
 * Created By : shultz
 
@@ -18,11 +18,11 @@ _._._._._._._._._._._._._._._._._._._._._.*/
 #include "radmat/utils/stringify.h"
 #include "radmat/utils/printer.h"
 
-#include "redstar_single_particle_meson_block.h"
-#include "redstar_unimproved_vector_current.h"
-#include "redstar_improved_vector_current.h"
-
 #include <exception>
+
+#include "redstar_three_point_xml_lorentz_handler.h"
+#include "redstar_single_particle_meson_xml_interface.h"
+#include "redstar_vector_current_xml_interface.h"
 
 namespace FacEnv = radmat::TheRedstarAbstractXMLFactoryEnv;
 typedef radmat::TheRedstarAbstractXMLFactory Factory; 
@@ -67,6 +67,7 @@ namespace radmat
       {
         success &= do_reg<RedstarSingleParticleMesonXML>();
         success &= do_reg<RedstarVectorCurrentXML>(); 
+        success &= do_reg<RedstarThreePointXMLLorentzHandler>(); 
         local_registration = true; 
       }
 

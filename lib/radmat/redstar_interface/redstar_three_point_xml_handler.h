@@ -27,7 +27,7 @@ namespace radmat
     }
 
     // need to pass names in the case of improvement
-    virtual std::vector<ThreePointData> handle_work() const = 0; 
+    virtual std::vector<ThreePointData> handle_work() = 0; 
   }; 
 
 

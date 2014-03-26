@@ -6,7 +6,7 @@
 
  * Creation Date : 21-03-2014
 
- * Last Modified : Fri 21 Mar 2014 01:58:23 PM EDT
+ * Last Modified : Wed 26 Mar 2014 10:44:58 AM EDT
 
  * Created By : shultz
 
@@ -120,7 +120,7 @@ namespace radmat
           for(r = righty.begin(); r != righty.end(); ++r)
           {
             if( check_mom(*l,*g,*r) )
-              all.push_back( make_data(*l,*g,*r,ensemble) ); 
+              ret.push_back( make_data(*l,*g,*r,ensemble) ); 
           }
 
       return ret; 

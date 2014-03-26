@@ -6,7 +6,7 @@
 
  * Creation Date : 20-03-2014
 
- * Last Modified : Mon 24 Mar 2014 02:24:49 PM EDT
+ * Last Modified : Wed 26 Mar 2014 11:13:41 AM EDT
 
  * Created By : shultz
 
@@ -14,7 +14,8 @@
 
 
 #include "redstar_three_point_xml_interface.h"
-#include "radmat/utils/printer_function.h"
+#include "redstar_abstract_xml_factory.h"
+#include "radmat/utils/printer.h"
 
 
 namespace radmat
@@ -44,63 +45,68 @@ namespace radmat
         }
       }
 
-    void read(ADATXML::XMLReader &xml, 
-        const std::string &path, 
-        AbstractNamedObject<RedstarThreePointXML> &obj)
-    {
-      ADATXML::XMLReader ptop(xml,path); 
-      doXMLRead(ptop,"object_name",obj.object_name,__PRETTY_FUNCTION__); 
-
-      try
-      {
-        obj.param = TheRedstarThreePointAbstractXMLFactoryEnv::callFactory(obj.object_name); 
-        printer_function<abs_obj_read_printer>(obj.object_name); 
-        obj.param->read(ptop,std::string("param"));
-      }
-      catch(std::exception &e) 
-      {
-        std::cout << __PRETTY_FUNCTION__ 
-          << ": error, e.what() = " << e.what() << std::endl; 
-        throw e; 
-      }
-      catch(std::string &s)
-      {
-        std::cout << __PRETTY_FUNCTION__ 
-          << ": error, " << s << std::endl; 
-      }
-      catch(...)
-      {
-        std::cout << __PRETTY_FUNCTION__ 
-          << ": some non standard error" << std::endl; 
-        throw std::string("in") + std::string(__PRETTY_FUNCTION__); 
-      }
-    }
-
   } // anonomyous 
+
+
+  void read(ADATXML::XMLReader &xml, 
+      const std::string &path, 
+      AbstractNamedObject<AbsRedstarXMLInterface_t> &obj)
+  {
+    ADATXML::XMLReader ptop(xml,path); 
+    if(ptop.count("object_name") > 0)
+      read(ptop,"object_name",obj.object_name);
+    else
+      throw std::string( "AbsXML error rad" ); 
+
+    try
+    {
+      obj.param = TheRedstarThreePointAbstractXMLFactoryEnv::callFactory(obj.object_name); 
+      printer_function<abs_obj_read_printer>(obj.object_name); 
+      obj.param->read(ptop,std::string("param"));
+    }
+    catch(std::exception &e) 
+    {
+      std::cout << __PRETTY_FUNCTION__ 
+        << ": error, e.what() = " << e.what() << std::endl; 
+      throw e; 
+    }
+    catch(std::string &s)
+    {
+      std::cout << __PRETTY_FUNCTION__ 
+        << ": error, " << s << std::endl; 
+    }
+    catch(...)
+    {
+      std::cout << __PRETTY_FUNCTION__ 
+        << ": some non standard error" << std::endl; 
+      throw std::string("in") + std::string(__PRETTY_FUNCTION__); 
+    }
+  }
+
 
 
 
   void 
-  RedstarThreePointXML::read(ADATXML::XMLReader &xml, 
-      const std::string &path)
-  { 
-    ADATXML::XMLReader ptop(xml,path); 
-    doXMLRead(ptop,"npt",__PRETTY_FUNCTION__); 
-    doXMLRead(ptop,"ensemble",__PRETTY_FUNCTION__); 
+    RedstarThreePointXML::read(ADATXML::XMLReader &xml, 
+        const std::string &path)
+    { 
+      ADATXML::XMLReader ptop(xml,path); 
+      doXMLRead(ptop,"npt",npt,__PRETTY_FUNCTION__); 
+      doXMLRead(ptop,"ensemble",ensemble,__PRETTY_FUNCTION__); 
 
-    if( npt.size() != 3 )
-    {
-      printer_function<console_print>("incorrect npt size"); 
-      exit(1); 
+      if( npt.size() != 3 )
+      {
+        printer_function<console_print>("incorrect npt size"); 
+        exit(1); 
+      }
     }
-  }
 
   std::string 
     RedstarThreePointXML::write() const
     {
       return npt[0].param->write() 
-        + npt[1].param->write 
-        + npt[2].param->write 
+        + npt[1].param->write()
+        + npt[2].param->write() 
         + "\n ensembel = " + ensemble; 
     }
 
@@ -115,7 +121,7 @@ namespace radmat
       // this will bomb if we can't do the cast
       RedstarThreePointXML* derived;
       derived = dynamic_cast<RedstarThreePointXML*>(base_h.get_ptr());
-      
+
       // allocate a new guy for the ouput handle since the handle we 
       // called from TheRedstarAbstractXMLFactoryEnv will delete whatever
       // derived was pointing at on exit of this scope   

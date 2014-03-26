@@ -6,7 +6,7 @@
 
  * Creation Date : 22-02-2013
 
- * Last Modified : Mon 24 Mar 2014 03:44:02 PM EDT
+ * Last Modified : Tue 25 Mar 2014 03:01:57 PM EDT
 
  * Created By : shultz
 
@@ -44,22 +44,6 @@ namespace radmat
 
   namespace 
   {
-    bool is_singular(const SEMBLE::SembleMatrix<std::complex<double> > &M)
-    {
-      itpp::Mat<std::complex<double> > mm( M.mean() ); 
-      int bound = mm.cols();
-      itpp::Vec<double> s = itpp::svd(mm * itpp::hermitian_transpose(mm));
-      if ( s(bound - 1) / s(0) < 1e-4 )
-      {
-        std::cout << __func__ << bound << std::endl;
-        std::cout << __func__ << ": M is singular, sings " << s << std::endl;
-        std::cout << __func__ << ": M \n" << mm << std::endl;
-        return true; 
-      }
-      return false; 
-    }
-
-
 
     void init_dim(SEMBLE::SembleMatrix<std::complex<double> > &to_init, 
         const SEMBLE::SembleVector<std::complex<double> > &first_row)
@@ -72,26 +56,6 @@ namespace radmat
       to_init = foo; 
     }
 
-
-    FFKinematicInvariants 
-      makeMomInvariants(const ThreePointDataTag &t)
-    {
-#ifdef DEBUG_AT_MAKE_MOM_INV_TAGS 
-
-      std::cout << __func__ << ": debuggin on" << std::endl;
-      t.print_me();
-      std::cout << "mom_string = " << t.mom_string() << std::endl;
-      std::cout << "E_string = " << t.E_string() << std::endl;
-#endif
-
-      return FFKinematicInvariants(
-            FFSingleKinematicInvariants(t.left_E, t.left_mom, 
-              t.left_row, t.mom_fac ) ,
-            FFSingleKinematicInvariants(t.right_E, t.right_mom, 
-              t.right_row, t.mom_fac ) ,
-            t.mom_fac
-          );
-    }
 
 
     std::string sort_string(const ThreePointDataTag &t)
@@ -337,12 +301,9 @@ namespace radmat
     }
 
 
-    FFKinematicFactors_t Kt( FormFactorDecompositionFactoryEnv::callFactory(old_tags.begin()->mat_elem_id) ); 
+    FFKinematicFactors_t Kt;
 
-    Junk = Kt.genFactors(makeMomInvariants(*old_tags.begin()),
-        old_tags.begin()->gamma,
-        old_tags.begin()->gamma_sph,
-        old_tags.begin()->jmu); 
+    Junk = Kt.genFactors(&(*old_tags.begin())); 
     Zero = Junk;
     Zero.zeros(); 
 
@@ -351,10 +312,7 @@ namespace radmat
       SEMBLE::SembleVector<std::complex<double> > workV;
 
       workV = SEMBLE::round_to_zero(
-         Kt.genFactors( makeMomInvariants(old_tags[elem]),
-          old_tags[elem].gamma,
-          old_tags[elem].gamma_sph,
-          old_tags[elem].jmu), tolerance); 
+          Kt.genFactors(&old_tags[elem]), tolerance); 
 
 #if 0
       std::cout << __FILE__ << __func__ << "\n" << workM.mean() << std::endl;
@@ -379,21 +337,19 @@ namespace radmat
 
     lattice_data = non_zero_data;
 
+    rHandle<FormFactorBase_t> mat_elem; 
+    mat_elem = FormFactorDecompositionFactoryEnv::callFactory( old_tags.begin()->mat_elem_id ); 
+
     // warn that we are killing this data point 
-    if(non_zero_data->nrows() < Kt.nFacs())
+    if(non_zero_data->nrows() < mat_elem->nFacs())
     {
       std::cout << __func__ << ": not enough data points to solve the llsq" << std::endl;
       std::cout << "passed in " << sz << " elements of which " << zeroed_data.nrows() 
-        << " failed the zero test, needed " << Kt.nFacs() << " elems, had " 
+        << " failed the zero test, needed " << mat_elem->nFacs() << " elems, had " 
         << non_zero_data->nrows() << "elements " << std::endl;
     }
 
-    // check if the matrix is singular 
-//    if( lattice_data->nrows() >= KJunk.nFacs() )
-//      if ( is_singular( check_singular->data() ) )
-//        return false; 
-//
-    return (non_zero_data->nrows() >= Kt.nFacs());
+    return (non_zero_data->nrows() >= mat_elem->nFacs());
   }
 
 
@@ -609,11 +565,11 @@ namespace radmat
     FF_t = Kinv * lattice_data->data(); 
 
     // pull out the name list here -- yuck
-    FFKinematicFactors_t KK( 
+    rHandle<FormFactorBase_t> KK = 
         FormFactorDecompositionFactoryEnv::callFactory(
-          lattice_data->tags().begin()->mat_elem_id) ); 
+          lattice_data->tags().begin()->mat_elem_id);
     
-    ff_ids = KK.ff_ids(); 
+    ff_ids = KK->ff_ids(); 
 
     init_FF = true; 
 
@@ -643,16 +599,13 @@ namespace radmat
     std::vector<ThreePointDataTag> tags = lattice_data->tags(); 
     std::vector<ThreePointDataTag>::const_iterator it; 
   
-    FFKinematicFactors_t KK( FormFactorDecompositionFactoryEnv::callFactory(it->mat_elem_id)); 
+    FFKinematicFactors_t KK;
 
     for(it = tags.begin(); it != tags.end(); ++it)
     {
 
       SEMBLE::SembleVector<std::complex<double> > work;
-      work = KK.genFactors(makeMomInvariants(*it),
-          it->gamma,
-          it->gamma_sph,
-          it->jmu);
+      work = KK.genFactors( &(*it) );
 
       if(it == tags.begin())
         init_dim(K,work); 
