@@ -6,7 +6,7 @@
 
  * Creation Date : 20-03-2014
 
- * Last Modified : Wed 26 Mar 2014 10:23:12 AM EDT
+ * Last Modified : Thu 27 Mar 2014 09:57:02 AM EDT
 
  * Created By : shultz
 
@@ -31,6 +31,27 @@ namespace radmat
   // utility functions
   namespace
   {
+
+    struct particle_name_printer
+    {
+      static void print(const std::string &msg)
+      { std::cout << "particle_name_printer " << msg << std::endl;}
+    };
+
+    struct generate_block_print_name
+    {
+      static void print(const std::string &msg)
+      { std::cout << "generate_block_print_name " << msg << std::endl;}
+    };
+
+    struct move_lorentz4_printer
+    {
+      static void print(const std::string &msg) 
+      { std::cout << "move_to_lorentz4_printer" << msg << std::endl; }
+    };
+
+    std::string toString(const int i)
+    {std::stringstream ss; ss << i; return ss.str();}
 
     std::string stringy_mom(const ADATXML::Array<int> mom)
     {
@@ -123,14 +144,14 @@ namespace radmat
         ListLatticeIrrepExpr_t::const_iterator it; 
         for(it = lattice_meson.begin(); it != lattice_meson.end(); ++it)
         {
-          std::stringstream name;
-          name << name << "_";
+          std::stringstream op_name;
+          op_name << name << "_";
           if(isProjected)
-            name << stringy_mom(mom) << "_";
-          name << it->m_obj.irrep; 
+            op_name << stringy_mom(mom) << "_";
+          op_name << it->m_obj.irrep; 
 
           Hadron::KeyHadronNPartNPtCorr_t::NPoint_t npt; 
-          npt = make_npt( name.str(), 
+          npt = make_npt( op_name.str(), 
               mom, 
               it->m_obj.row, 
               twoI_z,
@@ -265,6 +286,10 @@ namespace radmat
       {
         std::vector<BlockData> ret; 
 
+        printer_function<move_lorentz4_printer>( 
+            "helicity.size " + toString( int(helicity3.size())) ); 
+
+
         // all the data merged together 
         std::map<std::string,BlockData> merge_blocks; 
 
@@ -285,7 +310,7 @@ namespace radmat
           {
             merge_blocks.insert(std::make_pair(foo.first,*block_it));
             std::stringstream ss;
-            ss << foo.second[0] << foo.second[1] << foo.second[3]; 
+            ss << foo.second[0] << foo.second[1] << foo.second[2]; 
             moms.insert(std::make_pair(ss.str(),foo.second));  
           }
           else
@@ -303,6 +328,12 @@ namespace radmat
           {
             std::stringstream ss; ss << h; 
             b = merge_blocks.find( it->first + "h" + ss.str() ); 
+            if( b == merge_blocks.end() )
+            {
+              std::cout << __PRETTY_FUNCTION__ 
+                << " error, missing " << it->first << std::endl;
+              exit(1); 
+            }
             hel[1-h] = b->second.data; 
           }
 
@@ -334,6 +365,9 @@ namespace radmat
         for( it = d.data.begin(); it != d.data.end(); ++it)
         {
           ENSEM::Complex coeff = it->m_coeff; 
+          printer_function<particle_name_printer>( 
+              it->m_obj.irrep.op.ops[1].name );
+
           std::string key = Hadron::ensemFileName(it->m_obj.irrep); 
 
           if( coeff_map.find(key) != coeff_map.end() )
@@ -393,6 +427,9 @@ namespace radmat
         for(int h = 0; h < hsz; ++h)
         {
           EnsemRedstarBlock block; 
+          
+          printer_function<generate_block_print_name>( ptr->name ); 
+
           block = make_ensem_block( ptr->name, 
               ptr->mom[p],
               ptr->twoI_z,

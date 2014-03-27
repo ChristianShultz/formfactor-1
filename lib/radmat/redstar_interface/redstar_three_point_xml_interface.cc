@@ -6,7 +6,7 @@
 
  * Creation Date : 20-03-2014
 
- * Last Modified : Wed 26 Mar 2014 11:13:41 AM EDT
+ * Last Modified : Wed 26 Mar 2014 01:25:09 PM EDT
 
  * Created By : shultz
 
@@ -60,7 +60,7 @@ namespace radmat
 
     try
     {
-      obj.param = TheRedstarThreePointAbstractXMLFactoryEnv::callFactory(obj.object_name); 
+      obj.param = TheRedstarAbstractXMLFactoryEnv::callFactory(obj.object_name); 
       printer_function<abs_obj_read_printer>(obj.object_name); 
       obj.param->read(ptop,std::string("param"));
     }

@@ -6,7 +6,7 @@
 
 * Creation Date : 24-03-2014
 
-* Last Modified : Wed 26 Mar 2014 12:53:01 PM EDT
+* Last Modified : Thu 27 Mar 2014 11:05:11 AM EDT
 
 * Created By : shultz
 
@@ -32,7 +32,10 @@ namespace radmat
   ENSEM::EnsemReal 
     ThreePointDataTag::Q2() const
     {
-      ENSEM::EnsemReal Q0, Q1, Q2, Q3; 
+      // use the energies to determine the size params of the 
+      // ensem objects then zero them, then set them based on 
+      // the value of the Real types 
+      ENSEM::EnsemReal Q0, Q1, Q2, Q3, QQ; 
       ENSEM::Real zero,q1,q2,q3; 
       zero = ENSEM::toDouble(0.); 
       Q0 = (left_E - right_E) * (left_E - right_E); 
@@ -40,15 +43,35 @@ namespace radmat
       Q2 = zero*Q0;
       Q3 = zero*Q0;
 
-      q1 = ENSEM::toDouble( double( left_mom[0] - right_mom[0] ) ); 
-      q2 = ENSEM::toDouble( double( left_mom[1] - right_mom[1] ) ); 
-      q3 = ENSEM::toDouble( double( left_mom[2] - right_mom[1] ) ); 
+      q1 = ENSEM::toDouble( mom_fac*( left_mom[0] - right_mom[0] ) ); 
+      q2 = ENSEM::toDouble( mom_fac*( left_mom[1] - right_mom[1] ) ); 
+      q3 = ENSEM::toDouble( mom_fac*( left_mom[2] - right_mom[2] ) ); 
 
       Q1 = q1*q1; 
       Q2 = q2*q2; 
       Q3 = q3*q3; 
 
-      return -Q0 + Q1 + Q2 + Q2;
+      // Q2 = - q \dot q 
+      QQ = -Q0 + Q1 + Q2 + Q3;
+      
+    //  double qq = SEMBLE::toScalar(ENSEM::mean(QQ) ); 
+    //  if( qq < 0 ) 
+    //  {
+    //    std::cout << __PRETTY_FUNCTION__ 
+    //      << mom_string() << " is messed up right now??" 
+    //      << " think q2 is " << qq << std::endl;  
+    //    double a0,a1,a2,a3; 
+    //    a0 = SEMBLE::toScalar(ENSEM::mean(Q0));
+    //    a1 = SEMBLE::toScalar(ENSEM::mean(Q1));
+    //    a2 = SEMBLE::toScalar(ENSEM::mean(Q2));
+    //    a3 = SEMBLE::toScalar(ENSEM::mean(Q3));
+    //    std::cout << " Q0 " << a0 << std::endl;
+    //    std::cout << " Q1 " << a1 << std::endl;
+    //    std::cout << " Q2 " << a2 << std::endl;
+    //    std::cout << " Q3 " << a3 << std::endl;
+    //  }
+
+      return QQ; 
     }
 
   void write(ADATIO::BinaryWriter &bin, const ThreePointDataTag &d)

@@ -31,7 +31,10 @@ namespace radmat
     std::string mom_string(const ADATXML::Array<int> &p) const
     { std::stringstream ss; ss << p[0] << p[1] << p[2]; return ss.str();}
     std::string mom_string() const 
-    { return mom_string(left_mom) + mom_string(right_mom); }
+    { 
+      return "left = " + mom_string(left_mom) 
+      + " right = " + mom_string(right_mom);
+    }
 
 
     // specify some representation information  
