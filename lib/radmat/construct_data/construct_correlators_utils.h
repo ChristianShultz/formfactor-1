@@ -23,7 +23,7 @@ namespace radmat
     sort_tagged_corrs_by_Q2(const std::vector<TaggedEnsemRedstarNPtBlock> &); 
 
   std::map<std::string,std::vector<TaggedEnsemRedstarNPtBlock> > 
-    sort_tagged_corrs_by_Q2_and_rotation_group(const std::vector<TaggedEnsemRedstarNPtBlock> &); 
+    sort_tagged_corrs_by_Q2_and_rotation_group(const std::vector<TaggedEnsemRedstarNPtBlock> &, const bool mix_irreps=false); 
 
   // the database type we will be using 
   typedef radmatAllConfDatabaseInterface< Hadron::KeyHadronNPartNPtCorr_t,

@@ -6,7 +6,7 @@
 
  * Creation Date : 22-02-2014
 
- * Last Modified : Thu 20 Mar 2014 09:25:44 AM EDT
+ * Last Modified : Mon 07 Apr 2014 09:50:37 AM EDT
 
  * Created By : shultz
 
@@ -42,6 +42,23 @@ namespace radmat
       //      {std::cout << "helicity form factors " << msg << std::endl;}
     };
 
+
+    struct momrp_printer
+    {
+      static void print(const std::string &msg)
+      {}
+      // { std::cout << "momrp_printer " << msg << std::endl; }
+    };
+
+    std::string to_string(const MomRowPair_t &p)
+    {
+      std::stringstream ss; 
+      ss << "p" << p.first[0] << " " << p.first[1]
+        << " " << p.first[2] << " " << p.first[3];
+      ss << "r" << p.second; 
+      return ss.str(); 
+    }
+
   }
 
   // use whatever is in the lorentzff_canonical_cont_spin decomp
@@ -54,6 +71,8 @@ namespace radmat
       POW2_ASSERT( recipe->id() == Stringify<HelicityFormFactorRecipe_t>() ); 
       const HelicityFormFactorRecipe_t * helicity_recipe;
       helicity_recipe = dynamic_cast< const HelicityFormFactorRecipe_t* >( recipe.get_ptr() );
+
+      printer_function<momrp_printer>( "l->" + to_string(lefty) + "  r->" + to_string(righty) ); 
 
       return helicity_recipe->mat->operator()(lefty,righty,mom_fac); 
     }

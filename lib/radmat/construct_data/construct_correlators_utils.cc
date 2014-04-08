@@ -6,7 +6,7 @@
 
  * Creation Date : 13-11-2013
 
- * Last Modified : Mon 24 Mar 2014 01:36:06 PM EDT
+ * Last Modified : Mon 07 Apr 2014 10:17:41 AM EDT
 
  * Created By : shultz
 
@@ -327,7 +327,8 @@ namespace radmat
   ////////////////////////////////////////////////////////////////////
   // brute force sort on qsq
   std::map<std::string,std::vector<TaggedEnsemRedstarNPtBlock> > 
-    sort_tagged_corrs_by_Q2_and_rotation_group(const std::vector<TaggedEnsemRedstarNPtBlock> &unsorted)
+    sort_tagged_corrs_by_Q2_and_rotation_group(const std::vector<TaggedEnsemRedstarNPtBlock> &unsorted, 
+        const bool mix_irreps)
     {
 
 #ifdef DO_TIMING_SORT_MAT_ELEMS_BY_Q2
@@ -340,11 +341,11 @@ namespace radmat
 
       // loop everything and toss it into a vector if it matches else make a new vector
       for(it = unsorted.begin(); it != unsorted.end(); ++it)
-        if(ret.find(it->rot_qsq_tag()) != ret.end())
-          ret.find(it->rot_qsq_tag())->second.push_back(*it);
+        if(ret.find(it->rot_qsq_tag(mix_irreps)) != ret.end())
+          ret.find(it->rot_qsq_tag(mix_irreps))->second.push_back(*it);
         else
           ret.insert(std::map<std::string,std::vector<TaggedEnsemRedstarNPtBlock> >::value_type(
-                it->rot_qsq_tag(),std::vector<TaggedEnsemRedstarNPtBlock>(1,*it))); 
+                it->rot_qsq_tag(mix_irreps),std::vector<TaggedEnsemRedstarNPtBlock>(1,*it))); 
 
 
 #ifdef DO_TIMING_SORT_MAT_ELEMS_BY_Q2

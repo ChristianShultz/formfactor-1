@@ -6,7 +6,7 @@
 
  * Creation Date : 20-03-2014
 
- * Last Modified : Thu 27 Mar 2014 09:57:02 AM EDT
+ * Last Modified : Thu 03 Apr 2014 05:26:26 PM EDT
 
  * Created By : shultz
 
@@ -17,6 +17,7 @@
 #include "redstar_cartesian_interface.h"
 #include "radmat/data_representation/data_representation.h"
 #include "radmat/utils/printer.h"
+#include "radmat/utils/tokenize.h"
 #include "hadron/irrep_util.h"
 #include "ensem/ensem.h"
 #include "formfac/formfac_qsq.h"
@@ -226,7 +227,8 @@ namespace radmat
         {
           std::string name = it->second.irrep.op.ops[1].name; 
           int row = it->second.irrep.row; 
-          std::string rep = Hadron::getIrrep(name); 
+          std::vector<std::string> tokens = tokenize(name, "_" ); 
+          std::string rep = * ( tokens.end() -1 ); 
           EnsemRedstarBlock data; 
           data = convert_to_list( EnsemRedstarBlock::ListObj_t(one,it->second) );
           ret.push_back( make_block_data(origin,rep,row,data) ); 
@@ -455,7 +457,7 @@ namespace radmat
     generate_cubic_block( const RedstarSingleParticleMesonXML * const ptr)
     {
       std::vector<BlockData> cont = generate_lorentz_block(ptr);
-      return resum_ensem_redstar_blocks(conv_lorentz_to_cubic_block(cont)); 
+      return conv_lorentz_to_cubic_block(cont); 
     }
 
   std::vector<BlockData>
@@ -508,7 +510,7 @@ namespace radmat
     {
       // these two steps get us an unweighted list of everything 
       std::vector<BlockData> cont = generate_lorentz_block(ptr);
-      std::vector<BlockData> resum = resum_ensem_redstar_blocks(conv_lorentz_to_cubic_block(cont)); 
+      std::vector<BlockData> resum = conv_lorentz_to_cubic_block(cont); 
 
       // now go back through and apply the photon weights 
 

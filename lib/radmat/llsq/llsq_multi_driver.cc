@@ -6,7 +6,7 @@
 
  * Creation Date : 22-02-2013
 
- * Last Modified : Tue 25 Mar 2014 03:01:57 PM EDT
+ * Last Modified : Tue 08 Apr 2014 11:04:00 AM EDT
 
  * Created By : shultz
 
@@ -347,6 +347,7 @@ namespace radmat
       std::cout << "passed in " << sz << " elements of which " << zeroed_data.nrows() 
         << " failed the zero test, needed " << mat_elem->nFacs() << " elems, had " 
         << non_zero_data->nrows() << "elements " << std::endl;
+      std::cout << "for " << old_tags.begin()->mom_string() << std::endl; 
     }
 
     return (non_zero_data->nrows() >= mat_elem->nFacs());
@@ -440,6 +441,12 @@ namespace radmat
     check_exit_Kinv();
     check_exit_FF(); 
 
+    std::stringstream Kpth; 
+    Kpth <<  path << "K";
+    SEMBLE::SEMBLEIO::makeDirectoryPath( Kpth.str() ); 
+    Kpth << "/"; 
+
+
 
     std::stringstream ss, A,Ainv, x; 
     std::stringstream unity, Kstr,Kistr; 
@@ -448,8 +455,8 @@ namespace radmat
     Ainv << ss.str() << "Kinv.mean"; 
     unity << ss.str() <<  "Kinv_x_K.mean"; 
     x << ss.str() << "ff_";
-    Kstr << ss.str() << "K_row_";
-    Kistr << ss.str() << "Kinv_row_";
+    Kstr << Kpth.str() << "K_row_";
+    Kistr << Kpth.str() << "Kinv_row_";
 
 
     my_writer_mean(A.str(),K);

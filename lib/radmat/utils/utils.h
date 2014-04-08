@@ -15,6 +15,7 @@
 #include "splash.h"
 #include "stringify.h"
 #include "tensor.h"
+#include "tokenize.h"
 #include "type_computations.h"
 #include "utils.h"
 #endif

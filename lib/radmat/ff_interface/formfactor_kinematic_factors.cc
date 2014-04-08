@@ -6,7 +6,7 @@
 
  * Creation Date : 18-03-2014
 
- * Last Modified : Tue 25 Mar 2014 02:32:47 PM EDT
+ * Last Modified : Tue 08 Apr 2014 10:14:13 AM EDT
 
  * Created By : shultz
 
@@ -21,6 +21,9 @@
 #include "semble/semble_meta.h"
 #include "radmat/utils/printer.h"
 #include "radmat/utils/stringify.h"
+#include "radmat/utils/pow2assert.h"
+#include "radmat/redstar_interface/redstar_cartesian_interface.h"
+#include "radmat/redstar_interface/redstar_photon_props.h"
 #include <utility>
 #include <sstream>
 #include <string>
@@ -32,6 +35,156 @@ namespace radmat
 
   namespace 
   {
+
+    struct three_point_tag_printer
+    {
+      static void print(const std::string &msg)
+      {}
+      // { std::cout << "three_point_tag_printer " << msg << std::endl;}
+    };
+
+    struct subduce_info_printer
+    {
+      static void print(const std::string &msg)
+      {}
+      // { std::cout << "subduce_info_printer " << msg << std::endl;}
+    };
+
+    struct kgen_info_printer
+    {
+      static void print(const std::string &msg)
+      {}
+      // { std::cout << "kgen_info_printer " << msg << std::endl;}
+    };
+
+    struct helicity_printer
+    {
+      static void print(const std::string &msg) 
+      {}
+      // { std::cout << "helicity_printer " << msg << std::endl; }
+    }; 
+
+    std::string to_string(const int i)
+    {std::stringstream ss; ss << i; return ss.str();}
+
+    std::string to_string(const std::complex<double> &cd)
+    {std::stringstream ss; ss << cd; return ss.str();}
+
+    std::string to_string(const itpp::Mat<std::complex<double> > &m )
+    {std::stringstream ss; ss << m; return ss.str(); }
+
+
+    FFKinematicFactors_t::KinematicFactorRow
+      handle_subduce_J0( const FFKinematicFactors_t::KinematicFactorMatrix &KF , 
+          const int row, 
+          const ADATXML::Array<int> &q, 
+          const std::string &sub_key)
+      {
+        const SubduceTableMap::irrep_sub_table * table; 
+        table = TheSmarterSubduceTableMap::Instance().get_table(sub_key); 
+        SubduceTableMap::sub_list subduce = table->query_1( row ); 
+
+        // subduce is a list of pairs of stl complex and int  
+
+        // this must be a 1 elem list
+        POW2_ASSERT(subduce.size() == 1);
+
+        // the scalar part lives in the 0 slot
+        return KF.getRow(0);  
+      }
+
+
+    // rows are + 0 - 
+    FFKinematicFactors_t::KinematicFactorMatrix 
+      move_to_helicity( const FFKinematicFactors_t::KinematicFactorMatrix &KF , 
+          const ADATXML::Array<int> &q)
+      {
+        FFKinematicFactors_t::KinematicFactorMatrix ret; 
+
+        // single precision zero  
+        double tolerance = 1e-6; 
+
+        // rows are + 0 -  , cols are x y z 
+        itpp::Mat<std::complex<double> > eps = itpp::round_to_zero(eps3d(q,PHOTON_CREATE),tolerance); 
+
+
+        // intermediate variables 
+        FFKinematicFactors_t::KinematicFactorRow p,z,m; 
+        p = KF.getRow(0); 
+        p.zeros(); 
+        z = p;
+        m = p; 
+
+        // ensems are big, avoid a copy if the coeff is zero-ish 
+        std::complex<double> complex_zero(0.,0.); 
+
+        // take the linear combinations, 
+        // bung them into named vectors
+        //
+        // NB: KF is a 4 tensor, eps is a 3 tensor
+        for(int i = 0; i < 3; ++i)
+        {
+          if( eps(0,i) != complex_zero )
+            p += eps(0,i) * KF.getRow(i+1); 
+          if( eps(1,i) != complex_zero )
+            z += eps(1,i) * KF.getRow(i+1); 
+          if( eps(2,i) != complex_zero )
+            m += eps(2,i) * KF.getRow(i+1); 
+        }
+
+
+        // dump the vectors into the return matrix 
+        ret.reDim(p.getB(), 3, p.getN()); 
+        for(int j = 0; j < p.getN(); ++j)
+        {
+          ret.loadEnsemElement(0,j,p.getEnsemElement(j));
+          ret.loadEnsemElement(1,j,z.getEnsemElement(j));
+          ret.loadEnsemElement(2,j,m.getEnsemElement(j));
+        }
+
+        //  printer_function<helicity_printer>( "\n" +  to_string(eps) ) ; 
+        //  printer_function<helicity_printer>( " - KF \n" + to_string( KF.mean() ) ); 
+        //  printer_function<helicity_printer>( " - eps * KF\n" + to_string( ret.mean() ) ); 
+
+
+        return ret; 
+      }
+
+    FFKinematicFactors_t::KinematicFactorRow
+      handle_subduce_J1( const FFKinematicFactors_t::KinematicFactorMatrix &KF , 
+          const int row, 
+          const ADATXML::Array<int> &q, 
+          const std::string &sub_key)
+      {
+        FFKinematicFactors_t::KinematicFactorRow ret; 
+
+        // subduce is a list of pairs of stl complex and int  
+        const SubduceTableMap::irrep_sub_table * table; 
+        table = TheSmarterSubduceTableMap::Instance().get_table(sub_key); 
+        SubduceTableMap::sub_list subduce = table->query_1( row ); 
+
+        // + -> row 0, 0 -> row 1, - -> row 2 of the matric Hel
+        FFKinematicFactors_t::KinematicFactorMatrix Hel = move_to_helicity( KF, q); 
+
+        // init it 
+        ret = Hel.getRow(0); 
+        ret.zeros(); 
+
+        std::complex<double> complex_zero(0.,0.); 
+
+        // loop the coeffs and put it together 
+        SubduceTableMap::sub_list::const_iterator it; 
+        for(it = subduce.begin(); it != subduce.end(); ++it)
+          if( it->first != complex_zero )
+          {
+            printer_function<subduce_info_printer>( 
+                to_string(it->first) + " x [" + to_string(it->second) +"]");  
+            ret += it->first * Hel.getRow(1 - it->second); 
+          }
+
+        return ret; 
+      }
+
 
     FFKinematicFactors_t::KinematicFactorRow
       handle_three_point_lorentz_insertion( 
@@ -47,8 +200,47 @@ namespace radmat
           const ThreePointDataTag * tag, 
           const rHandle<Rep_p> & gamma)
       {
-        __builtin_trap(); 
-        return KF.getRow( tag->gamma_row ); 
+        // return variable
+        FFKinematicFactors_t::KinematicFactorRow ret = KF.getRow(0); 
+        ret.zeros(); 
+
+        printer_function<three_point_tag_printer>(gamma->rep_type()); 
+
+        // create the key  -- cubic part
+        const CubicRep * g_rep_ptr; 
+        g_rep_ptr = dynamic_cast<const CubicRep*>(gamma.get_ptr()); 
+        rHandle<CubicRep> g_rep( g_rep_ptr->clone() ); 
+
+        // create the key  -- lorentz part
+        rHandle<Rep_p> g_origin_prim = tag->origin_rep.gamma(); 
+        const LorentzRep * g_origin_rep; 
+        g_origin_rep = dynamic_cast<const LorentzRep*>(g_origin_prim.get_ptr()); 
+        rHandle<LorentzRep> g_origin( g_origin_rep->clone() ); 
+
+        // subduction table key 
+        std::string key = make_subduce_table_map_id(g_origin,g_rep);  
+
+        printer_function<three_point_tag_printer>( "subduce key->" + key ); 
+        int g_row = tag->gamma_row; 
+        ADATXML::Array<int> q = tag->q; 
+
+        if( g_origin->rep_spin() == 0 )
+        {
+          ret = handle_subduce_J0( KF, g_row, q, key); 
+        }
+        else if( g_origin->rep_spin() == 1 )
+        {
+          ret = handle_subduce_J1( KF, g_row, q, key); 
+        }
+        else
+        {
+          // die with a seg fault, photons are spin 0 or 1 for me,
+          // I dont care about you
+          std::cout << __PRETTY_FUNCTION__ << " err: " 
+            << g_origin->rep_id() << " is not a photon" << std::endl;
+          __builtin_trap(); 
+        }
+        return ret; 
       }
 
     FFKinematicFactors_t::KinematicFactorRow
@@ -99,6 +291,10 @@ namespace radmat
 
         // this also checks size of righty vs size of lefty
         POW2_ASSERT_DEBUG( (nbins == right_E.size()) && (nfacs > 0) );
+
+        printer_function<kgen_info_printer>(tag->mat_elem_id); 
+        printer_function<kgen_info_printer>("left_row " + to_string(left_row)); 
+        printer_function<kgen_info_printer>("right_row " + to_string(right_row)); 
 
         // loop over cfgs and use the wrapper to operator()
         for(int bin = 0; bin < nbins; bin++)

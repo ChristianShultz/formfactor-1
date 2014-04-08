@@ -6,7 +6,7 @@
 
  * Creation Date : 19-03-2014
 
- * Last Modified : Thu 20 Mar 2014 09:23:15 AM EDT
+ * Last Modified : Tue 08 Apr 2014 01:22:15 PM EDT
 
  * Created By : shultz
 
@@ -33,13 +33,15 @@ namespace radmat
     struct subduce_table_printer
     {
       static void print(const std::string &msg)
-      { std::cout << "subduce_table_printer " << msg << std::endl;}
+      {}
+    //  { std::cout << "subduce_table_printer " << msg << std::endl;}
     };
 
     struct subduce_printer
     {
       static void print(const std::string &msg)
-      { std::cout << "subduce_printer " << msg << std::endl;}
+      {}
+    //  { std::cout << "subduce_printer " << msg << std::endl;}
     };
 
     SubduceTableMap::irrep_sub_table*

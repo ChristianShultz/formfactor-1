@@ -6,7 +6,7 @@
 
  * Creation Date : 13-03-2014
 
- * Last Modified : Thu 20 Mar 2014 09:26:35 AM EDT
+ * Last Modified : Tue 08 Apr 2014 01:22:45 PM EDT
 
  * Created By : shultz
 
@@ -35,11 +35,19 @@ namespace radmat
 
   namespace 
   {
-    
+
     struct subduce_table_printer
     {
       static void print(const std::string &msg)
-      { std::cout << "subduce_table_printer " + msg << std::endl; }
+      {}
+      // { std::cout << "subduce_table_printer " + msg << std::endl; }
+    };
+
+    struct subduce_names_printer
+    {
+      static void print(const std::string &msg)
+      {}
+      // { std::cout << msg << std::endl; }
     };
 
 
@@ -83,13 +91,27 @@ namespace radmat
 
       // left and right representations to make the strings to 
       // call the factory 
-      rHandle<CubicRep> l_cub_rep , r_cub_rep;
-      rHandle<LorentzRep> l_sph_rep , r_sph_rep; 
+      const CubicRep *l_cub_rep_ptr , *r_cub_rep_ptr;
+      const LorentzRep *l_sph_rep_ptr , *r_sph_rep_ptr; 
 
-      l_cub_rep = recipe->lefty;
-      r_cub_rep = recipe->righty;
-      l_sph_rep = recipe->hel.lefty;
-      r_sph_rep = recipe->hel.righty; 
+      // get some pointers, cant use handles b/c of threading 
+      l_cub_rep_ptr = recipe->lefty.get_ptr();
+      r_cub_rep_ptr = recipe->righty.get_ptr();
+      l_sph_rep_ptr = recipe->hel.lefty.get_ptr();
+      r_sph_rep_ptr = recipe->hel.righty.get_ptr(); 
+
+      // use clone method so our handles are function local 
+      // and equivalently thread local 
+      rHandle<CubicRep> l_cub_rep( l_cub_rep_ptr->clone() ); 
+      rHandle<CubicRep> r_cub_rep( r_cub_rep_ptr->clone() ); 
+      rHandle<LorentzRep> l_sph_rep( l_sph_rep_ptr->clone() );
+      rHandle<LorentzRep> r_sph_rep( r_sph_rep_ptr->clone() );
+
+      printer_function<subduce_names_printer>( "l_cub " + l_cub_rep->rep_id() );
+      printer_function<subduce_names_printer>( "r_cub " + r_cub_rep->rep_id() );
+      printer_function<subduce_names_printer>( "l_sph " + l_sph_rep->rep_id() );
+      printer_function<subduce_names_printer>( "r_sph " + r_sph_rep->rep_id() );
+
 
       // generate the id for the subduce table map 
       std::string l_map_id , r_map_id; 
@@ -114,10 +136,10 @@ namespace radmat
       //     to transform under rotations so all the hard work is hidden 
       for( l = l_table->sub[left_row].begin(); l != l_table->sub[left_row].end(); ++l)
         for( r = r_table->sub[right_row].begin(); r != r_table->sub[right_row].end(); ++r)
-         ret += ( ( std::conj(l->first) * r->first ) 
-                * recipe->hel.mat->operator()( std::make_pair( lefty.first , l->second),
-                      std::make_pair( righty.first , r->second ),
-                      mom_fac)); 
+          ret += ( ( std::conj(l->first) * r->first ) 
+              * recipe->hel.mat->operator()( std::make_pair( lefty.first , l->second),
+                std::make_pair( righty.first , r->second ),
+                mom_fac)); 
 
       return ret; 
     }
@@ -134,20 +156,21 @@ namespace radmat
       {
         static void print(const std::string &s)
         {}
-      //  { std::cout << "subduced form factors, found a " << s << std::endl;}
+        //  { std::cout << "subduced form factors, found a " << s << std::endl;}
       };
 
       struct subduce_printer
       {
         static void print(const std::string &s)
         {}
-      //  { std::cout << "found subduction table " << s << std::endl;}
+        //  { std::cout << "found subduction table " << s << std::endl;}
       };
 
       struct subduce_reg_printer
       {
         static void print(const std::string &s)
-        { std::cout << "subduced form factors, regging  " << s << std::endl;}
+        {}
+        //   { std::cout << "subduced form factors, regging  " << s << std::endl;}
       };
 
 
@@ -165,7 +188,8 @@ namespace radmat
       struct possible_sub_printer
       {
         static void print(const std::string &msg)
-        {std::cout << "possible subduction " << msg << std::endl;}
+        {}
+        // {std::cout << "possible subduction " << msg << std::endl;}
       };
 
 

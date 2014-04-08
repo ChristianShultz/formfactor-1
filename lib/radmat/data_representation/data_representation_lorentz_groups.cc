@@ -6,7 +6,7 @@
 
 * Creation Date : 19-03-2014
 
-* Last Modified : Thu 20 Mar 2014 09:22:45 AM EDT
+* Last Modified : Tue 08 Apr 2014 10:12:15 AM EDT
 
 * Created By : shultz
 
@@ -34,14 +34,15 @@ namespace radmat
       struct reg_printer
       {
         static void print(const std::string &msg)
-        { std::cout << "spher rep, regged " << msg << std::endl; }
+        {}
+        // { std::cout << "spher rep, regged " << msg << std::endl; }
       };
 
       struct key_printer
       {
         static void print(const std::string &msg)
         {}
-//        {std::cout << __PRETTY_FUNCTION__<<  "  " << msg << std::endl;}
+        // {std::cout << __PRETTY_FUNCTION__<<  "  " << msg << std::endl;}
       };
 
       bool registered = false; 

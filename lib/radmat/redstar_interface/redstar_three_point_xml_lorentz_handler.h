@@ -13,7 +13,7 @@ namespace radmat
   struct RedstarThreePointXMLLorentzHandler
     : public RedstarThreePointXMLHandler
   {
-    virtual ~RedstarThreePointXMLLorentzHandler() {};
+    virtual ~RedstarThreePointXMLLorentzHandler() {}
 
     virtual std::string type() const
     { return Stringify<RedstarThreePointXMLLorentzHandler>(); }

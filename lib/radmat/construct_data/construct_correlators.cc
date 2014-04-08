@@ -6,7 +6,7 @@
 
  * Creation Date : 04-12-2012
 
- * Last Modified : Wed 26 Mar 2014 11:23:35 AM EDT
+ * Last Modified : Mon 07 Apr 2014 10:27:40 AM EDT
 
  * Created By : shultz
 
@@ -137,39 +137,98 @@ namespace radmat
         return ret; 
       }
 
-// template xml handler 
+    // template xml handler 
     template<typename T> 
-      std::vector<ThreePointData>
+      std::vector<TaggedEnsemRedstarNPtBlock> 
       pull_data_xml_function( const ThreePointCorrIni_t &, 
-           rHandle<AbsRedstarXMLInterface_t> &)
-      { __builtin_trap(); return std::vector<ThreePointData>(); }
+          rHandle<AbsRedstarXMLInterface_t> &)
+      { __builtin_trap(); return std::vector<TaggedEnsemRedstarNPtBlock>(); }
 
     // handle a lorentz type 
     template<>
-      std::vector<ThreePointData>
-      pull_data_xml_function<RedstarThreePointXMLLorentzHandler>( const ThreePointCorrIni_t &, 
+      std::vector<TaggedEnsemRedstarNPtBlock> 
+      pull_data_xml_function<RedstarThreePointXMLLorentzHandler>( const ThreePointCorrIni_t &ini, 
           rHandle<AbsRedstarXMLInterface_t> &handle)
       {
         RedstarThreePointXMLLorentzHandler *red; 
         red = dynamic_cast<RedstarThreePointXMLLorentzHandler*>(handle.get_ptr()); 
-        return red->handle_work(); 
+
+        double p_factor = mom_factor(ini.xi,ini.L_s); 
+        std::string elem_id = ini.matElemID; 
+        const radmatDBProp_t *db_prop = &ini.radmatDBProp; 
+        const ThreePointCorrXMLIni_t *three_pt = &ini.threePointCorrXMLIni; 
+
+
+        return tag_lattice_xml(
+            red->handle_work(),
+            p_factor, 
+            three_pt->maSink, 
+            three_pt->maSource, 
+            elem_id); 
       }
 
 
+    // handle a lorentz type 
+    template<>
+      std::vector<TaggedEnsemRedstarNPtBlock> 
+      pull_data_xml_function<RedstarThreePointXMLSubduceHandler>( const ThreePointCorrIni_t &ini, 
+          rHandle<AbsRedstarXMLInterface_t> &handle)
+      {
+        RedstarThreePointXMLSubduceHandler *red; 
+        red = dynamic_cast<RedstarThreePointXMLSubduceHandler*>(handle.get_ptr()); 
+
+        double p_factor = mom_factor(ini.xi,ini.L_s); 
+        std::string elem_id = ini.matElemID; 
+        const radmatDBProp_t *db_prop = &ini.radmatDBProp; 
+        const ThreePointCorrXMLIni_t *three_pt = &ini.threePointCorrXMLIni; 
+
+        // this must pick out the correct matrix element
+        std::vector<TaggedEnsemRedstarNPtBlock> lorentz_tagged_data;
+        lorentz_tagged_data =  tag_lattice_xml(
+            red->handle_work(),
+            p_factor, 
+            three_pt->maSink, 
+            three_pt->maSource, 
+            elem_id); 
+
+        std::vector<TaggedEnsemRedstarNPtBlock>::iterator it; 
+        for(it = lorentz_tagged_data.begin(); it != lorentz_tagged_data.end(); ++it)
+          {
+            // use a pointer to avoid a full copy 
+            ThreePointDataTag * tag = &(it->data_tag); 
+            rHandle<Rep_p> l_prim, r_prim; 
+            l_prim = tag->data_rep.lefty(); 
+            r_prim = tag->data_rep.righty(); 
+            tag->mat_elem_id += "__" + l_prim->rep_id() + "," + r_prim->rep_id(); 
+          }
+
+        // actually has an updated cubic mat elem here despite the 
+        // stupidity of the name 
+        return lorentz_tagged_data; 
+      }
+
     //////////////////////////////////////////////////////
     // pull data out of the xml class
-    std::vector<ThreePointData> pull_data_xml(const ThreePointCorrIni_t &ini)
-    {
-      rHandle<AbsRedstarXMLInterface_t> red = ini.threePointCorrXMLIni.redstar; 
+    //      -- the name of the class defines the type of 
+    //      representation we want out matrix element to 
+    //      have but does not not not define the sorting 
+    //      method that we apply to the data 
+    std::vector<TaggedEnsemRedstarNPtBlock> 
+      pull_data_xml(const ThreePointCorrIni_t &ini)
+      {
+        rHandle<AbsRedstarXMLInterface_t> red = ini.threePointCorrXMLIni.redstar; 
 
-      if( red->type() == Stringify<RedstarThreePointXMLLorentzHandler>() )
-        return pull_data_xml_function<RedstarThreePointXMLLorentzHandler>( ini, red ); 
-      else
-        printer_function<console_print>(" unknown type " + red->type() ); 
+        if( red->type() == Stringify<RedstarThreePointXMLLorentzHandler>() )
+          return pull_data_xml_function<RedstarThreePointXMLLorentzHandler>( ini, red ); 
+        else if( red->type() == Stringify<RedstarThreePointXMLSubduceHandler>() )
+          return pull_data_xml_function<RedstarThreePointXMLSubduceHandler>( ini, red ); 
+        else
+          printer_function<console_print>(" unknown type " + red->type()
+              + " in pull_data_xml in construct_correlators.cc " ); 
 
-      exit(1); 
-    }
-  
+        exit(1); 
+      }
+
 
 
     ///////////////////////////////////////////////////////
@@ -191,17 +250,30 @@ namespace radmat
 
         std::vector<TaggedEnsemRedstarNPtBlock> unsorted_elems; 
 
-        std::vector<ThreePointData> raw_data = pull_data_xml(ini); 
-        unsorted_elems = tag_lattice_xml(
-            raw_data,
-            p_factor, 
-            three_pt->maSink, 
-            three_pt->maSource, 
-            elem_id); 
+        unsorted_elems = pull_data_xml(ini); 
+
+        bool sort_mode; 
+        std::map<std::string,bool> sort_mode_map; 
+        sort_mode_map.insert( std::make_pair( "subduce" , false ) ); 
+        sort_mode_map.insert( std::make_pair( "mix_irreps" , true ) ); 
+
+        std::map<std::string,bool>::const_iterator sort_mode_it; 
+        sort_mode_it = sort_mode_map.find( ini.matElemMode ); 
+        if( sort_mode_it == sort_mode_map.end() ) 
+        {
+          std::cout << __PRETTY_FUNCTION__ << ": " << ini.matElemMode 
+            << " is not supported, try one of the following" << std::endl;
+          for(sort_mode_it = sort_mode_map.begin(); sort_mode_it != sort_mode_map.end(); ++sort_mode_it)
+            std::cout << sort_mode_it->first << std::endl;
+          exit(1); 
+        }
+
+        sort_mode = sort_mode_it->second; 
+
 
         std::map<std::string,std::vector<TaggedEnsemRedstarNPtBlock> > sorted_elems;
         std::map<std::string,std::vector<TaggedEnsemRedstarNPtBlock> >::const_iterator it;
-        sorted_elems = sort_tagged_corrs_by_Q2_and_rotation_group(unsorted_elems); 
+        sorted_elems = sort_tagged_corrs_by_Q2_and_rotation_group(unsorted_elems, sort_mode); 
 
         std::vector<std::pair<std::string,std::vector<TaggedEnsemRedstarNPtBlock> > > loop_data; 
 
@@ -274,13 +346,7 @@ namespace radmat
       const ThreePointCorrXMLIni_t *three_pt = &m_ini.threePointCorrXMLIni; 
 
       std::vector<TaggedEnsemRedstarNPtBlock> unsorted_elems; 
-      std::vector<ThreePointData> raw_data = pull_data_xml(m_ini); 
-      unsorted_elems = tag_lattice_xml(
-          raw_data,
-          p_factor, 
-          three_pt->maSink, 
-          three_pt->maSource, 
-          elem_id); 
+      unsorted_elems = pull_data_xml(m_ini); 
 
       std::cout << __PRETTY_FUNCTION__ << ": $#unsorted = " << unsorted_elems.size() << std::endl; 
 

@@ -1,3 +1,4 @@
+
 #
 # Path and flags for all files used in building the library
 #
@@ -94,12 +95,14 @@ nobase_include_HEADERS =   \
 													 radmat/redstar_interface/redstar_interface.h    \
 													 radmat/redstar_interface/redstar_invert_subduction.h    \
 													 radmat/redstar_interface/redstar_particle_handler_utils.h    \
+													 radmat/redstar_interface/redstar_photon_polarization_tensor.h    \
 													 radmat/redstar_interface/redstar_photon_props.h    \
 													 radmat/redstar_interface/redstar_single_particle_meson_xml_interface.h    \
 													 radmat/redstar_interface/redstar_three_point_utils.h    \
 													 radmat/redstar_interface/redstar_three_point_xml_handler.h    \
 													 radmat/redstar_interface/redstar_three_point_xml_interface.h    \
 													 radmat/redstar_interface/redstar_three_point_xml_lorentz_handler.h    \
+													 radmat/redstar_interface/redstar_three_point_xml_subduce_handler.h    \
 													 radmat/redstar_interface/redstar_vector_current_xml_interface.h    \
 													 radmat/register_all/register_all.h    \
 													 radmat/utils/aux.h    \
@@ -118,6 +121,7 @@ nobase_include_HEADERS =   \
 													 radmat/utils/splash.h    \
 													 radmat/utils/stringify.h    \
 													 radmat/utils/tensor.h    \
+													 radmat/utils/tokenize.h    \
 													 radmat/utils/type_computations.h    \
 													 radmat/utils/utils.h    
 
@@ -172,6 +176,7 @@ libradmat_a_SOURCES =	\
 											radmat/redstar_interface/redstar_three_point_utils.cc    \
 											radmat/redstar_interface/redstar_three_point_xml_interface.cc    \
 											radmat/redstar_interface/redstar_three_point_xml_lorentz_handler.cc    \
+											radmat/redstar_interface/redstar_three_point_xml_subduce_handler.cc    \
 											radmat/redstar_interface/redstar_vector_current_xml_interface.cc    \
 											radmat/register_all/register_all.cc    \
 											radmat/utils/aux.cc    \

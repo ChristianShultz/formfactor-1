@@ -1,182 +1,164 @@
 /* -.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.
 
-* File Name : grab_ff.cc
+ * File Name : grab_ff.cc
 
-* Purpose :
+ * Purpose :
 
-* Creation Date : 22-04-2013
+ * Creation Date : 22-04-2013
 
-* Last Modified : Sat 22 Feb 2014 05:05:47 PM EST
+ * Last Modified : Tue 08 Apr 2014 01:15:08 PM EDT
 
-* Created By : shultz
+ * Created By : shultz
 
-_._._._._._._._._._._._._._._._._._._._._.*/
+ _._._._._._._._._._._._._._._._._._._._._.*/
 
 
 #include <string>
 #include <sstream>
 
-#include "radmat/ff/lorentzff_formfactor_factory.h"
-#include "radmat/ff/lorentzff_canonical_rotations.h"
-#include "radmat/utils/tensor.h"
 #include "radmat/register_all/register_all.h"
-
-//
-//
-// NB: this uses lorentzff_formfactor_factory
-//
-//  the internal form factors used by radmat are 
-//  mapped to linear combinations of these but are
-//  evaluated in a slightly different way, check 
-//  radmat/ff_interface/forfactor_factory.h for
-//  more details 
-//
-//
-//  -- currently this guy does not have access to 
-//  the cubic form factors 
-//
-//  -- currently this guy does not have access to 
-//  the helicity form factors
-//
-//
+#include "radmat/ff_interface/ff_interface.h"
+#include "io/adat_xmlio.h"
 
 
-
-using namespace radmat;
-using namespace std; 
-
-struct inp
+struct chunk
 {
-  string matElemID; 
-  Tensor<double,1> pf,pi;
-  mom_t l,r; 
-  double pfac;
-  bool jmu;
-  int mu, hf, hi; 
+  std::string origin, data;
+  double E; 
+  int row; 
+  ADATXML::Array<int> mom; 
+};
+
+struct input
+{
+  chunk left, gamma, right; 
+  std::string tran; 
+  double mom_fac; 
 };
 
 
-// assuming that the momentum factor is already in the space bits here -- on shell
-void do_boost(Tensor<double,1> &p)
+  template<typename T>
+void doXMLReadT(ADATXML::XMLReader &ptop, const std::string &path, T &place, const char * f)
 {
-  p[0] = sqrt(p[0]*p[0] + p[1]*p[1] + p[2]*p[2] + p[3]*p[3]);
+  if(ptop.count(path) > 0)
+    read(ptop,path,place);
+  else
+  {
+    std::cerr << __PRETTY_FUNCTION__ << ": Error, called by " << f << " trying to read path, " << path
+      << ", path was empty, exiting" << std::endl;
+    exit(1);
+  }
 }
 
 
-inp usage(int argc, char *argv[])
+void read( ADATXML::XMLReader &xml, const std::string &pth, chunk &c)
 {
-  if( (argc != 13) && (argc != 14) ) 
-  {
-    std::cerr << "usage: <grab_ff> <matElemID> <m_f> <nx ny nz>  <m_i> <nx ny, nz> <2pi/xi/nspace> <h_f> <h_i>  <optional jmu>" << std::endl;
-    exit(1); 
-  }
+  ADATXML::XMLReader ptop(xml,pth); 
+  doXMLReadT(ptop,"origin",c.origin,__PRETTY_FUNCTION__);
+  doXMLReadT(ptop,"data",c.data,__PRETTY_FUNCTION__);
+  doXMLReadT(ptop,"mass",c.E,__PRETTY_FUNCTION__);
+  doXMLReadT(ptop,"row",c.row,__PRETTY_FUNCTION__);
+  doXMLReadT(ptop,"mom",c.mom,__PRETTY_FUNCTION__);
+}; 
 
 
-  inp foo;
+int mom_sq(const ADATXML::Array<int> &p)
+{
+  return p[0]*p[0] + p[1]*p[1] + p[2]*p[2]; 
+}
 
-  { std::stringstream ss(argv[1]); ss >> foo.matElemID; }
-  { std::stringstream z(argv[2]),o(argv[3]),t(argv[4]),th(argv[5]);
-    mom_t p; 
-    p.resize(3); 
-    Tensor<double,1> fred((TensorShape<1>())[4],0.);
-    z >> fred[0];
-    o >> fred[1];
-    t >> fred[2];
-    th >> fred[3];
-    
-    p[0] = fred[1]; 
-    p[1] = fred[2];
-    p[2] = fred[3];  
-
-    foo.l = p; 
-    foo.pf = fred; }
-
-    { std::stringstream z(argv[6]),o(argv[7]),t(argv[8]),th(argv[9]);
-    Tensor<double,1> fred((TensorShape<1>())[4],0.);
-    mom_t p; 
-    p.resize(3); 
-    z >> fred[0];
-    o >> fred[1];
-    t >> fred[2];
-    th >> fred[3];
-     
-    
-    p[0] = fred[1]; 
-    p[1] = fred[2];
-    p[2] = fred[3];  
-
-    foo.r = p; 
-    foo.pi = fred; }
-
-    {std::stringstream ss(argv[10]); ss >> foo.pfac;}
-    {std::stringstream ss(argv[11]); ss >> foo.hf;}
-    {std::stringstream ss(argv[12]); ss >> foo.hi;}
+void read( ADATXML::XMLReader &xml, const std::string &pth, input &i)
+{
+  ADATXML::XMLReader ptop(xml,pth); 
+  doXMLReadT(ptop,"left",i.left,__PRETTY_FUNCTION__);
+  doXMLReadT(ptop,"gamma",i.gamma,__PRETTY_FUNCTION__);
+  doXMLReadT(ptop,"right",i.right,__PRETTY_FUNCTION__);
+  doXMLReadT(ptop,"tran",i.tran,__PRETTY_FUNCTION__);
+  doXMLReadT(ptop,"mom_fac",i.mom_fac,__PRETTY_FUNCTION__);
 
 
-    for(int i = 1; i < 4; ++i)
-    {
-      foo.pf[i] *= foo.pfac;
-      foo.pi[i] *= foo.pfac;
-    }
-    
-    do_boost(foo.pf);
-    do_boost(foo.pi); 
+  i.left.E = sqrt( i.left.E * i.left.E + i.mom_fac*i.mom_fac*double(mom_sq(i.left.mom)));
+  i.gamma.E = sqrt( i.gamma.E * i.gamma.E + i.mom_fac*i.mom_fac*double(mom_sq(i.gamma.mom)));
+  i.right.E = sqrt( i.right.E * i.right.E + i.mom_fac*i.mom_fac*double(mom_sq(i.right.mom)));
+}
 
-    foo.jmu = false; 
 
-    if(argc == 14)
-    {
-      foo.jmu = true;
-      std::stringstream ss(argv[11]); ss >> foo.mu; 
-    }
+  ENSEM::EnsemReal 
+ensem_energy( const double d, const int sz)
+{
+  ENSEM::EnsemReal ret; 
+  ret.resize(sz); 
+  ret = ENSEM::Real(d); 
+  return ret; 
+}
 
-    return foo; 
+
+
+  radmat::ThreePointDataTag
+generate_tag( const chunk &l , 
+    const chunk &g, 
+    const chunk &r, 
+    const std::string &tran, 
+    const double mom_fac)
+{
+  radmat::ThreePointDataTag foo; 
+  foo.origin_rep = radmat::DataRep3pt( l.origin, g.origin, r.origin); 
+  foo.data_rep = radmat::DataRep3pt( l.data, g.data, r.data); 
+  foo.mat_elem_id = l.origin + r.origin + "_" + tran; 
+
+  foo.left_row = l.row; 
+  foo.gamma_row = g.row; 
+  foo.right_row = r.row; 
+
+  foo.left_mom = l.mom;
+  foo.q = g.mom;
+  foo.right_mom = r.mom; 
+
+  foo.mom_fac = mom_fac; 
+
+  foo.left_E = ensem_energy( l.E , 10 ); 
+  foo.right_E = ensem_energy( r.E , 10 ); 
+
+  return foo;
 }
 
 
 int main(int argc, char *argv[])
 {
+  radmat::AllFactoryEnv::registerAll(); 
 
-  AllFactoryEnv::registerAll(); 
+  chunk left, right , gamma ;
 
-  inp fred = usage(argc, argv); 
-
-  std::cout << "the canonical frame is " <<
-    radmat::LatticeRotationEnv::TheRotationGroupGenerator::Instance().get_can_frame_string(fred.l,fred.r) << std::endl;
-
-  rHandle<FFAbsBase_t > foo = LorentzffFormFactorDecompositionFactoryEnv::callFactory(fred.matElemID); 
-
-  itpp::Mat<std::complex<double> > baz = (*foo)( 
-      std::pair< Tensor<double,1> , int >(fred.pf,fred.hf),
-      std::pair< Tensor<double,1> , int >(fred.pi,fred.hi),
-      fred.pfac); 
-
-  if(fred.jmu)
+  if( argc != 2 )
   {
-
-    itpp::Vec<std::complex<double> > bar;
-    bar = itpp::round_to_zero(baz.get_row(fred.mu) , 1e-6); 
-
-    for(int elem = 0; elem < bar.size() -1; ++elem)
-    {
-      std::complex<double> my_cmp = bar[elem];
-      std::cout << my_cmp.real() << " " << my_cmp.imag() << "   ,   "; 
-    }
-
-    std::complex<double> my_cmp = bar[bar.size() -1];
-    std::cout << my_cmp.real() << " " << my_cmp.imag() << std::endl;
-
+    std::cout << "error: usage grab_ff <xml_ini>" << std::endl; 
+    exit(1); 
   }
-  else
+
+  input inp; 
+  std::istringstream val(argv[1]); 
+  std::string ini; 
+  val >> ini; 
+
+  try 
   {
-    std::cout << " The list of ffs is : \n" << foo->ff() << std::endl;
-
-    std::cout << "by value (row index is lorentz, col is FF num) \n" 
-      << itpp::round_to_zero( baz , 1e-6);
-
-
-    std::cout << "\n\n" << std::endl;
+    ADATXML::XMLReader xml(ini); 
+    doXMLReadT(xml,"/Props",inp,__PRETTY_FUNCTION__); 
   }
+  catch(...)
+  {
+    std::cout << "something went wrong" << std::endl;
+    exit(1); 
+  }
+
+
+  radmat::ThreePointDataTag foo = generate_tag( inp.left , inp.gamma , inp.right , inp.tran , inp.mom_fac ); 
+
+  radmat::FFKinematicFactors_t KK; 
+  radmat::FFKinematicFactors_t::KinematicFactorRow r = KK.genFactors( &foo ); 
+
+  std::cout << r.mean() << std::endl; 
+
 
   return 0;
 }

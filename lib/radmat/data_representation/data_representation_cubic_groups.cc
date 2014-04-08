@@ -6,7 +6,7 @@
 
 * Creation Date : 19-03-2014
 
-* Last Modified : Wed 19 Mar 2014 06:27:59 PM EDT
+* Last Modified : Tue 08 Apr 2014 10:12:43 AM EDT
 
 * Created By : shultz
 
@@ -36,7 +36,8 @@ namespace radmat
       struct reg_printer
       {
         static void print(const std::string &msg)
-        { std::cout << "cubic reps, regged " << msg << std::endl; }
+        {}
+      //  { std::cout << "cubic reps, regged " << msg << std::endl; }
       };
 
       struct key_printer

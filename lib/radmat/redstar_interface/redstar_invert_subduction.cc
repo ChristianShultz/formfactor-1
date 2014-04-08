@@ -6,7 +6,7 @@
 
  * Creation Date : 12-10-2012
 
- * Last Modified : Sun 23 Feb 2014 10:39:41 AM EST
+ * Last Modified : Thu 03 Apr 2014 05:05:57 PM EDT
 
  * Created By : shultz
 
@@ -20,7 +20,7 @@
 #include "radmat/utils/handle.h"
 #include "radmat/utils/polarization_tensors.h"
 #include "radmat/utils/printer.h"
-
+#include "radmat/utils/tokenize.h"
 #include "hadron/subduce_tables_factory.h"
 #include "semble/semble_meta.h"
 

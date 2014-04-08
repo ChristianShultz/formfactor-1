@@ -6,7 +6,7 @@
 
 * Creation Date : 24-03-2014
 
-* Last Modified : Mon 24 Mar 2014 02:09:40 PM EDT
+* Last Modified : Wed 02 Apr 2014 10:24:11 AM EDT
 
 * Created By : shultz
 
@@ -68,6 +68,13 @@ namespace radmat
 
       ret.file_id = gen_file_id(ret); 
 
+
+      //////
+      //
+      //  HERE <-------------
+      //
+      // this needs to update the mat elem id for the subduction 
+      // pathway throught the code
       return ret; 
     }
 

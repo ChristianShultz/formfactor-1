@@ -116,6 +116,7 @@ am_libradmat_a_OBJECTS =  \
 	redstar_three_point_utils.$(OBJEXT) \
 	redstar_three_point_xml_interface.$(OBJEXT) \
 	redstar_three_point_xml_lorentz_handler.$(OBJEXT) \
+	redstar_three_point_xml_subduce_handler.$(OBJEXT) \
 	redstar_vector_current_xml_interface.$(OBJEXT) \
 	register_all.$(OBJEXT) aux.$(OBJEXT) harmonic.$(OBJEXT) \
 	mink_qsq.$(OBJEXT) polarization_tensors.$(OBJEXT) \
@@ -331,12 +332,14 @@ nobase_include_HEADERS = \
 													 radmat/redstar_interface/redstar_interface.h    \
 													 radmat/redstar_interface/redstar_invert_subduction.h    \
 													 radmat/redstar_interface/redstar_particle_handler_utils.h    \
+													 radmat/redstar_interface/redstar_photon_polarization_tensor.h    \
 													 radmat/redstar_interface/redstar_photon_props.h    \
 													 radmat/redstar_interface/redstar_single_particle_meson_xml_interface.h    \
 													 radmat/redstar_interface/redstar_three_point_utils.h    \
 													 radmat/redstar_interface/redstar_three_point_xml_handler.h    \
 													 radmat/redstar_interface/redstar_three_point_xml_interface.h    \
 													 radmat/redstar_interface/redstar_three_point_xml_lorentz_handler.h    \
+													 radmat/redstar_interface/redstar_three_point_xml_subduce_handler.h    \
 													 radmat/redstar_interface/redstar_vector_current_xml_interface.h    \
 													 radmat/register_all/register_all.h    \
 													 radmat/utils/aux.h    \
@@ -355,6 +358,7 @@ nobase_include_HEADERS = \
 													 radmat/utils/splash.h    \
 													 radmat/utils/stringify.h    \
 													 radmat/utils/tensor.h    \
+													 radmat/utils/tokenize.h    \
 													 radmat/utils/type_computations.h    \
 													 radmat/utils/utils.h    
 
@@ -408,6 +412,7 @@ libradmat_a_SOURCES = \
 											radmat/redstar_interface/redstar_three_point_utils.cc    \
 											radmat/redstar_interface/redstar_three_point_xml_interface.cc    \
 											radmat/redstar_interface/redstar_three_point_xml_lorentz_handler.cc    \
+											radmat/redstar_interface/redstar_three_point_xml_subduce_handler.cc    \
 											radmat/redstar_interface/redstar_vector_current_xml_interface.cc    \
 											radmat/register_all/register_all.cc    \
 											radmat/utils/aux.cc    \
@@ -546,6 +551,7 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/redstar_three_point_utils.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/redstar_three_point_xml_interface.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/redstar_three_point_xml_lorentz_handler.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/redstar_three_point_xml_subduce_handler.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/redstar_vector_current_xml_interface.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/register_all.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/splash.Po@am__quote@
@@ -1208,6 +1214,20 @@ redstar_three_point_xml_lorentz_handler.obj: radmat/redstar_interface/redstar_th
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='radmat/redstar_interface/redstar_three_point_xml_lorentz_handler.cc' object='redstar_three_point_xml_lorentz_handler.obj' libtool=no @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCXX_FALSE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o redstar_three_point_xml_lorentz_handler.obj `if test -f 'radmat/redstar_interface/redstar_three_point_xml_lorentz_handler.cc'; then $(CYGPATH_W) 'radmat/redstar_interface/redstar_three_point_xml_lorentz_handler.cc'; else $(CYGPATH_W) '$(srcdir)/radmat/redstar_interface/redstar_three_point_xml_lorentz_handler.cc'; fi`
+
+redstar_three_point_xml_subduce_handler.o: radmat/redstar_interface/redstar_three_point_xml_subduce_handler.cc
+@am__fastdepCXX_TRUE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT redstar_three_point_xml_subduce_handler.o -MD -MP -MF $(DEPDIR)/redstar_three_point_xml_subduce_handler.Tpo -c -o redstar_three_point_xml_subduce_handler.o `test -f 'radmat/redstar_interface/redstar_three_point_xml_subduce_handler.cc' || echo '$(srcdir)/'`radmat/redstar_interface/redstar_three_point_xml_subduce_handler.cc
+@am__fastdepCXX_TRUE@	$(am__mv) $(DEPDIR)/redstar_three_point_xml_subduce_handler.Tpo $(DEPDIR)/redstar_three_point_xml_subduce_handler.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='radmat/redstar_interface/redstar_three_point_xml_subduce_handler.cc' object='redstar_three_point_xml_subduce_handler.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o redstar_three_point_xml_subduce_handler.o `test -f 'radmat/redstar_interface/redstar_three_point_xml_subduce_handler.cc' || echo '$(srcdir)/'`radmat/redstar_interface/redstar_three_point_xml_subduce_handler.cc
+
+redstar_three_point_xml_subduce_handler.obj: radmat/redstar_interface/redstar_three_point_xml_subduce_handler.cc
+@am__fastdepCXX_TRUE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT redstar_three_point_xml_subduce_handler.obj -MD -MP -MF $(DEPDIR)/redstar_three_point_xml_subduce_handler.Tpo -c -o redstar_three_point_xml_subduce_handler.obj `if test -f 'radmat/redstar_interface/redstar_three_point_xml_subduce_handler.cc'; then $(CYGPATH_W) 'radmat/redstar_interface/redstar_three_point_xml_subduce_handler.cc'; else $(CYGPATH_W) '$(srcdir)/radmat/redstar_interface/redstar_three_point_xml_subduce_handler.cc'; fi`
+@am__fastdepCXX_TRUE@	$(am__mv) $(DEPDIR)/redstar_three_point_xml_subduce_handler.Tpo $(DEPDIR)/redstar_three_point_xml_subduce_handler.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='radmat/redstar_interface/redstar_three_point_xml_subduce_handler.cc' object='redstar_three_point_xml_subduce_handler.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o redstar_three_point_xml_subduce_handler.obj `if test -f 'radmat/redstar_interface/redstar_three_point_xml_subduce_handler.cc'; then $(CYGPATH_W) 'radmat/redstar_interface/redstar_three_point_xml_subduce_handler.cc'; else $(CYGPATH_W) '$(srcdir)/radmat/redstar_interface/redstar_three_point_xml_subduce_handler.cc'; fi`
 
 redstar_vector_current_xml_interface.o: radmat/redstar_interface/redstar_vector_current_xml_interface.cc
 @am__fastdepCXX_TRUE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT redstar_vector_current_xml_interface.o -MD -MP -MF $(DEPDIR)/redstar_vector_current_xml_interface.Tpo -c -o redstar_vector_current_xml_interface.o `test -f 'radmat/redstar_interface/redstar_vector_current_xml_interface.cc' || echo '$(srcdir)/'`radmat/redstar_interface/redstar_vector_current_xml_interface.cc

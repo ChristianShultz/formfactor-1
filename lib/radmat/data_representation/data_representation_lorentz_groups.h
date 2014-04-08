@@ -56,6 +56,7 @@ namespace radmat
     : public LorentzRep_p
   {
     virtual ~LorentzRep() {}
+    virtual std::string rep_id() const = 0; 
     virtual int rep_parity() const = 0; 
     virtual int rep_spin() const = 0;
     virtual int rep_eta_p() const = 0; 

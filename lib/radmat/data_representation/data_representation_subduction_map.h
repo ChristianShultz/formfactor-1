@@ -48,6 +48,22 @@ namespace radmat
       lat_rep lat; 
     };
 
+    const irrep_sub_table* get_table(const std::string &s)
+    {
+      map_t::const_iterator it; 
+      it = mappy.find(s); 
+      if(it == mappy.end())
+      {
+        std::cout << __PRETTY_FUNCTION__ << " key " << s << " not present" << std::endl;
+        for(it = mappy.begin(); it != mappy.end(); ++it)
+          std::cout << it->first << std::endl;
+
+        throw std::string("subduce table key not present"); 
+      }
+
+      return it->second; 
+    }
+
     typedef std::map<std::string,irrep_sub_table*> map_t; 
 
     ~SubduceTableMap() 
