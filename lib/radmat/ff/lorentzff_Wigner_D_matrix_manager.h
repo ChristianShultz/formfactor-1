@@ -64,7 +64,8 @@ namespace radmat
       triad_rotation_wigner_matrix(const RotationMatrix_t *R, 
           const mom_t &l, 
           const mom_t &r, 
-          const int J) const;
+          const int J,
+          const bool check_frame=false) const;
 
     virtual WignerMatrix_t*
       left_wigner_matrix(const RotationMatrix_t *R, 

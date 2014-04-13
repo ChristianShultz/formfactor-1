@@ -6,7 +6,7 @@
 
 * Creation Date : 04-03-2014
 
-* Last Modified : Tue 04 Mar 2014 01:04:26 PM EST
+* Last Modified : Fri 11 Apr 2014 01:26:04 PM EDT
 
 * Created By : shultz
 
@@ -97,10 +97,14 @@ namespace radmat
     DMatrixManager::triad_rotation_wigner_matrix(const RotationMatrix_t *R,
         const mom_t &l,
         const mom_t &r,
-        const int J) const
+        const int J,
+        const bool check_frame) const
     {
-      FrameOrientation_t f = get_frame(l,r); 
-      check_throw_frame_err(R,f); 
+      if( check_frame)
+      {
+        FrameOrientation_t f = get_frame(l,r); 
+        check_throw_frame_err(R,f); 
+      }
 
       int bound = 2*J+1; 
       WignerMatrix_t *W  = new WignerMatrix_t( (TensorShape<2>())[bound][bound] , std::complex<double>(0.,0.));   
@@ -151,17 +155,17 @@ namespace radmat
 
       if( print ) 
       {
-          std::cout << __func__ << ": moms " << "f.l" << string_mom(f.l)
-            << " f.r " << string_mom(f.r) << " f.cl " << string_mom(f.cl)
-            << " f.cr " << string_mom(f.cr) << std::endl;
+        std::cout << __func__ << ": moms " << "f.l" << string_mom(f.l)
+          << " f.r " << string_mom(f.r) << " f.cl " << string_mom(f.cl)
+          << " f.cr " << string_mom(f.cr) << std::endl;
 
-          clean(Wn); 
-          clean(Wt);
-          clean(Wi); 
+        clean(Wn); 
+        clean(Wt);
+        clean(Wi); 
 
-          std::cout << __func__ << ": ingredients "  
-            << "Wn:" <<  *Wn << "\nWt:" << *Wt << "\nWi:" << *Wi
-            << std::endl;
+        std::cout << __func__ << ": ingredients "  
+          << "Wn:" <<  *Wn << "\nWt:" << *Wt << "\nWi:" << *Wi
+          << std::endl;
       }
 
 
@@ -205,17 +209,17 @@ namespace radmat
 
       if( print ) 
       {
-          std::cout << __func__ << ": moms " << "f.l" << string_mom(f.l)
-            << " f.r " << string_mom(f.r) << " f.cl " << string_mom(f.cl)
-            << " f.cr " << string_mom(f.cr) << std::endl;
+        std::cout << __func__ << ": moms " << "f.l" << string_mom(f.l)
+          << " f.r " << string_mom(f.r) << " f.cl " << string_mom(f.cl)
+          << " f.cr " << string_mom(f.cr) << std::endl;
 
-          clean(Wk); 
-          clean(Wt);
-          clean(Wl); 
+        clean(Wk); 
+        clean(Wt);
+        clean(Wl); 
 
-          std::cout << __func__ << ": ingredients "  
-            << "Wk:" <<  *Wk << "\nWt:" << *Wt << "\nWl:" << *Wl
-            << std::endl;
+        std::cout << __func__ << ": ingredients "  
+          << "Wk:" <<  *Wk << "\nWt:" << *Wt << "\nWl:" << *Wl
+          << std::endl;
       }
 
 

@@ -6,7 +6,7 @@
 
  * Creation Date : 20-03-2014
 
- * Last Modified : Thu 03 Apr 2014 05:26:26 PM EDT
+ * Last Modified : Thu 10 Apr 2014 11:48:52 AM EDT
 
  * Created By : shultz
 
@@ -36,19 +36,22 @@ namespace radmat
     struct particle_name_printer
     {
       static void print(const std::string &msg)
-      { std::cout << "particle_name_printer " << msg << std::endl;}
+      {}
+      // { std::cout << "particle_name_printer " << msg << std::endl;}
     };
 
     struct generate_block_print_name
     {
       static void print(const std::string &msg)
-      { std::cout << "generate_block_print_name " << msg << std::endl;}
+      {}
+      // { std::cout << "generate_block_print_name " << msg << std::endl;}
     };
 
     struct move_lorentz4_printer
     {
       static void print(const std::string &msg) 
-      { std::cout << "move_to_lorentz4_printer" << msg << std::endl; }
+      {}
+      // { std::cout << "move_to_lorentz4_printer" << msg << std::endl; }
     };
 
     std::string toString(const int i)
@@ -64,7 +67,7 @@ namespace radmat
 
     /////////////////////////
     /////////////////////////
-    
+
     BlockData make_block_data(const std::string &origin, 
         const std::string &data, 
         const int row, 
@@ -160,7 +163,7 @@ namespace radmat
               smearedP,
               t_slice );
 
-            ret = ret + EnsemRedstarBlock::ListObj_t(it->m_coeff,npt); 
+          ret = ret + EnsemRedstarBlock::ListObj_t(it->m_coeff,npt); 
         }
 
         return ret; 
@@ -429,7 +432,7 @@ namespace radmat
         for(int h = 0; h < hsz; ++h)
         {
           EnsemRedstarBlock block; 
-          
+
           printer_function<generate_block_print_name>( ptr->name ); 
 
           block = make_ensem_block( ptr->name, 

@@ -1,0 +1,28 @@
+<?xml version="1.0"?>
+<Props>
+  <left>
+    <origin>J0m</origin>
+    <data>H0D4A2</data>
+    <mass>0.148</mass>
+    <row>0</row>
+    <mom>0 0 -2</mom>
+  </left>
+  <gamma>
+    <origin>J1m</origin>
+    <data>T1</data>
+    <mass>0.</mass>
+    <row>3</row>
+    <mom>0 0 0</mom>
+  </gamma>
+  <right>
+    <origin>J0m</origin>
+    <data>H0D2A2</data>
+    <mass>0.216</mass>
+    <row>0</row>
+    <mom>0 0 -2</mom>
+  </right>
+  <tran>diag</tran>
+  <mom_fac>0.11</mom_fac>
+</Props>
+
+
