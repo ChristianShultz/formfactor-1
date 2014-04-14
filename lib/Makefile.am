@@ -55,10 +55,7 @@ nobase_include_HEADERS =   \
 													 radmat/ff/lorentzff_canonical_PiRho.h    \
 													 radmat/ff/lorentzff_canonical_RhoPi.h    \
 													 radmat/ff/lorentzff_canonical_RhoRho.h    \
-													 radmat/ff/lorentzff_canonical_rotation_groups.h    \
 													 radmat/ff/lorentzff_canonical_rotations_checker.h    \
-													 radmat/ff/lorentzff_canonical_rotations.h    \
-													 radmat/ff/lorentzff_canonical_rotations_utils.h    \
 													 radmat/ff/lorentzff_cubic_reps.h    \
 													 radmat/ff/lorentzff_formfactor_abs_base_cfg.h    \
 													 radmat/ff/lorentzff_formfactor_factory.h    \
@@ -66,9 +63,6 @@ nobase_include_HEADERS =   \
 													 radmat/ff/lorentzff_polarization_embedding.h    \
 													 radmat/ff/lorentzff_polarization_embedding_old.h    \
 													 radmat/ff/lorentzff_polarization_tensors.h    \
-													 radmat/ff/lorentzff_Wigner_D_matrix_embedding.h    \
-													 radmat/ff/lorentzff_Wigner_D_matrix_factory.h    \
-													 radmat/ff/lorentzff_Wigner_D_matrix_manager.h    \
 													 radmat/ff/make_head.csh    \
 													 radmat/fitting/fitting.h    \
 													 radmat/fitting/fit_tins.h    \
@@ -106,6 +100,12 @@ nobase_include_HEADERS =   \
 													 radmat/redstar_interface/redstar_three_point_xml_subduce_handler.h    \
 													 radmat/redstar_interface/redstar_vector_current_xml_interface.h    \
 													 radmat/register_all/register_all.h    \
+													 radmat/rotation_interface/make_head.csh    \
+													 radmat/rotation_interface/rotation_group_generator.h    \
+													 radmat/rotation_interface/rotation_interface.h    \
+													 radmat/rotation_interface/rotation_utils.h    \
+													 radmat/rotation_interface/Wigner_D_matrix_factory.h    \
+													 radmat/rotation_interface/Wigner_D_matrix_manager.h    \
 													 radmat/utils/aux.h    \
 													 radmat/utils/debug_handler.h    \
 													 radmat/utils/handle.h    \
@@ -124,7 +124,7 @@ nobase_include_HEADERS =   \
 													 radmat/utils/tensor.h    \
 													 radmat/utils/tokenize.h    \
 													 radmat/utils/type_computations.h    \
-													 radmat/utils/utils.h   
+													 radmat/utils/utils.h    
 
 # the lib
 lib_LIBRARIES = libradmat.a
@@ -154,13 +154,9 @@ libradmat_a_SOURCES =	\
 											radmat/ff_interface/formfactor_kinematic_factors.cc    \
 											radmat/ff_interface/formfactor_subduced_formfactors.cc    \
 											radmat/ff_interface/photon_subduction.cc    \
-											radmat/ff/lorentzff_canonical_rotations.cc    \
 											radmat/ff/lorentzff_canonical_rotations_checker.cc    \
-											radmat/ff/lorentzff_canonical_rotations_utils.cc    \
 											radmat/ff/lorentzff_formfactor_factory.cc    \
 											radmat/ff/lorentzff_formfac_utils.cc    \
-											radmat/ff/lorentzff_Wigner_D_matrix_factory.cc    \
-											radmat/ff/lorentzff_Wigner_D_matrix_manager.cc    \
 											radmat/fitting/fit_tins.cc    \
 											radmat/llsq/llsq_chisq.cc    \
 											radmat/llsq/llsq_formfactor_data.cc    \
@@ -181,6 +177,10 @@ libradmat_a_SOURCES =	\
 											radmat/redstar_interface/redstar_three_point_xml_subduce_handler.cc    \
 											radmat/redstar_interface/redstar_vector_current_xml_interface.cc    \
 											radmat/register_all/register_all.cc    \
+											radmat/rotation_interface/rotation_group_generator.cc    \
+											radmat/rotation_interface/rotation_utils.cc    \
+											radmat/rotation_interface/Wigner_D_matrix_factory.cc    \
+											radmat/rotation_interface/Wigner_D_matrix_manager.cc    \
 											radmat/utils/aux.cc    \
 											radmat/utils/harmonic.cc    \
 											radmat/utils/mink_qsq.cc    \

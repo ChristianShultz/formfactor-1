@@ -6,7 +6,7 @@
 
 * Creation Date : 11-12-2013
 
-* Last Modified : Tue 04 Mar 2014 02:37:17 PM EST
+* Last Modified : Mon 14 Apr 2014 06:31:25 PM EDT
 
 * Created By : shultz
 
@@ -18,12 +18,7 @@ _._._._._._._._._._._._._._._._._._._._._.*/
 #include <sstream>
 #include "radmat/redstar_interface/redstar_canonical_rotations.h"
 #include "radmat/redstar_interface/redstar_canonical_lattice_rotations.h"
-#include "radmat/ff/lorentzff_canonical_rotations_utils.h"
-#include "radmat/ff/lorentzff_canonical_frame_formfacs_rotation_manager.h"
-#include "radmat/ff/lorentzff_canonical_rotations.h"
-#include "radmat/ff/lorentzff_Wigner_D_matrix_factory.h"
-#include "radmat/ff/lorentzff_Wigner_D_matrix_embedding.h"
-#include "radmat/ff/lorentzff_canonical_JJlist_ff.h"
+#include "radmat/ff/ff.h"
 #include "radmat/utils/levi_civita.h"
 #include "hadron/irrep_util.h"
 #include "formfac/formfac_qsq.h"
@@ -344,8 +339,8 @@ void get_frame_rotation(int argc, char *argv[])
   std::cout << "read m1 " << string_mom(m1) << " m2 " << string_mom(m2) 
     << " m_prime1 " << string_mom(ma) << " m_prime2 " << string_mom(mb) << std::endl;
 
-  RotationMatrix_t *rl = radmat::LatticeRotationEnv::get_left_rotation(m1,m2,ma,mb);
-  RotationMatrix_t *rr = radmat::LatticeRotationEnv::get_right_rotation(m1,m2,ma,mb);
+  RotationMatrix_t *rl = radmat::generate_frame_transformation(m1,ma);
+  RotationMatrix_t *rr = radmat::generate_frame_transformation(m2,mb);
   std::cout << "Rleft:" << *rl << std::endl;
   std::cout << "Rright:" << *rr << std::endl;
 
@@ -359,122 +354,6 @@ void get_frame_rotation(int argc, char *argv[])
 //////////////////////////////////////////////////
 
 
-
-void get_wigner_phase(int argc, char *argv[])
-{
-  if( argc != 9 )
-  {
-    std::cout << "error usage: test_rotations [" << __func__ << "] "
-      << "<mom1> <mom2> <J> " << std::endl; 
-    exit(1);
-  }
-  
-  mom_t m1 = radmat::gen_mom<0,0,0>(); 
-  mom_t m2 = radmat::gen_mom<0,0,0>(); 
-  int J; 
-
-  read_momentum(2,m1,argv);
-  read_momentum(5,m2,argv);
-  std::istringstream val(argv[8]);
-  val >> J; 
-
-
-  radmat::LatticeRotationEnv::FrameOrientation_t frame; 
-
-  std::cout << "read m1 " << string_mom(m1) 
-    << " m2 " << string_mom(m2) << " J " << J <<std::endl;
-
-  radmat::WignerMatrix_t D; 
-  radmat::primitiveEmbededWignerDMatrix *W;  
-
-  if( J == 1 )
-    W = new radmat::embededWignerDMatrix<1>();  
-  else if (J == 2)
-    W = new radmat::embededWignerDMatrix<2>();  
-  else if (J == 3)
-    W = new radmat::embededWignerDMatrix<3>();  
-  else if (J == 4)
-    W = new radmat::embededWignerDMatrix<4>();  
-  else
-  {
-    std::cout << "J " << J << "is not supported" << std::endl;
-    exit(1); 
-  }
-
-  frame = W->get_frame(m1,m2);
-  std::cout << "canonical frame " << string_mom(frame.cl) << " " 
-    << string_mom(frame.cr) << std::endl;
-
-  D = W->composite_wigner_matrix(m1,m2); 
-
-  std::cout << "\nD:" << D << std::endl;
-
-  radmat::WignerMatrix_t I,Dstar = D;
-  W->conjugate(&Dstar); 
-  D.lower_index(1); 
-  I = radmat::contract(D,Dstar,1,1); 
-  W->clean_up(I); 
-
-  std::cout << "D Ddag = " << I << std::endl;
-
-
-  delete W; 
-}
-
-
-//////////////////////////////////////////////////
-//////////////////////////////////////////////////
-//////////////////////////////////////////////////
-
-
-void get_JJ11_ff_sum(int argc, char *argv[])
-{
-  if( argc != 10 )
-  {
-    std::cout << "error usage: test_rotations [" << __func__ << "] "
-      << "<moml> <momr> <hl> <hr>" << std::endl; 
-    exit(1);
-  }
-  
-  mom_t m1 = radmat::gen_mom<0,0,0>(); 
-  mom_t m2 = radmat::gen_mom<0,0,0>(); 
-
-  read_momentum(2,m1,argv);
-  read_momentum(5,m2,argv);
-
-  std::stringstream v1(argv[8]);
-  std::stringstream v2(argv[9]);
-  int hl, hr; 
-  v1 >> hl;
-  v2 >> hr; 
-
-
-  radmat::LatticeRotationEnv::FrameOrientation_t frame; 
-
-  std::cout << "read m1 " << string_mom(m1) 
-    << " m2 " << string_mom(m2) 
-    << " hl " << hl << " hr " << hr <<std::endl;
-
-  radmat::WignerMatrix_t D; 
-  radmat::primitiveEmbededWignerDMatrix *W;  
-
-  W = new radmat::embededWignerDMatrix<1>();  
-
-  frame = W->get_frame(m1,m2);
-  std::cout << "canonical frame " << string_mom(frame.cl) << " " 
-    << string_mom(frame.cr) << std::endl;
-  delete W; 
-
-
-
-  radmat::JJFFimpl<1,1> foo;
-
-  double kick = 0.11;
-  radmat::Tensor<double,1> pf = init_4tens(0.216,m1[0],m1[1],m1[2],kick); 
-  radmat::Tensor<double,1> pi = init_4tens(0.216,m2[0],m2[1],m2[2],kick); 
-  std::cout << foo(std::make_pair(pf,hl),std::make_pair(pi,hr),kick) << std::endl; 
-
-}
 
 
 //////////////////////////////////////////////////
@@ -501,7 +380,7 @@ void get_left_triad_wigner(int argc, char *argv[])
 
   radmat::DMatrixManager Wig; 
   radmat::RotationMatrix_t * Rtriad; 
-  Rtriad = Wig.triad_rotation_matrix(l,r);
+  Rtriad = Wig.rotation_matrix(l,r);
   radmat::WignerMatrix_t *D,*Dtriad; 
   D = Wig.left_wigner_matrix(Rtriad,l,r,J,true); 
 
@@ -542,7 +421,7 @@ void get_right_triad_wigner(int argc, char *argv[])
 
   radmat::DMatrixManager Wig; 
   radmat::RotationMatrix_t * Rtriad; 
-  Rtriad = Wig.triad_rotation_matrix(l,r);
+  Rtriad = Wig.rotation_matrix(l,r);
   radmat::WignerMatrix_t *D,*Dtriad; 
   D = Wig.right_wigner_matrix(Rtriad,l,r,J,true); 
 
@@ -576,18 +455,18 @@ void get_triad_rotation(int argc, char *argv[])
 
   radmat::DMatrixManager Wig; 
   radmat::RotationMatrix_t * Rtriad; 
-  Rtriad = Wig.triad_rotation_matrix(l,r);
-  radmat::LatticeRotationEnv::FrameOrientation_t frame; 
+  Rtriad = Wig.rotation_matrix(l,r);
+  std::pair<radmat::mom_t,radmat::mom_t> frame; 
   frame = Wig.get_frame(l,r);
-  std::cout << "canonical frame " << string_mom(frame.cl) << " " 
-    << string_mom(frame.cr) << std::endl;
+  std::cout << "canonical frame " << string_mom(frame.first) << " " 
+    << string_mom(frame.second) << std::endl;
 
   clean_up_rot_mat(Rtriad);
 
   std::cout << "l " << string_mom(l) << " r " << string_mom(r)
     << "\nRtriad:" << *Rtriad << std::endl;  
-  std::cout << "R*cl " << string_mom(rotate_int_mom(Rtriad,frame.cl)) 
-    << "\nR*cr " << string_mom(rotate_int_mom(Rtriad,frame.cr)) << std::endl;
+  std::cout << "R*cl " << string_mom(rotate_int_mom(Rtriad,frame.first)) 
+    << "\nR*cr " << string_mom(rotate_int_mom(Rtriad,frame.second)) << std::endl;
   std::cout << "det(R) = " << determinant(Rtriad) << std::endl;
 
   delete Rtriad; 
@@ -685,7 +564,6 @@ void insert_op(const std::string &s, const fptr &f)
 void init_options(void)
 {
   insert_op("get_triad_rotation",&get_triad_rotation);
-  insert_op("get_JJ11_ff_sum",&get_JJ11_ff_sum);
   insert_op("get_left_triad_wigner",&get_left_triad_wigner);
   insert_op("get_right_triad_wigner",&get_right_triad_wigner);
   insert_op("check_rotations_mom",&check_rotations_mom); 
@@ -694,7 +572,6 @@ void init_options(void)
   insert_op("get_frame_rotation",&get_frame_rotation); 
   insert_op("get_wigner_matrix",&get_wigner_matrix); 
   insert_op("get_prod_wigner_matrix",&get_prod_wigner_matrix); 
-  insert_op("get_wigner_phase",&get_wigner_phase); 
 }
 
 

@@ -1,18 +1,20 @@
 /* -.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.
 
- * File Name : lorentzff_canonical_rotations_utils.cc
+* File Name : rotation_utils.cc
 
- * Purpose :
+* Purpose :
 
- * Creation Date : 10-12-2013
+* Creation Date : 14-04-2014
 
- * Last Modified : Wed 26 Feb 2014 09:50:49 AM EST
+* Last Modified : Mon 14 Apr 2014 05:33:39 PM EDT
 
- * Created By : shultz
+* Created By : shultz
 
- _._._._._._._._._._._._._._._._._._._._._.*/
+_._._._._._._._._._._._._._._._._._._._._.*/
 
-#include "lorentzff_canonical_rotations_utils.h"
+
+
+#include "rotation_utils.h"
 #include "radmat/redstar_interface/redstar_canonical_lattice_rotations.h"
 #include "radmat/utils/levi_civita.h"
 #include "radmat/utils/tensor.h"
@@ -159,7 +161,7 @@ namespace radmat
 
   // generate an orthogonal transformation 
   RotationMatrix_t*
-    generate_triad_rotation_matrix(const mom_t &l, 
+    generate_rotation_matrix(const mom_t &l, 
         const mom_t &r,
         const mom_t &ll, 
         const mom_t &rr)
@@ -170,6 +172,28 @@ namespace radmat
 
       // if colinear then cross product is garbage
       if( colinear_momentum(l,r) && colinear_momentum(ll,rr) )
+      {
+        delete R; 
+        return generate_frame_transformation(l,ll); 
+      }
+
+      if( is_rest(l) )
+      {
+        if( is_rest(r) )
+        {
+          (*R)[1][1] = 1.;
+          (*R)[2][2] = 1.;
+          (*R)[3][3] = 1.;
+
+          return R; 
+        }
+          
+        delete R; 
+
+        return generate_frame_transformation(r,rr); 
+      }
+
+      if ( is_rest(r) )
       {
         delete R; 
         return generate_frame_transformation(l,ll); 
@@ -341,12 +365,19 @@ namespace radmat
       const mom_t &lleft, const mom_t &rright,
       const bool allow_flip)
   {
-    if( is_rest(left) || is_rest(lleft) || is_rest(right) || is_rest(rright) )
+  
+    if( is_rest(left) )
     {
-      std::cout << __func__ << ": passed in a rest momentum, throwing an error"
-        << std::endl;
-      throw std::string("related_by_rotation rest error"); 
+      POW2_ASSERT( is_rest(lleft) ); 
+      return same_length(right,rright); 
     }
+
+    if( is_rest(right) )
+    {
+      POW2_ASSERT( is_rest(rright) ); 
+      return same_length(left,lleft); 
+    }
+  
 
     bool success = true; 
     success &= (cos_theta(left,right) == cos_theta(lleft,rright));
@@ -371,17 +402,17 @@ namespace radmat
       return false; 
 
     // R *ll = l && R *rr = r -- doesnt work for rest
-    RotationMatrix_t *Rtriad = generate_triad_rotation_matrix(left,right,lleft,rright); 
+    RotationMatrix_t *Rtriad = generate_rotation_matrix(left,right,lleft,rright); 
     // check that the frame transformation actually works
     success &= check_total_frame_transformation(Rtriad,left,right,lleft,rright,true); 
 
-    // not a proper rotation 
-    if( fabs( determinant(Rtriad) - 1. ) > 1e-6 )
-    {
-      std::cout << __func__ << ": triad had det " << determinant(Rtriad) 
-        << ": which was not 1, confused Rtriad:" << *Rtriad << std::endl;
-      success = false; 
-    }
+    //   // not a proper rotation 
+    //   if( fabs( determinant(Rtriad) - 1. ) > 1e-6 )
+    //   {
+    //     std::cout << __func__ << ": triad had det " << determinant(Rtriad) 
+    //       << ": which was not 1, confused Rtriad:" << *Rtriad << std::endl;
+    //     success = false; 
+    //   }
 
     delete Rtriad; 
     return success;
@@ -432,3 +463,4 @@ namespace radmat
   }
 
 }
+

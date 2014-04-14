@@ -1,5 +1,6 @@
-#ifndef LORENTZFF_WIGNER_D_MATRIX_FACTORY_H
-#define LORENTZFF_WIGNER_D_MATRIX_FACTORY_H 
+#ifndef WIGNER_D_MATRIX_FACTORY_H
+#define WIGNER_D_MATRIX_FACTORY_H 
+
 
 #include "radmat/utils/tensor.h"
 #include "radmat/utils/handle.h"
@@ -62,4 +63,4 @@ namespace radmat
 
 
 
-#endif /* LORENTZFF_WIGNER_D_MATRIX_FACTORY_H */
+#endif /* WIGNER_D_MATRIX_FACTORY_H */

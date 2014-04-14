@@ -97,13 +97,9 @@ am_libradmat_a_OBJECTS =  \
 	formfactor_kinematic_factors.$(OBJEXT) \
 	formfactor_subduced_formfactors.$(OBJEXT) \
 	photon_subduction.$(OBJEXT) \
-	lorentzff_canonical_rotations.$(OBJEXT) \
 	lorentzff_canonical_rotations_checker.$(OBJEXT) \
-	lorentzff_canonical_rotations_utils.$(OBJEXT) \
 	lorentzff_formfactor_factory.$(OBJEXT) \
-	lorentzff_formfac_utils.$(OBJEXT) \
-	lorentzff_Wigner_D_matrix_factory.$(OBJEXT) \
-	lorentzff_Wigner_D_matrix_manager.$(OBJEXT) fit_tins.$(OBJEXT) \
+	lorentzff_formfac_utils.$(OBJEXT) fit_tins.$(OBJEXT) \
 	llsq_chisq.$(OBJEXT) llsq_formfactor_data.$(OBJEXT) \
 	llsq_gen_system.$(OBJEXT) llsq_multi_driver.$(OBJEXT) \
 	llsq_solvers.$(OBJEXT) redstar_abstract_xml_factory.$(OBJEXT) \
@@ -119,9 +115,12 @@ am_libradmat_a_OBJECTS =  \
 	redstar_three_point_xml_lorentz_handler.$(OBJEXT) \
 	redstar_three_point_xml_subduce_handler.$(OBJEXT) \
 	redstar_vector_current_xml_interface.$(OBJEXT) \
-	register_all.$(OBJEXT) aux.$(OBJEXT) harmonic.$(OBJEXT) \
-	mink_qsq.$(OBJEXT) polarization_tensors.$(OBJEXT) \
-	pow2assert.$(OBJEXT) splash.$(OBJEXT) tensor.$(OBJEXT)
+	register_all.$(OBJEXT) rotation_group_generator.$(OBJEXT) \
+	rotation_utils.$(OBJEXT) Wigner_D_matrix_factory.$(OBJEXT) \
+	Wigner_D_matrix_manager.$(OBJEXT) aux.$(OBJEXT) \
+	harmonic.$(OBJEXT) mink_qsq.$(OBJEXT) \
+	polarization_tensors.$(OBJEXT) pow2assert.$(OBJEXT) \
+	splash.$(OBJEXT) tensor.$(OBJEXT)
 libradmat_a_OBJECTS = $(am_libradmat_a_OBJECTS)
 DEFAULT_INCLUDES = -I.@am__isrc@
 depcomp = $(SHELL) $(top_srcdir)/config/depcomp
@@ -293,10 +292,7 @@ nobase_include_HEADERS = \
 													 radmat/ff/lorentzff_canonical_PiRho.h    \
 													 radmat/ff/lorentzff_canonical_RhoPi.h    \
 													 radmat/ff/lorentzff_canonical_RhoRho.h    \
-													 radmat/ff/lorentzff_canonical_rotation_groups.h    \
 													 radmat/ff/lorentzff_canonical_rotations_checker.h    \
-													 radmat/ff/lorentzff_canonical_rotations.h    \
-													 radmat/ff/lorentzff_canonical_rotations_utils.h    \
 													 radmat/ff/lorentzff_cubic_reps.h    \
 													 radmat/ff/lorentzff_formfactor_abs_base_cfg.h    \
 													 radmat/ff/lorentzff_formfactor_factory.h    \
@@ -304,9 +300,6 @@ nobase_include_HEADERS = \
 													 radmat/ff/lorentzff_polarization_embedding.h    \
 													 radmat/ff/lorentzff_polarization_embedding_old.h    \
 													 radmat/ff/lorentzff_polarization_tensors.h    \
-													 radmat/ff/lorentzff_Wigner_D_matrix_embedding.h    \
-													 radmat/ff/lorentzff_Wigner_D_matrix_factory.h    \
-													 radmat/ff/lorentzff_Wigner_D_matrix_manager.h    \
 													 radmat/ff/make_head.csh    \
 													 radmat/fitting/fitting.h    \
 													 radmat/fitting/fit_tins.h    \
@@ -344,6 +337,12 @@ nobase_include_HEADERS = \
 													 radmat/redstar_interface/redstar_three_point_xml_subduce_handler.h    \
 													 radmat/redstar_interface/redstar_vector_current_xml_interface.h    \
 													 radmat/register_all/register_all.h    \
+													 radmat/rotation_interface/make_head.csh    \
+													 radmat/rotation_interface/rotation_group_generator.h    \
+													 radmat/rotation_interface/rotation_interface.h    \
+													 radmat/rotation_interface/rotation_utils.h    \
+													 radmat/rotation_interface/Wigner_D_matrix_factory.h    \
+													 radmat/rotation_interface/Wigner_D_matrix_manager.h    \
 													 radmat/utils/aux.h    \
 													 radmat/utils/debug_handler.h    \
 													 radmat/utils/handle.h    \
@@ -362,7 +361,7 @@ nobase_include_HEADERS = \
 													 radmat/utils/tensor.h    \
 													 radmat/utils/tokenize.h    \
 													 radmat/utils/type_computations.h    \
-													 radmat/utils/utils.h   
+													 radmat/utils/utils.h    
 
 
 # the lib
@@ -391,13 +390,9 @@ libradmat_a_SOURCES = \
 											radmat/ff_interface/formfactor_kinematic_factors.cc    \
 											radmat/ff_interface/formfactor_subduced_formfactors.cc    \
 											radmat/ff_interface/photon_subduction.cc    \
-											radmat/ff/lorentzff_canonical_rotations.cc    \
 											radmat/ff/lorentzff_canonical_rotations_checker.cc    \
-											radmat/ff/lorentzff_canonical_rotations_utils.cc    \
 											radmat/ff/lorentzff_formfactor_factory.cc    \
 											radmat/ff/lorentzff_formfac_utils.cc    \
-											radmat/ff/lorentzff_Wigner_D_matrix_factory.cc    \
-											radmat/ff/lorentzff_Wigner_D_matrix_manager.cc    \
 											radmat/fitting/fit_tins.cc    \
 											radmat/llsq/llsq_chisq.cc    \
 											radmat/llsq/llsq_formfactor_data.cc    \
@@ -418,6 +413,10 @@ libradmat_a_SOURCES = \
 											radmat/redstar_interface/redstar_three_point_xml_subduce_handler.cc    \
 											radmat/redstar_interface/redstar_vector_current_xml_interface.cc    \
 											radmat/register_all/register_all.cc    \
+											radmat/rotation_interface/rotation_group_generator.cc    \
+											radmat/rotation_interface/rotation_utils.cc    \
+											radmat/rotation_interface/Wigner_D_matrix_factory.cc    \
+											radmat/rotation_interface/Wigner_D_matrix_manager.cc    \
 											radmat/utils/aux.cc    \
 											radmat/utils/harmonic.cc    \
 											radmat/utils/mink_qsq.cc    \
@@ -503,6 +502,8 @@ mostlyclean-compile:
 distclean-compile:
 	-rm -f *.tab.c
 
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/Wigner_D_matrix_factory.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/Wigner_D_matrix_manager.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/aux.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/construct_correlators.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/construct_correlators_bad_data_repository.Po@am__quote@
@@ -527,11 +528,7 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/llsq_gen_system.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/llsq_multi_driver.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/llsq_solvers.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/lorentzff_Wigner_D_matrix_factory.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/lorentzff_Wigner_D_matrix_manager.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/lorentzff_canonical_rotations.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/lorentzff_canonical_rotations_checker.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/lorentzff_canonical_rotations_utils.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/lorentzff_formfac_utils.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/lorentzff_formfactor_factory.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/mink_qsq.Po@am__quote@
@@ -558,6 +555,8 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/redstar_three_point_xml_subduce_handler.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/redstar_vector_current_xml_interface.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/register_all.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/rotation_group_generator.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/rotation_utils.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/splash.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/tensor.Po@am__quote@
 
@@ -897,20 +896,6 @@ photon_subduction.obj: radmat/ff_interface/photon_subduction.cc
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCXX_FALSE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o photon_subduction.obj `if test -f 'radmat/ff_interface/photon_subduction.cc'; then $(CYGPATH_W) 'radmat/ff_interface/photon_subduction.cc'; else $(CYGPATH_W) '$(srcdir)/radmat/ff_interface/photon_subduction.cc'; fi`
 
-lorentzff_canonical_rotations.o: radmat/ff/lorentzff_canonical_rotations.cc
-@am__fastdepCXX_TRUE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT lorentzff_canonical_rotations.o -MD -MP -MF $(DEPDIR)/lorentzff_canonical_rotations.Tpo -c -o lorentzff_canonical_rotations.o `test -f 'radmat/ff/lorentzff_canonical_rotations.cc' || echo '$(srcdir)/'`radmat/ff/lorentzff_canonical_rotations.cc
-@am__fastdepCXX_TRUE@	$(am__mv) $(DEPDIR)/lorentzff_canonical_rotations.Tpo $(DEPDIR)/lorentzff_canonical_rotations.Po
-@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='radmat/ff/lorentzff_canonical_rotations.cc' object='lorentzff_canonical_rotations.o' libtool=no @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCXX_FALSE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o lorentzff_canonical_rotations.o `test -f 'radmat/ff/lorentzff_canonical_rotations.cc' || echo '$(srcdir)/'`radmat/ff/lorentzff_canonical_rotations.cc
-
-lorentzff_canonical_rotations.obj: radmat/ff/lorentzff_canonical_rotations.cc
-@am__fastdepCXX_TRUE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT lorentzff_canonical_rotations.obj -MD -MP -MF $(DEPDIR)/lorentzff_canonical_rotations.Tpo -c -o lorentzff_canonical_rotations.obj `if test -f 'radmat/ff/lorentzff_canonical_rotations.cc'; then $(CYGPATH_W) 'radmat/ff/lorentzff_canonical_rotations.cc'; else $(CYGPATH_W) '$(srcdir)/radmat/ff/lorentzff_canonical_rotations.cc'; fi`
-@am__fastdepCXX_TRUE@	$(am__mv) $(DEPDIR)/lorentzff_canonical_rotations.Tpo $(DEPDIR)/lorentzff_canonical_rotations.Po
-@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='radmat/ff/lorentzff_canonical_rotations.cc' object='lorentzff_canonical_rotations.obj' libtool=no @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCXX_FALSE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o lorentzff_canonical_rotations.obj `if test -f 'radmat/ff/lorentzff_canonical_rotations.cc'; then $(CYGPATH_W) 'radmat/ff/lorentzff_canonical_rotations.cc'; else $(CYGPATH_W) '$(srcdir)/radmat/ff/lorentzff_canonical_rotations.cc'; fi`
-
 lorentzff_canonical_rotations_checker.o: radmat/ff/lorentzff_canonical_rotations_checker.cc
 @am__fastdepCXX_TRUE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT lorentzff_canonical_rotations_checker.o -MD -MP -MF $(DEPDIR)/lorentzff_canonical_rotations_checker.Tpo -c -o lorentzff_canonical_rotations_checker.o `test -f 'radmat/ff/lorentzff_canonical_rotations_checker.cc' || echo '$(srcdir)/'`radmat/ff/lorentzff_canonical_rotations_checker.cc
 @am__fastdepCXX_TRUE@	$(am__mv) $(DEPDIR)/lorentzff_canonical_rotations_checker.Tpo $(DEPDIR)/lorentzff_canonical_rotations_checker.Po
@@ -924,20 +909,6 @@ lorentzff_canonical_rotations_checker.obj: radmat/ff/lorentzff_canonical_rotatio
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='radmat/ff/lorentzff_canonical_rotations_checker.cc' object='lorentzff_canonical_rotations_checker.obj' libtool=no @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCXX_FALSE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o lorentzff_canonical_rotations_checker.obj `if test -f 'radmat/ff/lorentzff_canonical_rotations_checker.cc'; then $(CYGPATH_W) 'radmat/ff/lorentzff_canonical_rotations_checker.cc'; else $(CYGPATH_W) '$(srcdir)/radmat/ff/lorentzff_canonical_rotations_checker.cc'; fi`
-
-lorentzff_canonical_rotations_utils.o: radmat/ff/lorentzff_canonical_rotations_utils.cc
-@am__fastdepCXX_TRUE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT lorentzff_canonical_rotations_utils.o -MD -MP -MF $(DEPDIR)/lorentzff_canonical_rotations_utils.Tpo -c -o lorentzff_canonical_rotations_utils.o `test -f 'radmat/ff/lorentzff_canonical_rotations_utils.cc' || echo '$(srcdir)/'`radmat/ff/lorentzff_canonical_rotations_utils.cc
-@am__fastdepCXX_TRUE@	$(am__mv) $(DEPDIR)/lorentzff_canonical_rotations_utils.Tpo $(DEPDIR)/lorentzff_canonical_rotations_utils.Po
-@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='radmat/ff/lorentzff_canonical_rotations_utils.cc' object='lorentzff_canonical_rotations_utils.o' libtool=no @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCXX_FALSE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o lorentzff_canonical_rotations_utils.o `test -f 'radmat/ff/lorentzff_canonical_rotations_utils.cc' || echo '$(srcdir)/'`radmat/ff/lorentzff_canonical_rotations_utils.cc
-
-lorentzff_canonical_rotations_utils.obj: radmat/ff/lorentzff_canonical_rotations_utils.cc
-@am__fastdepCXX_TRUE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT lorentzff_canonical_rotations_utils.obj -MD -MP -MF $(DEPDIR)/lorentzff_canonical_rotations_utils.Tpo -c -o lorentzff_canonical_rotations_utils.obj `if test -f 'radmat/ff/lorentzff_canonical_rotations_utils.cc'; then $(CYGPATH_W) 'radmat/ff/lorentzff_canonical_rotations_utils.cc'; else $(CYGPATH_W) '$(srcdir)/radmat/ff/lorentzff_canonical_rotations_utils.cc'; fi`
-@am__fastdepCXX_TRUE@	$(am__mv) $(DEPDIR)/lorentzff_canonical_rotations_utils.Tpo $(DEPDIR)/lorentzff_canonical_rotations_utils.Po
-@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='radmat/ff/lorentzff_canonical_rotations_utils.cc' object='lorentzff_canonical_rotations_utils.obj' libtool=no @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCXX_FALSE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o lorentzff_canonical_rotations_utils.obj `if test -f 'radmat/ff/lorentzff_canonical_rotations_utils.cc'; then $(CYGPATH_W) 'radmat/ff/lorentzff_canonical_rotations_utils.cc'; else $(CYGPATH_W) '$(srcdir)/radmat/ff/lorentzff_canonical_rotations_utils.cc'; fi`
 
 lorentzff_formfactor_factory.o: radmat/ff/lorentzff_formfactor_factory.cc
 @am__fastdepCXX_TRUE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT lorentzff_formfactor_factory.o -MD -MP -MF $(DEPDIR)/lorentzff_formfactor_factory.Tpo -c -o lorentzff_formfactor_factory.o `test -f 'radmat/ff/lorentzff_formfactor_factory.cc' || echo '$(srcdir)/'`radmat/ff/lorentzff_formfactor_factory.cc
@@ -966,34 +937,6 @@ lorentzff_formfac_utils.obj: radmat/ff/lorentzff_formfac_utils.cc
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='radmat/ff/lorentzff_formfac_utils.cc' object='lorentzff_formfac_utils.obj' libtool=no @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCXX_FALSE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o lorentzff_formfac_utils.obj `if test -f 'radmat/ff/lorentzff_formfac_utils.cc'; then $(CYGPATH_W) 'radmat/ff/lorentzff_formfac_utils.cc'; else $(CYGPATH_W) '$(srcdir)/radmat/ff/lorentzff_formfac_utils.cc'; fi`
-
-lorentzff_Wigner_D_matrix_factory.o: radmat/ff/lorentzff_Wigner_D_matrix_factory.cc
-@am__fastdepCXX_TRUE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT lorentzff_Wigner_D_matrix_factory.o -MD -MP -MF $(DEPDIR)/lorentzff_Wigner_D_matrix_factory.Tpo -c -o lorentzff_Wigner_D_matrix_factory.o `test -f 'radmat/ff/lorentzff_Wigner_D_matrix_factory.cc' || echo '$(srcdir)/'`radmat/ff/lorentzff_Wigner_D_matrix_factory.cc
-@am__fastdepCXX_TRUE@	$(am__mv) $(DEPDIR)/lorentzff_Wigner_D_matrix_factory.Tpo $(DEPDIR)/lorentzff_Wigner_D_matrix_factory.Po
-@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='radmat/ff/lorentzff_Wigner_D_matrix_factory.cc' object='lorentzff_Wigner_D_matrix_factory.o' libtool=no @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCXX_FALSE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o lorentzff_Wigner_D_matrix_factory.o `test -f 'radmat/ff/lorentzff_Wigner_D_matrix_factory.cc' || echo '$(srcdir)/'`radmat/ff/lorentzff_Wigner_D_matrix_factory.cc
-
-lorentzff_Wigner_D_matrix_factory.obj: radmat/ff/lorentzff_Wigner_D_matrix_factory.cc
-@am__fastdepCXX_TRUE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT lorentzff_Wigner_D_matrix_factory.obj -MD -MP -MF $(DEPDIR)/lorentzff_Wigner_D_matrix_factory.Tpo -c -o lorentzff_Wigner_D_matrix_factory.obj `if test -f 'radmat/ff/lorentzff_Wigner_D_matrix_factory.cc'; then $(CYGPATH_W) 'radmat/ff/lorentzff_Wigner_D_matrix_factory.cc'; else $(CYGPATH_W) '$(srcdir)/radmat/ff/lorentzff_Wigner_D_matrix_factory.cc'; fi`
-@am__fastdepCXX_TRUE@	$(am__mv) $(DEPDIR)/lorentzff_Wigner_D_matrix_factory.Tpo $(DEPDIR)/lorentzff_Wigner_D_matrix_factory.Po
-@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='radmat/ff/lorentzff_Wigner_D_matrix_factory.cc' object='lorentzff_Wigner_D_matrix_factory.obj' libtool=no @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCXX_FALSE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o lorentzff_Wigner_D_matrix_factory.obj `if test -f 'radmat/ff/lorentzff_Wigner_D_matrix_factory.cc'; then $(CYGPATH_W) 'radmat/ff/lorentzff_Wigner_D_matrix_factory.cc'; else $(CYGPATH_W) '$(srcdir)/radmat/ff/lorentzff_Wigner_D_matrix_factory.cc'; fi`
-
-lorentzff_Wigner_D_matrix_manager.o: radmat/ff/lorentzff_Wigner_D_matrix_manager.cc
-@am__fastdepCXX_TRUE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT lorentzff_Wigner_D_matrix_manager.o -MD -MP -MF $(DEPDIR)/lorentzff_Wigner_D_matrix_manager.Tpo -c -o lorentzff_Wigner_D_matrix_manager.o `test -f 'radmat/ff/lorentzff_Wigner_D_matrix_manager.cc' || echo '$(srcdir)/'`radmat/ff/lorentzff_Wigner_D_matrix_manager.cc
-@am__fastdepCXX_TRUE@	$(am__mv) $(DEPDIR)/lorentzff_Wigner_D_matrix_manager.Tpo $(DEPDIR)/lorentzff_Wigner_D_matrix_manager.Po
-@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='radmat/ff/lorentzff_Wigner_D_matrix_manager.cc' object='lorentzff_Wigner_D_matrix_manager.o' libtool=no @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCXX_FALSE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o lorentzff_Wigner_D_matrix_manager.o `test -f 'radmat/ff/lorentzff_Wigner_D_matrix_manager.cc' || echo '$(srcdir)/'`radmat/ff/lorentzff_Wigner_D_matrix_manager.cc
-
-lorentzff_Wigner_D_matrix_manager.obj: radmat/ff/lorentzff_Wigner_D_matrix_manager.cc
-@am__fastdepCXX_TRUE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT lorentzff_Wigner_D_matrix_manager.obj -MD -MP -MF $(DEPDIR)/lorentzff_Wigner_D_matrix_manager.Tpo -c -o lorentzff_Wigner_D_matrix_manager.obj `if test -f 'radmat/ff/lorentzff_Wigner_D_matrix_manager.cc'; then $(CYGPATH_W) 'radmat/ff/lorentzff_Wigner_D_matrix_manager.cc'; else $(CYGPATH_W) '$(srcdir)/radmat/ff/lorentzff_Wigner_D_matrix_manager.cc'; fi`
-@am__fastdepCXX_TRUE@	$(am__mv) $(DEPDIR)/lorentzff_Wigner_D_matrix_manager.Tpo $(DEPDIR)/lorentzff_Wigner_D_matrix_manager.Po
-@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='radmat/ff/lorentzff_Wigner_D_matrix_manager.cc' object='lorentzff_Wigner_D_matrix_manager.obj' libtool=no @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCXX_FALSE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o lorentzff_Wigner_D_matrix_manager.obj `if test -f 'radmat/ff/lorentzff_Wigner_D_matrix_manager.cc'; then $(CYGPATH_W) 'radmat/ff/lorentzff_Wigner_D_matrix_manager.cc'; else $(CYGPATH_W) '$(srcdir)/radmat/ff/lorentzff_Wigner_D_matrix_manager.cc'; fi`
 
 fit_tins.o: radmat/fitting/fit_tins.cc
 @am__fastdepCXX_TRUE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT fit_tins.o -MD -MP -MF $(DEPDIR)/fit_tins.Tpo -c -o fit_tins.o `test -f 'radmat/fitting/fit_tins.cc' || echo '$(srcdir)/'`radmat/fitting/fit_tins.cc
@@ -1274,6 +1217,62 @@ register_all.obj: radmat/register_all/register_all.cc
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='radmat/register_all/register_all.cc' object='register_all.obj' libtool=no @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCXX_FALSE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o register_all.obj `if test -f 'radmat/register_all/register_all.cc'; then $(CYGPATH_W) 'radmat/register_all/register_all.cc'; else $(CYGPATH_W) '$(srcdir)/radmat/register_all/register_all.cc'; fi`
+
+rotation_group_generator.o: radmat/rotation_interface/rotation_group_generator.cc
+@am__fastdepCXX_TRUE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT rotation_group_generator.o -MD -MP -MF $(DEPDIR)/rotation_group_generator.Tpo -c -o rotation_group_generator.o `test -f 'radmat/rotation_interface/rotation_group_generator.cc' || echo '$(srcdir)/'`radmat/rotation_interface/rotation_group_generator.cc
+@am__fastdepCXX_TRUE@	$(am__mv) $(DEPDIR)/rotation_group_generator.Tpo $(DEPDIR)/rotation_group_generator.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='radmat/rotation_interface/rotation_group_generator.cc' object='rotation_group_generator.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o rotation_group_generator.o `test -f 'radmat/rotation_interface/rotation_group_generator.cc' || echo '$(srcdir)/'`radmat/rotation_interface/rotation_group_generator.cc
+
+rotation_group_generator.obj: radmat/rotation_interface/rotation_group_generator.cc
+@am__fastdepCXX_TRUE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT rotation_group_generator.obj -MD -MP -MF $(DEPDIR)/rotation_group_generator.Tpo -c -o rotation_group_generator.obj `if test -f 'radmat/rotation_interface/rotation_group_generator.cc'; then $(CYGPATH_W) 'radmat/rotation_interface/rotation_group_generator.cc'; else $(CYGPATH_W) '$(srcdir)/radmat/rotation_interface/rotation_group_generator.cc'; fi`
+@am__fastdepCXX_TRUE@	$(am__mv) $(DEPDIR)/rotation_group_generator.Tpo $(DEPDIR)/rotation_group_generator.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='radmat/rotation_interface/rotation_group_generator.cc' object='rotation_group_generator.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o rotation_group_generator.obj `if test -f 'radmat/rotation_interface/rotation_group_generator.cc'; then $(CYGPATH_W) 'radmat/rotation_interface/rotation_group_generator.cc'; else $(CYGPATH_W) '$(srcdir)/radmat/rotation_interface/rotation_group_generator.cc'; fi`
+
+rotation_utils.o: radmat/rotation_interface/rotation_utils.cc
+@am__fastdepCXX_TRUE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT rotation_utils.o -MD -MP -MF $(DEPDIR)/rotation_utils.Tpo -c -o rotation_utils.o `test -f 'radmat/rotation_interface/rotation_utils.cc' || echo '$(srcdir)/'`radmat/rotation_interface/rotation_utils.cc
+@am__fastdepCXX_TRUE@	$(am__mv) $(DEPDIR)/rotation_utils.Tpo $(DEPDIR)/rotation_utils.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='radmat/rotation_interface/rotation_utils.cc' object='rotation_utils.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o rotation_utils.o `test -f 'radmat/rotation_interface/rotation_utils.cc' || echo '$(srcdir)/'`radmat/rotation_interface/rotation_utils.cc
+
+rotation_utils.obj: radmat/rotation_interface/rotation_utils.cc
+@am__fastdepCXX_TRUE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT rotation_utils.obj -MD -MP -MF $(DEPDIR)/rotation_utils.Tpo -c -o rotation_utils.obj `if test -f 'radmat/rotation_interface/rotation_utils.cc'; then $(CYGPATH_W) 'radmat/rotation_interface/rotation_utils.cc'; else $(CYGPATH_W) '$(srcdir)/radmat/rotation_interface/rotation_utils.cc'; fi`
+@am__fastdepCXX_TRUE@	$(am__mv) $(DEPDIR)/rotation_utils.Tpo $(DEPDIR)/rotation_utils.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='radmat/rotation_interface/rotation_utils.cc' object='rotation_utils.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o rotation_utils.obj `if test -f 'radmat/rotation_interface/rotation_utils.cc'; then $(CYGPATH_W) 'radmat/rotation_interface/rotation_utils.cc'; else $(CYGPATH_W) '$(srcdir)/radmat/rotation_interface/rotation_utils.cc'; fi`
+
+Wigner_D_matrix_factory.o: radmat/rotation_interface/Wigner_D_matrix_factory.cc
+@am__fastdepCXX_TRUE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT Wigner_D_matrix_factory.o -MD -MP -MF $(DEPDIR)/Wigner_D_matrix_factory.Tpo -c -o Wigner_D_matrix_factory.o `test -f 'radmat/rotation_interface/Wigner_D_matrix_factory.cc' || echo '$(srcdir)/'`radmat/rotation_interface/Wigner_D_matrix_factory.cc
+@am__fastdepCXX_TRUE@	$(am__mv) $(DEPDIR)/Wigner_D_matrix_factory.Tpo $(DEPDIR)/Wigner_D_matrix_factory.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='radmat/rotation_interface/Wigner_D_matrix_factory.cc' object='Wigner_D_matrix_factory.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o Wigner_D_matrix_factory.o `test -f 'radmat/rotation_interface/Wigner_D_matrix_factory.cc' || echo '$(srcdir)/'`radmat/rotation_interface/Wigner_D_matrix_factory.cc
+
+Wigner_D_matrix_factory.obj: radmat/rotation_interface/Wigner_D_matrix_factory.cc
+@am__fastdepCXX_TRUE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT Wigner_D_matrix_factory.obj -MD -MP -MF $(DEPDIR)/Wigner_D_matrix_factory.Tpo -c -o Wigner_D_matrix_factory.obj `if test -f 'radmat/rotation_interface/Wigner_D_matrix_factory.cc'; then $(CYGPATH_W) 'radmat/rotation_interface/Wigner_D_matrix_factory.cc'; else $(CYGPATH_W) '$(srcdir)/radmat/rotation_interface/Wigner_D_matrix_factory.cc'; fi`
+@am__fastdepCXX_TRUE@	$(am__mv) $(DEPDIR)/Wigner_D_matrix_factory.Tpo $(DEPDIR)/Wigner_D_matrix_factory.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='radmat/rotation_interface/Wigner_D_matrix_factory.cc' object='Wigner_D_matrix_factory.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o Wigner_D_matrix_factory.obj `if test -f 'radmat/rotation_interface/Wigner_D_matrix_factory.cc'; then $(CYGPATH_W) 'radmat/rotation_interface/Wigner_D_matrix_factory.cc'; else $(CYGPATH_W) '$(srcdir)/radmat/rotation_interface/Wigner_D_matrix_factory.cc'; fi`
+
+Wigner_D_matrix_manager.o: radmat/rotation_interface/Wigner_D_matrix_manager.cc
+@am__fastdepCXX_TRUE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT Wigner_D_matrix_manager.o -MD -MP -MF $(DEPDIR)/Wigner_D_matrix_manager.Tpo -c -o Wigner_D_matrix_manager.o `test -f 'radmat/rotation_interface/Wigner_D_matrix_manager.cc' || echo '$(srcdir)/'`radmat/rotation_interface/Wigner_D_matrix_manager.cc
+@am__fastdepCXX_TRUE@	$(am__mv) $(DEPDIR)/Wigner_D_matrix_manager.Tpo $(DEPDIR)/Wigner_D_matrix_manager.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='radmat/rotation_interface/Wigner_D_matrix_manager.cc' object='Wigner_D_matrix_manager.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o Wigner_D_matrix_manager.o `test -f 'radmat/rotation_interface/Wigner_D_matrix_manager.cc' || echo '$(srcdir)/'`radmat/rotation_interface/Wigner_D_matrix_manager.cc
+
+Wigner_D_matrix_manager.obj: radmat/rotation_interface/Wigner_D_matrix_manager.cc
+@am__fastdepCXX_TRUE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT Wigner_D_matrix_manager.obj -MD -MP -MF $(DEPDIR)/Wigner_D_matrix_manager.Tpo -c -o Wigner_D_matrix_manager.obj `if test -f 'radmat/rotation_interface/Wigner_D_matrix_manager.cc'; then $(CYGPATH_W) 'radmat/rotation_interface/Wigner_D_matrix_manager.cc'; else $(CYGPATH_W) '$(srcdir)/radmat/rotation_interface/Wigner_D_matrix_manager.cc'; fi`
+@am__fastdepCXX_TRUE@	$(am__mv) $(DEPDIR)/Wigner_D_matrix_manager.Tpo $(DEPDIR)/Wigner_D_matrix_manager.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='radmat/rotation_interface/Wigner_D_matrix_manager.cc' object='Wigner_D_matrix_manager.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o Wigner_D_matrix_manager.obj `if test -f 'radmat/rotation_interface/Wigner_D_matrix_manager.cc'; then $(CYGPATH_W) 'radmat/rotation_interface/Wigner_D_matrix_manager.cc'; else $(CYGPATH_W) '$(srcdir)/radmat/rotation_interface/Wigner_D_matrix_manager.cc'; fi`
 
 aux.o: radmat/utils/aux.cc
 @am__fastdepCXX_TRUE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT aux.o -MD -MP -MF $(DEPDIR)/aux.Tpo -c -o aux.o `test -f 'radmat/utils/aux.cc' || echo '$(srcdir)/'`radmat/utils/aux.cc

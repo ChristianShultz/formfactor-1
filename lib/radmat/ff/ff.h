@@ -11,10 +11,7 @@
 #include "lorentzff_canonical_PiRho.h"
 #include "lorentzff_canonical_RhoPi.h"
 #include "lorentzff_canonical_RhoRho.h"
-#include "lorentzff_canonical_rotation_groups.h"
 #include "lorentzff_canonical_rotations_checker.h"
-#include "lorentzff_canonical_rotations.h"
-#include "lorentzff_canonical_rotations_utils.h"
 #include "lorentzff_cubic_reps.h"
 #include "lorentzff_formfactor_abs_base_cfg.h"
 #include "lorentzff_formfactor_factory.h"
@@ -22,7 +19,4 @@
 #include "lorentzff_polarization_embedding.h"
 #include "lorentzff_polarization_embedding_old.h"
 #include "lorentzff_polarization_tensors.h"
-#include "lorentzff_Wigner_D_matrix_embedding.h"
-#include "lorentzff_Wigner_D_matrix_factory.h"
-#include "lorentzff_Wigner_D_matrix_manager.h"
 #endif

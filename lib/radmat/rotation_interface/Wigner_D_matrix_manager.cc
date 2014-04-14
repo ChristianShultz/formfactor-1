@@ -1,12 +1,12 @@
 /* -.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.
 
-* File Name : lorentzff_Wigner_D_matrix_manager.cc
+* File Name : Wigner_D_matrix_manager.cc
 
 * Purpose :
 
-* Creation Date : 04-03-2014
+* Creation Date : 14-04-2014
 
-* Last Modified : Fri 11 Apr 2014 01:26:04 PM EDT
+* Last Modified : Mon 14 Apr 2014 05:43:24 PM EDT
 
 * Created By : shultz
 
@@ -14,29 +14,38 @@ _._._._._._._._._._._._._._._._._._._._._.*/
 
 
 
-
-#include "lorentzff_Wigner_D_matrix_manager.h"
-#include "lorentzff_formfac_utils.h"
+#include "Wigner_D_matrix_manager.h"
 #include "hadron/clebsch.h"
 #include "radmat/utils/pow2assert.h"
 #include "semble/semble_semble.h"
+#include "rotation_group_generator.h"
 
 
 
 namespace radmat
 {
+  namespace
+  {
+    std::complex<double> complex_zero(0.,0.); 
 
-  DMatrixManager::FrameOrientation_t 
+    std::complex<double> round_to_zero(const std::complex<double> &cd, const double thresh=1e-6)
+    {return ( std::norm(cd) < thresh ) ? complex_zero : cd ; }
+  } // anonomyous 
+    
+
+  std::pair<mom_t,mom_t>
     DMatrixManager::get_frame(const mom_t &l, const mom_t &r) const
     {
-      return radmat::LatticeRotationEnv::get_frame_orientation(l,r); 
+      return radmat::LatticeRotationEnv::rotation_group_key(l,r); 
     }
 
       // there is a delta function that MUST be satisfied 
   void 
-    DMatrixManager::check_throw_frame_err(const RotationMatrix_t *R, const FrameOrientation_t &f) const
+    DMatrixManager::check_throw_frame_err(const RotationMatrix_t *R, 
+        const std::pair<mom_t,mom_t> &f, 
+        const std::pair<mom_t,mom_t> &c) const
     {
-      if( !!! check_total_frame_transformation(R,f.l,f.r,f.cl,f.cr,true) )
+      if( !!! check_total_frame_transformation(R,f.first,f.second,c.first,c.second,true) )
       {
         std::cout << __func__ << ": throwing string " << std::endl;
         throw std::string("triad wigner rotation error"); 
@@ -87,25 +96,18 @@ namespace radmat
     }
 
   RotationMatrix_t*
-    DMatrixManager::triad_rotation_matrix(const mom_t &l, const mom_t &r) const
+    DMatrixManager::rotation_matrix(const mom_t &l, const mom_t &r) const
     {
-      FrameOrientation_t f = get_frame(l,r); 
-      return generate_triad_rotation_matrix(f.l,f.r,f.cl,f.cr); 
+      std::pair<mom_t,mom_t> f  = get_frame(l,r); 
+      return generate_rotation_matrix(l,r,f.first,f.second); 
     }
 
   WignerMatrix_t*
-    DMatrixManager::triad_rotation_wigner_matrix(const RotationMatrix_t *R,
+    DMatrixManager::wigner_matrix(const RotationMatrix_t *R,
         const mom_t &l,
         const mom_t &r,
-        const int J,
-        const bool check_frame) const
+        const int J) const
     {
-      if( check_frame)
-      {
-        FrameOrientation_t f = get_frame(l,r); 
-        check_throw_frame_err(R,f); 
-      }
-
       int bound = 2*J+1; 
       WignerMatrix_t *W  = new WignerMatrix_t( (TensorShape<2>())[bound][bound] , std::complex<double>(0.,0.));   
 
@@ -131,15 +133,15 @@ namespace radmat
         const int J,
         bool print) const
     {
-      FrameOrientation_t f = get_frame(l,r); 
+      std::pair<mom_t,mom_t> can = get_frame(l,r); 
       int bound = 2*J+1; 
       WignerMatrix_t *W  = new WignerMatrix_t( (TensorShape<2>())[bound][bound] , std::complex<double>(0.,0.));   
       WignerMatrix_t *Wt,*Wn,*Wi; 
 
       // the delta function is checked here
-      Wt = triad_rotation_wigner_matrix(R,l,r,J); 
-      Wn = radmat::WignerDMatrixEnv::call_factory(f.l,J);
-      Wi = radmat::WignerDMatrixEnv::call_factory(f.cl,J);
+      Wt = wigner_matrix(R,l,r,J); 
+      Wn = radmat::WignerDMatrixEnv::call_factory(l,J);
+      Wi = radmat::WignerDMatrixEnv::call_factory(can.first,J);
 
       dagger(Wi); 
       dagger(Wt); 
@@ -155,9 +157,9 @@ namespace radmat
 
       if( print ) 
       {
-        std::cout << __func__ << ": moms " << "f.l" << string_mom(f.l)
-          << " f.r " << string_mom(f.r) << " f.cl " << string_mom(f.cl)
-          << " f.cr " << string_mom(f.cr) << std::endl;
+        std::cout << __func__ << ": moms " << "l" << string_mom(l)
+          << " r " << string_mom(r) << " cl " << string_mom(can.first)
+          << " cr " << string_mom(can.second) << std::endl;
 
         clean(Wn); 
         clean(Wt);
@@ -185,15 +187,15 @@ namespace radmat
         const int J,
         bool print) const
     {
-      FrameOrientation_t f = get_frame(l,r); 
+      std::pair<mom_t,mom_t> can = get_frame(l,r); 
       int bound = 2*J+1; 
       WignerMatrix_t *W  = new WignerMatrix_t( (TensorShape<2>())[bound][bound] , std::complex<double>(0.,0.));   
       WignerMatrix_t *Wt,*Wk,*Wl; 
 
       // the delta function is checked here
-      Wt = triad_rotation_wigner_matrix(R,l,r,J); 
-      Wl = radmat::WignerDMatrixEnv::call_factory(f.r,J);
-      Wk = radmat::WignerDMatrixEnv::call_factory(f.cr,J);
+      Wt = wigner_matrix(R,l,r,J); 
+      Wl = radmat::WignerDMatrixEnv::call_factory(r,J);
+      Wk = radmat::WignerDMatrixEnv::call_factory(can.second,J);
 
       dagger(Wl); 
 
@@ -209,9 +211,9 @@ namespace radmat
 
       if( print ) 
       {
-        std::cout << __func__ << ": moms " << "f.l" << string_mom(f.l)
-          << " f.r " << string_mom(f.r) << " f.cl " << string_mom(f.cl)
-          << " f.cr " << string_mom(f.cr) << std::endl;
+        std::cout << __func__ << ": moms " << "l" << string_mom(l)
+          << " r " << string_mom(r) << " cl " << string_mom(can.first)
+          << " cr " << string_mom(can.second) << std::endl;
 
         clean(Wk); 
         clean(Wt);
@@ -233,3 +235,4 @@ namespace radmat
 
 
 }// radmat
+

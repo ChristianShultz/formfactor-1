@@ -6,7 +6,7 @@
 
  * Creation Date : 18-03-2014
 
- * Last Modified : Sun 13 Apr 2014 11:19:28 AM EDT
+ * Last Modified : Mon 14 Apr 2014 05:10:13 PM EDT
 
  * Created By : shultz
 
@@ -109,14 +109,13 @@ namespace radmat
         mom_t q,qc; 
         q = tag->q; 
 
-        std::string can_frame = RG::Instance().get_can_frame_string( tag->left_mom, tag->right_mom); 
-        std::pair<mom_t,mom_t>  canonical_momentum = RG::Instance().get_frame_momentum(can_frame); 
+        std::pair<mom_t,mom_t>  canonical_momentum = RG::Instance().canonical_frame(tag->left_mom,tag->right_mom); 
         qc = canonical_momentum.first - canonical_momentum.second;
 
         // skip and return the dmatrix 
         if( is_rest(qc)  )
         {
-          Dret = wig.triad_rotation_wigner_matrix(R,tag->left_mom,tag->right_mom,1); 
+          Dret = wig.wigner_matrix(R,tag->left_mom,tag->right_mom,1); 
           wig.conjugate(Dret); 
         }
         else
@@ -124,11 +123,11 @@ namespace radmat
 
           WignerMatrix_t *Dq,*DR,*Dqc; 
 
-          DR = wig.triad_rotation_wigner_matrix(R,tag->left_mom,tag->right_mom,1); 
+          DR = wig.wigner_matrix(R,tag->left_mom,tag->right_mom,1); 
           Dq = radmat::WignerDMatrixEnv::call_factory(q,1); 
           Dqc = radmat::WignerDMatrixEnv::call_factory(qc,1); 
 
-          wig.dagger(Dq); 
+          wig.conjugate(Dq); 
 
           for(int i =0; i < 3; ++i)
             for(int j =0; j < 3; ++j)
@@ -163,8 +162,7 @@ namespace radmat
         double tolerance = 1e-6; 
 
         // first find the polarization in the original frame 
-        std::string can_frame = RG::Instance().get_can_frame_string( tag->left_mom, tag->right_mom); 
-        std::pair<mom_t,mom_t>  canonical_momentum = RG::Instance().get_frame_momentum(can_frame); 
+        std::pair<mom_t,mom_t>  canonical_momentum = RG::Instance().canonical_frame(tag->left_mom, tag->right_mom); 
         mom_t qc = canonical_momentum.first - canonical_momentum.second;
 
         // rows are + 0 -  , cols are x y z 
@@ -177,7 +175,7 @@ namespace radmat
         WignerMatrix_t * D; 
         RotationMatrix_t *R; 
 
-        R = wig.triad_rotation_matrix(tag->left_mom,tag->right_mom); 
+        R = wig.rotation_matrix(tag->left_mom,tag->right_mom); 
         D = pull_wigner_matrix( wig, tag, R);   
 
         // not going to worry about this case now  
@@ -258,8 +256,7 @@ namespace radmat
         double tolerance = 1e-6; 
 
         // first find the polarization in the original frame 
-        std::string can_frame = RG::Instance().get_can_frame_string( tag->left_mom, tag->right_mom); 
-        std::pair<mom_t,mom_t>  canonical_momentum = RG::Instance().get_frame_momentum(can_frame); 
+        std::pair<mom_t,mom_t>  canonical_momentum = RG::Instance().canonical_frame(tag->left_mom,tag->right_mom); 
         mom_t qc = canonical_momentum.first - canonical_momentum.second;
 
         // rows are + 0 -  , cols are x y z 
@@ -272,7 +269,7 @@ namespace radmat
         WignerMatrix_t * D; 
         RotationMatrix_t *R; 
 
-        R = wig.triad_rotation_matrix(tag->left_mom,tag->right_mom); 
+        R = wig.rotation_matrix(tag->left_mom,tag->right_mom); 
         D = pull_wigner_matrix( wig, tag, R);   
 
         // not going to worry about this case now  

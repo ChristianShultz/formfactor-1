@@ -7,7 +7,7 @@
 #include <complex>
 
 #include "lorentzff_polarization_tensors.h"
-#include "lorentzff_canonical_rotations.h"
+#include "radmat/rotation_interface/rotation_interface.h"
 #include "lorentzff_formfac_utils.h"
 #include "ensem/ensem.h"
 #include "semble/semble_meta.h"

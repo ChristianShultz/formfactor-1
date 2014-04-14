@@ -2,13 +2,10 @@
 #define LORENTZFF_CANONICAL_FRAME_FORMFACS_ROTATION_MANAGER_H 
 
 #include "formfactor_abs_base_cfg.h"
-#include "lorentzff_Wigner_D_matrix_factory.h"
-#include "lorentzff_Wigner_D_matrix_manager.h"
-#include "lorentzff_canonical_rotations_utils.h"
-#include "lorentzff_canonical_rotations.h"
-#include "lorentzff_formfac_utils.h"
 #include "hadron/irrep_util.h"
 #include "radmat/utils/tensor.h"
+#include "radmat/rotation_interface/rotation_interface.h"
+#include "lorentzff_formfac_utils.h"
 #include <complex>
 #include <sstream>
 
@@ -25,7 +22,6 @@ namespace radmat
     : public FFAbsBlockBase_t<Data_t>,
     public DMatrixManager
   {
-    typedef DMatrixManager::FrameOrientation_t FrameOrientation_t; 
     typedef Tensor<double,1> p4_t; 
 
     virtual ~FormFacRotationManager() {}
@@ -46,8 +42,7 @@ namespace radmat
         Tensor<double,1> ll( (TensorShape<1>())[4], 0.);
         Tensor<double,1> rr( (TensorShape<1>())[4], 0.);
         std::pair<mom_t,mom_t> fmom = pair_mom(l,r,kick); 
-        std::string clab = RG::Instance().get_can_frame_string(fmom.first,fmom.second); 
-        std::pair<mom_t,mom_t> cmom = RG::Instance().get_frame_momentum(clab);
+        std::pair<mom_t,mom_t> cmom = this->get_frame(fmom.first,fmom.second); 
         mom_t cl = cmom.first; 
         mom_t cr = cmom.second; 
 
@@ -115,7 +110,7 @@ namespace radmat
           const double kick) const
       {
         std::pair<mom_t,mom_t> moms = pair_mom(lefty.first,righty.first,kick);  
-        RotationMatrix_t *R = triad_rotation_matrix(moms.first,moms.second); 
+        RotationMatrix_t *R = rotation_matrix(moms.first,moms.second); 
         std::pair<p4_t,p4_t> can_moms = can_mom(R,lefty.first,righty.first,kick); 
         WignerMatrix_t * Wl = left_wigner_matrix(R,moms.first,moms.second,J_left);
         WignerMatrix_t * Wr = right_wigner_matrix(R,moms.first,moms.second,J_right);

@@ -4,7 +4,7 @@
 #include "io/adat_xmlio.h"
 #include <complex>
 #include "radmat/utils/tensor.h"
-#include "lorentzff_canonical_rotations_utils.h"
+#include "radmat/rotation_interface/rotation_interface.h"
 
 namespace radmat
 {

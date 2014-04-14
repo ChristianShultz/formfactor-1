@@ -6,7 +6,7 @@
 
  * Creation Date : 10-12-2013
 
- * Last Modified : Wed 26 Mar 2014 11:37:08 AM EDT
+ * Last Modified : Mon 14 Apr 2014 05:32:15 PM EDT
 
  * Created By : shultz
 
@@ -15,9 +15,9 @@
 
 #include "radmat/data_representation/data_representation_factory.h"
 #include "radmat/data_representation/data_representation_subduction_map.h"
-#include "radmat/ff/lorentzff_canonical_rotations.h"
-#include "radmat/ff/lorentzff_Wigner_D_matrix_factory.h"
 #include "radmat/ff/lorentzff_formfactor_factory.h"
+#include "radmat/rotation_interface/rotation_group_generator.h"
+#include "radmat/rotation_interface/Wigner_D_matrix_factory.h"
 #include "radmat/ff_interface/formfactor_factory.h"
 #include "radmat/llsq/llsq_solvers.h"
 #include "radmat/redstar_interface/redstar_abstract_xml_factory.h"

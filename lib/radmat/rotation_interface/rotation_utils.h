@@ -1,5 +1,6 @@
-#ifndef LORENTZFF_CANONICAL_ROTATIONS_UTILS_H
-#define LORENTZFF_CANONICAL_ROTATIONS_UTILS_H 
+#ifndef ROTATION_UTILS_H
+#define ROTATION_UTILS_H 
+
 
 #include "radmat/redstar_interface/redstar_canonical_rotations.h"
 #include "itpp/itbase.h"
@@ -10,7 +11,7 @@ namespace radmat
 {
 
 
-  // Ax = b
+  // Ax ?= b
   bool
     check_frame_transformation(const RotationMatrix_t *A,
         const mom_t &x, 
@@ -28,7 +29,7 @@ namespace radmat
       bool print_on_false=false); 
 
 
-  // are they colinear
+  // are they colinear l x r = 0 
   bool colinear_momentum(const mom_t &l, const mom_t &r); 
 
   // return the transformation from pp to p
@@ -41,6 +42,7 @@ namespace radmat
     generate_frame_transformation(const mom_t &first, const mom_t &second);
 
   //  TRIaxial Attitude Determination 
+  //    or some adat hackery 
   //
   // fails if @ rest 
   //
@@ -54,7 +56,7 @@ namespace radmat
   //     return
   //      generate_frame_transformation(l,ll)
   RotationMatrix_t* 
-    generate_triad_rotation_matrix(const mom_t &l, const mom_t &r, 
+    generate_rotation_matrix(const mom_t &l, const mom_t &r, 
         const mom_t &ll, const mom_t &rr); 
 
   // parameterize the triad rotaion in terms
@@ -102,4 +104,4 @@ namespace radmat
 }
 
 
-#endif /* LORENTZFF_CANONICAL_ROTATIONS_UTILS_H */
+#endif /* ROTATION_UTILS_H */

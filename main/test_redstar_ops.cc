@@ -6,7 +6,7 @@
 
  * Creation Date : 8-122013
 
- * Last Modified : Thu 12 Dec 2013 05:48:35 PM EST
+ * Last Modified : Mon 14 Apr 2014 06:03:52 PM EDT
 
  * Created By : shultz
 
@@ -22,8 +22,7 @@
 #include "semble/semble_meta.h"
 #include "radmat/register_all/register_all.h"
 #include "radmat/redstar_interface/redstar_interface.h"
-#include "radmat/ff/lorentzff_polarization_embedding.h"
-#include "radmat/ff/lorentzff_canonical_rotations.h"
+#include "radmat/ff/ff.h"
 #include "itpp/itbase.h"
 #include <map>
 #include <algorithm>
@@ -962,9 +961,9 @@ void unique_frames(int argc, char *argv[])
   }
 
 
-  std::vector<std::string> frames; 
-  std::vector<std::string>::const_iterator it; 
-  frames = radmat::LatticeRotationEnv::TheRotationGroupGenerator::Instance().unique_frames();;
+  std::vector<radmat::mom_pair_key> frames; 
+  std::vector<radmat::mom_pair_key>::const_iterator it; 
+  frames = radmat::LatticeRotationEnv::TheRotationGroupGenerator::Instance().canonical_frames;
 
   for(it = frames.begin(); it != frames.end(); ++it)
     std::cout << *it << std::endl;
@@ -1003,12 +1002,21 @@ void related_by_rotation(int argc, char *argv[])
   www >> p2[2]; 
 
 
-  std::vector<std::string> frames; 
-  std::vector<std::string>::const_iterator it; 
-  frames = radmat::LatticeRotationEnv::TheRotationGroupGenerator::Instance().get_related_frames(p1,p2);;
+  std::vector<radmat::mom_pair_key> frames; 
+  std::vector<radmat::mom_pair_key>::const_iterator frame_it; 
+  std::map<radmat::mom_pair_key,radmat::mom_pair_key,radmat::mom_key_comp>::const_iterator it; 
+  std::pair<radmat::mom_t,radmat::mom_t> canonical = radmat::LatticeRotationEnv::rotation_group_key(p1,p2); 
+  radmat::mom_pair_key canonical_key( radmat::mom_key(canonical.first) , radmat::mom_key(canonical.second)); 
 
-  for(it = frames.begin(); it != frames.end(); ++it)
-    std::cout << *it << std::endl;
+  typedef radmat::LatticeRotationEnv::TheRotationGroupGenerator RG; 
+  radmat::mom_key_comp comparator; 
+
+  for( it = RG::Instance().can_frame_map.begin() ; it != RG::Instance().can_frame_map.end(); ++it)
+    if( comparator.exact_equivalence( canonical_key, it->second) )
+      frames.push_back( it->first ); 
+
+  for(frame_it = frames.begin(); frame_it != frames.end(); ++frame_it)
+    std::cout << *frame_it << std::endl;
 
 }
 

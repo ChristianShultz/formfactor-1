@@ -6,15 +6,15 @@
 
  * Creation Date : 24-12-2013
 
- * Last Modified : Mon 24 Mar 2014 03:29:24 PM EDT
+ * Last Modified : Mon 14 Apr 2014 05:26:41 PM EDT
 
  * Created By : shultz
 
  _._._._._._._._._._._._._._._._._._._._._.*/
 
 
+#include "radmat/rotation_interface/rotation_interface.h"
 #include "lorentzff_canonical_rotations_checker.h"
-#include "lorentzff_canonical_rotations_utils.h"
 #include "lorentzff_canonical_frame_formfacs_rotation_manager.h"
 #include "lorentzff_canonical_JJlist_ff.h"
 #include "semble/semble_semble.h"
@@ -152,7 +152,7 @@ namespace radmat
     {
       DMatrixManager D;
       RotationMatrix_t *Rtriad; 
-      Rtriad = D.triad_rotation_matrix(k.left,k.right);
+      Rtriad = D.rotation_matrix(k.left,k.right);
       mom_t ll = mul_tran(Rtriad,k.left); 
       mom_t rr = mul_tran(Rtriad,k.right); 
       delete  Rtriad; 

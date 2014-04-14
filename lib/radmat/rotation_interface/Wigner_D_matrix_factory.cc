@@ -1,20 +1,19 @@
 /* -.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.
 
- * File Name : lorentzff_Wigner_D_matrix_factory.cc
+* File Name : Wigner_D_matrix_factory.cc
 
- * Purpose :
+* Purpose :
 
- * Creation Date : 14-12-2013
+* Creation Date : 14-04-2014
 
- * Last Modified : Mon 14 Apr 2014 10:40:14 AM EDT
+* Last Modified : Mon 14 Apr 2014 05:39:10 PM EDT
 
- * Created By : shultz
+* Created By : shultz
 
- _._._._._._._._._._._._._._._._._._._._._.*/
+_._._._._._._._._._._._._._._._._._._._._.*/
 
-#include "lorentzff_Wigner_D_matrix_factory.h"
-#include "lorentzff_canonical_rotations_utils.h"
-#include "lorentzff_formfac_utils.h"
+#include "Wigner_D_matrix_factory.h"
+#include "rotation_utils.h"
 #include "hadron/irrep_util.h"
 #include "hadron/clebsch.h"
 #include "semble/semble_meta.h"
@@ -28,6 +27,10 @@ namespace radmat
 
   namespace
   {
+    std::complex<double> complex_zero(0.,0.); 
+
+    std::complex<double> round_to_zero(const std::complex<double> &cd, const double thresh=1e-6)
+    {return ( std::norm(cd) < thresh ) ? complex_zero : cd ; }
     
     WignerMatrix_t gen_wigner_matrix(const mom_t &p, const int J)
     {
