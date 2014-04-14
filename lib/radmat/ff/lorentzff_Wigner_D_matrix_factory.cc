@@ -6,7 +6,7 @@
 
  * Creation Date : 14-12-2013
 
- * Last Modified : Sun 23 Feb 2014 10:29:11 AM EST
+ * Last Modified : Mon 14 Apr 2014 10:40:14 AM EDT
 
  * Created By : shultz
 
@@ -47,29 +47,31 @@ namespace radmat
       return W; 
     }
 
-    std::string gen_id(const mom_t &p, const int J)
+    WignerKey gen_id(const mom_t &p, const int J)
     {
-      std::stringstream ss; 
-      ss << "J_" << J << "__" << Hadron::generateLittleGroup(p) 
-        << "_p"<< p[0] << p[1] << p[2] << std::endl;  
-      return ss.str(); 
+      return WignerKey(p,J); 
     }
 
     typedef radmat::WignerDMatrixEnv::TheWignerDMatrixFactory WDFac; 
 
-    bool reg_wigner_matrix(const WignerMatrix_t &W, const std::string &id)
+    bool reg_wigner_matrix(const WignerMatrix_t &W, const WignerKey &id)
     {
       if( WDFac::Instance().find(id) != WDFac::Instance().end() )
         throw std::string("WignerDMatrixEnv double reg error"); 
 
-      WDFac::Instance().insert(std::pair<std::string,WignerMatrix_t>(id,W)); 
+      WDFac::Instance().insert(std::make_pair(id,W)); 
       return true; 
+    }
+
+    std::ostream& operator<<(std::ostream &o, const WignerKey &k)
+    {
+      return o << "J_" << k.J << "__p" << k.px << k.py << k.pz; 
     }
 
     WignerMatrix_t* query_factory(const mom_t &p, const int J)
     {
-      std::string id = gen_id(p,J); 
-      std::map<std::string,WignerMatrix_t>::const_iterator it; 
+      WignerKey id = gen_id(p,J); 
+      std::map<WignerKey,WignerMatrix_t,WignerKeyClassComp>::const_iterator it; 
       it = WDFac::Instance().find(id); 
       if( it == WDFac::Instance().end())
       {
@@ -91,7 +93,7 @@ namespace radmat
       bool do_reg(const int J)
       {
         mom_t mom = gen_mom<X,Y,Z>(); 
-        std::string id = gen_id(mom,J); 
+        WignerKey id = gen_id(mom,J); 
         WignerMatrix_t W = gen_wigner_matrix(mom,J);  
         return reg_wigner_matrix(W,id); 
       }

@@ -6,7 +6,7 @@
 
  * Creation Date : 20-03-2014
 
- * Last Modified : Thu 10 Apr 2014 11:48:52 AM EDT
+ * Last Modified : Mon 14 Apr 2014 12:29:02 PM EDT
 
  * Created By : shultz
 
@@ -582,5 +582,68 @@ namespace radmat
       }
 
       return resum; 
+    }
+
+
+  std::vector<VectorCurrentImprovedBlockData>
+    generate_lorentz_block(const RedstarImprovedVectorCurrentXML *const ptr)
+    {
+      std::vector<VectorCurrentImprovedBlockData> ret; 
+      std::vector<BlockData>::const_iterator it; 
+      std::vector<BlockData> piggy; 
+      RedstarVectorCurrentXML back; 
+      back.pmin = ptr->pmin; 
+      back.pmax = ptr->pmax; 
+      back.t_slice = ptr->t_slice; 
+      back.time = ptr->time; 
+      back.space = ptr->space;
+
+      piggy = generate_lorentz_block( &back ); 
+      ret.reserve(piggy.size()); 
+
+      for(it = piggy.begin(); it != piggy.end(); ++it)
+      {
+        VectorCurrentImprovedBlockData foo; 
+        foo.origin_rep = it->origin_rep; 
+        foo.data_rep = it->data_rep; 
+        foo.row = it->row; 
+        foo.data = it->data; 
+        foo.imp = ptr->imp; 
+        ret.push_back(foo); 
+      }
+      
+      return ret; 
+    }
+
+
+
+  std::vector<VectorCurrentImprovedBlockData>
+    generate_cubic_block(const RedstarImprovedVectorCurrentXML *const ptr)
+    {
+      std::vector<VectorCurrentImprovedBlockData> ret; 
+      std::vector<BlockData>::const_iterator it; 
+      std::vector<BlockData> piggy; 
+      RedstarVectorCurrentXML back; 
+      back.pmin = ptr->pmin; 
+      back.pmax = ptr->pmax; 
+      back.t_slice = ptr->t_slice; 
+      back.time = ptr->time; 
+      back.space = ptr->space;
+
+      piggy = generate_cubic_block( &back ); 
+      ret.reserve(piggy.size()); 
+
+      for(it = piggy.begin(); it != piggy.end(); ++it)
+      {
+        VectorCurrentImprovedBlockData foo; 
+        foo.origin_rep = it->origin_rep; 
+        foo.data_rep = it->data_rep; 
+        foo.row = it->row; 
+        foo.data = it->data; 
+        foo.imp = ptr->imp; 
+        ret.push_back(foo); 
+      }
+      
+      return ret; 
     }
 } 

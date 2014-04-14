@@ -6,6 +6,7 @@
 #include "redstar_canonical_lattice_rotations.h"
 #include "redstar_canonical_rotations.h"
 #include "redstar_cartesian_interface.h"
+#include "redstar_improved_vector_current_xml_interface.h"
 #include "redstar_interface.h"
 #include "redstar_invert_subduction.h"
 #include "redstar_particle_handler_utils.h"

@@ -15,11 +15,33 @@ namespace radmat
 {
   typedef Tensor<std::complex<double>,2> WignerMatrix_t; 
 
+  struct WignerKey
+  {
+    WignerKey() {}
+    WignerKey( const mom_t &p, const int JJ )
+      :px(p[0]) , py(p[1]) , pz(p[2]) , J(JJ)
+    {}
+    int px,py,pz,J; 
+  };
+
+  struct WignerKeyClassComp
+  {
+    bool operator()(const WignerKey &l, const WignerKey &r)
+    {
+      if(l.px != r.px)
+        return l.px < r.px;
+      if(l.py != r.py) 
+        return l.py < r.py; 
+      if(l.pz != r.pz)
+        return l.pz < r.pz; 
+      return l.J < r.J; 
+    }
+  };
 
   namespace WignerDMatrixEnv
   {
     typedef Util::SingletonHolder<
-      std::map<std::string,WignerMatrix_t> >
+      std::map<WignerKey,WignerMatrix_t,WignerKeyClassComp> >
       TheWignerDMatrixFactory;
 
     bool registerAll(const int Jmax); 

@@ -110,6 +110,7 @@ am_libradmat_a_OBJECTS =  \
 	redstar_canonical_lattice_rotations.$(OBJEXT) \
 	redstar_canonical_rotations.$(OBJEXT) \
 	redstar_cartesian_interface.$(OBJEXT) \
+	redstar_improved_vector_current_xml_interface.$(OBJEXT) \
 	redstar_invert_subduction.$(OBJEXT) \
 	redstar_particle_handler_utils.$(OBJEXT) \
 	redstar_single_particle_meson_xml_interface.$(OBJEXT) \
@@ -329,6 +330,7 @@ nobase_include_HEADERS = \
 													 radmat/redstar_interface/redstar_canonical_lattice_rotations.h    \
 													 radmat/redstar_interface/redstar_canonical_rotations.h    \
 													 radmat/redstar_interface/redstar_cartesian_interface.h    \
+													 radmat/redstar_interface/redstar_improved_vector_current_xml_interface.h    \
 													 radmat/redstar_interface/redstar_interface.h    \
 													 radmat/redstar_interface/redstar_invert_subduction.h    \
 													 radmat/redstar_interface/redstar_particle_handler_utils.h    \
@@ -360,7 +362,7 @@ nobase_include_HEADERS = \
 													 radmat/utils/tensor.h    \
 													 radmat/utils/tokenize.h    \
 													 radmat/utils/type_computations.h    \
-													 radmat/utils/utils.h    
+													 radmat/utils/utils.h   
 
 
 # the lib
@@ -406,6 +408,7 @@ libradmat_a_SOURCES = \
 											radmat/redstar_interface/redstar_canonical_lattice_rotations.cc    \
 											radmat/redstar_interface/redstar_canonical_rotations.cc    \
 											radmat/redstar_interface/redstar_cartesian_interface.cc    \
+											radmat/redstar_interface/redstar_improved_vector_current_xml_interface.cc    \
 											radmat/redstar_interface/redstar_invert_subduction.cc    \
 											radmat/redstar_interface/redstar_particle_handler_utils.cc    \
 											radmat/redstar_interface/redstar_single_particle_meson_xml_interface.cc    \
@@ -545,6 +548,7 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/redstar_canonical_lattice_rotations.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/redstar_canonical_rotations.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/redstar_cartesian_interface.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/redstar_improved_vector_current_xml_interface.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/redstar_invert_subduction.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/redstar_particle_handler_utils.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/redstar_single_particle_meson_xml_interface.Po@am__quote@
@@ -1130,6 +1134,20 @@ redstar_cartesian_interface.obj: radmat/redstar_interface/redstar_cartesian_inte
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='radmat/redstar_interface/redstar_cartesian_interface.cc' object='redstar_cartesian_interface.obj' libtool=no @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCXX_FALSE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o redstar_cartesian_interface.obj `if test -f 'radmat/redstar_interface/redstar_cartesian_interface.cc'; then $(CYGPATH_W) 'radmat/redstar_interface/redstar_cartesian_interface.cc'; else $(CYGPATH_W) '$(srcdir)/radmat/redstar_interface/redstar_cartesian_interface.cc'; fi`
+
+redstar_improved_vector_current_xml_interface.o: radmat/redstar_interface/redstar_improved_vector_current_xml_interface.cc
+@am__fastdepCXX_TRUE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT redstar_improved_vector_current_xml_interface.o -MD -MP -MF $(DEPDIR)/redstar_improved_vector_current_xml_interface.Tpo -c -o redstar_improved_vector_current_xml_interface.o `test -f 'radmat/redstar_interface/redstar_improved_vector_current_xml_interface.cc' || echo '$(srcdir)/'`radmat/redstar_interface/redstar_improved_vector_current_xml_interface.cc
+@am__fastdepCXX_TRUE@	$(am__mv) $(DEPDIR)/redstar_improved_vector_current_xml_interface.Tpo $(DEPDIR)/redstar_improved_vector_current_xml_interface.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='radmat/redstar_interface/redstar_improved_vector_current_xml_interface.cc' object='redstar_improved_vector_current_xml_interface.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o redstar_improved_vector_current_xml_interface.o `test -f 'radmat/redstar_interface/redstar_improved_vector_current_xml_interface.cc' || echo '$(srcdir)/'`radmat/redstar_interface/redstar_improved_vector_current_xml_interface.cc
+
+redstar_improved_vector_current_xml_interface.obj: radmat/redstar_interface/redstar_improved_vector_current_xml_interface.cc
+@am__fastdepCXX_TRUE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT redstar_improved_vector_current_xml_interface.obj -MD -MP -MF $(DEPDIR)/redstar_improved_vector_current_xml_interface.Tpo -c -o redstar_improved_vector_current_xml_interface.obj `if test -f 'radmat/redstar_interface/redstar_improved_vector_current_xml_interface.cc'; then $(CYGPATH_W) 'radmat/redstar_interface/redstar_improved_vector_current_xml_interface.cc'; else $(CYGPATH_W) '$(srcdir)/radmat/redstar_interface/redstar_improved_vector_current_xml_interface.cc'; fi`
+@am__fastdepCXX_TRUE@	$(am__mv) $(DEPDIR)/redstar_improved_vector_current_xml_interface.Tpo $(DEPDIR)/redstar_improved_vector_current_xml_interface.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='radmat/redstar_interface/redstar_improved_vector_current_xml_interface.cc' object='redstar_improved_vector_current_xml_interface.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o redstar_improved_vector_current_xml_interface.obj `if test -f 'radmat/redstar_interface/redstar_improved_vector_current_xml_interface.cc'; then $(CYGPATH_W) 'radmat/redstar_interface/redstar_improved_vector_current_xml_interface.cc'; else $(CYGPATH_W) '$(srcdir)/radmat/redstar_interface/redstar_improved_vector_current_xml_interface.cc'; fi`
 
 redstar_invert_subduction.o: radmat/redstar_interface/redstar_invert_subduction.cc
 @am__fastdepCXX_TRUE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT redstar_invert_subduction.o -MD -MP -MF $(DEPDIR)/redstar_invert_subduction.Tpo -c -o redstar_invert_subduction.o `test -f 'radmat/redstar_interface/redstar_invert_subduction.cc' || echo '$(srcdir)/'`radmat/redstar_interface/redstar_invert_subduction.cc

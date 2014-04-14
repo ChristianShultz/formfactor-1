@@ -9,6 +9,7 @@
 
 #include "redstar_single_particle_meson_xml_interface.h"
 #include "redstar_vector_current_xml_interface.h"
+#include "redstar_improved_vector_current_xml_interface.h"
 
 namespace radmat
 {
@@ -45,6 +46,21 @@ namespace radmat
   
   std::vector<BlockData>
     generate_cubic_block( const RedstarVectorCurrentXML * const );
+  
+  struct VectorCurrentImprovedBlockData
+  {
+    std::string origin_rep;
+    std::string data_rep;
+    int row; 
+    EnsemRedstarBlock data; 
+    RedstarImprovedVectorCurrentXML::improvement imp; 
+  };
+
+  std::vector<VectorCurrentImprovedBlockData>
+    generate_lorentz_block( const RedstarImprovedVectorCurrentXML *const ); 
+
+  std::vector<VectorCurrentImprovedBlockData>
+    generate_cubic_block( const RedstarImprovedVectorCurrentXML *const); 
 
 } 
 

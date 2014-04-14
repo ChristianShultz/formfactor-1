@@ -30,6 +30,13 @@ namespace radmat
         const std::vector<BlockData> &righty,
         const std::string &ensemble); 
 
+
+  std::vector<ThreePointData>
+    merge_blocks(const std::vector<BlockData> &lefty,
+        const std::vector<VectorCurrentImprovedBlockData> &gamma,
+        const std::vector<BlockData> &righty,
+        const std::string &ensemble); 
+
 }
 
 #endif /* REDSTAR_THREE_POINT_UTILS_H */

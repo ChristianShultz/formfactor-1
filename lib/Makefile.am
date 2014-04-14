@@ -92,6 +92,7 @@ nobase_include_HEADERS =   \
 													 radmat/redstar_interface/redstar_canonical_lattice_rotations.h    \
 													 radmat/redstar_interface/redstar_canonical_rotations.h    \
 													 radmat/redstar_interface/redstar_cartesian_interface.h    \
+													 radmat/redstar_interface/redstar_improved_vector_current_xml_interface.h    \
 													 radmat/redstar_interface/redstar_interface.h    \
 													 radmat/redstar_interface/redstar_invert_subduction.h    \
 													 radmat/redstar_interface/redstar_particle_handler_utils.h    \
@@ -123,7 +124,7 @@ nobase_include_HEADERS =   \
 													 radmat/utils/tensor.h    \
 													 radmat/utils/tokenize.h    \
 													 radmat/utils/type_computations.h    \
-													 radmat/utils/utils.h    
+													 radmat/utils/utils.h   
 
 # the lib
 lib_LIBRARIES = libradmat.a
@@ -170,6 +171,7 @@ libradmat_a_SOURCES =	\
 											radmat/redstar_interface/redstar_canonical_lattice_rotations.cc    \
 											radmat/redstar_interface/redstar_canonical_rotations.cc    \
 											radmat/redstar_interface/redstar_cartesian_interface.cc    \
+											radmat/redstar_interface/redstar_improved_vector_current_xml_interface.cc    \
 											radmat/redstar_interface/redstar_invert_subduction.cc    \
 											radmat/redstar_interface/redstar_particle_handler_utils.cc    \
 											radmat/redstar_interface/redstar_single_particle_meson_xml_interface.cc    \

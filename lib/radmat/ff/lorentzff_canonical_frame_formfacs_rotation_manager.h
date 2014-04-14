@@ -140,7 +140,7 @@ namespace radmat
           {
             // sanity, this should eventually be turned off 
             if( lh == 0 )
-              if( ( std::norm( (*Wl)[rh][right_h] ) > 1e-6 ) && (rh != right_h ) )
+              if( ( std::norm( (*Wr)[rh][right_h] ) > 1e-6 ) && (rh != right_h ) )
               {
                 std::cout << "Wr:\n" << *Wr << std::endl; 
                 throw std::string("off diagonal wigner matrix elems for helicity ops"); 

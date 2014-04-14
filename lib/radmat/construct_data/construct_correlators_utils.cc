@@ -6,7 +6,7 @@
 
  * Creation Date : 13-11-2013
 
- * Last Modified : Mon 07 Apr 2014 10:17:41 AM EDT
+ * Last Modified : Mon 14 Apr 2014 12:32:22 PM EDT
 
  * Created By : shultz
 
@@ -336,6 +336,13 @@ namespace radmat
       snoop.start(); 
 #endif
 
+      std::cout << __func__ << ": sorting correlators"; 
+      if( mix_irreps )
+        std::cout << " using mixe_irreps=true" << std::endl;
+      else
+        std::cout << " using mixe_irreps=false" << std::endl;
+
+        
       std::map<std::string,std::vector<TaggedEnsemRedstarNPtBlock> > ret; 
       std::vector<TaggedEnsemRedstarNPtBlock>::const_iterator it; 
 
