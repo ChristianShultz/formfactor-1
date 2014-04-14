@@ -6,7 +6,7 @@
 
  * Creation Date : 18-03-2014
 
- * Last Modified : Sun 13 Apr 2014 09:56:21 AM EDT
+ * Last Modified : Sun 13 Apr 2014 11:19:28 AM EDT
 
  * Created By : shultz
 
@@ -40,25 +40,29 @@ namespace radmat
     struct three_point_tag_printer
     {
       static void print(const std::string &msg)
-       { std::cout << "three_point_tag_printer " << msg << std::endl;}
+      {}
+      // { std::cout << "three_point_tag_printer " << msg << std::endl;}
     };
 
     struct subduce_info_printer
     {
       static void print(const std::string &msg)
-       { std::cout << "subduce_info_printer " << msg << std::endl;}
+      {}
+      // { std::cout << "subduce_info_printer " << msg << std::endl;}
     };
 
     struct kgen_info_printer
     {
       static void print(const std::string &msg)
-       { std::cout << "kgen_info_printer " << msg << std::endl;}
+      {}
+      // { std::cout << "kgen_info_printer " << msg << std::endl;}
     };
 
     struct helicity_printer
     {
       static void print(const std::string &msg) 
-      { std::cout << "helicity_printer " << msg << std::endl; }
+      {}
+      // { std::cout << "helicity_printer " << msg << std::endl; }
     }; 
 
     std::string to_string(const int i)
@@ -88,7 +92,7 @@ namespace radmat
         // the scalar part lives in the 0 slot
         return KF.getRow(0);  
       }
-  
+
     WignerMatrix_t* 
       pull_wigner_matrix( const DMatrixManager &wig, 
           const ThreePointDataTag * tag, 
@@ -97,7 +101,7 @@ namespace radmat
         typedef radmat::LatticeRotationEnv::TheRotationGroupGenerator RG;  
 
         WignerMatrix_t *Dret = new WignerMatrix_t( (TensorShape<2>())[3][3] , std::complex<double>(0.,0.)); 
-       
+
         // not going to worry about this case now  
         if( !!! PHOTON_CREATE ) 
           throw std::string("photon create error"); 
@@ -109,44 +113,36 @@ namespace radmat
         std::pair<mom_t,mom_t>  canonical_momentum = RG::Instance().get_frame_momentum(can_frame); 
         qc = canonical_momentum.first - canonical_momentum.second;
 
-        // specialize to transform like D4 when at rest 
+        // skip and return the dmatrix 
         if( is_rest(qc)  )
         {
-          qc = gen_mom<0,0,1>() ; 
-          q = gen_mom<0,0,0>(); 
-
-          // multiply out q = R * qc 
-          for(int i = 0; i < 3; ++i)
-          {
-            double res(0.); 
-            for(int j = 0; j < 3; ++j)
-              if ( fabs( (*R)[i+1][j+1] ) > 1e-6 )
-                res += (*R)[i+1][j+1] * double(qc[j]); 
-
-            q[i] = (res > 0.) ? int( fabs(res) + 0.5 ) : - int( fabs(res) + 0.5 ); 
-          }
+          Dret = wig.triad_rotation_wigner_matrix(R,tag->left_mom,tag->right_mom,1); 
+          wig.conjugate(Dret); 
         }
+        else
+        {
 
-        WignerMatrix_t *Dq,*DR,*Dqc; 
+          WignerMatrix_t *Dq,*DR,*Dqc; 
 
-        DR = wig.triad_rotation_wigner_matrix(R,tag->left_mom,tag->right_mom,1); 
-        Dq = radmat::WignerDMatrixEnv::call_factory(q,1); 
-        Dqc = radmat::WignerDMatrixEnv::call_factory(qc,1); 
+          DR = wig.triad_rotation_wigner_matrix(R,tag->left_mom,tag->right_mom,1); 
+          Dq = radmat::WignerDMatrixEnv::call_factory(q,1); 
+          Dqc = radmat::WignerDMatrixEnv::call_factory(qc,1); 
 
-        wig.dagger(Dq); 
+          wig.dagger(Dq); 
 
-        for(int i =0; i < 3; ++i)
-          for(int j =0; j < 3; ++j)
-            for(int k =0; k < 3; ++k)
-              for(int l =0; l < 3; ++l)
-                (*Dret)[i][l] += (*Dq)[i][j] * (*DR)[j][k] * (*Dqc)[k][l]; 
+          for(int i =0; i < 3; ++i)
+            for(int j =0; j < 3; ++j)
+              for(int k =0; k < 3; ++k)
+                for(int l =0; l < 3; ++l)
+                  (*Dret)[i][l] += (*Dq)[i][j] * (*DR)[j][k] * (*Dqc)[k][l]; 
 
-        wig.dagger(Dret); 
-        wig.clean(Dret); 
+          wig.conjugate(Dret); 
+          wig.clean(Dret); 
 
-        delete DR; 
-        delete Dq;
-        delete Dqc; 
+          delete DR; 
+          delete Dq;
+          delete Dqc; 
+        }
 
 
         return Dret; 
@@ -155,7 +151,102 @@ namespace radmat
 
     // rows are + 0 - 
     FFKinematicFactors_t::KinematicFactorMatrix 
-      move_to_helicity( const FFKinematicFactors_t::KinematicFactorMatrix &KF , 
+      move_to_helicity_rest( const FFKinematicFactors_t::KinematicFactorMatrix &KF , 
+          const ADATXML::Array<int> &q,
+          const ThreePointDataTag * tag)
+      {
+        typedef radmat::LatticeRotationEnv::TheRotationGroupGenerator RG;  
+
+        FFKinematicFactors_t::KinematicFactorMatrix ret; 
+
+        // single precision zero  
+        double tolerance = 1e-6; 
+
+        // first find the polarization in the original frame 
+        std::string can_frame = RG::Instance().get_can_frame_string( tag->left_mom, tag->right_mom); 
+        std::pair<mom_t,mom_t>  canonical_momentum = RG::Instance().get_frame_momentum(can_frame); 
+        mom_t qc = canonical_momentum.first - canonical_momentum.second;
+
+        // rows are + 0 -  , cols are x y z 
+        itpp::Mat<std::complex<double> > eps = itpp::round_to_zero(eps3d(qc,PHOTON_CREATE),tolerance); 
+
+        // eps = itpp::hermitian_transpose( itpp::transpose( eps ) ); 
+
+        // get the phases associated with the rotation 
+        DMatrixManager wig;
+        WignerMatrix_t * D; 
+        RotationMatrix_t *R; 
+
+        R = wig.triad_rotation_matrix(tag->left_mom,tag->right_mom); 
+        D = pull_wigner_matrix( wig, tag, R);   
+
+        // not going to worry about this case now  
+        if( !!! PHOTON_CREATE ) 
+          throw std::string("photon create error"); 
+
+        // undo the rotation that sits in the matrix elem decomp 
+        // by embedding it in the polarization then dotting it in  
+        itpp::Mat<std::complex<double> > Ritpp(3,3), Ditpp(3,3); 
+        for(int i = 0; i < 3; ++i)
+          for(int j = 0; j < 3; ++j) 
+          {
+            Ritpp(i,j) = (*R)[i+1][j+1]; 
+            Ditpp(i,j) = (*D)[i][j]; 
+          }
+
+        eps = itpp::transpose(Ritpp * itpp::transpose( Ditpp * eps ) );
+
+
+        // intermediate variables 
+        FFKinematicFactors_t::KinematicFactorRow p,z,m; 
+        p = KF.getRow(0); 
+        p.zeros(); 
+        z = p;
+        m = p; 
+
+        // ensems are big, avoid a copy if the coeff is zero-ish 
+        std::complex<double> complex_zero(0.,0.); 
+
+        // take the linear combinations, 
+        // bung them into named vectors
+        //
+        // NB: KF is a 4 tensor, eps is a 3 tensor
+        for(int i = 0; i < 3; ++i)
+        {
+          if( eps(0,i) != complex_zero )
+            p += eps(0,i) * KF.getRow(i+1); 
+          if( eps(1,i) != complex_zero )
+            z += eps(1,i) * KF.getRow(i+1); 
+          if( eps(2,i) != complex_zero )
+            m += eps(2,i) * KF.getRow(i+1); 
+        }
+
+
+        // dump the vectors into the return matrix 
+        ret.reDim(p.getB(), 3, p.getN()); 
+        for(int j = 0; j < p.getN(); ++j)
+        {
+          ret.loadEnsemElement(0,j,p.getEnsemElement(j));
+          ret.loadEnsemElement(1,j,z.getEnsemElement(j));
+          ret.loadEnsemElement(2,j,m.getEnsemElement(j));
+        }
+
+
+        //  printer_function<helicity_printer>( "\n" +  to_string(eps) ) ; 
+        //  printer_function<helicity_printer>( " - KF \n" + to_string( KF.mean() ) ); 
+        //  printer_function<helicity_printer>( " - eps * KF\n" + to_string( ret.mean() ) ); 
+        //  std::cout << "D " << *D << std::endl;
+
+        // clean up 
+        delete D; 
+        delete R; 
+
+        return ret; 
+      }
+
+    // rows are + 0 - 
+    FFKinematicFactors_t::KinematicFactorMatrix 
+      move_to_helicity_flight( const FFKinematicFactors_t::KinematicFactorMatrix &KF , 
           const ADATXML::Array<int> &q,
           const ThreePointDataTag * tag)
       {
@@ -215,8 +306,6 @@ namespace radmat
             }
           }
         }
-
-
 
         // intermediate variables 
         FFKinematicFactors_t::KinematicFactorRow p,z,m; 
@@ -279,7 +368,12 @@ namespace radmat
         SubduceTableMap::sub_list subduce = table->query_1( row ); 
 
         // + -> row 0, 0 -> row 1, - -> row 2 of the matric Hel
-        FFKinematicFactors_t::KinematicFactorMatrix Hel = move_to_helicity( KF, q, tag); 
+        FFKinematicFactors_t::KinematicFactorMatrix Hel;
+
+        if( is_rest(q) )
+          Hel = move_to_helicity_rest( KF, q, tag); 
+        else
+          Hel = move_to_helicity_flight( KF, q, tag); 
 
 
         // init it 
