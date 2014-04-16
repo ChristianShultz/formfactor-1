@@ -105,6 +105,8 @@ namespace radmat
         return ret;
       }
 
+    virtual LorentzFFAbsBase_t * clone() const = 0; 
+
     protected:  // hide ctor
     LorentzFFAbsBase_t(void);
 

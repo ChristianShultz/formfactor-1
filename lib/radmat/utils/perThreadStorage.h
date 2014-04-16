@@ -51,6 +51,7 @@ struct ompPerThreadMap
 
     typedef typename std::map<int,T>::const_iterator const_iterator; 
 
+    // this guy locks 
     T &operator()(void)
     {
         // scoped lock
@@ -68,24 +69,38 @@ struct ompPerThreadMap
         return threadMap.insert(typename std::map<int, T>::value_type(omp_get_thread_num(), T())).first->second;
     }
 
-
+    // read only !!! 
     T &operator()(const int id)
     {
       typename std::map<int, T>::iterator it = threadMap.find(id);
 
       // if it exist return it
-      if(it != threadMap.end())
-        return it->second;
+      if(it == threadMap.end())
+        inject_thread(omp_get_thread_num()); 
 
-      // insert it and then return the T
+      it = threadMap.find(id); 
+
+      return it->second;
+    }
+
+    void pre_inject_thread(const int id)
+    {
       // stl definition -- pair<iterator,bool> insert ( const value_type& x );
-      return threadMap.insert(typename std::map<int, T>::value_type(id, T())).first->second;
+      threadMap.insert(typename std::map<int, T>::value_type(id, T()));
+    }
 
+    void inject_thread(const int id)
+    {
+      // scoped lock
+      guardLock lock(lock_);
+
+      // stl definition -- pair<iterator,bool> insert ( const value_type& x );
+      threadMap.insert(typename std::map<int, T>::value_type(id, T()));
     }
 
     const_iterator begin(void) const {return threadMap.begin();}
     const_iterator end(void) const {return threadMap.end();}
-        
+
 
     void emptyThisThread(void)
     {
@@ -133,7 +148,7 @@ static ompPerThreadMap<double> threadLocalDouble;
 
 ompPerThreadMap<double> boobar::threadLocalDouble;
 
- */
+*/
 
 } //radmat
 

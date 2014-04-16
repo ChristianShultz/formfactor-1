@@ -6,7 +6,7 @@
 
  * Creation Date : 25-02-2013
 
- * Last Modified : Mon 24 Mar 2014 02:57:16 PM EDT
+ * Last Modified : Wed 16 Apr 2014 10:53:39 AM EDT
 
  * Created By : shultz
 
@@ -427,12 +427,12 @@ namespace radmat
     Util::StopWatch my_stopwatch; 
     my_stopwatch.start(); 
 
-    std::cout << "Loading correlators and inverting subduction.. " << std::endl; 
+    std::cout << "Loading correlators.. " << std::endl; 
 
     multi_lattice_data = m_correlators.construct_multi_correlators(m_ini.threePointIni);
 
     my_stopwatch.stop(); 
-    std::cout << "Loading correlators and inverting subduction took " 
+    std::cout << "Loading correlators and constructing matrix elements took " 
       << my_stopwatch.getTimeInSeconds() << " seconds " << std::endl;
 
     built_correlators = true; 
@@ -465,6 +465,10 @@ namespace radmat
 
     std::cout << __func__ << ": sz = " << sz << std::endl;
 
+    std::map<std::string,bool> irrep_ops; 
+    irrep_ops.insert(std::make_pair("subduce",false)); 
+    irrep_ops.insert(std::make_pair("mix_irreps",true)); 
+    bool mix_irreps = irrep_ops.find( m_ini.threePointIni.matElemMode )->second; 
 
 #ifdef LOAD_LLSQ_PARALLEL 
 
@@ -476,7 +480,8 @@ namespace radmat
     {
       good_qs[idx] =  linear_systems_of_Q2[idx].load_llsq(multi_lattice_data[idx],
           m_ini.poleMass,
-          m_ini.tolerance);
+          m_ini.tolerance,
+          mix_irreps);
     }
     // END PARALLEL
 

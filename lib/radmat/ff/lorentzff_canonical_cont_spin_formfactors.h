@@ -22,6 +22,7 @@ namespace radmat
     struct J0pJ0p_diag : public PiPi<0,0>
   {
     virtual ~J0pJ0p_diag() {};
+    virtual LorentzFFAbsBase_t* clone() const { return new J0pJ0p_diag() ; }
     virtual std::string reg_id() const { return Stringify< J0pJ0p_diag >(); }
   };
 
@@ -33,6 +34,7 @@ namespace radmat
     struct J0mJ0m_diag : public PiPi<0,0>
   {
     virtual ~J0mJ0m_diag() {};
+    virtual LorentzFFAbsBase_t* clone() const { return new J0mJ0m_diag() ; }
     virtual std::string reg_id() const { return Stringify< J0mJ0m_diag >(); }
   };
   
@@ -44,6 +46,7 @@ namespace radmat
     struct J0pJ0p_tran : public PiPiStar<0,0>
   {
     virtual ~J0pJ0p_tran() {};
+    virtual LorentzFFAbsBase_t* clone() const { return new J0pJ0p_tran() ; }
     virtual std::string reg_id() const { return Stringify< J0pJ0p_tran >(); }
   };
 
@@ -55,6 +58,7 @@ namespace radmat
     struct J0mJ0m_tran : public PiPiStar<0,0>
   {
     virtual ~J0mJ0m_tran() {};
+    virtual LorentzFFAbsBase_t* clone() const { return new J0mJ0m_tran() ; }
     virtual std::string reg_id() const { return Stringify< J0mJ0m_tran >(); }
   };
 
@@ -71,6 +75,7 @@ namespace radmat
     struct J1mJ0m_tran : public RhoPi<1,0>
   {
     virtual ~J1mJ0m_tran() {};
+    virtual LorentzFFAbsBase_t* clone() const { return new J1mJ0m_tran() ; }
     virtual std::string reg_id() const { return Stringify< J1mJ0m_tran >(); }
   };
 
@@ -82,6 +87,7 @@ namespace radmat
     struct J1pJ0p_tran : public RhoPi<1,0>
   {
     virtual ~J1pJ0p_tran() {};
+    virtual LorentzFFAbsBase_t* clone() const { return new J1pJ0p_tran() ; }
     virtual std::string reg_id() const { return Stringify< J1pJ0p_tran >(); }
   };
 
@@ -97,6 +103,7 @@ namespace radmat
     struct J0mJ1m_tran : public PiRho<0,1>
   {
     virtual ~J0mJ1m_tran() {};
+    virtual LorentzFFAbsBase_t* clone() const { return new J0mJ1m_tran() ; }
     virtual std::string reg_id() const { return Stringify< J0mJ1m_tran >(); }
   };
 
@@ -109,6 +116,7 @@ namespace radmat
     struct J0pJ1p_tran : public PiRho<0,1>
   {
     virtual ~J0pJ1p_tran() {};
+    virtual LorentzFFAbsBase_t* clone() const { return new J0pJ1p_tran() ; }
     virtual std::string reg_id() const { return Stringify< J0pJ1p_tran >(); }
   };
 
@@ -124,6 +132,7 @@ namespace radmat
     struct J1pJ1p_diag : public RhoRho<1,1>
   {
     virtual ~J1pJ1p_diag() {};
+    virtual LorentzFFAbsBase_t* clone() const { return new J1pJ1p_diag() ; }
     virtual std::string reg_id() const { return Stringify< J1pJ1p_diag >(); }
   };
 
@@ -135,6 +144,7 @@ namespace radmat
     struct J1mJ1m_diag : public RhoRho<1,1>
   {
     virtual ~J1mJ1m_diag() {};
+    virtual LorentzFFAbsBase_t* clone() const { return new J1mJ1m_diag() ; }
     virtual std::string reg_id() const { return Stringify< J1mJ1m_diag >(); }
   };
 

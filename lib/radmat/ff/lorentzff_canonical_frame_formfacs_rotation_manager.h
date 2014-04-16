@@ -123,26 +123,9 @@ namespace radmat
         int right_bound = 2*J_right +1; 
 
         for(int lh = 0; lh < left_bound; ++lh)
-        {
-          // sanity, this should eventually be turned off 
-          if( ( std::norm( (*Wl)[left_h][lh] ) > 1e-6 ) && (left_h != lh ) )
-          {
-            std::cout << "Wl:\n" << *Wl << std::endl; 
-            throw std::string("off diagonal wigner matrix elems for helicity ops"); 
-          }
-
           for(int rh = 0; rh < right_bound; ++rh)
           {
-            // sanity, this should eventually be turned off 
-            if( lh == 0 )
-              if( ( std::norm( (*Wr)[rh][right_h] ) > 1e-6 ) && (rh != right_h ) )
-              {
-                std::cout << "Wr:\n" << *Wr << std::endl; 
-                throw std::string("off diagonal wigner matrix elems for helicity ops"); 
-              }
-
             std::complex<double> weight = ( (*Wl)[left_h][lh] * (*Wr)[rh][right_h] ); // D matrix phase
-
 
             if( std::norm(weight) > 1e-6) 
             {
@@ -151,7 +134,6 @@ namespace radmat
                 sum[i] = sum[i] + weight * tmp[i] ; // do by hand for overloads
             }
           }
-        }
 
         Tensor<Data_t,1> ret = rotate(R,sum); 
 

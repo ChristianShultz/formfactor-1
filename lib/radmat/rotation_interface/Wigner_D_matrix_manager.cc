@@ -6,7 +6,7 @@
 
 * Creation Date : 14-04-2014
 
-* Last Modified : Mon 14 Apr 2014 05:43:24 PM EDT
+* Last Modified : Wed 16 Apr 2014 04:00:36 PM EDT
 
 * Created By : shultz
 
@@ -19,7 +19,8 @@ _._._._._._._._._._._._._._._._._._._._._.*/
 #include "radmat/utils/pow2assert.h"
 #include "semble/semble_semble.h"
 #include "rotation_group_generator.h"
-
+#include "radmat/utils/perThreadStorage.h"
+#include "Wigner_D_matrix_factory.h"
 
 
 namespace radmat
@@ -30,8 +31,110 @@ namespace radmat
 
     std::complex<double> round_to_zero(const std::complex<double> &cd, const double thresh=1e-6)
     {return ( std::norm(cd) < thresh ) ? complex_zero : cd ; }
+
+  typedef ADATXML::Array<int> mom_t; 
+
+
+  // a momentum key 
+  struct wig_key
+  {
+    wig_key() {}
+    wig_key(const int xx, const int yy, const int zz)
+      : x(xx) , y(yy) , z(zz)
+    { }
+
+    wig_key(const ADATXML::Array<int> &p)
+      : x(p[0]) , y(p[1]), z(p[2]) 
+    { }
+
+    int x,y,z; 
+  }; 
+
+  // a frame key 
+  struct wig_pair_key
+  {
+    wig_pair_key() {}
+    wig_pair_key(const ADATXML::Array<int> &ll , 
+        const ADATXML::Array<int> &rr, 
+        const int JJ)
+      : l(ll) , r(rr), J(JJ)
+    {}
+
+    wig_key l,r;
+    int J;  
+  }; 
+
+  // key comparison class, bung them all together  
+  struct wig_key_comp
+  {
+    bool operator()(const wig_key &l, const wig_key &r) const
+    {
+      if(l.x != r.x)
+        return l.x < r.x; 
+      if(l.y != r.y)
+        return l.y < r.y; 
+      return l.z < r.z; 
+    }
+
+    bool operator()(const wig_pair_key &l, const wig_pair_key &r) const
+    {
+      if ( !!! exact_equivalence(l.l,r.l) )
+        return this->operator()(l.l,r.l);
+
+      if( !!! exact_equivalence(l.r,r.r) )
+        return this->operator()(l.r,r.r); 
+
+      return l.J < r.J; 
+    }
+
+    bool exact_equivalence( const wig_key &l, const wig_key &r) const 
+    {
+      return ((l.x==r.x) && (l.y==r.y) && (l.z==r.z));
+    }
+
+    bool exact_equivalence(const wig_pair_key &l , const wig_pair_key &r) const
+    {
+      return exact_equivalence(l.l,r.l) && exact_equivalence(l.r,r.r) && (l.J == r.J); 
+    }
+
+  };
+
+
+  typedef std::map<wig_pair_key,WignerMatrix_t,wig_key_comp> WignerMatrixMap_t; 
+  ompPerThreadMap<WignerMatrixMap_t> left_map, right_map, rotation_map; 
+
+  WignerMatrixMap_t call_left_map()
+  {
+    return left_map(omp_get_thread_num());
+  }
+
+  WignerMatrixMap_t call_right_map()
+  {
+    return right_map(omp_get_thread_num());
+  }
+
+  WignerMatrixMap_r call_rotation_map(); 
+
+  bool local_registration = false;  
+
+  // this is a hardwire for qcd12kmi 
+  bool init_maps
+  {
+    if( !!! local_registration )
+    {
+      for(int i = 0; i < 33; ++i)
+      {
+        left_map.pre_inject_thread(i); 
+        right_map.pre_inject_thread(i); 
+        rotation_map.pre_inject_thread(i); 
+      }
+      local_registration = true; 
+    }
+    return true; 
+  }
+
   } // anonomyous 
-    
+
 
   std::pair<mom_t,mom_t>
     DMatrixManager::get_frame(const mom_t &l, const mom_t &r) const
@@ -39,7 +142,7 @@ namespace radmat
       return radmat::LatticeRotationEnv::rotation_group_key(l,r); 
     }
 
-      // there is a delta function that MUST be satisfied 
+  // there is a delta function that MUST be satisfied 
   void 
     DMatrixManager::check_throw_frame_err(const RotationMatrix_t *R, 
         const std::pair<mom_t,mom_t> &f, 
@@ -231,6 +334,12 @@ namespace radmat
 
       return W; 
     }
+
+
+  namespace WignerThreadMapEnv
+  {
+    bool registerAll(){ return init_maps(); }
+  }
 
 
 

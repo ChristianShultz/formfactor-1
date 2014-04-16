@@ -21,7 +21,8 @@ namespace radmat
 
     bool load_llsq(const rHandle<LLSQLatticeMultiData> &lattice_data,
         const double pole_mass_squared, 
-        const double tolerance);
+        const double tolerance,
+        const bool mix_irreps);
 
     // single q2 backdoor
     bool load_llsq(const rHandle<LLSQLatticeMultiData> &lattice_data,
@@ -84,7 +85,7 @@ namespace radmat
     void append_rotation_group_label(const std::string &s) {rot_id = s;}
 
     private:
-    std::string rotation_group_label(void) const; 
+    std::string rotation_group_label(const bool mix_irreps) const; 
     std::string rot_id; 
     std::string base_path(void) const; 
     void init_false(); 

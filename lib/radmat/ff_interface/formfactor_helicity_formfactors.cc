@@ -6,7 +6,7 @@
 
  * Creation Date : 22-02-2014
 
- * Last Modified : Mon 07 Apr 2014 09:50:37 AM EDT
+ * Last Modified : Tue 15 Apr 2014 11:17:51 AM EDT
 
  * Created By : shultz
 
@@ -128,6 +128,7 @@ namespace radmat
       {
         rHandle<LorentzFFAbsBase_t> mat; 
         mat = radmat::LorentzffFormFactorDecompositionFactoryEnv::callFactory(s); 
+        POW2_ASSERT( &*mat ); 
         return new HelicityFormFactorRecipe_t(mat,reps.first,reps.second); 
       }
 

@@ -93,7 +93,7 @@ namespace radmat
       const mom_t &right, 
       const mom_t &lleft,
       const mom_t &rright,
-      bool allow_flip=true);
+      bool allow_flip=false);
 
   // return a unit vector in the direction of m
   itpp::Vec<double> normalize(const mom_t &m); 

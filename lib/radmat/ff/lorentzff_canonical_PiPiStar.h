@@ -98,6 +98,7 @@ namespace radmat
     virtual std::string reg_id() const { return Stringify< PiPiStar<embedl,embedr> >(); }
     virtual int left_spin() const {return embedl;}
     virtual int right_spin() const {return embedr;}
+    virtual LorentzFFAbsBase_t * clone() const { return new PiPiStar(); }
 
     private:
     // I'm not sure if these could inherit so we will hide them as well

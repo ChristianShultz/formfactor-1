@@ -6,7 +6,7 @@
 
 * Creation Date : 14-04-2014
 
-* Last Modified : Mon 14 Apr 2014 05:39:10 PM EDT
+* Last Modified : Tue 15 Apr 2014 10:13:46 AM EDT
 
 * Created By : shultz
 
@@ -37,7 +37,17 @@ namespace radmat
       int bound = 2*J + 1; 
 
       WignerMatrix_t W( (TensorShape<2>())[bound][bound] , std::complex<double>(0.,0.) ); 
-      Hadron::CubicCanonicalRotation_t eul = Hadron::cubicCanonicalRotation(p); 
+
+      Hadron::CubicCanonicalRotation_t eul;
+      if( (p[0] == 0) && (p[1] == 0) && (p[2] == 0) )
+      {
+        eul.alpha = 0.;
+        eul.beta = 0.;
+        eul.gamma = 0.; 
+      } 
+      else
+        eul = Hadron::cubicCanonicalRotation(p); 
+
 
       for(int m1 = -J; m1 <= J; ++m1)
         for(int m2 = -J; m2 <= J; ++m2)
@@ -105,6 +115,8 @@ namespace radmat
     bool do_mom_reg(const int J)
     {
       bool success = true; 
+
+      success &= do_reg<0,0,0>(J); 
 
       // D4 
       success &= do_reg<1,0,0>(J); 

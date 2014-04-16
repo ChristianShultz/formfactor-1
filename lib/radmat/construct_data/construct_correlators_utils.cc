@@ -6,7 +6,7 @@
 
  * Creation Date : 13-11-2013
 
- * Last Modified : Mon 14 Apr 2014 12:32:22 PM EDT
+ * Last Modified : Tue 15 Apr 2014 10:20:20 AM EDT
 
  * Created By : shultz
 
@@ -338,9 +338,9 @@ namespace radmat
 
       std::cout << __func__ << ": sorting correlators"; 
       if( mix_irreps )
-        std::cout << " using mixe_irreps=true" << std::endl;
+        std::cout << " using mix_irreps=true" << std::endl;
       else
-        std::cout << " using mixe_irreps=false" << std::endl;
+        std::cout << " using mix_irreps=false" << std::endl;
 
         
       std::map<std::string,std::vector<TaggedEnsemRedstarNPtBlock> > ret; 
@@ -363,7 +363,8 @@ namespace radmat
       for(it1 = ret.begin(); it1 != ret.end(); ++it1)
         ct += it1->second.size();
 
-      std::cout << __func__ << ": sorting, " << ct << " elems took " 
+      std::cout << __func__ << ": sorting, " << ct << " elems " 
+        << " into " << ret.size() << " rotation groups took " 
         << snoop.getTimeInSeconds() << " seconds "  << std::endl; 
 #endif 
       return ret;

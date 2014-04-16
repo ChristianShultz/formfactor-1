@@ -77,6 +77,11 @@ namespace radmat
           bool print = false) const; 
   }; 
 
+  namespace WignerThreadMapEnv
+  {
+    bool registerAll(); 
+  }
+
 } // radmat
 
 

@@ -25,6 +25,7 @@ namespace radmat
     virtual std::map<int,std::string> ff_ids(void) const = 0; 
     virtual rHandle<Rep_p> left_rep() const = 0; 
     virtual rHandle<Rep_p> right_rep() const = 0; 
+    virtual FormFactorRecipe_t* clone() const = 0; 
     virtual rHandle<Rep_p> call(const std::string &s) const
     {
       return ::radmat::DataRepresentationFactoryEnv::callFactory(s);
@@ -52,14 +53,20 @@ namespace radmat
     typedef rHandle<FormFactorRecipe_t> recipe_h; 
 
     FormFactorBase_t( const recipe_h recipe_)
-      :  recipe(recipe_)
-    { } 
+    {
+      recipe = recipe_->clone(); 
+    } 
 
     FormFactorBase_t(const FormFactorBase_t &o)
-      : recipe(o.recipe) 
-    { }
+    {
+      delete recipe; 
+      recipe = o.recipe->clone(); 
+    }
 
-    virtual ~FormFactorBase_t() {}
+    virtual ~FormFactorBase_t() 
+    {
+      delete recipe; 
+    }
 
     // we now have to sum over a list
     virtual itpp::Mat<std::complex<double> > 
@@ -84,9 +91,9 @@ namespace radmat
           const MomRowPair_t &righty, 
           const double mom_fac) const = 0; 
 
-    recipe_h get_recipe() const { return recipe; }
+     recipe_h get_recipe() const { return recipe_h(recipe->clone()); }
 
-    recipe_h recipe; 
+     FormFactorRecipe_t* recipe; 
   };
 
 } // radmat

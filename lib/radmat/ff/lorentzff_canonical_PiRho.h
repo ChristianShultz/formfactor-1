@@ -122,6 +122,7 @@ namespace radmat
     virtual std::string reg_id() const { return Stringify<PiRho<embedl,embedr> >(); }
     virtual int left_spin() const { return embedl; }
     virtual int right_spin() const { return embedr; }
+    virtual LorentzFFAbsBase_t* clone() const { return new PiRho(); }
 
     private:
     PiRho(const LorentzFFAbsBase_t::LorentzFFAbs_list &);

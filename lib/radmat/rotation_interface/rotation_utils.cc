@@ -6,7 +6,7 @@
 
 * Creation Date : 14-04-2014
 
-* Last Modified : Mon 14 Apr 2014 05:33:39 PM EDT
+* Last Modified : Tue 15 Apr 2014 10:01:36 AM EDT
 
 * Created By : shultz
 
@@ -18,6 +18,7 @@ _._._._._._._._._._._._._._._._._._._._._.*/
 #include "radmat/redstar_interface/redstar_canonical_lattice_rotations.h"
 #include "radmat/utils/levi_civita.h"
 #include "radmat/utils/tensor.h"
+#include "radmat/utils/printer.h"
 #include <sstream>
 
 namespace radmat
@@ -25,6 +26,14 @@ namespace radmat
 
   namespace
   {
+
+    struct related_by_rotation_printer
+    {
+      static void print(const std::string &msg)
+      {}
+      // {std::cout << "related_by_rotation_printer " + msg << std::endl;}
+    };
+  
     std::string string_mom(const mom_t &p)
     {
       std::stringstream ss;
@@ -170,13 +179,6 @@ namespace radmat
       (*R)[0][0] = 1.; 
       R->lower_index(1); 
 
-      // if colinear then cross product is garbage
-      if( colinear_momentum(l,r) && colinear_momentum(ll,rr) )
-      {
-        delete R; 
-        return generate_frame_transformation(l,ll); 
-      }
-
       if( is_rest(l) )
       {
         if( is_rest(r) )
@@ -198,6 +200,14 @@ namespace radmat
         delete R; 
         return generate_frame_transformation(l,ll); 
       }
+
+      // if colinear then cross product is garbage
+      if( colinear_momentum(l,r) && colinear_momentum(ll,rr) )
+      {
+        delete R; 
+        return generate_frame_transformation(l,ll); 
+      }
+
 
       // make some unit vectors
       itpp::Vec<double> v1,v2,w1,w2; 
@@ -363,18 +373,22 @@ namespace radmat
   // test the dot product and volume element are the same
   bool related_by_rotation(const mom_t &left, const mom_t &right, 
       const mom_t &lleft, const mom_t &rright,
-      const bool allow_flip)
+      const bool allow_flip /*=false*/)
   {
   
     if( is_rest(left) )
     {
-      POW2_ASSERT( is_rest(lleft) ); 
+      if( !!! is_rest(lleft) )
+        return false; 
+
       return same_length(right,rright); 
     }
 
     if( is_rest(right) )
     {
-      POW2_ASSERT( is_rest(rright) ); 
+      if( !!! is_rest(rright) )
+        return false; 
+
       return same_length(left,lleft); 
     }
   
@@ -401,10 +415,18 @@ namespace radmat
     if( !!! success )
       return false; 
 
+
+    printer_function<related_by_rotation_printer>( "left " + string_mom(left)
+        + " lleft " + string_mom(lleft) 
+        + " right " + string_mom(right) 
+        + " rright " + string_mom(rright) );
+
+
+
     // R *ll = l && R *rr = r -- doesnt work for rest
     RotationMatrix_t *Rtriad = generate_rotation_matrix(left,right,lleft,rright); 
     // check that the frame transformation actually works
-    success &= check_total_frame_transformation(Rtriad,left,right,lleft,rright,true); 
+    success &= check_total_frame_transformation(Rtriad,left,right,lleft,rright,false); 
 
     //   // not a proper rotation 
     //   if( fabs( determinant(Rtriad) - 1. ) > 1e-6 )

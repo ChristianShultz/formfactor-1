@@ -6,7 +6,7 @@
 
 * Creation Date : 14-04-2014
 
-* Last Modified : Mon 14 Apr 2014 05:33:12 PM EDT
+* Last Modified : Wed 16 Apr 2014 09:17:43 AM EDT
 
 * Created By : shultz
 
@@ -66,8 +66,10 @@ namespace radmat
     std::string 
       rotation_group_label(const mom_t &l, const mom_t &r)
       {
+        std::pair<mom_t,mom_t> k = rotation_group_key(l,r); 
         std::stringstream ss; 
-        ss << "l" << l[0] << l[1] << l[2] << "r" << r[0] << r[1] << r[2]; 
+        ss << "lefty" << k.first[0] << k.first[1] << k.first[2] 
+          << "righty" << k.second[0] << k.second[1] << k.second[2]; 
         return ss.str(); 
       }
 

@@ -36,6 +36,55 @@ namespace radmat
       + " right = " + mom_string(right_mom);
     }
 
+    std::string rot_qsq_tag(const bool b) const
+    {
+      return b ? rot_qsq_tag(origin_rep) : rot_qsq_tag(data_rep); 
+    }
+
+    std::string rot_qsq_tag( const DataRep3pt &d) const
+    {
+      std::stringstream ss; 
+
+      if( d.is_cubic( d.l ) )
+      {
+        rHandle<CubicRep> foo = d.call_rep_cub(d.l); 
+        ss << "l" + foo->rep_irrep(); 
+      }
+      else
+      {
+        rHandle<LorentzRep> foo = d.call_rep_lor(d.l); 
+        ss << "l" + foo->rep_id(); 
+      }
+
+      ss << "x";
+      
+      if( d.is_cubic( d.r ) )
+      {
+        rHandle<CubicRep> foo = d.call_rep_cub(d.r); 
+        ss << "r" + foo->rep_irrep(); 
+      }
+      else
+      {
+        rHandle<LorentzRep> foo = d.call_rep_lor(d.r); 
+        ss << "r" + foo->rep_id(); 
+      }
+
+      ss << "x"; 
+
+      if( d.is_cubic( d.g ) )
+      {
+        rHandle<CubicRep> foo = d.call_rep_cub(d.g); 
+        ss << "g" + foo->rep_irrep(); 
+      }
+      else
+      {
+        rHandle<LorentzRep> foo = d.call_rep_lor(d.g); 
+        ss << "g" + foo->rep_id(); 
+      }
+
+      return ss.str();  
+    }
+
 
     // specify some representation information  
     DataRep3pt origin_rep; 

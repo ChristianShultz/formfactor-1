@@ -39,13 +39,13 @@ namespace radmat
       return CubicRepresentationFactoryEnv::callFactory(s); 
     }
 
-    bool is_cubic(const std::string &s)
+    bool is_cubic(const std::string &s) const
     {
       rHandle<Rep_p> r = call_rep_prim(s); 
       return r->rep_type() == Stringify<CubicRep_t>(); 
     }
 
-    bool is_lorentz(const std::string &s)
+    bool is_lorentz(const std::string &s) const
     {
       rHandle<Rep_p> r = call_rep_prim(s); 
       return r->rep_type() == Stringify<LorentzRep_t>(); 

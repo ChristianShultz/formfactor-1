@@ -6,7 +6,7 @@
 
  * Creation Date : 21-02-2014
 
- * Last Modified : Tue 04 Mar 2014 02:51:57 PM EST
+ * Last Modified : Wed 16 Apr 2014 01:12:31 PM EDT
 
  * Created By : shultz
 
@@ -14,10 +14,6 @@
 
 #include "llsq_formfactor_data.h"
 #include "ensem/ensem.h"
-#include "jackFitter/ensem_data.h"
-#include "jackFitter/jackknife_fitter.h"
-#include "jackFitter/ensem_data.h"
-#include "jackFitter/three_point_fit_forms.h"
 #include "jackFitter/plot.h"
 #include <string>
 #include <math.h>
@@ -71,7 +67,7 @@ namespace radmat
     {
       static void print(const std::string &s)
       {}
-     // { std::cout << s << std::endl;}
+      // { std::cout << s << std::endl;}
     };
 
     struct ensem_printer
@@ -118,97 +114,20 @@ namespace radmat
       {
         ENSEM::EnsemVectorReal real, imag;
 
-        double const_real, const_imag; 
-
         real = ENSEM::real(in);
         imag = ENSEM::imag(in);
 
-        // check code
-        std::stringstream ssr,ssi;
-        ssr << "tl " << tlow << " th " << thigh;
-        ssi << "tl " << tlow << " th " << thigh;
+        // mid plus offset (th-tl)/2 + tl
+        int t_sample = int( double(thigh + tlow)/2. ); 
 
-        for(int i = 0; i < in.numElem(); ++i)
-        {
-          ssr << " " << SEMBLE::toScalar( ENSEM::mean( ENSEM::peekObs(real,i)));
-          ssi << " " << SEMBLE::toScalar( ENSEM::mean( ENSEM::peekObs(imag,i)));
-        }
-
-        printer_function<ensem_printer>("real - " + ssr.str());
-        printer_function<ensem_printer>("imag - " + ssi.str());
-        printer_function<ensem_printer>("in.numElem() " + to_string(in.numElem()));
-        printer_function<ensem_printer>("in.size() " + to_string(in.size()));
-
-        // time variable, make ensem data 
-        std::vector<double> t;
-        for(int i = 0; i < in.numElem(); ++i)
-          t.push_back(double(i)); 
-
-        EnsemData ereal(t,real),eimag(t,imag); 
-        ereal.hideDataAboveX(thigh + 0.1); 
-        eimag.hideDataBelowX(tlow -0.1); 
-
- 
-//        // the fitting is acting up, check that we get out what 
-//        // we put into the ensem data -- passes
-//        ENSEM::EnsemVectorReal insanityi, insanityr; 
-//        insanityr = ereal.getAllYData(); 
-//        insanityi = eimag.getAllYData(); 
-//
-//        ssr.str("");
-//        ssr.clear();
-//        ssi.str("");
-//        ssi.clear(); 
-//
-//        for(int i = 0; i < in.numElem(); ++i)
-//        {
-//          ssr << " " << SEMBLE::toScalar( ENSEM::mean( ENSEM::peekObs(real,i)));
-//          ssi << " " << SEMBLE::toScalar( ENSEM::mean( ENSEM::peekObs(imag,i)));
-//        }
-//
-//        printer_function<ensem_printer>("insanity real - " + ssr.str());
-//        printer_function<ensem_printer>("insanity imag - " + ssi.str());
-
-
-        // do fits
-        ADAT::Handle<FitFunction> freal(new ThreePointConstant), fimag(new ThreePointConstant);  
-        JackFit fit_real(ereal,freal), fit_imag(eimag,fimag); 
-
-        fit_real.runAvgFit(); 
-        fit_imag.runAvgFit(); 
-        const_real = fit_real.getAvgFitParValue(0);
-        const_imag = fit_imag.getAvgFitParValue(0);
-
-        // no on has time for this 
-        //   fit_real.runJackFit(); 
-        //   fit_imag.runJackFit(); 
-        //   const_real = fit_real.getAvgFitParValue(0);
-        //   const_imag = fit_imag.getAvgFitParValue(0);
-
-        double const_real_var = fit_real.getAvgFitParError(0);
-        double const_imag_var = fit_imag.getAvgFitParError(0);
-
-
-//        // the fitting is acting up, check that we get out what 
-//        // we put into the ensem data -- also passes 
-//        insanityr = fit_real.data.getAllYData(); 
-//        insanityi = fit_real.data.getAllYData(); 
-//
-//        ssr.str("");
-//        ssr.clear();
-//        ssi.str("");
-//        ssi.clear(); 
-//
-//        for(int i = 0; i < in.numElem(); ++i)
-//        {
-//          ssr << " " << SEMBLE::toScalar( ENSEM::mean( ENSEM::peekObs(real,i)));
-//          ssi << " " << SEMBLE::toScalar( ENSEM::mean( ENSEM::peekObs(imag,i)));
-//        }
-//
-//        printer_function<ensem_printer>("insanity2 real - " + ssr.str());
-//        printer_function<ensem_printer>("insanity2 imag - " + ssi.str());
-//
-
+        // tried to do this with fitting but had issues, in practice the form factors 
+        // are fairly flat about the mid point, can come back to this an do something 
+        // smarter if it becomes a practical issue, JJD can do it since he may actually
+        // understand the nonsense that sits in jackFitter 
+        double const_real = SEMBLE::toScalar( ENSEM::mean( ENSEM::peekObs(real,t_sample)));
+        double const_imag = SEMBLE::toScalar( ENSEM::mean( ENSEM::peekObs(imag,t_sample)));
+        double const_real_var = SEMBLE::toScalar( ENSEM::variance( ENSEM::peekObs(real,t_sample)));
+        double const_imag_var = SEMBLE::toScalar( ENSEM::variance( ENSEM::peekObs(imag,t_sample)));
 
         // is the constant consistent with zero?
         if( fabs(const_real) - 3.*sqrt(fabs(const_real_var)) < 0.)

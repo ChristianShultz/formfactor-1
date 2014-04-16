@@ -93,6 +93,8 @@ namespace radmat
     virtual int left_spin() const {return embedl;}
     virtual int right_spin() const {return embedr;}
 
+    virtual LorentzFFAbsBase_t* clone() const { return new PiPi(); }; 
+
 
     private:
     // I'm not sure if these could inherit so we will hide them as well

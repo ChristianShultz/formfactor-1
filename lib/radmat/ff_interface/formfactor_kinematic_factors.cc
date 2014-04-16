@@ -6,7 +6,7 @@
 
  * Creation Date : 18-03-2014
 
- * Last Modified : Mon 14 Apr 2014 05:10:13 PM EDT
+ * Last Modified : Tue 15 Apr 2014 04:44:53 PM EDT
 
  * Created By : shultz
 
@@ -104,7 +104,10 @@ namespace radmat
 
         // not going to worry about this case now  
         if( !!! PHOTON_CREATE ) 
-          throw std::string("photon create error"); 
+        {
+          printer_function<console_print>( " annihilation ops as photons no longer supported" ); 
+          throw std::string( "photon create was false, blowing it up in formfactor_kinematic_factors.cc "); 
+        } 
 
         mom_t q,qc; 
         q = tag->q; 
@@ -112,45 +115,43 @@ namespace radmat
         std::pair<mom_t,mom_t>  canonical_momentum = RG::Instance().canonical_frame(tag->left_mom,tag->right_mom); 
         qc = canonical_momentum.first - canonical_momentum.second;
 
-        // skip and return the dmatrix 
-        if( is_rest(qc)  )
-        {
-          Dret = wig.wigner_matrix(R,tag->left_mom,tag->right_mom,1); 
-          wig.conjugate(Dret); 
-        }
-        else
-        {
 
-          WignerMatrix_t *Dq,*DR,*Dqc; 
+        WignerMatrix_t *Dq,*DR,*Dqc; 
 
-          DR = wig.wigner_matrix(R,tag->left_mom,tag->right_mom,1); 
-          Dq = radmat::WignerDMatrixEnv::call_factory(q,1); 
-          Dqc = radmat::WignerDMatrixEnv::call_factory(qc,1); 
+        DR = wig.wigner_matrix(R,tag->left_mom,tag->right_mom,1); 
+        Dq = radmat::WignerDMatrixEnv::call_factory(q,1); 
+        Dqc = radmat::WignerDMatrixEnv::call_factory(qc,1); 
 
-          wig.conjugate(Dq); 
+        wig.dagger(Dq); 
 
-          for(int i =0; i < 3; ++i)
-            for(int j =0; j < 3; ++j)
-              for(int k =0; k < 3; ++k)
-                for(int l =0; l < 3; ++l)
-                  (*Dret)[i][l] += (*Dq)[i][j] * (*DR)[j][k] * (*Dqc)[k][l]; 
+        for(int i =0; i < 3; ++i)
+          for(int j =0; j < 3; ++j)
+          {
+            // avoid the mul if the first one is zero-ish
+            if( std::norm( (*Dq)[i][j] ) < 1e-6 ) 
+              continue; 
 
-          wig.conjugate(Dret); 
-          wig.clean(Dret); 
+            for(int k =0; k < 3; ++k)
+              for(int l =0; l < 3; ++l)
+                (*Dret)[i][l] += (*Dq)[i][j] * (*DR)[j][k] * (*Dqc)[k][l]; 
+          }
 
-          delete DR; 
-          delete Dq;
-          delete Dqc; 
-        }
+        wig.dagger(Dret);
+        wig.clean(Dret); 
+
+        delete DR; 
+        delete Dq;
+        delete Dqc; 
 
 
         return Dret; 
       }
 
 
+
     // rows are + 0 - 
     FFKinematicFactors_t::KinematicFactorMatrix 
-      move_to_helicity_rest( const FFKinematicFactors_t::KinematicFactorMatrix &KF , 
+      move_to_helicity( const FFKinematicFactors_t::KinematicFactorMatrix &KF , 
           const ADATXML::Array<int> &q,
           const ThreePointDataTag * tag)
       {
@@ -162,7 +163,7 @@ namespace radmat
         double tolerance = 1e-6; 
 
         // first find the polarization in the original frame 
-        std::pair<mom_t,mom_t>  canonical_momentum = RG::Instance().canonical_frame(tag->left_mom, tag->right_mom); 
+        std::pair<mom_t,mom_t>  canonical_momentum = RG::Instance().canonical_frame(tag->left_mom,tag->right_mom); 
         mom_t qc = canonical_momentum.first - canonical_momentum.second;
 
         // rows are + 0 -  , cols are x y z 
@@ -181,6 +182,7 @@ namespace radmat
         // not going to worry about this case now  
         if( !!! PHOTON_CREATE ) 
           throw std::string("photon create error"); 
+
 
         // undo the rotation that sits in the matrix elem decomp 
         // by embedding it in the polarization then dotting it in  
@@ -189,120 +191,11 @@ namespace radmat
           for(int j = 0; j < 3; ++j) 
           {
             Ritpp(i,j) = (*R)[i+1][j+1]; 
-            Ditpp(i,j) = (*D)[i][j]; 
+            Ditpp(i,j) = (*D)[i][j];
           }
 
-        eps = itpp::transpose(Ritpp * itpp::transpose( Ditpp * eps ) );
+        eps = Ditpp*itpp::transpose(Ritpp * itpp::transpose( eps ) );
 
-
-        // intermediate variables 
-        FFKinematicFactors_t::KinematicFactorRow p,z,m; 
-        p = KF.getRow(0); 
-        p.zeros(); 
-        z = p;
-        m = p; 
-
-        // ensems are big, avoid a copy if the coeff is zero-ish 
-        std::complex<double> complex_zero(0.,0.); 
-
-        // take the linear combinations, 
-        // bung them into named vectors
-        //
-        // NB: KF is a 4 tensor, eps is a 3 tensor
-        for(int i = 0; i < 3; ++i)
-        {
-          if( eps(0,i) != complex_zero )
-            p += eps(0,i) * KF.getRow(i+1); 
-          if( eps(1,i) != complex_zero )
-            z += eps(1,i) * KF.getRow(i+1); 
-          if( eps(2,i) != complex_zero )
-            m += eps(2,i) * KF.getRow(i+1); 
-        }
-
-
-        // dump the vectors into the return matrix 
-        ret.reDim(p.getB(), 3, p.getN()); 
-        for(int j = 0; j < p.getN(); ++j)
-        {
-          ret.loadEnsemElement(0,j,p.getEnsemElement(j));
-          ret.loadEnsemElement(1,j,z.getEnsemElement(j));
-          ret.loadEnsemElement(2,j,m.getEnsemElement(j));
-        }
-
-
-        //  printer_function<helicity_printer>( "\n" +  to_string(eps) ) ; 
-        //  printer_function<helicity_printer>( " - KF \n" + to_string( KF.mean() ) ); 
-        //  printer_function<helicity_printer>( " - eps * KF\n" + to_string( ret.mean() ) ); 
-        //  std::cout << "D " << *D << std::endl;
-
-        // clean up 
-        delete D; 
-        delete R; 
-
-        return ret; 
-      }
-
-    // rows are + 0 - 
-    FFKinematicFactors_t::KinematicFactorMatrix 
-      move_to_helicity_flight( const FFKinematicFactors_t::KinematicFactorMatrix &KF , 
-          const ADATXML::Array<int> &q,
-          const ThreePointDataTag * tag)
-      {
-        typedef radmat::LatticeRotationEnv::TheRotationGroupGenerator RG;  
-
-        FFKinematicFactors_t::KinematicFactorMatrix ret; 
-
-        // single precision zero  
-        double tolerance = 1e-6; 
-
-        // first find the polarization in the original frame 
-        std::pair<mom_t,mom_t>  canonical_momentum = RG::Instance().canonical_frame(tag->left_mom,tag->right_mom); 
-        mom_t qc = canonical_momentum.first - canonical_momentum.second;
-
-        // rows are + 0 -  , cols are x y z 
-        itpp::Mat<std::complex<double> > eps = itpp::round_to_zero(eps3d(qc,PHOTON_CREATE),tolerance); 
-
-        // eps = itpp::hermitian_transpose( itpp::transpose( eps ) ); 
-
-        // get the phases associated with the rotation 
-        DMatrixManager wig;
-        WignerMatrix_t * D; 
-        RotationMatrix_t *R; 
-
-        R = wig.rotation_matrix(tag->left_mom,tag->right_mom); 
-        D = pull_wigner_matrix( wig, tag, R);   
-
-        // not going to worry about this case now  
-        if( !!! PHOTON_CREATE ) 
-          throw std::string("photon create error"); 
-
-
-        // undo the rotation that sits in the matrix elem decomp 
-        // by embedding it in the polarization then dotting it in  
-        itpp::Mat<std::complex<double> > Ritpp(3,3); 
-        for(int i = 0; i < 3; ++i)
-          for(int j = 0; j < 3; ++j) 
-            Ritpp(i,j) = (*R)[i+1][j+1]; 
-
-        eps = itpp::transpose(Ritpp * itpp::transpose( eps ) );
-
-        // update the polarization to account for the phase from the rotation 
-        for(int i = 0; i < 3; ++i)
-        {
-          eps(0,i) = eps(0,i) * (*D)[0][0]; 
-          eps(1,i) = eps(1,i) * (*D)[1][1]; 
-          eps(2,i) = eps(2,i) * (*D)[2][2]; 
-
-          // paranoia -- this loop should eventually be commented/removed
-          for(int j = 0; j < 3; ++j)
-          {
-            if( (std::norm( (*D)[i][j] ) > 1e-6 ) && i != j )
-            {
-              std::cout << "D:\n" << *D << std::endl;
-              throw std::string("off diagonal wigner matrix elems for helicity ops"); 
-            }
-          }
-        }
 
         // intermediate variables 
         FFKinematicFactors_t::KinematicFactorRow p,z,m; 
@@ -367,11 +260,7 @@ namespace radmat
         // + -> row 0, 0 -> row 1, - -> row 2 of the matric Hel
         FFKinematicFactors_t::KinematicFactorMatrix Hel;
 
-        if( is_rest(q) )
-          Hel = move_to_helicity_rest( KF, q, tag); 
-        else
-          Hel = move_to_helicity_flight( KF, q, tag); 
-
+        Hel = move_to_helicity( KF, q, tag); 
 
         // init it 
         ret = Hel.getRow(0); 

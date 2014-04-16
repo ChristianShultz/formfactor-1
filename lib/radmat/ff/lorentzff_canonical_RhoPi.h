@@ -118,6 +118,7 @@ namespace radmat
     virtual std::string reg_id() { return Stringify< RhoPi<embedl,embedr> >(); }
     virtual int left_spin() const { return embedl; }
     virtual int right_spin() const { return embedr; }
+    virtual LorentzFFAbsBase_t * clone() const { return new RhoPi(); }
 
     private:
     RhoPi(const LorentzFFAbsBase_t::LorentzFFAbs_list &);

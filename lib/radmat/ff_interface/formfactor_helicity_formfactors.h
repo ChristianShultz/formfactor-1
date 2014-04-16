@@ -25,20 +25,26 @@ namespace radmat
     typedef rHandle<LorentzRep> rep_h; 
 
     HelicityFormFactorRecipe_t(const mat_h &f, const rep_h &l, const rep_h &r)
-      : mat(f) , lefty(l) , righty(r)
-    {}
+    {
+      mat = rHandle<LorentzFFAbsBase_t>(f->clone()); 
+      lefty = rHandle<LorentzRep>(l->clone()); 
+      righty = rHandle<LorentzRep>(r->clone()); 
+    }
 
     HelicityFormFactorRecipe_t( const HelicityFormFactorRecipe_t &o)
-      : mat(o.mat) , lefty(o.lefty) , righty(o.righty)
-    {}
+    {
+      mat = rHandle<LorentzFFAbsBase_t>(o.mat->clone()); 
+      lefty = rHandle<LorentzRep>(o.lefty->clone()); 
+      righty = rHandle<LorentzRep>(o.righty->clone()); 
+    }
 
     HelicityFormFactorRecipe_t& operator=( const HelicityFormFactorRecipe_t &o)
     {
       if (this != &o) 
       {
-        mat = o.mat; 
-        lefty = o.lefty;
-        righty = o.righty; 
+        mat = rHandle<LorentzFFAbsBase_t>(o.mat->clone()); 
+        lefty = rHandle<LorentzRep>(o.lefty->clone()); 
+        righty = rHandle<LorentzRep>(o.righty->clone()); 
       }
       return *this;
     }
@@ -52,6 +58,11 @@ namespace radmat
     virtual rHandle<Rep_p> right_rep() const { return FormFactorRecipe_t::call(righty->rep_id()); }
     virtual std::string id() const { return Stringify<HelicityFormFactorRecipe_t>(); }
     virtual std::string reg_id() const { return mat->reg_id(); } // use the same names as in lorentzff
+
+    virtual FormFactorRecipe_t * clone() const 
+    {
+      return new HelicityFormFactorRecipe_t( mat,lefty,righty); 
+    }
 
     rHandle<LorentzFFAbsBase_t> mat; 
     rHandle<LorentzRep> lefty, righty; 
@@ -83,8 +94,8 @@ namespace radmat
 
     virtual itpp::Mat<std::complex<double> >
       generate_ffs( const MomRowPair_t &lefty, 
-         const MomRowPair_t &righty, 
-         const double mom_fac) const; 
+          const MomRowPair_t &righty, 
+          const double mom_fac) const; 
   };
 
 

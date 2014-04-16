@@ -20,20 +20,26 @@ namespace radmat
         const rHandle<CubicRep> &r,
         const std::string &left_table_id,
         const std::string &right_table_id)
-      : hel(m) , lefty(l) , righty(r) , lt(left_table_id) , rt(right_table_id)
-    { }
+      : hel(m) , lt(left_table_id) , rt(right_table_id)
+    { 
+      lefty = rHandle<CubicRep>(l->clone()); 
+      righty = rHandle<CubicRep>(r->clone()); 
+    }
 
     SubducedFormFactorRecipe_t(const SubducedFormFactorRecipe_t &o)
-      : hel(o.hel) , lefty(o.lefty) , righty(o.righty) , lt(o.lt) , rt(o.rt)
-    { }
+      : hel(o.hel) , lt(o.lt) , rt(o.rt)
+    { 
+      lefty = rHandle<CubicRep>(o.lefty->clone()); 
+      righty = rHandle<CubicRep>(o.righty->clone()); 
+    }
 
     SubducedFormFactorRecipe_t& operator=(const SubducedFormFactorRecipe_t &o)
     {
       if(this != &o)
       {
         hel = o.hel; 
-        lefty = o.lefty; 
-        righty = o.righty; 
+        lefty = rHandle<CubicRep>(o.lefty->clone()); 
+        righty = rHandle<CubicRep>(o.righty->clone()); 
         lt = o.lt;
         rt = o.rt; 
       }
@@ -48,6 +54,11 @@ namespace radmat
     virtual rHandle<Rep_p> left_rep() const { return FormFactorRecipe_t::call(lefty->rep_id());}
     virtual rHandle<Rep_p> right_rep() const { return FormFactorRecipe_t::call(righty->rep_id());}
     virtual std::string id() const { return Stringify<SubducedFormFactorRecipe_t>(); }
+
+    virtual FormFactorRecipe_t* clone() const 
+    { 
+      return new SubducedFormFactorRecipe_t(hel,lefty,righty,lt,rt); 
+    }
 
     h_rep hel; 
     rHandle<CubicRep> lefty,righty ; 

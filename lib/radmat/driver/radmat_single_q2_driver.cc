@@ -6,7 +6,7 @@
 
  * Creation Date : 25-02-2013
 
- * Last Modified : Mon 14 Apr 2014 05:05:52 PM EDT
+ * Last Modified : Wed 16 Apr 2014 10:17:31 AM EDT
 
  * Created By : shultz
 
@@ -119,7 +119,8 @@ namespace radmat
 
   bool RadmatSingleQ2Driver::load_llsq(const rHandle<LLSQLatticeMultiData> &d, 
       const double pole_mass_squared,
-      const double tolerance)
+      const double tolerance, 
+      const bool mix_irreps)
   {
     if(!!!linear_system.load_data(d,tolerance))
       return false;
@@ -139,7 +140,7 @@ namespace radmat
     }
 
     // append the label
-    append_rotation_group_label(rotation_group_label()); 
+    append_rotation_group_label(rotation_group_label(mix_irreps)); 
     
 
     init_linear_system = true; 
@@ -336,27 +337,23 @@ namespace radmat
     return ss.str(); 
   }
 
-  std::string RadmatSingleQ2Driver::rotation_group_label(void) const
+  std::string RadmatSingleQ2Driver::rotation_group_label(const bool mix_irreps) const
   {
     // check_exit_linear_system(); 
     std::vector<ThreePointDataTag> tt = linear_system.peek_tags(); 
-    std::vector<ThreePointDataTag>::const_iterator it;
   
     if( tt.empty() )
       return std::string(); 
 
-    it = tt.begin(); 
-    std::string chk = radmat::LatticeRotationEnv::rotation_group_label(it->left_mom,it->right_mom); 
-    for(it = tt.begin(); it != tt.end(); ++it)
-      if( chk != radmat::LatticeRotationEnv::rotation_group_label(it->left_mom,it->right_mom) )
-      {
-        std::cout << __func__ << ": returning empty string since more "
-          << " than one rotation group is present, unless one of the "
-          << "particles is spin zero this is rather problematic for you "
-          << std::endl;
-       return std::string();  
-      }
-    return chk; 
+    // have to do this complicated thing so that when we split on cubic 
+    // irreps we dont have the individual single q2 drivers writing to the 
+    // same directory, this effectively makes the output path a function 
+    // of the data and the sorting method  
+    std::stringstream id; 
+    id << tt.begin()->rot_qsq_tag(mix_irreps); 
+    id << "__" + radmat::LatticeRotationEnv::rotation_group_label(tt.begin()->left_mom,tt.begin()->right_mom);
+
+    return id.str(); 
   }
 
   void RadmatSingleQ2Driver::dump_fits(void) 

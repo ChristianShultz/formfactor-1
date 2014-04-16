@@ -21,18 +21,12 @@ namespace radmat
     double qsq_tag() const { return data_tag.get_qsq_label(); }
     std::string rot_qsq_tag(const bool mode) const
     {
-      return  ( mode ) ? rot_qsq_tag( data_tag.origin_rep ) : rot_qsq_tag( data_tag.data_rep ); 
-    } 
-    std::string rot_qsq_tag( const DataRep3pt &data_rep ) const
-    {
       std::stringstream ss; 
-      ss << qsq_tag() << "_" 
+      ss << qsq_tag() <<  "_" + data_tag.rot_qsq_tag(mode) + "_" 
         << LatticeRotationEnv::rotation_group_label(
             data_tag.left_mom,data_tag.right_mom); 
-      ss << "__" << data_rep.l 
-        << "," << data_rep.r; 
-      return ss.str();  
-    }
+      return ss.str(); 
+    } 
 
     EnsemRedstarNPtBlock coeff_lattice_xml; 
     ThreePointDataTag data_tag; 
