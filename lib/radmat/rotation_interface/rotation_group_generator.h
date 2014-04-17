@@ -136,12 +136,6 @@ namespace radmat
     struct RotationGroupGenerator
     {
 
-      mom_key key( const int x, const int y, const int z) const
-      { return mom_key(x,y,z); }
-
-      mom_pair_key key( const mom_key &l, const mom_key &r) const
-      { return mom_pair_key(l,r); }
-
       bool is_related_by_rotation( const mom_pair_key &test, const mom_pair_key &can) const
       {
         return related_by_rotation( test.l.mom() , test.r.mom() , can.l.mom(), can.r.mom() ); 
@@ -185,7 +179,7 @@ namespace radmat
                     if( l*l + m*m + n*n > MOM_MAX * MOM_MAX )
                       continue; 
 
-                    insert( key(  key(i,j,k), key(l,m,n) ) ); 
+                    insert( mom_pair_key(  i,j,k, l,m,n ) ); 
                   }
       }
 
@@ -218,7 +212,7 @@ namespace radmat
 
       std::pair<mom_t,mom_t> canonical_frame(const mom_t &l, const mom_t &r)
       {
-        return canonical_frame( key( key(l[0],l[1],l[2]) , key(r[0],r[1],r[2])) ); 
+        return canonical_frame( mom_pair_key( mom_key(l) , mom_key(r)) ); 
       }
 
 

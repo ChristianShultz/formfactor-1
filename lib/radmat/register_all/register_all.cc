@@ -6,7 +6,7 @@
 
  * Creation Date : 10-12-2013
 
- * Last Modified : Mon 14 Apr 2014 05:32:15 PM EDT
+ * Last Modified : Wed 16 Apr 2014 04:31:46 PM EDT
 
  * Created By : shultz
 
@@ -18,6 +18,7 @@
 #include "radmat/ff/lorentzff_formfactor_factory.h"
 #include "radmat/rotation_interface/rotation_group_generator.h"
 #include "radmat/rotation_interface/Wigner_D_matrix_factory.h"
+#include "radmat/rotation_interface/Wigner_D_matrix_manager.h"
 #include "radmat/ff_interface/formfactor_factory.h"
 #include "radmat/llsq/llsq_solvers.h"
 #include "radmat/redstar_interface/redstar_abstract_xml_factory.h"
@@ -69,6 +70,8 @@ namespace radmat
           success &= radmat::LatticeRotationEnv::registerAll(); 
           // d matricies 
           success &= radmat::WignerDMatrixEnv::registerAll(4); // up to J = 2 
+          // pre allocate thread storage 
+          success &= radmat::WignerThreadMapEnv::registerAll(); 
         }
         catch(std::exception &e)
         {

@@ -6,7 +6,7 @@
 
  * Creation Date : 22-02-2013
 
- * Last Modified : Tue 08 Apr 2014 11:04:00 AM EDT
+ * Last Modified : Thu 17 Apr 2014 12:22:49 PM EDT
 
  * Created By : shultz
 
@@ -28,6 +28,7 @@
 #include <fstream>
 #include <vector>
 #include <utility>
+#include "radmat/utils/printer.h"
 
 #include "adat/handle.h"
 #include "jackFitter/ensem_data.h"
@@ -211,6 +212,48 @@ namespace radmat
       return ss.str(); 
     }
 
+    struct is_solveable_printer
+    {
+      static void print(const std::string &s)
+      { std::cout << "is_solveable_printer " + s << std::endl;} 
+    };
+
+    bool is_llsq_solveable( const itpp::Mat<std::complex<double> > &m, const double tolerance)
+    {
+      printer_function<is_solveable_printer>( "in rows " + number_to_string(m.rows()) ); 
+      printer_function<is_solveable_printer>( "in cols " + number_to_string(m.cols()) ); 
+
+      itpp::Mat<std::complex<double> > M = itpp::hermitian_transpose(m) * m ; 
+
+      printer_function<is_solveable_printer>( "M.rows() " + number_to_string(M.rows()) ); 
+      printer_function<is_solveable_printer>( "M.cols() " + number_to_string(M.cols()) ); 
+
+      itpp::Vec<double> s = itpp::svd(M); 
+      int non_zero_singular_values(0); 
+      for(int i = 0; i < s.size(); ++i)
+        if( s(i) > 1e-6 ) 
+          ++non_zero_singular_values; 
+
+      printer_function<is_solveable_printer>( "nnz sings " + number_to_string(non_zero_singular_values)); 
+
+      int possible_extraction(0); 
+      int rows = m.rows(); 
+      int cols = m.cols(); 
+
+      for(int i = 0; i < rows; ++i)
+      {
+        int count(0); 
+        for(int j = 0; j < cols; ++j)
+          if( std::norm(m(i,j)) > tolerance )
+            ++count; 
+
+        possible_extraction = ( count > possible_extraction ) ? count : possible_extraction; 
+      }
+
+      printer_function<is_solveable_printer>( "possible sings " + number_to_string(possible_extraction)); 
+
+      return non_zero_singular_values >= possible_extraction; 
+    }
 
 
   } // anonomyous 
@@ -284,12 +327,9 @@ namespace radmat
   {
     check_exit_lat(); 
 
-    // splash_tags();
-
     rHandle<LLSQLatticeMultiData> non_zero_data(new LLSQLatticeMultiData);
-    rHandle<LLSQLatticeMultiData> check_singular( new LLSQLatticeMultiData); 
     std::vector<ThreePointDataTag> old_tags;
-    SEMBLE::SembleVector<std::complex<double> > Junk,Zero; 
+    SEMBLE::SembleVector<std::complex<double> > Zero; 
     old_tags = lattice_data->tags(); 
 
     const unsigned int sz = old_tags.size(); 
@@ -303,23 +343,21 @@ namespace radmat
 
     FFKinematicFactors_t Kt;
 
-    Junk = Kt.genFactors(&(*old_tags.begin())); 
-    Zero = Junk;
+    Zero = Kt.genFactors(&(*old_tags.begin())); 
     Zero.zeros(); 
 
+
+    bool first = true; 
+    SEMBLE::SembleVector<std::complex<double> > workV;
+
+    // loop to determine what should be zero
     for(unsigned int elem = 0; elem < sz; ++elem)
     {
-      SEMBLE::SembleVector<std::complex<double> > workV;
-
+      // pull down this set of kinematic factors
       workV = SEMBLE::round_to_zero(
           Kt.genFactors(&old_tags[elem]), tolerance); 
 
-#if 0
-      std::cout << __FILE__ << __func__ << "\n" << workM.mean() << std::endl;
-      std::cout << __func__ << ": " << old_tags[elem].mat_elem_id
-        << sort_string(old_tags[elem]) << "\n" << workV.mean() << std::endl;
-#endif
-
+      // if it is zero push it into the zeroed data pile
       if(workV == Zero)
       {
         zeroed_data.append_row_semble(
@@ -328,34 +366,44 @@ namespace radmat
       }  
       else
       {
+        // initialize dimensions on the first append 
+        if(first)
+        {
+          init_dim(K,workV); 
+          first = false; 
+        }
+        else
+          K.append_row(workV);
+        
+        // throw it into the good data pile 
         non_zero_data->append_row_semble(
             lattice_data->get_row_semble(elem),
             old_tags[elem]);
-        check_singular->append_row_semble(workV, old_tags[elem]); 
       }
     }
 
+    // we build the kinematic decomp along the way, save that bit of work 
+    init_K = true; 
+
+    // update lattice data to that good stuff 
     lattice_data = non_zero_data;
 
-    rHandle<FormFactorBase_t> mat_elem; 
-    mat_elem = FormFactorDecompositionFactoryEnv::callFactory( old_tags.begin()->mat_elem_id ); 
+    // check that we can solve the llsq -- only move if we have some data 
+    bool solveable = (!!!first) ?  is_llsq_solveable( SEMBLE::mean( peek_K() ) , tolerance) : false; 
 
     // warn that we are killing this data point 
-    if(non_zero_data->nrows() < mat_elem->nFacs())
+    if(!!!solveable)
     {
       std::cout << __func__ << ": not enough data points to solve the llsq" << std::endl;
-      std::cout << "passed in " << sz << " elements of which " << zeroed_data.nrows() 
-        << " failed the zero test, needed " << mat_elem->nFacs() << " elems, had " 
-        << non_zero_data->nrows() << "elements " << std::endl;
       std::cout << "for " << old_tags.begin()->mom_string() << std::endl; 
     }
 
-    return (non_zero_data->nrows() >= mat_elem->nFacs());
+    return solveable;
   }
 
 
 
-
+  // wrapper for the inversion method 
   void LLSQMultiDriver_t::solve_llsq(const std::string &soln_ID)
   {
     check_exit_lat();
@@ -374,6 +422,7 @@ namespace radmat
   }
 
 
+  // legacy, this is old 
   void LLSQMultiDriver_t::chisq_analysis(const SEMBLE::SembleVector<double> &ff,
       const std::string &path,
       const int tlow,
@@ -573,9 +622,9 @@ namespace radmat
 
     // pull out the name list here -- yuck
     rHandle<FormFactorBase_t> KK = 
-        FormFactorDecompositionFactoryEnv::callFactory(
+      FormFactorDecompositionFactoryEnv::callFactory(
           lattice_data->tags().begin()->mat_elem_id);
-    
+
     ff_ids = KK->ff_ids(); 
 
     init_FF = true; 
@@ -603,24 +652,29 @@ namespace radmat
   void LLSQMultiDriver_t::generate_kinematic_factors(void)
   {
     check_exit_lat(); 
-    std::vector<ThreePointDataTag> tags = lattice_data->tags(); 
-    std::vector<ThreePointDataTag>::const_iterator it; 
-  
-    FFKinematicFactors_t KK;
 
-    for(it = tags.begin(); it != tags.end(); ++it)
+    // can do this step during the zero filter 
+    if( !!! init_K )
     {
+      std::vector<ThreePointDataTag> tags = lattice_data->tags(); 
+      std::vector<ThreePointDataTag>::const_iterator it; 
 
-      SEMBLE::SembleVector<std::complex<double> > work;
-      work = KK.genFactors( &(*it) );
+      FFKinematicFactors_t KK;
 
-      if(it == tags.begin())
-        init_dim(K,work); 
-      else
-        K.append_row(work);
+      for(it = tags.begin(); it != tags.end(); ++it)
+      {
+
+        SEMBLE::SembleVector<std::complex<double> > work;
+        work = KK.genFactors( &(*it) );
+
+        if(it == tags.begin())
+          init_dim(K,work); 
+        else
+          K.append_row(work);
+      }
+
+      init_K = true; 
     }
-
-    init_K = true; 
   }
 
   void LLSQMultiDriver_t::init_false(void)

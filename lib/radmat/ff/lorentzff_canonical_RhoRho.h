@@ -251,9 +251,10 @@ namespace radmat
   {
     double operator()(const Tensor<double,1> &l, const Tensor<double,1> &r)
     {
-      Tensor<double,0 > Q2 = contract( l-r, l-r , 0, 0); 
-      Tensor<double,0 > ml = contract(l,l,0,0); 
-      Tensor<double,0 > mr = contract(r,r,0,0); 
+      Tensor<double,2 > metric = g_dd(); 
+      Tensor<double,0 > Q2 = contract( l-r, applyMetric(l-r,metric,0) , 0, 0); 
+      Tensor<double,0 > ml = contract(l, applyMetric(l,metric,0) ,0,0); 
+      Tensor<double,0 > mr = contract(r, applyMetric(r,metric,0) ,0,0); 
 
       // average over irrep splitting 
       return -Q2.value() / ( 0.5 *( ml.value() + mr.value() ) );  

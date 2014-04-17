@@ -1,7 +1,7 @@
 <?xml version="1.0"?>
 <DriverProps>
 
-  <version>2</version>
+  <version>3</version>
 
 
   <!-- control the fiting across t_ins -->
@@ -25,17 +25,15 @@
 
       <redstar>
 
-        <object_name>RedstarMergeVectorCurrentThreePoint</object_name>
+        <object_name>RedstarThreePointXMLLorentzHandler</object_name>
         <param>
-          <version>0</version>
           <ensemble>szscl3_16_128_b1p50_t_x4p300_um0p0743_n1p265_per</ensemble>
-          <NPoint>
+          <npt>
             <elem>
               <object_name>RedstarSingleParticleMesonXML</object_name>
               <param>
-                <J>0</J>
+                <cont_rep>J0m</cont_rep>
                 <H></H>
-                <parity>false</parity>
                 <!-- do we want to consider all the 
                 rotations of the provided momentum -->
                 <fill_star>false</fill_star>    
@@ -55,7 +53,7 @@
               </param>
             </elem>
             <elem>
-              <object_name>RedstarUnimprovedVectorCurrentXML</object_name>
+              <object_name>RedstarVectorCurrentXML</object_name>
               <param>
                 <!-- integer momentum cuts -->
                 <pmin>0</pmin>
@@ -66,7 +64,8 @@
                   <active>false</active>               <!-- on or off -->
                   <photons>
                     <elem> 
-                      <coeff>1</coeff>
+                      <coeff_r>1</coeff_r>
+                      <coeff_i>0</coeff_i>
                       <name>b_b0xD0_J0__J0</name>
                     </elem>            
                   </photons>
@@ -78,7 +77,8 @@
                   <active>true</active>               <!-- on or off -->
                   <photons>
                     <elem> 
-                      <coeff>1</coeff>
+                      <coeff_r>1</coeff_r>
+                      <coeff_i>0</coeff_i>
                       <name>rho_rhoxD0_J0__J1</name>
                     </elem>            
                   </photons>
@@ -91,12 +91,11 @@
             <elem>
               <object_name>RedstarSingleParticleMesonXML</object_name>
               <param>
-                <J>0</J>
+                <cont_rep>J0m</cont_rep>
                 <H></H>
-                <parity>false</parity>
                 <!-- do we want to consider all the 
                 rotations of the provided momentum -->
-                <fill_star>false</fill_star>    
+                <fill_star>true</fill_star>    
                 <mom>
                   <elem>0 0 0</elem>
                   <elem>1 0 0</elem>
@@ -112,7 +111,7 @@
                 <t_slice>0</t_slice>
               </param>
             </elem>
-          </NPoint>
+          </npt>
         </param>
 
       </redstar>
@@ -124,10 +123,10 @@
       </renormalization>
 
       <sink_id>pion_proj0</sink_id>
-      <maSink>0.148382</maSink>
+      <maSink>0.148</maSink>
 
       <source_id>pion_proj0</source_id>
-      <maSource>0.148382</maSource>
+      <maSource>0.148</maSource>
 
     </threePointCorrXMLIni>
 
@@ -156,9 +155,8 @@
       <LG_symmetry>true</LG_symmetry>
     </radmatDBProp>
 
-    <!-- specify a decomposition RhoPi means Vector to Pseudo-Scalar,  PiRho would be Pseudo-Scalar to Vector, either roll your own or use the ones provided --> 
-
-    <matElemID>PiPi</matElemID>
+    <matElemMode>mix_irreps</matElemMode>
+    <matElemID>J0mJ0m_diag</matElemID>
 
     <!-- anisotropy --> 
 
@@ -171,9 +169,11 @@
 
   <chisq>none</chisq>
 
-  <maxThread>2</maxThread>
+  <maxThread>11</maxThread>
 
   <!-- energy of lightest vector or branch cut from two pions -->
   <poleMass>0.216166</poleMass>
+
+  <tolerance>1e-3</tolerance>
 
 </DriverProps>

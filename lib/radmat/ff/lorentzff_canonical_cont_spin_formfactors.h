@@ -129,7 +129,7 @@ namespace radmat
   struct J1pJ1p_diag; 
   REGISTER_STRINGIFY_TYPE( J1pJ1p_diag ); 
 
-    struct J1pJ1p_diag : public RhoRho<1,1>
+    struct J1pJ1p_diag : public RhoRhoMultipole<1,1>
   {
     virtual ~J1pJ1p_diag() {};
     virtual LorentzFFAbsBase_t* clone() const { return new J1pJ1p_diag() ; }
@@ -141,7 +141,7 @@ namespace radmat
   struct J1mJ1m_diag; 
   REGISTER_STRINGIFY_TYPE( J1mJ1m_diag ); 
 
-    struct J1mJ1m_diag : public RhoRho<1,1>
+    struct J1mJ1m_diag : public RhoRhoMultipole<1,1>
   {
     virtual ~J1mJ1m_diag() {};
     virtual LorentzFFAbsBase_t* clone() const { return new J1mJ1m_diag() ; }

@@ -1,16 +1,16 @@
 /* -.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.
 
-* File Name : Wigner_D_matrix_manager.cc
+ * File Name : Wigner_D_matrix_manager.cc
 
-* Purpose :
+ * Purpose :
 
-* Creation Date : 14-04-2014
+ * Creation Date : 14-04-2014
 
-* Last Modified : Wed 16 Apr 2014 04:00:36 PM EDT
+ * Last Modified : Thu 17 Apr 2014 11:36:58 AM EDT
 
-* Created By : shultz
+ * Created By : shultz
 
-_._._._._._._._._._._._._._._._._._._._._.*/
+ _._._._._._._._._._._._._._._._._._._._._.*/
 
 
 
@@ -19,7 +19,7 @@ _._._._._._._._._._._._._._._._._._._._._.*/
 #include "radmat/utils/pow2assert.h"
 #include "semble/semble_semble.h"
 #include "rotation_group_generator.h"
-#include "radmat/utils/perThreadStorage.h"
+#include "radmat/utils/printer.h"
 #include "Wigner_D_matrix_factory.h"
 
 
@@ -32,106 +32,150 @@ namespace radmat
     std::complex<double> round_to_zero(const std::complex<double> &cd, const double thresh=1e-6)
     {return ( std::norm(cd) < thresh ) ? complex_zero : cd ; }
 
-  typedef ADATXML::Array<int> mom_t; 
 
-
-  // a momentum key 
-  struct wig_key
-  {
-    wig_key() {}
-    wig_key(const int xx, const int yy, const int zz)
-      : x(xx) , y(yy) , z(zz)
-    { }
-
-    wig_key(const ADATXML::Array<int> &p)
-      : x(p[0]) , y(p[1]), z(p[2]) 
-    { }
-
-    int x,y,z; 
-  }; 
-
-  // a frame key 
-  struct wig_pair_key
-  {
-    wig_pair_key() {}
-    wig_pair_key(const ADATXML::Array<int> &ll , 
-        const ADATXML::Array<int> &rr, 
-        const int JJ)
-      : l(ll) , r(rr), J(JJ)
-    {}
-
-    wig_key l,r;
-    int J;  
-  }; 
-
-  // key comparison class, bung them all together  
-  struct wig_key_comp
-  {
-    bool operator()(const wig_key &l, const wig_key &r) const
+    // a momentum key 
+    struct wig_key
     {
-      if(l.x != r.x)
-        return l.x < r.x; 
-      if(l.y != r.y)
-        return l.y < r.y; 
-      return l.z < r.z; 
-    }
+      wig_key() {}
+      wig_key(const int xx, const int yy, const int zz)
+        : x(xx) , y(yy) , z(zz)
+      { }
 
-    bool operator()(const wig_pair_key &l, const wig_pair_key &r) const
+      wig_key(const ADATXML::Array<int> &p)
+        : x(p[0]) , y(p[1]), z(p[2]) 
+      { }
+
+      int x,y,z; 
+    }; 
+
+    // error streaming 
+    std::ostream & operator<<(std::ostream &o, const wig_key &k)
+    {return (o << "p" << k.x << k.y << k.z);}
+
+    // a frame key 
+    struct wig_pair_key
     {
-      if ( !!! exact_equivalence(l.l,r.l) )
-        return this->operator()(l.l,r.l);
+      wig_pair_key() {}
+      wig_pair_key(const ADATXML::Array<int> &ll , 
+          const ADATXML::Array<int> &rr, 
+          const int JJ)
+        : l(ll) , r(rr), J(JJ)
+      {}
 
-      if( !!! exact_equivalence(l.r,r.r) )
-        return this->operator()(l.r,r.r); 
+      wig_key l,r;
+      int J;  
+    }; 
 
-      return l.J < r.J; 
-    }
+    // error streaming 
+    std::ostream &operator<<(std::ostream &o, const wig_pair_key &k)
+    { return (o << "l" << k.l << "r" << k.r << "J" << k.J);}
 
-    bool exact_equivalence( const wig_key &l, const wig_key &r) const 
+
+    // key comparison class, bung them all together  
+    struct wig_key_comp
     {
-      return ((l.x==r.x) && (l.y==r.y) && (l.z==r.z));
-    }
-
-    bool exact_equivalence(const wig_pair_key &l , const wig_pair_key &r) const
-    {
-      return exact_equivalence(l.l,r.l) && exact_equivalence(l.r,r.r) && (l.J == r.J); 
-    }
-
-  };
-
-
-  typedef std::map<wig_pair_key,WignerMatrix_t,wig_key_comp> WignerMatrixMap_t; 
-  ompPerThreadMap<WignerMatrixMap_t> left_map, right_map, rotation_map; 
-
-  WignerMatrixMap_t call_left_map()
-  {
-    return left_map(omp_get_thread_num());
-  }
-
-  WignerMatrixMap_t call_right_map()
-  {
-    return right_map(omp_get_thread_num());
-  }
-
-  WignerMatrixMap_r call_rotation_map(); 
-
-  bool local_registration = false;  
-
-  // this is a hardwire for qcd12kmi 
-  bool init_maps
-  {
-    if( !!! local_registration )
-    {
-      for(int i = 0; i < 33; ++i)
+      bool operator()(const wig_key &l, const wig_key &r) const
       {
-        left_map.pre_inject_thread(i); 
-        right_map.pre_inject_thread(i); 
-        rotation_map.pre_inject_thread(i); 
+        if(l.x != r.x)
+          return l.x < r.x; 
+        if(l.y != r.y)
+          return l.y < r.y; 
+        return l.z < r.z; 
       }
-      local_registration = true; 
+
+      bool operator()(const wig_pair_key &l, const wig_pair_key &r) const
+      {
+        if ( !!! exact_equivalence(l.l,r.l) )
+          return this->operator()(l.l,r.l);
+
+        if( !!! exact_equivalence(l.r,r.r) )
+          return this->operator()(l.r,r.r); 
+
+        return l.J < r.J; 
+      }
+
+      bool exact_equivalence( const wig_key &l, const wig_key &r) const 
+      {
+        return ((l.x==r.x) && (l.y==r.y) && (l.z==r.z));
+      }
+
+      bool exact_equivalence(const wig_pair_key &l , const wig_pair_key &r) const
+      {
+        return exact_equivalence(l.l,r.l) && exact_equivalence(l.r,r.r) && (l.J == r.J); 
+      }
+
+    };
+
+
+    typedef std::map<wig_pair_key,WignerMatrix_t,wig_key_comp> WignerMatrixMap_t; 
+    WignerMatrixMap_t left_map, right_map; 
+
+    WignerMatrixMap_t* call_left_map()
+    {
+      return &left_map;
     }
-    return true; 
-  }
+
+    WignerMatrixMap_t* call_right_map()
+    {
+      return &right_map;
+    }
+
+    struct injection_map_printer
+    {
+      static void print(const std::string &msg)
+      {}
+      // {std::cout << "injection_map_printer " << msg << std::endl;}
+    };
+
+    // pre compute avaliable wigner matricies  
+    void inject_map(const int J)
+    {
+      typedef radmat::LatticeRotationEnv::TheRotationGroupGenerator RG; 
+      std::map<mom_pair_key,mom_pair_key,mom_key_comp>::const_iterator it; 
+
+      DMatrixManager Wigner; 
+
+      for(it = RG::Instance().can_frame_map.begin(); it != RG::Instance().can_frame_map.end(); ++it)
+      {
+        mom_t l, r; 
+        l = it->first.l.mom(); 
+        r = it->first.r.mom(); 
+        RotationMatrix_t * R = Wigner.rotation_matrix(l,r); 
+        WignerMatrix_t * left = Wigner.left_wigner_matrix(R,l,r,J); 
+        WignerMatrix_t *right = Wigner.right_wigner_matrix(R,l,r,J); 
+        wig_pair_key key(l,r,J); 
+
+        //  std::stringstream ss; 
+        //  ss << key; 
+        //  printer_function<injection_map_printer>(ss.str()); 
+
+        call_left_map()->insert(std::make_pair(key,*left)); 
+        call_right_map()->insert(std::make_pair(key,*right)); 
+
+        delete R; 
+        delete left; 
+        delete right; 
+      }
+    }
+
+
+
+
+    bool local_registration = false;  
+    bool use_wigner_map = false; 
+
+    bool init_maps(const int J)
+    {
+      if( !!! local_registration )
+      {
+        for(int i = 0; i <= J; ++i)
+          inject_map(i); 
+
+        local_registration = true; 
+        use_wigner_map = true; 
+      }
+      return true; 
+    }
 
   } // anonomyous 
 
@@ -234,50 +278,52 @@ namespace radmat
         const mom_t &l,
         const mom_t &r, 
         const int J,
-        bool print) const
+        bool use_map) const
     {
-      std::pair<mom_t,mom_t> can = get_frame(l,r); 
       int bound = 2*J+1; 
       WignerMatrix_t *W  = new WignerMatrix_t( (TensorShape<2>())[bound][bound] , std::complex<double>(0.,0.));   
-      WignerMatrix_t *Wt,*Wn,*Wi; 
 
-      // the delta function is checked here
-      Wt = wigner_matrix(R,l,r,J); 
-      Wn = radmat::WignerDMatrixEnv::call_factory(l,J);
-      Wi = radmat::WignerDMatrixEnv::call_factory(can.first,J);
-
-      dagger(Wi); 
-      dagger(Wt); 
-
-      for(int i = 0; i < bound; ++i)
-        for(int j = 0; j < bound; ++j)
-          for(int k = 0; k < bound; ++k)
-            for(int l = 0; l < bound; ++l)
-              (*W)[i][l] += (*Wi)[i][j] * (*Wt)[j][k] * (*Wn)[k][l];
-
-      dagger(W); 
-      clean(W); 
-
-      if( print ) 
+      // use the precomputed wigner matricies
+      if ( use_wigner_map && use_map)
       {
-        std::cout << __func__ << ": moms " << "l" << string_mom(l)
-          << " r " << string_mom(r) << " cl " << string_mom(can.first)
-          << " cr " << string_mom(can.second) << std::endl;
+        wig_pair_key key(l,r,J); 
+        WignerMatrixMap_t::iterator it = call_left_map()->find(key); 
+        if( it == call_left_map()->end() )
+        {
+          std::cout << __PRETTY_FUNCTION__ << ": error missing key " 
+            << key << std::endl;
+          exit(1); 
+        }
 
-        clean(Wn); 
-        clean(Wt);
-        clean(Wi); 
-
-        std::cout << __func__ << ": ingredients "  
-          << "Wn:" <<  *Wn << "\nWt:" << *Wt << "\nWi:" << *Wi
-          << std::endl;
+        *W = it->second; 
       }
+      else
+      {
+        std::pair<mom_t,mom_t> can = get_frame(l,r); 
+        WignerMatrix_t *Wt,*Wn,*Wi; 
+
+        // the delta function is checked here
+        Wt = wigner_matrix(R,l,r,J); 
+        Wn = radmat::WignerDMatrixEnv::call_factory(l,J);
+        Wi = radmat::WignerDMatrixEnv::call_factory(can.first,J);
+
+        dagger(Wi); 
+        dagger(Wt); 
+
+        for(int i = 0; i < bound; ++i)
+          for(int j = 0; j < bound; ++j)
+            for(int k = 0; k < bound; ++k)
+              for(int l = 0; l < bound; ++l)
+                (*W)[i][l] += (*Wi)[i][j] * (*Wt)[j][k] * (*Wn)[k][l];
+
+        dagger(W); 
+        clean(W); 
 
 
-
-      delete Wt;
-      delete Wn;
-      delete Wi; 
+        delete Wt;
+        delete Wn;
+        delete Wi; 
+      }
 
       return W; 
     }
@@ -288,49 +334,54 @@ namespace radmat
         const mom_t &l, 
         const mom_t &r, 
         const int J,
-        bool print) const
+        bool use_map) const
     {
-      std::pair<mom_t,mom_t> can = get_frame(l,r); 
       int bound = 2*J+1; 
       WignerMatrix_t *W  = new WignerMatrix_t( (TensorShape<2>())[bound][bound] , std::complex<double>(0.,0.));   
-      WignerMatrix_t *Wt,*Wk,*Wl; 
 
-      // the delta function is checked here
-      Wt = wigner_matrix(R,l,r,J); 
-      Wl = radmat::WignerDMatrixEnv::call_factory(r,J);
-      Wk = radmat::WignerDMatrixEnv::call_factory(can.second,J);
-
-      dagger(Wl); 
-
-      for(int i = 0; i < bound; ++i)
-        for(int j = 0; j < bound; ++j)
-          for(int k = 0; k < bound; ++k)
-            for(int l = 0; l < bound; ++l)
-              (*W)[i][l] += (*Wl)[i][j] * (*Wt)[j][k] * (*Wk)[k][l];
-
-      dagger(W); 
-      clean(W); 
-
-
-      if( print ) 
+      // use the precomputed wigner matricies
+      if( use_wigner_map && use_map )
       {
-        std::cout << __func__ << ": moms " << "l" << string_mom(l)
-          << " r " << string_mom(r) << " cl " << string_mom(can.first)
-          << " cr " << string_mom(can.second) << std::endl;
+        wig_pair_key key(l,r,J); 
+        WignerMatrixMap_t::iterator it = call_right_map()->find(key); 
 
-        clean(Wk); 
-        clean(Wt);
-        clean(Wl); 
+        if( it == call_left_map()->end() )
+        {
+          std::cout << __PRETTY_FUNCTION__ << ": error missing key " 
+            << key << std::endl;
+          exit(1); 
+        }
 
-        std::cout << __func__ << ": ingredients "  
-          << "Wk:" <<  *Wk << "\nWt:" << *Wt << "\nWl:" << *Wl
-          << std::endl;
+        *W =  it->second; 
+
       }
+      else
+      {
+        std::pair<mom_t,mom_t> can = get_frame(l,r); 
+        int bound = 2*J+1; 
+        WignerMatrix_t *Wt,*Wk,*Wl; 
 
+        // the delta function is checked here
+        Wt = wigner_matrix(R,l,r,J); 
+        Wl = radmat::WignerDMatrixEnv::call_factory(r,J);
+        Wk = radmat::WignerDMatrixEnv::call_factory(can.second,J);
 
-      delete Wt;
-      delete Wl;
-      delete Wk; 
+        dagger(Wl); 
+
+        for(int i = 0; i < bound; ++i)
+          for(int j = 0; j < bound; ++j)
+            for(int k = 0; k < bound; ++k)
+              for(int l = 0; l < bound; ++l)
+                (*W)[i][l] += (*Wl)[i][j] * (*Wt)[j][k] * (*Wk)[k][l];
+
+        dagger(W); 
+        clean(W); 
+
+        delete Wt;
+        delete Wl;
+        delete Wk; 
+
+      }
 
       return W; 
     }
@@ -338,7 +389,7 @@ namespace radmat
 
   namespace WignerThreadMapEnv
   {
-    bool registerAll(){ return init_maps(); }
+    bool registerAll(){ return init_maps(4); }
   }
 
 
