@@ -6,7 +6,7 @@
 
  * Creation Date : 04-12-2012
 
- * Last Modified : Mon 07 Apr 2014 10:27:40 AM EDT
+ * Last Modified : Wed 23 Apr 2014 11:58:51 AM EDT
 
  * Created By : shultz
 
@@ -207,6 +207,47 @@ namespace radmat
         return lorentz_tagged_data; 
       }
 
+
+    // handle a lorentz type 
+    template<>
+      std::vector<TaggedEnsemRedstarNPtBlock> 
+      pull_data_xml_function<RedstarThreePointXMLMixedHandler>( const ThreePointCorrIni_t &ini, 
+          rHandle<AbsRedstarXMLInterface_t> &handle)
+      {
+        RedstarThreePointXMLMixedHandler *red; 
+        red = dynamic_cast<RedstarThreePointXMLMixedHandler*>(handle.get_ptr()); 
+
+        double p_factor = mom_factor(ini.xi,ini.L_s); 
+        std::string elem_id = ini.matElemID; 
+        const radmatDBProp_t *db_prop = &ini.radmatDBProp; 
+        const ThreePointCorrXMLIni_t *three_pt = &ini.threePointCorrXMLIni; 
+
+        // this must pick out the correct matrix element
+        std::vector<TaggedEnsemRedstarNPtBlock> lorentz_tagged_data;
+        lorentz_tagged_data =  tag_lattice_xml(
+            red->handle_work(),
+            p_factor, 
+            three_pt->maSink, 
+            three_pt->maSource, 
+            elem_id); 
+
+        std::vector<TaggedEnsemRedstarNPtBlock>::iterator it; 
+        for(it = lorentz_tagged_data.begin(); it != lorentz_tagged_data.end(); ++it)
+          {
+            // use a pointer to avoid a full copy 
+            ThreePointDataTag * tag = &(it->data_tag); 
+            rHandle<Rep_p> l_prim, r_prim; 
+            l_prim = tag->data_rep.lefty(); 
+            r_prim = tag->data_rep.righty(); 
+            tag->mat_elem_id += "__" + l_prim->rep_id() + "," + r_prim->rep_id(); 
+          }
+
+        // actually has an updated cubic mat elem here despite the 
+        // stupidity of the name 
+        return lorentz_tagged_data; 
+      }
+
+
     //////////////////////////////////////////////////////
     // pull data out of the xml class
     //      -- the name of the class defines the type of 
@@ -222,6 +263,8 @@ namespace radmat
           return pull_data_xml_function<RedstarThreePointXMLLorentzHandler>( ini, red ); 
         else if( red->type() == Stringify<RedstarThreePointXMLSubduceHandler>() )
           return pull_data_xml_function<RedstarThreePointXMLSubduceHandler>( ini, red ); 
+        else if( red->type() == Stringify<RedstarThreePointXMLMixedHandler>() )
+          return pull_data_xml_function<RedstarThreePointXMLMixedHandler>( ini, red ); 
         else
           printer_function<console_print>(" unknown type " + red->type()
               + " in pull_data_xml in construct_correlators.cc " ); 

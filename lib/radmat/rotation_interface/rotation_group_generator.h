@@ -179,7 +179,8 @@ namespace radmat
                     if( l*l + m*m + n*n > MOM_MAX * MOM_MAX )
                       continue; 
 
-                    insert( mom_pair_key(  i,j,k, l,m,n ) ); 
+                    // flip ordering from loops so that the p_ref get preferentially selected 
+                    insert( mom_pair_key(  k,j,i, n,m,l ) ); 
                   }
       }
 

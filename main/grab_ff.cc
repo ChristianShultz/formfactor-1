@@ -6,7 +6,7 @@
 
  * Creation Date : 22-04-2013
 
- * Last Modified : Tue 08 Apr 2014 01:15:08 PM EDT
+ * Last Modified : Wed 23 Apr 2014 03:11:36 PM EDT
 
  * Created By : shultz
 
@@ -106,6 +106,10 @@ generate_tag( const chunk &l ,
   foo.data_rep = radmat::DataRep3pt( l.data, g.data, r.data); 
   foo.mat_elem_id = l.origin + r.origin + "_" + tran; 
 
+  if( (l.data != l.origin ) || ( r.data != r.origin) )
+    foo.mat_elem_id += "__" + l.data + "," + r.data; 
+
+  // make it consistently 1 based 
   foo.left_row = l.row; 
   foo.gamma_row = g.row; 
   foo.right_row = r.row; 

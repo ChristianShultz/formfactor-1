@@ -17,6 +17,7 @@
 #include "redstar_three_point_xml_handler.h"
 #include "redstar_three_point_xml_interface.h"
 #include "redstar_three_point_xml_lorentz_handler.h"
+#include "redstar_three_point_xml_mixed_handler.h"
 #include "redstar_three_point_xml_subduce_handler.h"
 #include "redstar_vector_current_xml_interface.h"
 #endif

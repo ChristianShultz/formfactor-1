@@ -97,6 +97,7 @@ nobase_include_HEADERS =   \
 													 radmat/redstar_interface/redstar_three_point_xml_handler.h    \
 													 radmat/redstar_interface/redstar_three_point_xml_interface.h    \
 													 radmat/redstar_interface/redstar_three_point_xml_lorentz_handler.h    \
+													 radmat/redstar_interface/redstar_three_point_xml_mixed_handler.h    \
 													 radmat/redstar_interface/redstar_three_point_xml_subduce_handler.h    \
 													 radmat/redstar_interface/redstar_vector_current_xml_interface.h    \
 													 radmat/register_all/register_all.h    \
@@ -174,6 +175,7 @@ libradmat_a_SOURCES =	\
 											radmat/redstar_interface/redstar_three_point_utils.cc    \
 											radmat/redstar_interface/redstar_three_point_xml_interface.cc    \
 											radmat/redstar_interface/redstar_three_point_xml_lorentz_handler.cc    \
+											radmat/redstar_interface/redstar_three_point_xml_mixed_handler.cc    \
 											radmat/redstar_interface/redstar_three_point_xml_subduce_handler.cc    \
 											radmat/redstar_interface/redstar_vector_current_xml_interface.cc    \
 											radmat/register_all/register_all.cc    \

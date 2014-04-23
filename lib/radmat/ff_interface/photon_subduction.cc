@@ -6,7 +6,7 @@
 
 * Creation Date : 17-03-2014
 
-* Last Modified : Wed 19 Mar 2014 05:54:38 PM EDT
+* Last Modified : Wed 23 Apr 2014 02:31:17 PM EDT
 
 * Created By : shultz
 
@@ -122,7 +122,7 @@ namespace radmat
         // these guys are rows but 0 based so subtract 1 from the 
         // FORTRAN arrays that adat uses 
         lorentz_to_cubic_t ret; 
-        for(it = sub->sub[row-1].begin(); it != sub->sub[row-1].end(); ++it)
+        for(it = sub->begin(row); it != sub->end(row); ++it)
           if( create )
             ret = ret + it->first * hel[1 - it->second];  
           else
@@ -162,16 +162,16 @@ namespace radmat
 
         // pull down the subduction list 
         const SubduceTableMap::irrep_sub_table* sub = subduce->second; 
-        if(sub->sub.size() != 1)
+        if(sub->size() != 1)
         {
           std::cout << __PRETTY_FUNCTION__ << ": the table is the wrong dimension"
             << " I think this ( " << key << " ) is a scalar key but the table has"
-            << " dimension " << sub->sub.size() << std::endl;
+            << " dimension " << sub->size() << std::endl;
           throw std::string("subduction error"); 
           exit(1); 
         }
 
-        std::complex<double> weight = sub->sub[0].begin()->first; 
+        std::complex<double> weight = sub->begin(1)->first; 
         
         if(create)
           ret = weight * scal; 

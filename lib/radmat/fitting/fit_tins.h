@@ -46,6 +46,9 @@ namespace radmat
     // get the form factors at this q2
     std::pair<ENSEM::EnsemReal, SEMBLE::SembleVector<double> > fetchFF(void) const;
 
+    // get the named form factors at this q2
+    std::pair<ENSEM::EnsemReal, std::map<std::string,ENSEM::EnsemReal> > fetchNamedFF(void) const; 
+
     // get all of the ids
     std::vector<std::string> ff_ids(void) const; 
 

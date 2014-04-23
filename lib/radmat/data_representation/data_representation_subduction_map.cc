@@ -6,7 +6,7 @@
 
  * Creation Date : 19-03-2014
 
- * Last Modified : Tue 08 Apr 2014 01:22:15 PM EDT
+ * Last Modified : Wed 23 Apr 2014 03:42:50 PM EDT
 
  * Created By : shultz
 
@@ -34,14 +34,14 @@ namespace radmat
     {
       static void print(const std::string &msg)
       {}
-    //  { std::cout << "subduce_table_printer " << msg << std::endl;}
+      // { std::cout << "subduce_table_printer " << msg << std::endl;}
     };
 
     struct subduce_printer
     {
       static void print(const std::string &msg)
       {}
-    //  { std::cout << "subduce_printer " << msg << std::endl;}
+      //  { std::cout << "subduce_printer " << msg << std::endl;}
     };
 
     SubduceTableMap::irrep_sub_table*
@@ -119,6 +119,25 @@ namespace radmat
         return ret; 
       }
 
+    std::string print_table( const std::string &map_id)
+    {
+      const SubduceTableMap::irrep_sub_table* foo;
+      foo = TheSmarterSubduceTableMap::Instance().get_table(map_id); 
+      SubduceTableMap::sub_list::const_iterator list_it; 
+      std::stringstream ss; 
+      ss << map_id << std::endl;
+
+      for(int i = 0; i < foo->size(); ++i)
+      {
+        ss << i << std::endl;
+        for( list_it = foo->begin(i+1); list_it != foo->end(i+1); ++list_it) 
+          ss << "[" << list_it->first << "]x<" << list_it->second << ">    ";  
+        ss << std::endl;
+      }
+
+      return ss.str(); 
+    }
+
     void add_subduce_table( const std::string &table_id, 
         const rHandle<LorentzRep> &cont, 
         const rHandle<CubicRep> &cub)
@@ -128,14 +147,15 @@ namespace radmat
       if( TheSmarterSubduceTableMap::Instance().mappy.find(map_id)
           == TheSmarterSubduceTableMap::Instance().mappy.end() )
       {
-        printer_function<subduce_table_printer>( "made a " + map_id ); 
-
         if( cub->rep_group() == Stringify<Oh>() )
           TheSmarterSubduceTableMap::Instance().mappy.insert(
               std::make_pair( map_id , subduce_rest(table_id, cont , cub ) ) ); 
         else
           TheSmarterSubduceTableMap::Instance().mappy.insert(
               std::make_pair( map_id , subduce_flight(table_id, cont , cub ) ) ); 
+
+        printer_function<subduce_table_printer>( "made a " + map_id ); 
+        //  printer_function<subduce_table_printer>( print_table( map_id) ); 
       }
     }
 

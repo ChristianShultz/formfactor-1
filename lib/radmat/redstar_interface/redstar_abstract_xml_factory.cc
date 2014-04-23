@@ -6,7 +6,7 @@
 
 * Creation Date : 12-11-2013
 
-* Last Modified : Mon 31 Mar 2014 12:58:44 PM EDT
+* Last Modified : Wed 23 Apr 2014 11:23:55 AM EDT
 
 * Created By : shultz
 
@@ -21,6 +21,7 @@ _._._._._._._._._._._._._._._._._._._._._.*/
 #include <exception>
 
 #include "redstar_three_point_xml_lorentz_handler.h"
+#include "redstar_three_point_xml_mixed_handler.h"
 #include "redstar_three_point_xml_subduce_handler.h"
 #include "redstar_single_particle_meson_xml_interface.h"
 #include "redstar_vector_current_xml_interface.h"
@@ -70,6 +71,7 @@ namespace radmat
         success &= do_reg<RedstarVectorCurrentXML>(); 
         success &= do_reg<RedstarThreePointXMLLorentzHandler>(); 
         success &= do_reg<RedstarThreePointXMLSubduceHandler>(); 
+        success &= do_reg<RedstarThreePointXMLMixedHandler>(); 
         local_registration = true; 
       }
 

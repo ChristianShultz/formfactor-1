@@ -6,7 +6,7 @@
 
  * Creation Date : 25-02-2013
 
- * Last Modified : Wed 16 Apr 2014 10:17:31 AM EDT
+ * Last Modified : Thu 17 Apr 2014 04:27:40 PM EDT
 
  * Created By : shultz
 
@@ -320,6 +320,25 @@ namespace radmat
     { 
       check_exit_fits(); 
       return fit_across_time.fetchFF(); 
+    }
+
+    
+    RadmatSingleQ2Solution RadmatSingleQ2Driver::fetchSolution(void) const
+    {
+      check_exit_fits(); 
+
+      RadmatSingleQ2Solution ret; 
+     
+      // yoink the data from the fit across time class 
+      std::pair<ENSEM::EnsemReal,std::map<std::string,ENSEM::EnsemReal> > d; 
+      d = fit_across_time.fetchNamedFF(); 
+     
+      // bung it into this silly solution thingy 
+      ret.Q2 = d.first; 
+      ret.ff_map = d.second; 
+      ret.tags = linear_system.peek_tags(); 
+
+      return ret; 
     }
 
 

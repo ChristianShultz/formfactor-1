@@ -26,7 +26,7 @@ namespace radmat
 {
 
   // declare the index type
-  typedef unsigned short idx_t;
+  typedef short idx_t;
 
   // fwd declare some structs
   template<typename T, idx_t N>
@@ -339,13 +339,13 @@ namespace radmat
       // accessors
       T &operator [](idx_t Index)
       {
-        POW2_ASSERT(Index < pDimensions[0]);
+        POW2_ASSERT((Index < pDimensions[0]) && (Index > -1));
         return pElems[Index];
       }
 
       const T &operator [](idx_t Index) const
       {
-        POW2_ASSERT(Index < pDimensions[0]);
+        POW2_ASSERT((Index < pDimensions[0]) && (Index > -1));
         return pElems[Index];
       }
 
@@ -507,14 +507,14 @@ namespace radmat
     //! accessor
     sub_t < T, N - 1 > operator [](idx_t Index)
     {
-      POW2_ASSERT(Index < Dimensions[0]);
+      POW2_ASSERT((Index < Dimensions[0]) && (Index > -1));
       return sub_t < T, N - 1 > (&pElems[Index * SubArrLen[0]], Dimensions + 1, SubArrLen + 1);
     }
 
     //! accessor
     const sub_t < T, N - 1 > operator [](idx_t Index) const
     {
-      POW2_ASSERT(Index < Dimensions[0]);
+      POW2_ASSERT((Index < Dimensions[0]) && (Index > -1));
       return sub_t < T, N - 1 > (&pElems[Index * SubArrLen[0]], Dimensions + 1, SubArrLen + 1);
     }
 
@@ -834,14 +834,14 @@ namespace radmat
       //! accessor
       T &operator [](idx_t Index)
       {
-        POW2_ASSERT(Index < Dimensions[0]);
+        POW2_ASSERT((Index < Dimensions[0]) && (Index > -1));
         return pElems[Index];
       }
 
       //! accessor
       const T &operator [](idx_t Index) const
       {
-        POW2_ASSERT(Index < Dimensions[0]);
+        POW2_ASSERT((Index < Dimensions[0]) && (Index > -1));
         return pElems[Index];
       }
 

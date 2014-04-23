@@ -85,21 +85,6 @@ namespace radmat
       return MomRowPair_t(mom,row); 
     }
 
-    // wrap the call to operator() so we have a condensed
-    // version of the information later
-    virtual itpp::Mat<std::complex<double> >
-      wrapper(const ENSEM::Real El, 
-          const Array<double> &pl,
-          const int hl, 
-          const ENSEM::Real Er, 
-          const Array<double> &pr,
-          const int hr,
-          const double mom_fac)
-      {
-        return this->operator()(to_mom_row_pair(ENSEM::toDouble(El),pl,hl),
-            to_mom_row_pair(ENSEM::toDouble(Er),pr,hr),
-            mom_fac); 
-      }
   };
 
 

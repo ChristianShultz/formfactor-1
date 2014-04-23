@@ -6,7 +6,7 @@
 
  * Creation Date : 25-02-2013
 
- * Last Modified : Wed 16 Apr 2014 10:53:39 AM EDT
+ * Last Modified : Wed 23 Apr 2014 11:07:39 AM EDT
 
  * Created By : shultz
 
@@ -14,22 +14,16 @@
 
 #include "radmat/driver/radmat_driver.h"
 #include "radmat/driver/radmat_driver_aux.h"
-
 #include "radmat/utils/splash.h"
 #include "radmat/driver/radmat_driver_props.h"
-
+#include "radmat/data_representation/data_representation.h"
+#include "radmat/rotation_interface/rotation_interface.h"
 #include "jackFitter/plot.h"
-
 #include "semble/semble_semble.h"
-
 #include "io/adat_xmlio.h"
-
 #include "ensem/ensem.h"
-
 #include "adat/adat_stopwatch.h"
-
 #include "hadron/ensem_filenames.h"
-
 #include "formfac/formfac_qsq.h"
 
 #include <complex>
@@ -40,6 +34,7 @@
 #include <iostream>
 #include <sstream>
 #include <exception>
+#include <algorithm>
 
 using namespace radmat;
 using namespace ENSEM;
@@ -48,9 +43,9 @@ using namespace ADATIO;
 
 
 
- #define LOAD_LLSQ_PARALLEL 
- #define FIT_LLSQ_PARALLEL
- #define CHISQ_ANALYSIS_PARALLEL
+#define LOAD_LLSQ_PARALLEL 
+#define FIT_LLSQ_PARALLEL
+#define CHISQ_ANALYSIS_PARALLEL
 
 #ifdef LOAD_LLSQ_PARALLEL 
 #include <omp.h>
@@ -75,7 +70,31 @@ namespace radmat
         std::cout << s << std::endl; 
         return;
       }
-  }
+
+
+    struct ff_data_store
+    {
+      ff_data_store() {}
+      ff_data_store( const ENSEM::EnsemReal &QQ, 
+          const ENSEM::EnsemReal &FFF, 
+          const ThreePointDataTag &t)
+        : Q2(QQ) , FF(FFF) , tag(t) 
+      { }
+
+      ENSEM::EnsemReal Q2; 
+      ENSEM::EnsemReal FF;
+      ThreePointDataTag tag; 
+    };
+
+    struct ff_data_store_sort_class
+    {
+      bool operator()(const ff_data_store &l, const ff_data_store &r)
+      {
+        return SEMBLE::toScalar(ENSEM::mean(l.Q2)) < SEMBLE::toScalar(ENSEM::mean(r.Q2)); 
+      }
+    } ff_data_sort;
+
+  } // anonomyous 
 
 
   void RadmatDriver::run_program(const std::string &inifile)
@@ -409,7 +428,7 @@ namespace radmat
     }
     catch(...)
     {
-      SPLASH("An error occured while loading the fake data inifile");
+      SPLASH("An error occured while loading the inifile");
       exit(1);
     }
 
@@ -445,7 +464,7 @@ namespace radmat
     check_exit_corrs(); 
 
     int idx, sz = multi_lattice_data.size(); 
-  std::string soln_ID = std::string ("SVDNonSquare");
+    std::string soln_ID = std::string ("SVDNonSquare");
 
     if(sz == 0)
     {
@@ -502,13 +521,13 @@ namespace radmat
     print_Q2_list(); 
 
 
-      // threading over q2
+    // threading over q2
 #ifdef LOAD_LLSQ_PARALLEL 
 #pragma omp parallel for shared(idx)  schedule(dynamic,1)
 #endif   
-      for(idx = 0; idx < sz; ++idx)
-        if(good_qs[idx])
-          linear_systems_of_Q2[idx].solve_llsq(soln_ID); 
+    for(idx = 0; idx < sz; ++idx)
+      if(good_qs[idx])
+        linear_systems_of_Q2[idx].solve_llsq(soln_ID); 
 #pragma omp barrier
 
     my_stopwatch.stop();
@@ -589,10 +608,15 @@ namespace radmat
 
     fit_formfacs = true; 
 
-    // probably shouldn't parallel here since the file system will get pissed off
+#ifdef FIT_LLSQ_PARALLEL
+#pragma omp parallel for shared(idx,tsrc,tsnk)  schedule(dynamic,1)
+#endif 
+    // POSSIBLE PARALLEL HERE
     for(idx = 0; idx < sz; ++idx)
       if(good_qs[idx])                        // can only print the successful guys
         linear_systems_of_Q2[idx].dump_fits(); 
+
+#pragma omp barrier
 
     return fit_formfacs;
   }
@@ -647,85 +671,120 @@ namespace radmat
     path << pth << "FF_of_Q2/";
     SEMBLE::SEMBLEIO::makeDirectoryPath(path.str()); 
 
+    // single Q2 data solutions
+    std::vector<RadmatSingleQ2Solution> thingy; 
+    std::vector<RadmatSingleQ2Solution>::const_iterator it; 
+    thingy.reserve( good_qs.size() ); 
 
-    int nff = 0; 
-    int nQs = 0;
-    int ncfg = 0; 
-
-
-    for(unsigned int allQ = 0; allQ < linear_systems_of_Q2.size(); ++allQ)
-    {
-      if(linear_systems_of_Q2[allQ].check_fits()) 
-      {
-        std::cout << "allQ = " << allQ << std::endl; 
-        nff = (linear_systems_of_Q2[allQ].fetchFF()).second.getN();
-        nQs = linear_systems_of_Q2.size(); 
-        ncfg =  linear_systems_of_Q2[allQ].Q2().size(); 
-
-        std::cout << "nff = " << nff << " nQs = "
-          << nQs << " ncfg = " << ncfg << std::endl;
-
-        break; // only do this once but don't assume any ordering
-      }
-      if(allQ == linear_systems_of_Q2.size() -1)
-      {
-        std::cerr <<__func__ << ": the linear system was empty. exiting" << std::endl;
-        exit(1);
-      }
-    }
-
-    std::vector<double> q2s;
-    std::vector<double> q2s_err;
-
-    for(int Q = 0; Q < nQs; ++Q)
+    // only pull down the good ones 
+    for(int Q = 0; Q < linear_systems_of_Q2.size(); ++Q)
       if(good_qs[Q])
+        thingy.push_back( linear_systems_of_Q2[Q].fetchSolution() ); 
+
+    //key is name of form factor  
+    typedef std::map<std::string, std::vector<ff_data_store> > ff_map_t; 
+    ff_map_t ff_map;
+    ff_map_t::iterator ff_map_it; 
+    std::map<std::string,ENSEM::EnsemReal>::const_iterator little_it; 
+
+    // reorganize so the form factor name is the key, data is pair of ensems 
+    for(it = thingy.begin(); it != thingy.end(); ++it)
+      for(little_it = it->ff_map.begin(); little_it != it->ff_map.end(); ++little_it)
       {
-        q2s.push_back(SEMBLE::toScalar(
-              ENSEM::mean( linear_systems_of_Q2[Q].Q2() ) ) ); 
-        q2s_err.push_back( SEMBLE::toScalar( 
-              ENSEM::sqrt ( ENSEM::variance( linear_systems_of_Q2[Q].Q2() ) ) ) ); 
+        std::string id = little_it->first; 
+        ff_map_it = ff_map.find( id ); 
+
+        // if it is not in the ff_map then insert 
+        if( ff_map_it == ff_map.end() )
+        {
+          std::vector<ff_data_store> data; 
+          data.push_back(ff_data_store(it->Q2,little_it->second,*(it->tags.begin()))); 
+          ff_map.insert(std::make_pair(id,data)); 
+        }
+        else // grow the data 
+        {
+          ff_map_it->second.push_back( 
+              ff_data_store(it->Q2,little_it->second,*(it->tags.begin()))); 
+        }
       }
 
-    for(int ff = 0; ff < nff; ++ff)
+    // now loop and toss them into some plots/data files 
+    ff_map_t::const_iterator ffit; 
+
+    for( ffit = ff_map.begin(); ffit != ff_map.end(); ++ffit)
     {
-      std::cout << __func__ << ": working on FF_" << ff << std::endl;
+      std::string id = ffit->first; 
+      std::cout << __func__ << ": working on " << id << std::endl;
+      std::vector<ff_data_store> data = ffit->second; 
 
-      ENSEM::EnsemVectorReal FF;
-      FF.resize(ncfg);
-      FF.resizeObs(nQs);
+      // run a sort on the data ( on the mean of Q2 ) 
+      std::sort( data.begin() , data.end() , ff_data_sort ); 
 
-      std::vector<ENSEM::EnsemReal> tmp;  
+      ENSEM::EnsemVectorReal FF; 
+      FF.resize( data.begin()->Q2.size() ); 
+      FF.resizeObs( data.size() );  
 
-      // need to make sure to match up allQ vs good Q so we get the data
-      // at the correct position
-      for(int allQ = 0; allQ < nQs; ++allQ)
-        if(good_qs[allQ])
-          tmp.push_back( (linear_systems_of_Q2[allQ].fetchFF()).second.getEnsemElement(ff) ); 
+      std::vector<double> q(data.size()),qerr(data.size());  
+      std::stringstream data_buffer; 
 
-      for(unsigned int goodQ = 0; goodQ < q2s.size(); ++goodQ)
-        ENSEM::pokeObs(FF, tmp[goodQ],goodQ); 
+      data_buffer << "# Q2  Q2err FF FFerr | <left_rep> <left_mom> <right_rep> <right_mom> " << std::endl; 
 
+
+      // some cute little vector thingy 
+      for(int i = 0; i < data.size(); ++i)
+      {
+        q[i] = SEMBLE::toScalar(ENSEM::mean( data[i].Q2 )); 
+        qerr[i] = sqrt(SEMBLE::toScalar(ENSEM::variance( data[i].Q2 ))); 
+        ENSEM::pokeObs(FF,data[i].FF,i); 
+
+        ThreePointDataTag t = data[i].tag; 
+        DataRep3pt data_rep = t.data_rep; 
+
+        double ff = SEMBLE::toScalar(ENSEM::mean( data[i].FF )); 
+        double fferr = sqrt(SEMBLE::toScalar(ENSEM::variance( data[i].FF ))); 
+
+        // use the canonical momentum when reporting the solution 
+        // if people pay attention then they will know that the llsq 
+        // has been averaged over equivalent frames 
+        std::pair<mom_t,mom_t> canonical_momentum; 
+        canonical_momentum = radmat::LatticeRotationEnv::rotation_group_key(t.left_mom,t.right_mom);  
+        mom_t lp = canonical_momentum.first; 
+        mom_t rp = canonical_momentum.second; 
+
+        // have all the data, put it into a useful log form 
+        data_buffer << "q2 " << q[i] << " " << qerr[i]; 
+        data_buffer << " ff " << ff << " " << fferr; 
+        data_buffer << " | " << t.rep_id(data_rep,data_rep.l) 
+          << " " << lp[0] << " " << lp[1] << " " << lp[2]; 
+        data_buffer << " " << t.rep_id(data_rep,data_rep.r) 
+          << " " << rp[0] << " " << rp[1] << " " << rp[2]; 
+
+        data_buffer << std::endl; 
+      }
+
+      // make a simple plot 
       AxisPlot plt; 
-      plt.addEnsemData(q2s,FF,"\\sq",1);
+      plt.addEnsemData(q,FF,"\\sq",1);
 
       std::stringstream ss; 
-      ss << path.str() << "FF_" << ff << ".ax"; 
+      ss << path.str() << id << ".ax"; 
       plt.sendToFile(ss.str()); 
 
+      // throw some junk to the screen so people think they 
+      // actually did something 
+      std::string cute_data = data_buffer.str(); 
+      std::cout << cute_data << std::endl;
 
-      // write out a data file with numbers in it
+      // chunk out the useful info 
       std::stringstream s2; 
-      s2 << path.str() << "FF_" << ff << ".dat";
+      s2 << path.str() << id << ".dat";
       std::ofstream out2( s2.str().c_str() ) ; 
-      for (unsigned int idx = 0; idx < q2s.size(); ++idx ) 
-        out2 << q2s[idx] << " " << q2s_err[idx] 
-          << " " <<  ENSEM::toDouble( 
-              ENSEM::mean( ENSEM::peekObs( FF , idx ) ) ) 
-          << " " << ENSEM::toDouble( 
-              ENSEM::sqrt ( ENSEM::variance( ENSEM::peekObs( FF , idx ) ) ) ) << std::endl;  
+      out2 << cute_data << std::endl;
       out2.close(); 
-    }
 
+    } // end ffit 
+
+    // success 
     return true; 
   }
 

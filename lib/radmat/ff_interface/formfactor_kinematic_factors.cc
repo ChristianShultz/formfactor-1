@@ -6,7 +6,7 @@
 
  * Creation Date : 18-03-2014
 
- * Last Modified : Tue 15 Apr 2014 04:44:53 PM EDT
+ * Last Modified : Wed 23 Apr 2014 04:08:55 PM EDT
 
  * Created By : shultz
 
@@ -72,8 +72,10 @@ namespace radmat
     {std::stringstream ss; ss << cd; return ss.str();}
 
     std::string to_string(const itpp::Mat<std::complex<double> > &m )
-    {std::stringstream ss; ss << m; return ss.str(); }
+    {std::stringstream ss; ss << itpp::round_to_zero(m,1e-6); return ss.str(); }
 
+    std::string to_string(const mom_t &p )
+    {std::stringstream ss; ss << p[0] << p[1] << p[2]; return ss.str(); }
 
     FFKinematicFactors_t::KinematicFactorRow
       handle_subduce_J0( const FFKinematicFactors_t::KinematicFactorMatrix &KF , 
@@ -118,7 +120,7 @@ namespace radmat
 
         WignerMatrix_t *Dq,*DR,*Dqc; 
 
-        DR = wig.wigner_matrix(R,tag->left_mom,tag->right_mom,1); 
+        DR = wig.wigner_matrix(R,1); 
         Dq = radmat::WignerDMatrixEnv::call_factory(q,1); 
         Dqc = radmat::WignerDMatrixEnv::call_factory(qc,1); 
 
@@ -136,7 +138,6 @@ namespace radmat
                 (*Dret)[i][l] += (*Dq)[i][j] * (*DR)[j][k] * (*Dqc)[k][l]; 
           }
 
-        wig.dagger(Dret);
         wig.clean(Dret); 
 
         delete DR; 
@@ -178,6 +179,8 @@ namespace radmat
 
         R = wig.rotation_matrix(tag->left_mom,tag->right_mom); 
         D = pull_wigner_matrix( wig, tag, R);   
+        wig.clean(D); 
+        wig.conjugate(D); 
 
         // not going to worry about this case now  
         if( !!! PHOTON_CREATE ) 
@@ -186,6 +189,7 @@ namespace radmat
 
         // undo the rotation that sits in the matrix elem decomp 
         // by embedding it in the polarization then dotting it in  
+        //    NB: R is 4x4 lorentz rotation matrix, take the O(3) part
         itpp::Mat<std::complex<double> > Ritpp(3,3), Ditpp(3,3); 
         for(int i = 0; i < 3; ++i)
           for(int j = 0; j < 3; ++j) 
@@ -194,7 +198,10 @@ namespace radmat
             Ditpp(i,j) = (*D)[i][j];
           }
 
-        eps = Ditpp*itpp::transpose(Ritpp * itpp::transpose( eps ) );
+        // D * eps * Rinv * ( R * K^mu ) -- we get R * K back from 
+        // the row solvers, embed the inverse to create the dot 
+        // product in the original frame then attach the phases 
+        eps = Ditpp * eps * itpp::transpose( Ritpp ) ;
 
 
         // intermediate variables 
@@ -231,10 +238,12 @@ namespace radmat
         }
 
 
-        //  printer_function<helicity_printer>( "\n" +  to_string(eps) ) ; 
-        //  printer_function<helicity_printer>( " - KF \n" + to_string( KF.mean() ) ); 
-        //  printer_function<helicity_printer>( " - eps * KF\n" + to_string( ret.mean() ) ); 
-        //  std::cout << "D " << *D << std::endl;
+      //  printer_function<helicity_printer>( "\nmomc: " +  to_string(qc) ) ; 
+      //  printer_function<helicity_printer>( "\nmom: " +  to_string(tag->q) ) ; 
+      //  printer_function<helicity_printer>( "\n" +  to_string(eps) ) ; 
+      //  printer_function<helicity_printer>( " - KF \n" + to_string( KF.mean() ) ); 
+      //  printer_function<helicity_printer>( " - eps * KF\n" + to_string( ret.mean() ) ); 
+      //  std::cout << "D " << *D << std::endl;
 
         // clean up 
         delete D; 
@@ -393,10 +402,17 @@ namespace radmat
         printer_function<kgen_info_printer>("right_row " + to_string(right_row)); 
         printer_function<kgen_info_printer>("gamma_row " + to_string(tag->gamma_row)); 
 
-        // loop over cfgs and use the wrapper to operator()
+        //   // loop over cfgs and use the wrapper to operator()
+        //   for(int bin = 0; bin < nbins; bin++)
+        //     KF[bin] = mat_elem->wrapper( left_E.elem(bin) , left_mom , left_row,
+        //         right_E.elem(bin) , right_mom , right_row , mom_factor);
+
         for(int bin = 0; bin < nbins; bin++)
-          KF[bin] = mat_elem->wrapper( left_E.elem(bin) , left_mom , left_row,
-              right_E.elem(bin) , right_mom , right_row , mom_factor);
+          KF[bin] = mat_elem->generate_ffs( 
+              mat_elem->to_mom_row_pair( ENSEM::toDouble(left_E.elem(bin)), left_mom, left_row), 
+              mat_elem->to_mom_row_pair( ENSEM::toDouble(right_E.elem(bin)), right_mom, right_row), 
+              mom_factor); 
+
 
         // scale up return data
         KF.rescaleSembleUp();

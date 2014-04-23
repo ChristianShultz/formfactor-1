@@ -58,8 +58,6 @@ namespace radmat
 
     virtual WignerMatrix_t*
       wigner_matrix(const RotationMatrix_t *R, 
-          const mom_t &l, 
-          const mom_t &r, 
           const int J) const;
 
     virtual WignerMatrix_t*

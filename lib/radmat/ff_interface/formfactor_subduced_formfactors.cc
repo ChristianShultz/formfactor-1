@@ -6,7 +6,7 @@
 
  * Creation Date : 13-03-2014
 
- * Last Modified : Tue 08 Apr 2014 01:22:45 PM EDT
+ * Last Modified : Wed 23 Apr 2014 03:53:43 PM EDT
 
  * Created By : shultz
 
@@ -47,7 +47,7 @@ namespace radmat
     {
       static void print(const std::string &msg)
       {}
-      // { std::cout << msg << std::endl; }
+      // { std::cout << __PRETTY_FUNCTION__ <<  msg << std::endl; }
     };
 
 
@@ -84,9 +84,8 @@ namespace radmat
       itpp::Mat<std::complex<double> > ret(4,recipe->nFacs());
       ret.zeros(); 
 
-      // the rows that we store internally are 0 based 
-      int left_row = lefty.second - 1; 
-      int right_row = righty.second - 1; 
+      int left_row = lefty.second; 
+      int right_row = righty.second; 
       std::complex<double> cmplx_zero(0.,0.); 
 
       // left and right representations to make the strings to 
@@ -134,12 +133,29 @@ namespace radmat
       //     -- this call eventually descends all the way down to the 
       //     lorentzff_canonical classes, these classes know about how
       //     to transform under rotations so all the hard work is hidden 
-      for( l = l_table->sub[left_row].begin(); l != l_table->sub[left_row].end(); ++l)
-        for( r = r_table->sub[right_row].begin(); r != r_table->sub[right_row].end(); ++r)
-          ret += ( ( std::conj(l->first) * r->first ) 
-              * recipe->hel.mat->operator()( std::make_pair( lefty.first , l->second),
+      
+      itpp::Mat<std::complex<double> > tmp(4,recipe->nFacs());
+      std::complex<double> weight; 
+
+      for( l = l_table->begin(left_row); l != l_table->end(left_row); ++l)
+        for( r = r_table->begin(right_row); r != r_table->end(right_row); ++r)
+        {
+          weight =  ( std::conj(l->first) * r->first ); 
+          tmp = recipe->hel.mat->operator()( std::make_pair( lefty.first , l->second),
                 std::make_pair( righty.first , r->second ),
-                mom_fac)); 
+                mom_fac); 
+          
+          // skip baddies ( the subduce tables only have non-zero entries so this
+          // line is redundant but guards against future stupidity 
+          if( std::norm(weight) < 1e-6) 
+            continue; 
+
+          //   std::cout << __func__ << " left " << l->second << " " << l->first 
+          //     << "\n right " << r->second << " " << r->first  
+          //     <<  "\n prod weight " << weight << " res\n" << tmp << std::endl;
+
+          ret += weight * tmp;
+        }
 
       return ret; 
     }
@@ -211,7 +227,7 @@ namespace radmat
               const SubduceTableMap::irrep_sub_table * foo; 
               foo = TheSmarterSubduceTableMap::Instance().mappy[*it]; 
               CubicRep * rep; 
-              rep = foo->lat->clone(); 
+              rep = foo->get_l_rep()->clone(); 
 
               ret.push_back(std::make_pair(comp,rHandle<CubicRep>(rep) ) ); 
             }

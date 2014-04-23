@@ -5,6 +5,7 @@
 #include "radmat/llsq/llsq_multi_driver.h"
 #include "radmat/fitting/fit_tins.h"
 #include "ensem/ensem.h"
+#include "radmat/data_representation/data_representation.h"
 
 #include <string>
 #include <utility>
@@ -12,7 +13,24 @@
 namespace radmat
 {
 
+  // a container class 
+  struct RadmatSingleQ2Solution
+  {
+    // key is ff name, data is value @Q2 
+    typedef std::map<std::string,ENSEM::EnsemReal>  ff_map_t; 
 
+    // map of the solutions
+    ff_map_t ff_map; 
+
+    // the Q2 value
+    ENSEM::EnsemReal Q2; 
+
+    // the tags that went into the calculation 
+    std::vector<ThreePointDataTag> tags; 
+  }; 
+
+
+  // run and possible find a solution at some value of Q2
   struct RadmatSingleQ2Driver
   { 
     RadmatSingleQ2Driver(void);
@@ -68,6 +86,7 @@ namespace radmat
 
     ENSEM::EnsemReal Q2(void) const; 
     std::pair<ENSEM::EnsemReal, SEMBLE::SembleVector<double> > fetchFF(void) const;
+    RadmatSingleQ2Solution fetchSolution(void) const ; 
 
     std::string tags_at_this_Q2(void) const; 
 
@@ -81,7 +100,7 @@ namespace radmat
     bool check_linear_system(void) const {return init_linear_system;}
     bool check_solved_llsq(void) const {return init_solved_llsq;}
     bool check_fits(void) const {return init_fits;}
-    
+
     void append_rotation_group_label(const std::string &s) {rot_id = s;}
 
     private:

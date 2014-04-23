@@ -6,7 +6,7 @@
 
  * Creation Date : 22-02-2013
 
- * Last Modified : Thu 17 Apr 2014 12:22:49 PM EDT
+ * Last Modified : Thu 17 Apr 2014 02:37:14 PM EDT
 
  * Created By : shultz
 
@@ -215,18 +215,18 @@ namespace radmat
     struct is_solveable_printer
     {
       static void print(const std::string &s)
-      { std::cout << "is_solveable_printer " + s << std::endl;} 
+      {}
+      // { std::cout << "is_solveable_printer " + s << std::endl;} 
     };
 
     bool is_llsq_solveable( const itpp::Mat<std::complex<double> > &m, const double tolerance)
     {
-      printer_function<is_solveable_printer>( "in rows " + number_to_string(m.rows()) ); 
-      printer_function<is_solveable_printer>( "in cols " + number_to_string(m.cols()) ); 
-
       itpp::Mat<std::complex<double> > M = itpp::hermitian_transpose(m) * m ; 
 
-      printer_function<is_solveable_printer>( "M.rows() " + number_to_string(M.rows()) ); 
-      printer_function<is_solveable_printer>( "M.cols() " + number_to_string(M.cols()) ); 
+      //  printer_function<is_solveable_printer>( "in rows " + number_to_string(m.rows()) ); 
+      //  printer_function<is_solveable_printer>( "in cols " + number_to_string(m.cols()) ); 
+      //  printer_function<is_solveable_printer>( "M.rows() " + number_to_string(M.rows()) ); 
+      //  printer_function<is_solveable_printer>( "M.cols() " + number_to_string(M.cols()) ); 
 
       itpp::Vec<double> s = itpp::svd(M); 
       int non_zero_singular_values(0); 
@@ -234,7 +234,6 @@ namespace radmat
         if( s(i) > 1e-6 ) 
           ++non_zero_singular_values; 
 
-      printer_function<is_solveable_printer>( "nnz sings " + number_to_string(non_zero_singular_values)); 
 
       int possible_extraction(0); 
       int rows = m.rows(); 
@@ -250,7 +249,8 @@ namespace radmat
         possible_extraction = ( count > possible_extraction ) ? count : possible_extraction; 
       }
 
-      printer_function<is_solveable_printer>( "possible sings " + number_to_string(possible_extraction)); 
+      //  printer_function<is_solveable_printer>( "nnz sings " + number_to_string(non_zero_singular_values)); 
+      // printer_function<is_solveable_printer>( "possible sings " + number_to_string(possible_extraction)); 
 
       return non_zero_singular_values >= possible_extraction; 
     }
@@ -374,7 +374,7 @@ namespace radmat
         }
         else
           K.append_row(workV);
-        
+
         // throw it into the good data pile 
         non_zero_data->append_row_semble(
             lattice_data->get_row_semble(elem),

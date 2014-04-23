@@ -6,7 +6,7 @@
 
  * Creation Date : 01-08-2012
 
- * Last Modified : Wed 26 Feb 2014 03:27:16 PM EST
+ * Last Modified : Thu 17 Apr 2014 03:26:38 PM EDT
 
  * Created By : shultz
 
@@ -187,6 +187,18 @@ namespace radmat
     POW2_ASSERT(didFit);
 
     return std::pair<ENSEM::EnsemReal,SEMBLE::SembleVector<double> >(Q2,ff);
+  }
+
+  std::pair<ENSEM::EnsemReal,std::map<std::string,ENSEM::EnsemReal> > TinsFitter::fetchNamedFF(void) const
+  {
+    POW2_ASSERT(didFit); 
+    std::vector<std::string> ids = ff_ids(); 
+    std::vector<std::string>::const_iterator it; 
+    std::map<std::string,ENSEM::EnsemReal> mappy; 
+    for(it = ids.begin(); it != ids.end(); ++it)
+      mappy.insert( std::make_pair( *it, getFF(*it) ) ); 
+
+    return std::make_pair( Q2, mappy ); 
   }
 
 

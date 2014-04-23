@@ -41,47 +41,28 @@ namespace radmat
       return b ? rot_qsq_tag(origin_rep) : rot_qsq_tag(data_rep); 
     }
 
-    std::string rot_qsq_tag( const DataRep3pt &d) const
+    std::string rep_id( const DataRep3pt &d, const std::string &s) const
     {
       std::stringstream ss; 
 
-      if( d.is_cubic( d.l ) )
+      if( d.is_cubic( s ) )
       {
-        rHandle<CubicRep> foo = d.call_rep_cub(d.l); 
-        ss << "l" + foo->rep_irrep(); 
+        rHandle<CubicRep> foo = d.call_rep_cub(s); 
+        ss <<  foo->rep_irrep(); 
       }
       else
       {
-        rHandle<LorentzRep> foo = d.call_rep_lor(d.l); 
-        ss << "l" + foo->rep_id(); 
+        rHandle<LorentzRep> foo = d.call_rep_lor(s); 
+        ss <<  foo->rep_id(); 
       }
 
-      ss << "x";
-      
-      if( d.is_cubic( d.r ) )
-      {
-        rHandle<CubicRep> foo = d.call_rep_cub(d.r); 
-        ss << "r" + foo->rep_irrep(); 
-      }
-      else
-      {
-        rHandle<LorentzRep> foo = d.call_rep_lor(d.r); 
-        ss << "r" + foo->rep_id(); 
-      }
+      return ss.str(); 
+    }
 
-      ss << "x"; 
-
-      if( d.is_cubic( d.g ) )
-      {
-        rHandle<CubicRep> foo = d.call_rep_cub(d.g); 
-        ss << "g" + foo->rep_irrep(); 
-      }
-      else
-      {
-        rHandle<LorentzRep> foo = d.call_rep_lor(d.g); 
-        ss << "g" + foo->rep_id(); 
-      }
-
+    std::string rot_qsq_tag( const DataRep3pt &d) const
+    {
+      std::stringstream ss; 
+      ss << "l" +  rep_id(d,d.l) + "xr" + rep_id(d,d.r) + "xg" + rep_id(d,d.g);
       return ss.str();  
     }
 

@@ -6,7 +6,7 @@
 
  * Creation Date : 14-04-2014
 
- * Last Modified : Thu 17 Apr 2014 11:36:58 AM EDT
+ * Last Modified : Wed 23 Apr 2014 01:31:57 PM EDT
 
  * Created By : shultz
 
@@ -30,7 +30,7 @@ namespace radmat
     std::complex<double> complex_zero(0.,0.); 
 
     std::complex<double> round_to_zero(const std::complex<double> &cd, const double thresh=1e-6)
-    {return ( std::norm(cd) < thresh ) ? complex_zero : cd ; }
+    {return itpp::round_to_zero(cd,thresh); }
 
 
     // a momentum key 
@@ -251,8 +251,6 @@ namespace radmat
 
   WignerMatrix_t*
     DMatrixManager::wigner_matrix(const RotationMatrix_t *R,
-        const mom_t &l,
-        const mom_t &r,
         const int J) const
     {
       int bound = 2*J+1; 
@@ -302,8 +300,7 @@ namespace radmat
         std::pair<mom_t,mom_t> can = get_frame(l,r); 
         WignerMatrix_t *Wt,*Wn,*Wi; 
 
-        // the delta function is checked here
-        Wt = wigner_matrix(R,l,r,J); 
+        Wt = wigner_matrix(R,J); 
         Wn = radmat::WignerDMatrixEnv::call_factory(l,J);
         Wi = radmat::WignerDMatrixEnv::call_factory(can.first,J);
 
@@ -316,7 +313,7 @@ namespace radmat
               for(int l = 0; l < bound; ++l)
                 (*W)[i][l] += (*Wi)[i][j] * (*Wt)[j][k] * (*Wn)[k][l];
 
-        dagger(W); 
+        //  dagger(W); 
         clean(W); 
 
 
@@ -361,8 +358,7 @@ namespace radmat
         int bound = 2*J+1; 
         WignerMatrix_t *Wt,*Wk,*Wl; 
 
-        // the delta function is checked here
-        Wt = wigner_matrix(R,l,r,J); 
+        Wt = wigner_matrix(R,J); 
         Wl = radmat::WignerDMatrixEnv::call_factory(r,J);
         Wk = radmat::WignerDMatrixEnv::call_factory(can.second,J);
 
@@ -374,7 +370,7 @@ namespace radmat
               for(int l = 0; l < bound; ++l)
                 (*W)[i][l] += (*Wl)[i][j] * (*Wt)[j][k] * (*Wk)[k][l];
 
-        dagger(W); 
+        //  dagger(W); 
         clean(W); 
 
         delete Wt;

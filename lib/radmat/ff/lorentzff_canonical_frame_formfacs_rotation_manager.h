@@ -63,7 +63,7 @@ namespace radmat
         //      ll[j] += (*R)[i][j] * l[i]; 
         //      rr[j] += (*R)[i][j] * r[i];
         //    }
-        
+
 
         // are these the momentum i think that they are? 
         if ( !!! check_total_frame_transformation( R, fmom.first,fmom.second,cl,cr,true ) )
@@ -115,6 +115,9 @@ namespace radmat
         WignerMatrix_t * Wl = left_wigner_matrix(R,moms.first,moms.second,J_left);
         WignerMatrix_t * Wr = right_wigner_matrix(R,moms.first,moms.second,J_right);
 
+        this->conjugate(Wl); 
+        this->conjugate(Wr); 
+
         Tensor<Data_t,1> sum( (TensorShape<1>())[4] , Data_t() ); 
 
         int left_h = J_left - lefty.second; 
@@ -125,7 +128,7 @@ namespace radmat
         for(int lh = 0; lh < left_bound; ++lh)
           for(int rh = 0; rh < right_bound; ++rh)
           {
-            std::complex<double> weight = ( (*Wl)[left_h][lh] * (*Wr)[rh][right_h] ); // D matrix phase
+             std::complex<double> weight = ( (*Wl)[lh][left_h] * (*Wr)[right_h][rh] );
 
             if( std::norm(weight) > 1e-6) 
             {
