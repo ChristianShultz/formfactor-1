@@ -80,6 +80,15 @@ namespace radmat
         const ThreePointCorrXMLIni_t::RenormalizationProp &,
         const DatabaseInterface_t & );
 
+  // only take the first N cfgs 
+  std::pair<bool, rHandle<LLSQLatticeMultiData> > 
+    build_correlators_no_copy_Ncfg_mean_fast(
+        const std::vector<TaggedEnsemRedstarNPtBlock> &corrs,
+        const std::string &sink_id, 
+        const std::string &source_id, 
+        const ThreePointCorrXMLIni_t::RenormalizationProp &Z_V,
+        const DatabaseInterface_t &db,
+        const int N);
 
   namespace BAD_DATA_REPO
   {

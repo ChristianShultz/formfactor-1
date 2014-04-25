@@ -6,7 +6,7 @@
 
  * Creation Date : 18-03-2014
 
- * Last Modified : Wed 23 Apr 2014 04:08:55 PM EDT
+ * Last Modified : Fri 25 Apr 2014 02:52:17 PM EDT
 
  * Created By : shultz
 
@@ -54,15 +54,13 @@ namespace radmat
     struct kgen_info_printer
     {
       static void print(const std::string &msg)
-      {}
-      // { std::cout << "kgen_info_printer " << msg << std::endl;}
+       { std::cout << "kgen_info_printer " << msg << std::endl;}
     };
 
     struct helicity_printer
     {
       static void print(const std::string &msg) 
-      {}
-      // { std::cout << "helicity_printer " << msg << std::endl; }
+       { std::cout << "helicity_printer " << msg << std::endl; }
     }; 
 
     std::string to_string(const int i)
@@ -296,6 +294,8 @@ namespace radmat
           const FFKinematicFactors_t::KinematicFactorMatrix &KF,
           const ThreePointDataTag * tag)
       {
+        
+        printer_function<helicity_printer>( " - KF \n" + to_string( KF.mean() ) ); 
         return KF.getRow( tag->gamma_row ); 
       }
 

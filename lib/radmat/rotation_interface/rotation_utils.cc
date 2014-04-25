@@ -1,16 +1,16 @@
 /* -.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.
 
-* File Name : rotation_utils.cc
+ * File Name : rotation_utils.cc
 
-* Purpose :
+ * Purpose :
 
-* Creation Date : 14-04-2014
+ * Creation Date : 14-04-2014
 
-* Last Modified : Wed 23 Apr 2014 05:26:58 PM EDT
+ * Last Modified : Thu 24 Apr 2014 02:13:44 PM EDT
 
-* Created By : shultz
+ * Created By : shultz
 
-_._._._._._._._._._._._._._._._._._._._._.*/
+ _._._._._._._._._._._._._._._._._._._._._.*/
 
 
 
@@ -33,7 +33,7 @@ namespace radmat
       {}
       // {std::cout << "related_by_rotation_printer " + msg << std::endl;}
     };
-  
+
     std::string string_mom(const mom_t &p)
     {
       std::stringstream ss;
@@ -84,10 +84,10 @@ namespace radmat
       {
         if(print_on_false)
         {
-        std::cout << __func__ << ": returning false Rp = pp\n"
-          << "p = " << string_mom(x) << " pp = " << string_mom(b)
-          << " Rp = " << string_mom(chk)
-          << " R:" << *A << std::endl; 
+          std::cout << __func__ << ": returning false Rp = pp\n"
+            << "p = " << string_mom(x) << " pp = " << string_mom(b)
+            << " Rp = " << string_mom(chk)
+            << " R:" << *A << std::endl; 
         }
         return false; 
       }
@@ -96,7 +96,7 @@ namespace radmat
 
   ///////////////////////////////////////////////
   ///////////////////////////////////////////////
-  
+
   bool
     check_total_frame_transformation(const RotationMatrix_t *R,
         const mom_t &l, 
@@ -122,6 +122,8 @@ namespace radmat
   //////////////////////////////////////////////
   //////////////////////////////////////////////
 
+  // returns R_p*R_pp^-1 -- a rotation from pp to ref followed by a rotation 
+  // from ref to the vector p 
   RotationMatrix_t*
     generate_frame_transformation(const mom_t &p, const mom_t &pp)
     {
@@ -140,25 +142,20 @@ namespace radmat
 
       for(int i = 0; i < 4; ++i)
         for(int j = 0; j < 4; ++j)
-        {
-          if( fabs( (*Rp)[i][j] ) < 1e-6 )
-            continue;
-
           for(int k = 0; k < 4; ++k)
             (*R)[i][k] += (*Rp)[i][j] * (*Rpp)[k][j]; 
-        }
 
       delete Rp;
       delete Rpp; 
 
- //     if( !!! check_frame_transformation(R,pp,p) )
- //     {
- //       std::cout << __func__ << ": error transforming frames "
- //         << "\np" << string_mom(p) << " pp " << string_mom(pp) 
- //         << " p = Rpp\nR:" << *R << std::endl;
- //       delete R; 
- //       exit(1); 
- //     }
+      //     if( !!! check_frame_transformation(R,pp,p) )
+      //     {
+      //       std::cout << __func__ << ": error transforming frames "
+      //         << "\np" << string_mom(p) << " pp " << string_mom(pp) 
+      //         << " p = Rpp\nR:" << *R << std::endl;
+      //       delete R; 
+      //       exit(1); 
+      //     }
 
       clean_up_rot_mat(R); 
 
@@ -189,17 +186,20 @@ namespace radmat
 
           return R; 
         }
-          
+
         delete R; 
 
         return generate_frame_transformation(r,rr); 
       }
 
+      // left is not at rest else we would be in the statement above
       if ( is_rest(r) )
       {
         delete R; 
         return generate_frame_transformation(l,ll); 
       }
+
+      // ok nobody is at rest 
 
       // if colinear then cross product is garbage
       if( colinear_momentum(l,r) && colinear_momentum(ll,rr) )
@@ -266,7 +266,7 @@ namespace radmat
       double alpha,beta,gamma;
 
       // this blows 
-      
+
       // R < 1
       if( fabs( (*R)[3][3] - 1.) > 1e-6 )
       {
@@ -375,7 +375,7 @@ namespace radmat
       const mom_t &lleft, const mom_t &rright,
       const bool allow_flip /*=false*/)
   {
-  
+
     if( is_rest(left) )
     {
       if( !!! is_rest(lleft) )
@@ -391,7 +391,7 @@ namespace radmat
 
       return same_length(left,lleft); 
     }
-  
+
 
     bool success = true; 
     success &= (cos_theta(left,right) == cos_theta(lleft,rright));

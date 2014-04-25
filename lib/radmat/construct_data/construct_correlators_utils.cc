@@ -6,7 +6,7 @@
 
  * Creation Date : 13-11-2013
 
- * Last Modified : Tue 15 Apr 2014 10:20:20 AM EDT
+ * Last Modified : Thu 24 Apr 2014 11:31:49 AM EDT
 
  * Created By : shultz
 
@@ -146,7 +146,8 @@ namespace radmat
           const std::string &sink_id, 
           const std::string &source_id, 
           const ThreePointCorrXMLIni_t::RenormalizationProp & Z_V,
-          const DatabaseInterface_t &db
+          const DatabaseInterface_t &db,
+          const int N=0
           )
       {
 #ifdef DO_TIMING_CACHE_NORM_MAT_ELEMS
@@ -232,6 +233,38 @@ namespace radmat
             ENSEM::EnsemVectorComplex corr_tmp = db.fetch(npt->m_obj);
             RadmatMassOverlapData_t source = db.fetch(k.source); 
             RadmatMassOverlapData_t sink = db.fetch(k.sink); 
+
+            if( N != 0 )
+            {
+              ENSEM::EnsemVectorComplex corr_u; 
+              ENSEM::EnsemReal src_E_u, src_Z_u;
+              ENSEM::EnsemReal snk_E_u, snk_Z_u;
+              int sz = N; 
+
+              src_E_u.resize(sz); 
+              src_Z_u.resize(sz); 
+              snk_E_u.resize(sz); 
+              snk_Z_u.resize(sz); 
+              corr_u = corr_tmp;  
+              corr_u.resize(sz); 
+
+              for(int i = 0; i < sz; ++i)
+              {
+                ENSEM::pokeEnsem( src_E_u, ENSEM::peekEnsem(source.E(),i), i);
+                ENSEM::pokeEnsem( src_Z_u, ENSEM::peekEnsem(source.Z(),i), i);
+
+                ENSEM::pokeEnsem( snk_E_u, ENSEM::peekEnsem(sink.E(),i), i);
+                ENSEM::pokeEnsem( snk_Z_u, ENSEM::peekEnsem(sink.Z(),i), i);
+
+                ENSEM::pokeEnsem( corr_u, ENSEM::peekEnsem(corr_tmp,i), i); 
+              }
+
+              corr_tmp = corr_u; 
+              source.E() = src_E_u; 
+              source.Z() = src_Z_u; 
+              sink.E() = snk_E_u; 
+              sink.Z() = snk_Z_u; 
+            }
 
             std::string outstem = Hadron::ensemFileName(npt->m_obj); 
             std::string pth = SEMBLE::SEMBLEIO::getPath();
@@ -515,6 +548,171 @@ namespace radmat
 #endif
 
       return std::pair<bool, std::vector<ConstructCorrsMatrixElement> >(any_data,ret);  
+    }
+
+
+  ////////////////////////////////////////////////////////////////////
+  ////////////////////////////////////////////////////////////////////
+  //build a correlator
+  std::pair<bool, rHandle<LLSQLatticeMultiData> > 
+    build_correlators_no_copy_Ncfg_mean_fast(
+        const std::vector<TaggedEnsemRedstarNPtBlock> &corrs,
+        const std::string &sink_id, 
+        const std::string &source_id, 
+        const ThreePointCorrXMLIni_t::RenormalizationProp &Z_V,
+        const DatabaseInterface_t &db,
+        const int N)
+    {
+#ifdef DO_TIMING_SUM_NORM_MAT_ELEMS
+      Util::StopWatch snoop;
+      snoop.start(); 
+#endif
+
+      std::vector<Hadron::KeyHadronNPartNPtCorr_t> missed_xml; 
+      std::vector<RadmatExtendedKeyHadronNPartIrrep_t> missed_norm; 
+
+      rHandle<LLSQLatticeMultiData> ret(new LLSQLatticeMultiData) ; 
+      double qsq; 
+
+      // create a cache of all ingredients and 
+      // strip all members of principle time 
+      // dependence and overlap factors, 
+      // ie: isolate the cubic matrix element 
+      singleThreadQ2NormalizedCorrCache npoint_cache; 
+      npoint_cache = normalize_correlators( corrs, missed_xml, missed_norm, 
+          sink_id, source_id, Z_V, db, N);
+
+      // push the bad data at the global repo 
+      BAD_DATA_REPO::local_bad_data_repo.insert(omp_get_thread_num(),missed_xml);   
+      BAD_DATA_REPO::local_bad_data_repo.insert(omp_get_thread_num(),missed_norm);   
+
+      // abort if we missed everything
+      if(npoint_cache.size() == 0) 
+      {
+        DEBUG_MSG(exiting early);
+#ifdef DO_TIMING_SUM_NORM_MAT_ELEMS
+        snoop.stop(); 
+        std::cout << __func__ << "npoint_cache is empty"
+          << " exiting early " << std::endl; 
+#endif
+        return std::pair<bool, rHandle<LLSQLatticeMultiData> >(false,ret); 
+      }
+
+
+      // intitialize some variables
+      ENSEM::EnsemReal ScalarZeroR;
+      ENSEM::EnsemVectorComplex VectorZeroC; 
+      bool any_data = false; 
+      std::vector<TaggedEnsemRedstarNPtBlock>::const_iterator block_it; 
+      EnsemRedstarNPtBlock::const_iterator npt; 
+      bool found = false; 
+
+      // set the above variables (determine things like nbins, Lt etc)
+      for ( block_it = corrs.begin(); block_it != corrs.end(); ++block_it)
+      {
+        if (found ) 
+          break; 
+
+        for(npt = block_it->coeff_lattice_xml.begin(); npt != block_it->coeff_lattice_xml.end(); ++npt) 
+          if(npoint_cache.exist(npt->m_obj))
+          {
+            found = true; 
+            DatabaseInterface_k k(npt->m_obj,sink_id,source_id);  
+            RadmatMassOverlapData_t dummy = db.fetch(k.source); 
+            ScalarZeroR = SEMBLE::toScalar(0.) * dummy.E();  
+            VectorZeroC = SEMBLE::toScalar(std::complex<double>(0.,0.))* npoint_cache[npt->m_obj]; 
+            break; 
+          }
+      }     
+
+      // can't do anything -- no data 
+      if ( !!! found ) 
+        return std::pair<bool, rHandle<LLSQLatticeMultiData> >(false,ret);  
+
+      for ( block_it = corrs.begin(); block_it != corrs.end(); ++block_it)
+      {
+        // A + B + C - B + A -> 2A +C
+        TaggedEnsemRedstarNPtBlock block = organizeCorrelatorSum(*block_it); 
+
+        // return corrs
+        ENSEM::EnsemVectorComplex corr; 
+        ENSEM::EnsemReal E_snk, E_src; 
+
+        // zero out data
+        corr = VectorZeroC; 
+        E_snk = ScalarZeroR; 
+        E_src = ScalarZeroR;
+        int ct(0); 
+        bool success = true;  
+
+        for(npt = block.coeff_lattice_xml.begin(); npt != block.coeff_lattice_xml.end(); ++npt) 
+        {
+          success &= npoint_cache.exist(npt->m_obj);
+
+          // abandon rest of loop if we miss one
+          if ( !!! success ) 
+            break; 
+
+          // pull out data 
+          DatabaseInterface_k k(npt->m_obj,sink_id,source_id);  
+          RadmatMassOverlapData_t source = db.fetch(k.source); 
+          RadmatMassOverlapData_t sink = db.fetch(k.sink); 
+
+          // update energies
+          E_snk = E_snk + sink.E(); 
+          E_src = E_src + source.E(); 
+
+          // update correlator sum 
+          corr = corr + npt->m_coeff * npoint_cache[npt->m_obj];
+
+          ++ct; 
+        }
+
+        // the return energy is a flat average 
+        // of the things that went into the correlator
+        if ( ct != 0)
+        {
+          E_snk = E_snk / SEMBLE::toScalar(double(ct)); 
+          E_src = E_src / SEMBLE::toScalar(double(ct)); 
+        }
+
+        // hack time !! 
+        ENSEM::EnsemReal l_sE,r_sE; 
+        ENSEM::EnsemVectorComplex corr_s; 
+        int sz = N; 
+        l_sE.resize(sz); 
+        r_sE.resize(sz); 
+        corr_s = corr; 
+        corr_s.resize(sz);
+
+        for(int i =0; i < sz; ++i)
+        {
+          ENSEM::pokeEnsem(l_sE,ENSEM::peekEnsem(E_snk,i),i);
+          ENSEM::pokeEnsem(r_sE,ENSEM::peekEnsem(E_src,i),i);
+          ENSEM::pokeEnsem(corr_s,ENSEM::peekEnsem(corr,i),i); 
+        }
+      
+
+        // thingy 
+        ThreePointDataTag tag = block.data_tag;
+        tag.left_E = l_sE; 
+        tag.right_E = r_sE; 
+
+        any_data |= success; 
+
+        // only push back good corrs
+        if(success) 
+          ret->append_row_ensem(corr_s,tag); 
+      }
+
+#ifdef DO_TIMING_SUM_NORM_MAT_ELEMS
+      snoop.stop(); 
+      std::cout << __func__ << ": building " << ret->nrows() 
+        << " matrix elements took " << snoop.getTimeInSeconds() 
+        << " seconds" << std::endl; 
+#endif
+
+      return std::pair<bool, rHandle<LLSQLatticeMultiData> >(any_data,ret);  
     }
 
 

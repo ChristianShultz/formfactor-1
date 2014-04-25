@@ -128,7 +128,7 @@ namespace radmat
         for(int lh = 0; lh < left_bound; ++lh)
           for(int rh = 0; rh < right_bound; ++rh)
           {
-             std::complex<double> weight = ( (*Wl)[lh][left_h] * (*Wr)[right_h][rh] );
+            std::complex<double> weight = ( (*Wl)[lh][left_h] * (*Wr)[right_h][rh] );
 
             if( std::norm(weight) > 1e-6) 
             {

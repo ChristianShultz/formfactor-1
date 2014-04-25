@@ -1,16 +1,16 @@
 /* -.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.
 
-* File Name : redstar_single_particle_meson_xml_interface.cc
+ * File Name : redstar_single_particle_meson_xml_interface.cc
 
-* Purpose :
+ * Purpose :
 
-* Creation Date : 20-03-2014
+ * Creation Date : 20-03-2014
 
-* Last Modified : Wed 26 Mar 2014 10:40:38 AM EDT
+ * Last Modified : Thu 24 Apr 2014 06:31:30 PM EDT
 
-* Created By : shultz
+ * Created By : shultz
 
-_._._._._._._._._._._._._._._._._._._._._.*/
+ _._._._._._._._._._._._._._._._._._._._._.*/
 
 
 #include "redstar_single_particle_meson_xml_interface.h"
@@ -160,23 +160,23 @@ namespace radmat
         mom = star_p(mom); 
     }
 
-//  //! xml writer
-//  void 
-//    RedstarSingleParticleMesonXML::write(ADATXML::XMLWriter &xml, const std::string &path ) const
-//    {
-//      ADATXML::push(xml,path);
-//      ADATXML::write(xml,"cont_rep",cont_rep);
-//      ADATXML::write(xml,"H",H);
-//      ADATXML::write(xml,"parity",parity);
-//      ADATXML::write(xml,"mom",mom);
-//      ADATXML::write(xml,"twoI_z",twoI_z);
-//      ADATXML::write(xml,"name",name);
-//      ADATXML::write(xml,"creation_op",creation_op);
-//      ADATXML::write(xml,"smearedP",smearedP);
-//      ADATXML::write(xml,"isProjected",isProjected); 
-//      ADATXML::write(xml,"t_slice",t_slice);
-//      ADATXML::pop(xml);
-//    }
+  //  //! xml writer
+  //  void 
+  //    RedstarSingleParticleMesonXML::write(ADATXML::XMLWriter &xml, const std::string &path ) const
+  //    {
+  //      ADATXML::push(xml,path);
+  //      ADATXML::write(xml,"cont_rep",cont_rep);
+  //      ADATXML::write(xml,"H",H);
+  //      ADATXML::write(xml,"parity",parity);
+  //      ADATXML::write(xml,"mom",mom);
+  //      ADATXML::write(xml,"twoI_z",twoI_z);
+  //      ADATXML::write(xml,"name",name);
+  //      ADATXML::write(xml,"creation_op",creation_op);
+  //      ADATXML::write(xml,"smearedP",smearedP);
+  //      ADATXML::write(xml,"isProjected",isProjected); 
+  //      ADATXML::write(xml,"t_slice",t_slice);
+  //      ADATXML::pop(xml);
+  //    }
 
 } // radmat
 

@@ -6,7 +6,7 @@
 
  * Creation Date : 25-02-2013
 
- * Last Modified : Sat 22 Feb 2014 05:39:23 PM EST
+ * Last Modified : Fri 25 Apr 2014 12:57:37 PM EDT
 
  * Created By : shultz
 
@@ -114,12 +114,22 @@ namespace
 
   void pull_elems(radmat::rHandle< radmat::LLSQLatticeMultiData > &inout , const ArrSingleQ2Prop_t &p)
   {
+
     radmat::LLSQLatticeMultiData trim;
 
-    for (int i = 0; i < p.lat_elems.size(); ++i)
-      trim.append_row_semble(inout->get_row_semble(p.lat_elems[i]),inout->get_tag(p.lat_elems[i])); 
+    // parse the list 
+    if( p.lat_elems.size() > 0 )
+    {
+      for (int i = 0; i < p.lat_elems.size(); ++i)
+      {
+        trim.append_row_semble(inout->get_row_semble(p.lat_elems[i]),inout->get_tag(p.lat_elems[i])); 
+      }
 
-    *inout = trim;
+      *inout = trim;
+    }
+
+    std::cout << __func__ << " pulled :" << std::endl;
+    inout->splash_tags();
   }
 
 } // anonomyous 

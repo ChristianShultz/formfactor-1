@@ -6,7 +6,7 @@
 
  * Creation Date : 24-12-2013
 
- * Last Modified : Mon 14 Apr 2014 05:26:41 PM EDT
+ * Last Modified : Fri 25 Apr 2014 03:24:30 PM EDT
 
  * Created By : shultz
 
@@ -126,9 +126,13 @@ namespace radmat
         for(int i =0; i < tags.size(); ++i)
         {
           KEY foo(tags[i].left_mom, tags[i].right_mom, tags[i].left_row, tags[i].right_row,tags[i].gamma_row); 
+          std::cout << __func__ << " ky " << foo.key() << std::endl; 
           DATA e = d->get_row_ensem(i); 
           insert(foo,e); 
         }
+
+        std::cout << "\n\n" << __func__ << ": finished map initialization" 
+          << "\n************************************************\n\n" << std::endl;
       } 
 
       DATA query(const KEY &k) const
@@ -138,7 +142,11 @@ namespace radmat
         it = data_map.find(key); 
 
         if( it == data_map.end())
-          throw std::string("missing key"); 
+        {
+          std::cout << __PRETTY_FUNCTION__ << "missing " << key << std::endl;
+          exit(1); 
+        }
+
 
         return it->second; 
       }
@@ -173,6 +181,8 @@ namespace radmat
         ret[3] = kick * p[2];
         return ret; 
       }
+
+    int local_count = 0; 
 
     ////////////////////////////////////////////////
     bool 
@@ -210,6 +220,9 @@ namespace radmat
         double const_real_var = fit_real.getAvgFitParError(0);
         double const_imag_var = fit_imag.getAvgFitParError(0);
 
+        std::cout << __func__ << ": real = " << const_real << " +/- " << const_real_var << std::endl;
+        std::cout << __func__ << ": imag = " << const_imag << " +/- " << const_imag_var << std::endl;
+
         // zero vy value
         if( fabs(const_real) < 1e-3 ) 
           if( fabs(const_imag) < 1e-3)
@@ -221,14 +234,21 @@ namespace radmat
             return true; 
 
         // zero w/ in err
-        if( fabs(const_real) - 3.*sqrt(fabs(const_real_var)) < 0.)
-          if( fabs(const_imag) - 3.*sqrt(fabs(const_imag_var)) < 0.)
+        if( fabs(const_real) - 1.*sqrt(fabs(const_real_var)) < 0.)
+          if( fabs(const_imag) - 1.*sqrt(fabs(const_imag_var)) < 0.)
             return true; 
 
+        std::stringstream cnt; 
+        cnt << ++local_count; 
+        std::string count = cnt.str(); 
+        
         std::cout << __func__ << ": reporting failure, C = A-B (should be zero) " << std::endl;
         std::cout << __func__ << ": real = " << const_real << " +/- " << const_real_var << std::endl;
         std::cout << __func__ << ": imag = " << const_imag << " +/- " << const_imag_var << std::endl;
-        ENSEM::write( std::string("C.jack") , C ); 
+        std::cout << "count " << count << std::endl;
+        ENSEM::write( std::string("C_") + count + std::string(".jack") , C ); 
+        ENSEM::write( std::string("A_") + count + std::string(".jack") , A ); 
+        ENSEM::write( std::string("B_") + count + std::string(".jack") , B ); 
 
 
         return false; 
@@ -243,10 +263,13 @@ namespace radmat
       do_work(const map_holder *mappy, 
           const KEY &k)
       {
-        JJFFimpl<Jl,Jr> foo; 
+        JJFFimpl<Jl,Jr> foo;  
+
+        // std::cout << __func__ << " attempting " << k.key() << std::endl; 
+
         Tensor<canIdx_t,1> tens = foo.canonicalize(
-            std::make_pair( cook_p_tens(0.216,k.left,0.11), k.h_left), 
-            std::make_pair( cook_p_tens(0.216,k.right,0.11), k.h_right),
+            std::make_pair( cook_p_tens(0.216,k.left,0.11), k.h_left ), 
+            std::make_pair( cook_p_tens(0.216,k.right,0.11), k.h_right ),
             0.11);
 
         canIdx_t chk = tens[ k.jmu ]; 
@@ -263,20 +286,27 @@ namespace radmat
           int hr = it->m_obj.h_right;
           int jmu = it->m_obj.idx;
           KEY q_key = can_key(k,hl,hr,jmu);
-          ss << q_key.key() << std::endl;
+          ss << "[" << SEMBLE::toScalar(it->m_coeff) << "] * <" << q_key.key() << ">" << std::endl;
           map_holder::DATA tmp = mappy->query(q_key);
           can_sum = can_sum + SEMBLE::toScalar( it->m_coeff ) * tmp;  
         }
 
+        std::cout << "\n***************************************************" << std::endl;
+        std::cout << "testing " << k.key()  << std::endl;
+        std::cout << k.key() << " - ingredients:\n" <<  ss.str() << std::endl; 
         bool success =  test_equivalence( k_frame, can_sum ); 
 
         if( !!! success )
         {
           ENSEM::write( k.key() , k_frame ) ;
           ENSEM::write( k.key() + std::string(".can_sum") , can_sum ); 
-
-          std::cout << k.key() << " - ingredients:\n" <<  ss.str() << std::endl; 
+          std::cout << "****** FAIL \n" << std::endl;
         }
+        else
+        {
+          std::cout << "****** PASS \n" << std::endl;
+        }
+
 
         return success; 
       }

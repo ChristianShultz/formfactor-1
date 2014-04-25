@@ -65,14 +65,16 @@ namespace radmat
           const mom_t &l, 
           const mom_t &r, 
           const int J,
-          bool use_map=true) const; 
+          const bool use_map=true,
+          const int print=0) const; 
 
     virtual WignerMatrix_t*
       right_wigner_matrix(const RotationMatrix_t *R,
           const mom_t &l, 
           const mom_t &r, 
           const int J,
-          bool use_map=true) const; 
+          const bool use_map=true,
+          const int print=0) const; 
   }; 
 
   namespace WignerThreadMapEnv

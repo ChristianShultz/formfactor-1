@@ -6,7 +6,7 @@
 
  * Creation Date : 22-02-2013
 
- * Last Modified : Thu 17 Apr 2014 02:37:14 PM EDT
+ * Last Modified : Fri 25 Apr 2014 12:42:23 PM EDT
 
  * Created By : shultz
 
@@ -45,6 +45,48 @@ namespace radmat
 
   namespace 
   {
+    // pull the unique elems of the union -- guard with map 
+    rHandle<LLSQLatticeMultiData>
+      unique_data(const rHandle<LLSQLatticeMultiData> &lattice_data,
+          const LLSQLatticeMultiData &zeroed_data)
+      {
+        rHandle<LLSQLatticeMultiData> ret(new LLSQLatticeMultiData() ); 
+
+        std::map<std::string,int> data_map; 
+        std::vector<LLSQLatticeMultiData::TT> tags = zeroed_data.tags(); 
+        for(int i = 0; i < tags.size(); ++i)
+        {
+          std::string key = tags[i].file_id; 
+          if(data_map.find(key) == data_map.end())
+          {
+            data_map[key] = 1; 
+            ret->append_row_semble( zeroed_data.get_row_semble(i),tags[i]); 
+          }
+          else
+          {
+            std::cout << __func__ << ": warning duped data??" << std::endl;
+          }
+        }
+        
+        tags = lattice_data->tags(); 
+
+        // add unique elems from lattice data 
+        for(int i = 0; i < tags.size(); ++i)
+        {
+          std::string key = tags[i].file_id; 
+          if(data_map.find(key) == data_map.end())
+          {
+            data_map[key] = 1; 
+            ret->append_row_semble( lattice_data->get_row_semble(i),tags[i]); 
+          }
+          else
+          {
+            std::cout << __func__ << ": warning duped data??" << std::endl;
+          }
+        }
+
+        return ret; 
+      } 
 
     void init_dim(SEMBLE::SembleMatrix<std::complex<double> > &to_init, 
         const SEMBLE::SembleVector<std::complex<double> > &first_row)
@@ -527,10 +569,13 @@ namespace radmat
   {
     //    std::cout << __func__ << ": entering" << std::endl; 
     check_exit_lat();
+    
+    rHandle<LLSQLatticeMultiData> output_data = unique_data(lattice_data,zeroed_data); 
+
     std::stringstream ss; 
     ss << path << "state_database.rad"; 
     ADATIO::BinaryFileWriter bin(ss.str());
-    write(bin,*lattice_data); 
+    write(bin,*output_data); 
     bin.close();
   }
 

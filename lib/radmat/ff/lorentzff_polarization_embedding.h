@@ -37,6 +37,7 @@ namespace radmat
             const double mom_factor,
             const int hel)
         {
+          POW2_ASSERT( abs(hel) < J+1 ); 
           double mod_p = sqrt( t[1]*t[1] + t[2]*t[2] + t[3]*t[3] );
           ZAxisHelicityTensor<J> foo;
 

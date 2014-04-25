@@ -6,7 +6,7 @@
 
  * Creation Date : 19-03-2014
 
- * Last Modified : Wed 23 Apr 2014 03:42:50 PM EDT
+ * Last Modified : Thu 24 Apr 2014 08:48:37 AM EDT
 
  * Created By : shultz
 
@@ -154,8 +154,8 @@ namespace radmat
           TheSmarterSubduceTableMap::Instance().mappy.insert(
               std::make_pair( map_id , subduce_flight(table_id, cont , cub ) ) ); 
 
-        printer_function<subduce_table_printer>( "made a " + map_id ); 
-        //  printer_function<subduce_table_printer>( print_table( map_id) ); 
+      //  printer_function<subduce_table_printer>( "made a " + map_id ); 
+      //  printer_function<subduce_table_printer>( print_table( map_id) ); 
       }
     }
 

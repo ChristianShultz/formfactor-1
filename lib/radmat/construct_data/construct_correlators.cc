@@ -6,7 +6,7 @@
 
  * Creation Date : 04-12-2012
 
- * Last Modified : Wed 23 Apr 2014 11:58:51 AM EDT
+ * Last Modified : Thu 24 Apr 2014 11:33:51 AM EDT
 
  * Created By : shultz
 
@@ -31,6 +31,8 @@
 
 #define TIME_CONSTRUCT_SINGLE_CORRS
 #define TIME_CONSTRUCT_ALL_CORRS
+
+#define USE_MEAN_CORRS_DEBUG_MODE 
 
 namespace radmat
 {
@@ -81,7 +83,13 @@ namespace radmat
         std::cout << __func__ << ": working on Q2 =" << qsq << std::endl;
 
         std::pair<bool , rHandle<LLSQLatticeMultiData> >  data;
+
+#ifdef USE_MEAN_CORRS_DEBUG_MODE 
+        std::cout << __func__ << ": WARNING COMPILED WITH MEAN CORRS, GARBAGE STATISTICS " << std::endl;
+        data = build_correlators_no_copy_Ncfg_mean_fast(corrs,sink_id,source_id,Z_V,db,50); 
+#else
         data = build_correlators_no_copy(corrs,sink_id,source_id,Z_V,db); 
+#endif 
 
 #ifdef TIME_CONSTRUCT_SINGLE_CORRS
         snoop.stop();

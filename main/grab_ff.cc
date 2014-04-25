@@ -6,7 +6,7 @@
 
  * Creation Date : 22-04-2013
 
- * Last Modified : Wed 23 Apr 2014 03:11:36 PM EDT
+ * Last Modified : Thu 24 Apr 2014 10:36:46 AM EDT
 
  * Created By : shultz
 
@@ -120,8 +120,8 @@ generate_tag( const chunk &l ,
 
   foo.mom_fac = mom_fac; 
 
-  foo.left_E = ensem_energy( l.E , 10 ); 
-  foo.right_E = ensem_energy( r.E , 10 ); 
+  foo.left_E = ensem_energy( l.E , 2 ); 
+  foo.right_E = ensem_energy( r.E , 2 ); 
 
   return foo;
 }

@@ -11,6 +11,8 @@
 #include <sstream>
 #include <complex>
 
+#define PRINT_RR_DECOMP
+
 namespace radmat
 {
 
@@ -57,6 +59,10 @@ namespace radmat
 
         ret = convertTensorUnderlyingType<std::complex<double>, double,1>(p_f + p_i); 
 
+#ifdef PRINT_RR_DECOMP
+        std::cout << "RRG1:" << " val " << val.value() << " pp " << ret << std::endl; 
+#endif
+
         return -( val.value() * ret ); 
       }
   };
@@ -102,8 +108,8 @@ namespace radmat
         val_a = contract(eps_left, applyMetric(p_right,metric,0),0,0);  
         val_b = contract(eps_right, applyMetric(p_left,metric,0),0,0);  
 
-#if 0 
-        std::cout << __func__ << ": pleft = " << p_left 
+#ifdef PRINT_RR_DECOMP
+        std::cout << "RRG2:" << ": pleft = " << p_left 
           << " pright = " << p_right 
           << " epsl = " << eps_left 
           << " epsr = " << eps_right 
@@ -161,6 +167,14 @@ namespace radmat
         mass = contract(p_right, applyMetric(p_right,metric,0),0,0); 
 
         ret = convertTensorUnderlyingType<std::complex<double>, double,1>(p_f + p_i); 
+
+#ifdef PRINT_RR_DECOMP
+        std::cout << "RRG3:" << " lh " << lh << " rh " << rh << std::endl;
+        std::cout << "pl " << p_f << " pr " << p_i << std::endl;
+        std::cout << " eps_left " << eps_left << " eps_r " << eps_right << std::endl; 
+        std::cout << "pp " << ret << std::endl; 
+#endif 
+
         // return - val_a.value() * val_b.value() * ret;
         return  - ( (val_a.value() * val_b.value() ) / (2.*mass.value()) ) * ret; 
       }

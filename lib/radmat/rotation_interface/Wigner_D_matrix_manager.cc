@@ -6,7 +6,7 @@
 
  * Creation Date : 14-04-2014
 
- * Last Modified : Wed 23 Apr 2014 01:31:57 PM EDT
+ * Last Modified : Fri 25 Apr 2014 12:12:05 PM EDT
 
  * Created By : shultz
 
@@ -32,6 +32,8 @@ namespace radmat
     std::complex<double> round_to_zero(const std::complex<double> &cd, const double thresh=1e-6)
     {return itpp::round_to_zero(cd,thresh); }
 
+    std::ostream & operator<<(std::ostream &o, const mom_t &p)
+    { return ( o << "p" << p[0] << p[1] << p[2]);}
 
     // a momentum key 
     struct wig_key
@@ -78,20 +80,20 @@ namespace radmat
       {
         if(l.x != r.x)
           return l.x < r.x; 
-        if(l.y != r.y)
+        else if(l.y != r.y)
           return l.y < r.y; 
-        return l.z < r.z; 
+        else
+          return l.z < r.z; 
       }
 
       bool operator()(const wig_pair_key &l, const wig_pair_key &r) const
       {
         if ( !!! exact_equivalence(l.l,r.l) )
           return this->operator()(l.l,r.l);
-
-        if( !!! exact_equivalence(l.r,r.r) )
+        else if( !!! exact_equivalence(l.r,r.r) )
           return this->operator()(l.r,r.r); 
-
-        return l.J < r.J; 
+        else
+          return l.J < r.J; 
       }
 
       bool exact_equivalence( const wig_key &l, const wig_key &r) const 
@@ -176,6 +178,26 @@ namespace radmat
       }
       return true; 
     }
+
+
+    mom_t mul_mom(const RotationMatrix_t *R,
+        const mom_t &x)
+    {
+      mom_t chk = gen_mom<0,0,0>();
+
+      for(int i = 0; i < 3; ++i)
+      {
+        double res(0.); 
+        for(int j = 0; j < 3; ++j)
+          if ( fabs( (*R)[i+1][j+1] ) > 1e-6 )
+            res += (*R)[i+1][j+1] * double(x[j]); 
+
+        chk[i] = (res > 0.) ? int( fabs(res) + 0.5 ) : - int( fabs(res) + 0.5 ); 
+      }
+
+      return chk;  
+    } 
+
 
   } // anonomyous 
 
@@ -276,7 +298,8 @@ namespace radmat
         const mom_t &l,
         const mom_t &r, 
         const int J,
-        bool use_map) const
+        const bool use_map,
+        const int print) const
     {
       int bound = 2*J+1; 
       WignerMatrix_t *W  = new WignerMatrix_t( (TensorShape<2>())[bound][bound] , std::complex<double>(0.,0.));   
@@ -294,10 +317,13 @@ namespace radmat
         }
 
         *W = it->second; 
+
       }
       else
       {
         std::pair<mom_t,mom_t> can = get_frame(l,r); 
+        check_throw_frame_err(R,std::make_pair(l,r),can);
+
         WignerMatrix_t *Wt,*Wn,*Wi; 
 
         Wt = wigner_matrix(R,J); 
@@ -313,9 +339,17 @@ namespace radmat
               for(int l = 0; l < bound; ++l)
                 (*W)[i][l] += (*Wi)[i][j] * (*Wt)[j][k] * (*Wn)[k][l];
 
-        //  dagger(W); 
         clean(W); 
 
+        if(print == 1)
+        {
+          clean(Wi); 
+          clean(Wt); 
+          clean(Wn); 
+          std::cout <<  "(*W)[i][l] += (*Wi)[i][j] * (*Wt)[j][k] * (*Wn)[k][l] "
+            << "\nWi: " << *Wi << "\nWt:" << *Wt << "\nWn:" << *Wn << std::endl;
+          std::cout << "W:" << *W << std::endl;
+        }
 
         delete Wt;
         delete Wn;
@@ -331,7 +365,8 @@ namespace radmat
         const mom_t &l, 
         const mom_t &r, 
         const int J,
-        bool use_map) const
+        const bool use_map,
+        const int print) const
     {
       int bound = 2*J+1; 
       WignerMatrix_t *W  = new WignerMatrix_t( (TensorShape<2>())[bound][bound] , std::complex<double>(0.,0.));   
@@ -350,12 +385,12 @@ namespace radmat
         }
 
         *W =  it->second; 
-
       }
       else
       {
         std::pair<mom_t,mom_t> can = get_frame(l,r); 
-        int bound = 2*J+1; 
+        check_throw_frame_err(R,std::make_pair(l,r),can);
+
         WignerMatrix_t *Wt,*Wk,*Wl; 
 
         Wt = wigner_matrix(R,J); 
@@ -370,8 +405,17 @@ namespace radmat
               for(int l = 0; l < bound; ++l)
                 (*W)[i][l] += (*Wl)[i][j] * (*Wt)[j][k] * (*Wk)[k][l];
 
-        //  dagger(W); 
         clean(W); 
+
+        if(print == 1)
+        {
+          clean(Wl); 
+          clean(Wt); 
+          clean(Wk); 
+          std::cout <<  "(*W)[i][l] += (*Wl)[i][j] * (*Wt)[j][k] * (*Wk)[k][l] "
+            << "\nWl: " << *Wl << "\nWt:" << *Wt << "\nWk:" << *Wk << std::endl;
+          std::cout << "W:" << *W << std::endl;
+        }
 
         delete Wt;
         delete Wl;

@@ -6,7 +6,7 @@
 
  * Creation Date : 22-02-2014
 
- * Last Modified : Tue 15 Apr 2014 11:17:51 AM EDT
+ * Last Modified : Fri 25 Apr 2014 04:33:30 PM EDT
 
  * Created By : shultz
 
@@ -39,15 +39,14 @@ namespace radmat
     {
       static void print(const std::string &msg)
       {}
-      //      {std::cout << "helicity form factors " << msg << std::endl;}
+      // {std::cout << "helicity form factors " << msg << std::endl;}
     };
 
 
     struct momrp_printer
     {
       static void print(const std::string &msg)
-      {}
-      // { std::cout << "momrp_printer " << msg << std::endl; }
+      { std::cout << "momrp_printer " << msg << std::endl; }
     };
 
     std::string to_string(const MomRowPair_t &p)

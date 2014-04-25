@@ -223,7 +223,7 @@ void LLSQMultiData<TT,ST>::splash_tags(void) const
 {
   typename std::vector<TT>::const_iterator tt; 
   for(tt = m_tags.begin(); tt != m_tags.end(); ++tt)
-    std::cout << tt->file_id;
+    std::cout << tt->file_id << std::endl;
 }
 
 
