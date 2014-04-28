@@ -6,7 +6,7 @@
 
  * Creation Date : 24-12-2013
 
- * Last Modified : Fri 25 Apr 2014 03:24:30 PM EDT
+ * Last Modified : Mon 28 Apr 2014 11:23:23 AM EDT
 
  * Created By : shultz
 
@@ -159,8 +159,8 @@ namespace radmat
     KEY can_key(const KEY &k, const int hl, const int hr, const int jmu)
     {
       DMatrixManager D;
-      RotationMatrix_t *Rtriad; 
-      Rtriad = D.rotation_matrix(k.left,k.right);
+      rCompEulAngles eul = D.rotation_matrix(k.left,k.right);
+      RotationMatrix_t *Rtriad = new RotationMatrix_t( genRotationMatrix(eul) ); 
       mom_t ll = mul_tran(Rtriad,k.left); 
       mom_t rr = mul_tran(Rtriad,k.right); 
       delete  Rtriad; 

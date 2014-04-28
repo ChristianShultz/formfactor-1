@@ -6,16 +6,16 @@
 
  * Creation Date : 09-12-2013
 
- * Last Modified : Sun 23 Feb 2014 10:34:23 AM EST
+ * Last Modified : Mon 28 Apr 2014 10:41:52 AM EDT
 
  * Created By : shultz
 
  _._._._._._._._._._._._._._._._._._._._._.*/
 
 #include "redstar_canonical_rotations.h"
-#include "hadron/irrep_util.h"
 #include <exception>
 #include "radmat/utils/printer.h"
+#include "radmat/utils/euler_angles.h"
 
 
 
@@ -44,14 +44,15 @@ namespace radmat
         RotationMatrix_t * 
         gen_rot_mat(void)
         {
-          return new RotationMatrix_t(genRotationMatrix(gen_mom<X,Y,Z>()));  
+          rEulAngles eul = get_euler_angles( gen_mom<X,Y,Z>() ); 
+          return new RotationMatrix_t(genRotationMatrix(eul));  
         }
 
       // Table VI of 1107.1930
       RotationMatrix_t * 
         gen_rot_ref_mat_D4()
         {
-          Hadron::CubicCanonicalRotation_t eul; 
+          rEulAngles eul; 
           eul.alpha = 0;
           eul.beta = 0; 
           eul.gamma = 0; 
@@ -62,7 +63,7 @@ namespace radmat
       RotationMatrix_t * 
         gen_rot_ref_mat_D2()
         {
-          Hadron::CubicCanonicalRotation_t eul; 
+          rEulAngles eul; 
           double pi = acos(-1); 
           eul.alpha = pi/2.;
           eul.beta = pi/4.; 
@@ -73,7 +74,7 @@ namespace radmat
       RotationMatrix_t * 
         gen_rot_ref_mat_D3()
         {
-          Hadron::CubicCanonicalRotation_t eul; 
+          rEulAngles eul; 
           eul.alpha = acos(-1)/4.;
           eul.beta = acos(1./sqrt(3)); 
           eul.gamma = 0; 

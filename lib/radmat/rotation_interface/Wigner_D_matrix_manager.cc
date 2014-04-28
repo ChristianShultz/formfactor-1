@@ -6,7 +6,7 @@
 
  * Creation Date : 14-04-2014
 
- * Last Modified : Fri 25 Apr 2014 12:12:05 PM EDT
+ * Last Modified : Mon 28 Apr 2014 12:54:19 PM EDT
 
  * Created By : shultz
 
@@ -142,9 +142,9 @@ namespace radmat
         mom_t l, r; 
         l = it->first.l.mom(); 
         r = it->first.r.mom(); 
-        RotationMatrix_t * R = Wigner.rotation_matrix(l,r); 
-        WignerMatrix_t * left = Wigner.left_wigner_matrix(R,l,r,J); 
-        WignerMatrix_t *right = Wigner.right_wigner_matrix(R,l,r,J); 
+        rCompEulAngles eul = Wigner.rotation_matrix(l,r); 
+        WignerMatrix_t * left = Wigner.left_wigner_matrix(eul,l,r,J); 
+        WignerMatrix_t *right = Wigner.right_wigner_matrix(eul,l,r,J); 
         wig_pair_key key(l,r,J); 
 
         //  std::stringstream ss; 
@@ -154,7 +154,6 @@ namespace radmat
         call_left_map()->insert(std::make_pair(key,*left)); 
         call_right_map()->insert(std::make_pair(key,*right)); 
 
-        delete R; 
         delete left; 
         delete right; 
       }
@@ -210,15 +209,20 @@ namespace radmat
 
   // there is a delta function that MUST be satisfied 
   void 
-    DMatrixManager::check_throw_frame_err(const RotationMatrix_t *R, 
+    DMatrixManager::check_throw_frame_err(const rCompEulAngles &eul, 
         const std::pair<mom_t,mom_t> &f, 
         const std::pair<mom_t,mom_t> &c) const
     {
+      RotationMatrix_t *R( new RotationMatrix_t( genRotationMatrix(eul) ) ); 
+
       if( !!! check_total_frame_transformation(R,f.first,f.second,c.first,c.second,true) )
       {
         std::cout << __func__ << ": throwing string " << std::endl;
+        delete R; 
         throw std::string("triad wigner rotation error"); 
       }
+
+      delete R; 
     }
 
   WignerMatrix_t* 
@@ -264,7 +268,7 @@ namespace radmat
         *it = round_to_zero( *it , thresh ); 
     }
 
-  RotationMatrix_t*
+  rCompEulAngles 
     DMatrixManager::rotation_matrix(const mom_t &l, const mom_t &r) const
     {
       std::pair<mom_t,mom_t> f  = get_frame(l,r); 
@@ -272,13 +276,11 @@ namespace radmat
     }
 
   WignerMatrix_t*
-    DMatrixManager::wigner_matrix(const RotationMatrix_t *R,
+    DMatrixManager::wigner_matrix(const rEulAngles &eul,
         const int J) const
     {
       int bound = 2*J+1; 
       WignerMatrix_t *W  = new WignerMatrix_t( (TensorShape<2>())[bound][bound] , std::complex<double>(0.,0.));   
-
-      Hadron::CubicCanonicalRotation_t eul = generate_euler_angles(R); 
 
       for(int m1 = -J; m1 <= J; ++m1)
         for(int m2 = -J; m2 <= J; ++m2)
@@ -288,13 +290,51 @@ namespace radmat
           (*W)[J-m1][J-m2] = round_to_zero(cd,1e-6); 
         }
 
+      // allow for us to treat this as tensor multiplication 
+      W->lower_index(1); 
+
+      return W; 
+    }
+
+  WignerMatrix_t*
+    DMatrixManager::wigner_matrix(const rCompEulAngles &eul, 
+        const int J) const
+    {
+      int bound = 2*J+1; 
+      WignerMatrix_t *W  = new WignerMatrix_t( (TensorShape<2>())[bound][bound] , std::complex<double>(0.,0.));   
+      WignerMatrix_t *tmp1; 
+      WignerMatrix_t tmp2; 
+
+      // identity 
+      for(int i =0; i < bound; ++i)
+        (*W)[i][i] = std::complex<double>(1.,0.); 
+
+      // so we can abuse the tensor contraction code
+      W->lower_index(1); 
+
+      rCompEulAngles::const_iterator e; 
+      for( e = eul.begin(); e != eul.end(); ++e)
+      {
+        // grab the pointer
+        tmp1 = wigner_matrix( *e, J ); 
+        
+        // make an actual copy 
+        tmp2 = *W ** tmp1 ; 
+
+        // kill the new 
+        delete tmp1; 
+
+        // copy into W 
+        *W = tmp2; 
+      }
+
       return W; 
     }
 
 
   // notation follows notes
   WignerMatrix_t* 
-    DMatrixManager::left_wigner_matrix(const RotationMatrix_t *R,
+    DMatrixManager::left_wigner_matrix(const rCompEulAngles &eul,
         const mom_t &l,
         const mom_t &r, 
         const int J,
@@ -322,11 +362,11 @@ namespace radmat
       else
       {
         std::pair<mom_t,mom_t> can = get_frame(l,r); 
-        check_throw_frame_err(R,std::make_pair(l,r),can);
+        check_throw_frame_err(eul,std::make_pair(l,r),can);
 
         WignerMatrix_t *Wt,*Wn,*Wi; 
 
-        Wt = wigner_matrix(R,J); 
+        Wt = wigner_matrix(eul,J); 
         Wn = radmat::WignerDMatrixEnv::call_factory(l,J);
         Wi = radmat::WignerDMatrixEnv::call_factory(can.first,J);
 
@@ -361,7 +401,7 @@ namespace radmat
 
   // notation follows notes
   WignerMatrix_t*
-    DMatrixManager::right_wigner_matrix(const RotationMatrix_t *R, 
+    DMatrixManager::right_wigner_matrix(const rCompEulAngles &eul, 
         const mom_t &l, 
         const mom_t &r, 
         const int J,
@@ -389,11 +429,11 @@ namespace radmat
       else
       {
         std::pair<mom_t,mom_t> can = get_frame(l,r); 
-        check_throw_frame_err(R,std::make_pair(l,r),can);
+        check_throw_frame_err(eul,std::make_pair(l,r),can);
 
         WignerMatrix_t *Wt,*Wk,*Wl; 
 
-        Wt = wigner_matrix(R,J); 
+        Wt = wigner_matrix(eul,J); 
         Wl = radmat::WignerDMatrixEnv::call_factory(r,J);
         Wk = radmat::WignerDMatrixEnv::call_factory(can.second,J);
 

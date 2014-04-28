@@ -6,7 +6,7 @@
 
  * Creation Date : 04-05-2013
 
- * Last Modified : Mon 09 Dec 2013 03:08:45 PM EST
+ * Last Modified : Mon 28 Apr 2014 11:35:11 AM EDT
 
  * Created By : shultz
 
@@ -16,10 +16,9 @@
 #include "polarization_tensors.h"
 #include "hadron/irrep_util.h"
 #include "hadron/clebsch.h"
-
 #include "semble/semble_meta.h"
-
 #include "tensor.h"
+#include "euler_angles.h"
 
 namespace radmat
 {
@@ -70,7 +69,7 @@ namespace radmat
       int lambda2 = -2*(lambda_row - 1) + J2; 
 
       // angles to rotate
-      Hadron::CubicCanonicalRotation_t rot;
+      rEulAngles rot;
 
       if((mom[0] == 0) && (mom[1] == 0) && (mom[2] == 0))
       {
@@ -78,7 +77,7 @@ namespace radmat
       }
       else
       {
-        rot = Hadron::cubicCanonicalRotation(mom); 
+        rot = get_euler_angles(mom); 
       }
 
       for(int i = 1; i <= 3; ++i)
@@ -145,7 +144,7 @@ namespace radmat
       eps.zeros();
 
       // angles to rotate
-      Hadron::CubicCanonicalRotation_t rot;
+      rEulAngles rot;
 
       if((mom[0] == 0) && (mom[1] == 0) && (mom[2] == 0))
       {
@@ -153,11 +152,11 @@ namespace radmat
       }
       else
       {
-        rot = Hadron::cubicCanonicalRotation(mom); 
+        rot = get_euler_angles(mom); 
       }
 
       Tensor<std::complex<double>, 2> RotMat;
-      RotMat = convertTensorUnderlyingType<std::complex<double> , double , 2 > (genRotationMatrix(mom));
+      RotMat = convertTensorUnderlyingType<std::complex<double> , double , 2 > (genRotationMatrix(rot));
       itpp::Mat<std::complex<double> > R(4,4); 
       R.zeros();
 

@@ -7,6 +7,7 @@
 #include "rotation_utils.h"
 #include "hadron/irrep_util.h"
 #include "radmat/utils/tensor.h"
+#include "radmat/utils/euler_angles.h"
 #include <complex>
 #include <sstream>
 
@@ -31,7 +32,7 @@ namespace radmat
           const mom_t &r) const ;
 
     virtual void 
-      check_throw_frame_err(const RotationMatrix_t* Rtriad, 
+      check_throw_frame_err(const rCompEulAngles &, 
           const std::pair<mom_t,mom_t> &f, 
           const std::pair<mom_t,mom_t> &can) const; 
 
@@ -52,16 +53,20 @@ namespace radmat
       clean(WignerMatrix_t *D, 
           const double thresh=1e-6) const;  
 
-    virtual RotationMatrix_t*
+    virtual rCompEulAngles
       rotation_matrix(const mom_t &l, 
           const mom_t &r) const; 
 
+    virtual WignerMatrix_t* 
+      wigner_matrix(const rEulAngles &, 
+          const int J) const; 
+
     virtual WignerMatrix_t*
-      wigner_matrix(const RotationMatrix_t *R, 
+      wigner_matrix(const rCompEulAngles &, 
           const int J) const;
 
     virtual WignerMatrix_t*
-      left_wigner_matrix(const RotationMatrix_t *R, 
+      left_wigner_matrix(const rCompEulAngles &, 
           const mom_t &l, 
           const mom_t &r, 
           const int J,
@@ -69,7 +74,7 @@ namespace radmat
           const int print=0) const; 
 
     virtual WignerMatrix_t*
-      right_wigner_matrix(const RotationMatrix_t *R,
+      right_wigner_matrix(const rCompEulAngles &,
           const mom_t &l, 
           const mom_t &r, 
           const int J,

@@ -2,6 +2,7 @@
 #define UTILS_H
 #include "aux.h"
 #include "debug_handler.h"
+#include "euler_angles.h"
 #include "handle.h"
 #include "harmonic.h"
 #include "levi_civita.h"

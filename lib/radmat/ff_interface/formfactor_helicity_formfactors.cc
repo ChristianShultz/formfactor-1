@@ -6,7 +6,7 @@
 
  * Creation Date : 22-02-2014
 
- * Last Modified : Fri 25 Apr 2014 04:33:30 PM EDT
+ * Last Modified : Mon 28 Apr 2014 01:02:58 PM EDT
 
  * Created By : shultz
 
@@ -46,7 +46,8 @@ namespace radmat
     struct momrp_printer
     {
       static void print(const std::string &msg)
-      { std::cout << "momrp_printer " << msg << std::endl; }
+      {}
+      // { std::cout << "momrp_printer " << msg << std::endl; }
     };
 
     std::string to_string(const MomRowPair_t &p)

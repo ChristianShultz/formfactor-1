@@ -6,7 +6,7 @@
 
  * Creation Date : 18-03-2014
 
- * Last Modified : Fri 25 Apr 2014 02:52:17 PM EDT
+ * Last Modified : Mon 28 Apr 2014 11:21:52 AM EDT
 
  * Created By : shultz
 
@@ -54,13 +54,13 @@ namespace radmat
     struct kgen_info_printer
     {
       static void print(const std::string &msg)
-       { std::cout << "kgen_info_printer " << msg << std::endl;}
+      { std::cout << "kgen_info_printer " << msg << std::endl;}
     };
 
     struct helicity_printer
     {
       static void print(const std::string &msg) 
-       { std::cout << "helicity_printer " << msg << std::endl; }
+      { std::cout << "helicity_printer " << msg << std::endl; }
     }; 
 
     std::string to_string(const int i)
@@ -96,7 +96,7 @@ namespace radmat
     WignerMatrix_t* 
       pull_wigner_matrix( const DMatrixManager &wig, 
           const ThreePointDataTag * tag, 
-          const RotationMatrix_t * R)
+          const rCompEulAngles &eul)
       {
         typedef radmat::LatticeRotationEnv::TheRotationGroupGenerator RG;  
 
@@ -118,7 +118,7 @@ namespace radmat
 
         WignerMatrix_t *Dq,*DR,*Dqc; 
 
-        DR = wig.wigner_matrix(R,1); 
+        DR = wig.wigner_matrix(eul,1); 
         Dq = radmat::WignerDMatrixEnv::call_factory(q,1); 
         Dqc = radmat::WignerDMatrixEnv::call_factory(qc,1); 
 
@@ -173,12 +173,14 @@ namespace radmat
         // get the phases associated with the rotation 
         DMatrixManager wig;
         WignerMatrix_t * D; 
-        RotationMatrix_t *R; 
+        rCompEulAngles eul ; 
 
-        R = wig.rotation_matrix(tag->left_mom,tag->right_mom); 
-        D = pull_wigner_matrix( wig, tag, R);   
+        eul = wig.rotation_matrix(tag->left_mom,tag->right_mom); 
+        D = pull_wigner_matrix( wig, tag, eul);   
         wig.clean(D); 
         wig.conjugate(D); 
+
+        RotationMatrix_t *R = new RotationMatrix_t( genRotationMatrix(eul) ); 
 
         // not going to worry about this case now  
         if( !!! PHOTON_CREATE ) 
@@ -236,12 +238,12 @@ namespace radmat
         }
 
 
-      //  printer_function<helicity_printer>( "\nmomc: " +  to_string(qc) ) ; 
-      //  printer_function<helicity_printer>( "\nmom: " +  to_string(tag->q) ) ; 
-      //  printer_function<helicity_printer>( "\n" +  to_string(eps) ) ; 
-      //  printer_function<helicity_printer>( " - KF \n" + to_string( KF.mean() ) ); 
-      //  printer_function<helicity_printer>( " - eps * KF\n" + to_string( ret.mean() ) ); 
-      //  std::cout << "D " << *D << std::endl;
+        //  printer_function<helicity_printer>( "\nmomc: " +  to_string(qc) ) ; 
+        //  printer_function<helicity_printer>( "\nmom: " +  to_string(tag->q) ) ; 
+        //  printer_function<helicity_printer>( "\n" +  to_string(eps) ) ; 
+        //  printer_function<helicity_printer>( " - KF \n" + to_string( KF.mean() ) ); 
+        //  printer_function<helicity_printer>( " - eps * KF\n" + to_string( ret.mean() ) ); 
+        //  std::cout << "D " << *D << std::endl;
 
         // clean up 
         delete D; 
@@ -294,7 +296,7 @@ namespace radmat
           const FFKinematicFactors_t::KinematicFactorMatrix &KF,
           const ThreePointDataTag * tag)
       {
-        
+
         printer_function<helicity_printer>( " - KF \n" + to_string( KF.mean() ) ); 
         return KF.getRow( tag->gamma_row ); 
       }
@@ -464,5 +466,65 @@ namespace radmat
     }
 
 
+  // the tag contains all knowledge ( well at least of the radmat related variety ) 
+  FFKinematicFactors_t::KinematicFactorMatrix 
+    FFKinematicFactors_t::genFactorsMat(const DataTagPrimitive * ptr)
+    {
+      const ThreePointDataTag * tag = dynamic_cast<const ThreePointDataTag*>(ptr); 
+      rHandle<FormFactorBase_t> mat_elem; 
+      mat_elem = FormFactorDecompositionFactoryEnv::callFactory( tag->mat_elem_id); 
+
+      // size params 
+      int nfacs = mat_elem->nFacs(); 
+      int nbins = tag->left_E.size(); 
+      FFKinematicFactors_t::KinematicFactorMatrix KF(nbins,4,nfacs); 
+      KF.zeros(); 
+
+      // scale down the energies, momentum have zero variance 
+      //   NB: need to use assignment here
+      ENSEM::EnsemReal left_E , right_E; 
+      left_E = ENSEM::rescaleEnsemDown( tag->left_E ); 
+      right_E = ENSEM::rescaleEnsemDown( tag->right_E ); 
+
+      // mom and row params 
+      ADATXML::Array<double> left_mom(3),right_mom(3); 
+      int left_row, right_row; 
+      left_row = tag->left_row; 
+      right_row = tag->right_row; 
+
+      // the momentum unit
+      double mom_factor = tag->mom_fac; 
+
+      for(int i =0; i < 3; ++i )
+      {
+        left_mom[i] = mom_factor * tag->left_mom[i]; 
+        right_mom[i] = mom_factor * tag->right_mom[i]; 
+      }
+
+      // this also checks size of righty vs size of lefty
+      POW2_ASSERT_DEBUG( (nbins == right_E.size()) && (nfacs > 0) );
+
+      printer_function<kgen_info_printer>(tag->mat_elem_id); 
+      printer_function<kgen_info_printer>("left_row " + to_string(left_row)); 
+      printer_function<kgen_info_printer>("right_row " + to_string(right_row)); 
+      printer_function<kgen_info_printer>("gamma_row " + to_string(tag->gamma_row)); 
+
+      //   // loop over cfgs and use the wrapper to operator()
+      //   for(int bin = 0; bin < nbins; bin++)
+      //     KF[bin] = mat_elem->wrapper( left_E.elem(bin) , left_mom , left_row,
+      //         right_E.elem(bin) , right_mom , right_row , mom_factor);
+
+      for(int bin = 0; bin < nbins; bin++)
+        KF[bin] = mat_elem->generate_ffs( 
+            mat_elem->to_mom_row_pair( ENSEM::toDouble(left_E.elem(bin)), left_mom, left_row), 
+            mat_elem->to_mom_row_pair( ENSEM::toDouble(right_E.elem(bin)), right_mom, right_row), 
+            mom_factor); 
+
+
+      // scale up return data
+      KF.rescaleSembleUp();
+
+      return KF; 
+    }
 
 } // radmat 

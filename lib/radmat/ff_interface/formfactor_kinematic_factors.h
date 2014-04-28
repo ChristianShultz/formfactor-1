@@ -26,6 +26,7 @@ namespace radmat
     virtual ~FFKinematicFactors_t(void) {} // handle cleans itself up
 
     virtual KinematicFactorRow genFactors(const DataTagPrimitive *);
+    virtual KinematicFactorMatrix genFactorsMat(const DataTagPrimitive *); 
   };
 
 } // radmat

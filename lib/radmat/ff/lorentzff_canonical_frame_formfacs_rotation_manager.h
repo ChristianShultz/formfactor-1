@@ -110,10 +110,11 @@ namespace radmat
           const double kick) const
       {
         std::pair<mom_t,mom_t> moms = pair_mom(lefty.first,righty.first,kick);  
-        RotationMatrix_t *R = rotation_matrix(moms.first,moms.second); 
+        rCompEulAngles eul = rotation_matrix(moms.first,moms.second); 
+        RotationMatrix_t *R = new RotationMatrix_t( genRotationMatrix(eul) );  
         std::pair<p4_t,p4_t> can_moms = can_mom(R,lefty.first,righty.first,kick); 
-        WignerMatrix_t * Wl = left_wigner_matrix(R,moms.first,moms.second,J_left);
-        WignerMatrix_t * Wr = right_wigner_matrix(R,moms.first,moms.second,J_right);
+        WignerMatrix_t * Wl = left_wigner_matrix(eul,moms.first,moms.second,J_left);
+        WignerMatrix_t * Wr = right_wigner_matrix(eul,moms.first,moms.second,J_right);
 
         this->conjugate(Wl); 
         this->conjugate(Wr); 

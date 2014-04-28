@@ -6,7 +6,7 @@
 
 * Creation Date : 14-04-2014
 
-* Last Modified : Tue 15 Apr 2014 10:13:46 AM EDT
+* Last Modified : Mon 28 Apr 2014 10:49:40 AM EDT
 
 * Created By : shultz
 
@@ -20,6 +20,7 @@ _._._._._._._._._._._._._._._._._._._._._.*/
 #include <sstream>
 #include <exception> 
 #include "radmat/utils/printer.h"
+#include "radmat/utils/euler_angles.h"
 
 
 namespace radmat
@@ -38,16 +39,7 @@ namespace radmat
 
       WignerMatrix_t W( (TensorShape<2>())[bound][bound] , std::complex<double>(0.,0.) ); 
 
-      Hadron::CubicCanonicalRotation_t eul;
-      if( (p[0] == 0) && (p[1] == 0) && (p[2] == 0) )
-      {
-        eul.alpha = 0.;
-        eul.beta = 0.;
-        eul.gamma = 0.; 
-      } 
-      else
-        eul = Hadron::cubicCanonicalRotation(p); 
-
+      rEulAngles eul = get_euler_angles(p); 
 
       for(int m1 = -J; m1 <= J; ++m1)
         for(int m2 = -J; m2 <= J; ++m2)

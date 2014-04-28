@@ -11,7 +11,7 @@
 #include <sstream>
 #include <complex>
 
-#define PRINT_RR_DECOMP
+// #define PRINT_RR_DECOMP
 
 namespace radmat
 {

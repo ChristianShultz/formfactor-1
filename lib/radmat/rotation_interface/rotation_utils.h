@@ -3,14 +3,13 @@
 
 
 #include "radmat/redstar_interface/redstar_canonical_rotations.h"
+#include "radmat/utils/euler_angles.h"
 #include "itpp/itbase.h"
 #include "hadron/irrep_util.h"
 
 
 namespace radmat
 {
-
-
   // Ax ?= b
   bool
     check_frame_transformation(const RotationMatrix_t *A,
@@ -38,8 +37,9 @@ namespace radmat
   //
   // R is generated from the lg rotations in adat as 
   // R = R_lat(first) * R^-1_lat(second)
-  RotationMatrix_t* 
+  rCompEulAngles 
     generate_frame_transformation(const mom_t &first, const mom_t &second);
+
 
   //  TRIaxial Attitude Determination 
   //    or some adat hackery 
@@ -55,14 +55,14 @@ namespace radmat
   //     they are in the same lg so 
   //     return
   //      generate_frame_transformation(l,ll)
-  RotationMatrix_t* 
+  rCompEulAngles 
     generate_rotation_matrix(const mom_t &l, const mom_t &r, 
         const mom_t &ll, const mom_t &rr); 
 
   // parameterize the triad rotaion in terms
   // of z-y-z euler angles 
-  Hadron::CubicCanonicalRotation_t
-    generate_euler_angles(const RotationMatrix_t*); 
+  rEulAngles 
+    generate_euler_angles(const RotationMatrix_t*, const bool chk=false); 
 
   // kill things below a thresh 
   void clean_up_rot_mat(RotationMatrix_t *);

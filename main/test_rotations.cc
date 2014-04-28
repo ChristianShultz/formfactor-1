@@ -6,7 +6,7 @@
 
 * Creation Date : 11-12-2013
 
-* Last Modified : Fri 25 Apr 2014 10:09:46 AM EDT
+* Last Modified : Mon 28 Apr 2014 12:39:19 PM EDT
 
 * Created By : shultz
 
@@ -296,7 +296,8 @@ void get_lattice_rotation(int argc, char *argv[])
     << " m2 " << string_mom(m2) << std::endl;
   std::cout << " returning R_lat * m1 = m2 " << std::endl;
 
-  RotationMatrix_t *r = radmat::generate_frame_transformation(m2,m1);
+   radmat::rCompEulAngles eul = radmat::generate_frame_transformation(m2,m1);
+  RotationMatrix_t *r = new RotationMatrix_t( genRotationMatrix(eul) ); 
 
   if( !!! radmat::check_frame_transformation(r, m1 , m2 ) )
   {
@@ -339,13 +340,14 @@ void get_frame_rotation(int argc, char *argv[])
   std::cout << "read m1 " << string_mom(m1) << " m2 " << string_mom(m2) 
     << " m_prime1 " << string_mom(ma) << " m_prime2 " << string_mom(mb) << std::endl;
 
-  RotationMatrix_t *rl = radmat::generate_frame_transformation(m1,ma);
-  RotationMatrix_t *rr = radmat::generate_frame_transformation(m2,mb);
-  std::cout << "Rleft:" << *rl << std::endl;
-  std::cout << "Rright:" << *rr << std::endl;
+   radmat::rCompEulAngles eul_l = radmat::generate_frame_transformation(m1,ma);
+   radmat::rCompEulAngles eul_r = radmat::generate_frame_transformation(m2,mb);
 
-  delete rl; 
-  delete rr; 
+  RotationMatrix_t rl = genRotationMatrix(eul_l); 
+  RotationMatrix_t rr = genRotationMatrix(eul_r); 
+  std::cout << "Rleft:" << rl << std::endl;
+  std::cout << "Rright:" << rr << std::endl;
+
 }
 
 
@@ -379,10 +381,10 @@ void get_left_triad_wigner(int argc, char *argv[])
   val >> J; 
 
   radmat::DMatrixManager Wig; 
-  radmat::RotationMatrix_t * Rtriad; 
-  Rtriad = Wig.rotation_matrix(l,r);
+  radmat::rCompEulAngles eul = Wig.rotation_matrix(l,r); 
+  radmat::RotationMatrix_t * Rtriad = new RotationMatrix_t( genRotationMatrix(eul) ); 
   radmat::WignerMatrix_t *D,*Dtriad; 
-  D = Wig.left_wigner_matrix(Rtriad,l,r,J,false,1); 
+  D = Wig.left_wigner_matrix(eul,l,r,J,false,1); 
 
   clean_up_rot_mat(Rtriad);
   Wig.clean(D); 
@@ -423,10 +425,11 @@ void get_right_triad_wigner(int argc, char *argv[])
 
 
   radmat::DMatrixManager Wig; 
-  radmat::RotationMatrix_t * Rtriad; 
-  Rtriad = Wig.rotation_matrix(l,r);
+  radmat::rCompEulAngles eul = Wig.rotation_matrix(l,r);
+  radmat::RotationMatrix_t * Rtriad(new RotationMatrix_t( genRotationMatrix(eul) )); 
+
   radmat::WignerMatrix_t *D,*Dtriad; 
-  D = Wig.right_wigner_matrix(Rtriad,l,r,J,false,1); 
+  D = Wig.right_wigner_matrix(eul,l,r,J,false,1); 
 
   clean_up_rot_mat(Rtriad);
   Wig.clean(D); 
@@ -460,8 +463,9 @@ void get_triad_rotation(int argc, char *argv[])
   read_momentum(5,r,argv);
 
   radmat::DMatrixManager Wig; 
-  radmat::RotationMatrix_t * Rtriad; 
-  Rtriad = Wig.rotation_matrix(l,r);
+  radmat::rCompEulAngles eul = Wig.rotation_matrix(l,r);
+  radmat::RotationMatrix_t * Rtriad( new RotationMatrix_t( genRotationMatrix(eul) ) ); 
+
   std::pair<radmat::mom_t,radmat::mom_t> frame; 
   frame = Wig.get_frame(l,r);
   std::cout << "canonical frame " << string_mom(frame.first) << " " 

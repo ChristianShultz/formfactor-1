@@ -119,7 +119,7 @@ am_libradmat_a_OBJECTS =  \
 	register_all.$(OBJEXT) rotation_group_generator.$(OBJEXT) \
 	rotation_utils.$(OBJEXT) Wigner_D_matrix_factory.$(OBJEXT) \
 	Wigner_D_matrix_manager.$(OBJEXT) aux.$(OBJEXT) \
-	harmonic.$(OBJEXT) mink_qsq.$(OBJEXT) \
+	euler_angles.$(OBJEXT) harmonic.$(OBJEXT) mink_qsq.$(OBJEXT) \
 	polarization_tensors.$(OBJEXT) pow2assert.$(OBJEXT) \
 	splash.$(OBJEXT) tensor.$(OBJEXT)
 libradmat_a_OBJECTS = $(am_libradmat_a_OBJECTS)
@@ -347,6 +347,7 @@ nobase_include_HEADERS = \
 													 radmat/rotation_interface/Wigner_D_matrix_manager.h    \
 													 radmat/utils/aux.h    \
 													 radmat/utils/debug_handler.h    \
+													 radmat/utils/euler_angles.h    \
 													 radmat/utils/handle.h    \
 													 radmat/utils/harmonic.h    \
 													 radmat/utils/levi_civita.h    \
@@ -421,6 +422,7 @@ libradmat_a_SOURCES = \
 											radmat/rotation_interface/Wigner_D_matrix_factory.cc    \
 											radmat/rotation_interface/Wigner_D_matrix_manager.cc    \
 											radmat/utils/aux.cc    \
+											radmat/utils/euler_angles.cc    \
 											radmat/utils/harmonic.cc    \
 											radmat/utils/mink_qsq.cc    \
 											radmat/utils/polarization_tensors.cc    \
@@ -519,6 +521,7 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/data_representation_three_point.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/data_tag_redstar_interface.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/data_tag_three_point.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/euler_angles.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/fit_tins.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/formfactor_cubic_formfactors.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/formfactor_factory.Po@am__quote@
@@ -1305,6 +1308,20 @@ aux.obj: radmat/utils/aux.cc
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='radmat/utils/aux.cc' object='aux.obj' libtool=no @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCXX_FALSE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o aux.obj `if test -f 'radmat/utils/aux.cc'; then $(CYGPATH_W) 'radmat/utils/aux.cc'; else $(CYGPATH_W) '$(srcdir)/radmat/utils/aux.cc'; fi`
+
+euler_angles.o: radmat/utils/euler_angles.cc
+@am__fastdepCXX_TRUE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT euler_angles.o -MD -MP -MF $(DEPDIR)/euler_angles.Tpo -c -o euler_angles.o `test -f 'radmat/utils/euler_angles.cc' || echo '$(srcdir)/'`radmat/utils/euler_angles.cc
+@am__fastdepCXX_TRUE@	$(am__mv) $(DEPDIR)/euler_angles.Tpo $(DEPDIR)/euler_angles.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='radmat/utils/euler_angles.cc' object='euler_angles.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o euler_angles.o `test -f 'radmat/utils/euler_angles.cc' || echo '$(srcdir)/'`radmat/utils/euler_angles.cc
+
+euler_angles.obj: radmat/utils/euler_angles.cc
+@am__fastdepCXX_TRUE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT euler_angles.obj -MD -MP -MF $(DEPDIR)/euler_angles.Tpo -c -o euler_angles.obj `if test -f 'radmat/utils/euler_angles.cc'; then $(CYGPATH_W) 'radmat/utils/euler_angles.cc'; else $(CYGPATH_W) '$(srcdir)/radmat/utils/euler_angles.cc'; fi`
+@am__fastdepCXX_TRUE@	$(am__mv) $(DEPDIR)/euler_angles.Tpo $(DEPDIR)/euler_angles.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='radmat/utils/euler_angles.cc' object='euler_angles.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o euler_angles.obj `if test -f 'radmat/utils/euler_angles.cc'; then $(CYGPATH_W) 'radmat/utils/euler_angles.cc'; else $(CYGPATH_W) '$(srcdir)/radmat/utils/euler_angles.cc'; fi`
 
 harmonic.o: radmat/utils/harmonic.cc
 @am__fastdepCXX_TRUE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT harmonic.o -MD -MP -MF $(DEPDIR)/harmonic.Tpo -c -o harmonic.o `test -f 'radmat/utils/harmonic.cc' || echo '$(srcdir)/'`radmat/utils/harmonic.cc

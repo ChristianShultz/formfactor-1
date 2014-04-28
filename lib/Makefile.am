@@ -109,6 +109,7 @@ nobase_include_HEADERS =   \
 													 radmat/rotation_interface/Wigner_D_matrix_manager.h    \
 													 radmat/utils/aux.h    \
 													 radmat/utils/debug_handler.h    \
+													 radmat/utils/euler_angles.h    \
 													 radmat/utils/handle.h    \
 													 radmat/utils/harmonic.h    \
 													 radmat/utils/levi_civita.h    \
@@ -184,6 +185,7 @@ libradmat_a_SOURCES =	\
 											radmat/rotation_interface/Wigner_D_matrix_factory.cc    \
 											radmat/rotation_interface/Wigner_D_matrix_manager.cc    \
 											radmat/utils/aux.cc    \
+											radmat/utils/euler_angles.cc    \
 											radmat/utils/harmonic.cc    \
 											radmat/utils/mink_qsq.cc    \
 											radmat/utils/polarization_tensors.cc    \

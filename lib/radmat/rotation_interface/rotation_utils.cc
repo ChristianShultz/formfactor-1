@@ -6,7 +6,7 @@
 
  * Creation Date : 14-04-2014
 
- * Last Modified : Thu 24 Apr 2014 02:13:44 PM EDT
+ * Last Modified : Mon 28 Apr 2014 10:46:00 AM EDT
 
  * Created By : shultz
 
@@ -19,6 +19,7 @@
 #include "radmat/utils/levi_civita.h"
 #include "radmat/utils/tensor.h"
 #include "radmat/utils/printer.h"
+#include "radmat/utils/euler_angles.h"
 #include <sstream>
 
 namespace radmat
@@ -124,9 +125,11 @@ namespace radmat
 
   // returns R_p*R_pp^-1 -- a rotation from pp to ref followed by a rotation 
   // from ref to the vector p 
-  RotationMatrix_t*
+  rCompEulAngles 
     generate_frame_transformation(const mom_t &p, const mom_t &pp)
     {
+      rCompEulAngles ret; 
+
       if( dot_mom_t(p,p) != dot_mom_t(pp,pp) )
       {
         std::cout << __func__ << ": error, frames are unrelated " 
@@ -135,59 +138,31 @@ namespace radmat
         exit(1); 
       }
 
-      RotationMatrix_t *R = new Tensor<double,2>( (TensorShape<2>())[4][4], 0.); 
-      RotationMatrix_t *Rp = radmat::CanonicalLatticeRotationEnv::call_factory(p);
-      RotationMatrix_t *Rpp = radmat::CanonicalLatticeRotationEnv::call_factory(pp);
-      R->lower_index(1); 
+      ret.push_back( get_euler_angles(p) ); 
+      ret.push_back( inverse( get_euler_angles(pp) ) ); 
 
-      for(int i = 0; i < 4; ++i)
-        for(int j = 0; j < 4; ++j)
-          for(int k = 0; k < 4; ++k)
-            (*R)[i][k] += (*Rp)[i][j] * (*Rpp)[k][j]; 
-
-      delete Rp;
-      delete Rpp; 
-
-      //     if( !!! check_frame_transformation(R,pp,p) )
-      //     {
-      //       std::cout << __func__ << ": error transforming frames "
-      //         << "\np" << string_mom(p) << " pp " << string_mom(pp) 
-      //         << " p = Rpp\nR:" << *R << std::endl;
-      //       delete R; 
-      //       exit(1); 
-      //     }
-
-      clean_up_rot_mat(R); 
-
-      return R; 
+      return ret; 
     }
 
   //////////////////////////////////////////
   //////////////////////////////////////////
 
   // generate an orthogonal transformation 
-  RotationMatrix_t*
+  rCompEulAngles
     generate_rotation_matrix(const mom_t &l, 
         const mom_t &r,
         const mom_t &ll, 
         const mom_t &rr)
     {
-      RotationMatrix_t *R = new Tensor<double,2>( (TensorShape<2>())[4][4], 0.); 
-      (*R)[0][0] = 1.; 
-      R->lower_index(1); 
+      rCompEulAngles ret; 
 
       if( is_rest(l) )
       {
         if( is_rest(r) )
         {
-          (*R)[1][1] = 1.;
-          (*R)[2][2] = 1.;
-          (*R)[3][3] = 1.;
-
-          return R; 
+          ret.push_back( rEulAngles(0.,0.,0.) ); 
+          return ret; 
         }
-
-        delete R; 
 
         return generate_frame_transformation(r,rr); 
       }
@@ -195,7 +170,6 @@ namespace radmat
       // left is not at rest else we would be in the statement above
       if ( is_rest(r) )
       {
-        delete R; 
         return generate_frame_transformation(l,ll); 
       }
 
@@ -204,7 +178,6 @@ namespace radmat
       // if colinear then cross product is garbage
       if( colinear_momentum(l,r) && colinear_momentum(ll,rr) )
       {
-        delete R; 
         return generate_frame_transformation(l,ll); 
       }
 
@@ -228,6 +201,11 @@ namespace radmat
       wm = (w1 - w2)/sqrt(itpp::sum_sqr(w1 - w2));
       wc = itpp::cross(wp,wm); 
 
+
+      RotationMatrix_t *R = new Tensor<double,2>( (TensorShape<2>())[4][4], 0.); 
+      (*R)[0][0] = 1.; 
+      R->lower_index(1); 
+
       // outter product produces an orthogonal transformation 
       // that maps from one frame to the other (rotation matrix)
       for(int i =0; i < 3; ++i)
@@ -242,7 +220,12 @@ namespace radmat
       //   R*l = ll;
       //   R*r = rr; 
 
-      return R; 
+      // true means do a check 
+      ret = generate_euler_angles( R , true); 
+      
+      delete R; 
+
+      return ret; 
     }
 
   //////////////////////////////////////////
@@ -260,8 +243,8 @@ namespace radmat
   //      Eul[a,b,c] // MatrixForm 
   //
   // NB: This is not unique 
-  Hadron::CubicCanonicalRotation_t
-    generate_euler_angles(const RotationMatrix_t *R)
+  rEulAngles 
+    generate_euler_angles(const RotationMatrix_t *R, const bool chk)
     {
       double alpha,beta,gamma;
 
@@ -291,29 +274,29 @@ namespace radmat
         gamma = 0; 
       }      
 
-      Hadron::CubicCanonicalRotation_t e;
-      e.alpha = alpha;
-      e.beta = beta;
-      e.gamma = gamma;
+      rEulAngles e(alpha,beta,gamma); 
 
-      Tensor<double,2> Re = genRotationMatrix(e); 
-      for(int i = 0; i < 4; ++i)
-        for(int j = 0; j < 4; ++j)
-        {
-          if( fabs( Re[i][j] - (*R)[i][j] ) > 1e-6)
+      if( chk )
+      {
+        Tensor<double,2> Re = genRotationMatrix(e); 
+        for(int i = 0; i < 4; ++i)
+          for(int j = 0; j < 4; ++j)
           {
-            clean_up_rot_mat(&Re); 
-            RotationMatrix_t foo = *R;
-            clean_up_rot_mat(&foo); 
-            std::cout << __func__ << ": failed to extract the"
-              << " correct euler angles Rtarget = " << foo
-              << "\nR_eul = " << Re << "\n euler angles: "
-              << "alpha " << e.alpha << " beta " << e.beta 
-              << " gamma " << e.gamma << std::endl;
-            throw std::string("incorrect euler angles error"); 
-            exit(1);  
+            if( fabs( Re[i][j] - (*R)[i][j] ) > 1e-6)
+            {
+              clean_up_rot_mat(&Re); 
+              RotationMatrix_t foo = *R;
+              clean_up_rot_mat(&foo); 
+              std::cout << __func__ << ": failed to extract the"
+                << " correct euler angles Rtarget = " << foo
+                << "\nR_eul = " << Re << "\n euler angles: "
+                << "alpha " << e.alpha << " beta " << e.beta 
+                << " gamma " << e.gamma << std::endl;
+              throw std::string("incorrect euler angles error"); 
+              exit(1);  
+            }
           }
-        }
+      } // check 
 
       return e; 
     }
@@ -421,10 +404,11 @@ namespace radmat
         + " right " + string_mom(right) 
         + " rright " + string_mom(rright) );
 
-
-
     // R *ll = l && R *rr = r -- doesnt work for rest
-    RotationMatrix_t *Rtriad = generate_rotation_matrix(left,right,lleft,rright); 
+    rCompEulAngles eul = generate_rotation_matrix(left,right,lleft,rright); 
+    RotationMatrix_t *Rtriad( new RotationMatrix_t( genRotationMatrix(eul) ) ); 
+
+
     // check that the frame transformation actually works
     success &= check_total_frame_transformation(Rtriad,left,right,lleft,rright,false); 
 

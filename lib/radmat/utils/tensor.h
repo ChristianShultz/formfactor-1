@@ -94,12 +94,6 @@ namespace radmat
   //! diag(+,---) -- indicies raised
   Tensor<double,2> g_uu(void);
 
-  // R^mu_nu ( 0 index is up, 1 index is down ) 
-  Tensor<double,2> genRotationMatrix(const XMLArray::Array<int> &mom);
-
-  Tensor<double,2> genRotationMatrix(const Hadron::CubicCanonicalRotation_t &); 
-
-  Tensor<double,2> genRotationMatrix3D(const XMLArray::Array<int> &mom);
 
   /////////////////////////////////////////////////////////////////////////////////////////////////////////
   /////////////////////////////////////////////////////////////////////////////////////////////////////////
