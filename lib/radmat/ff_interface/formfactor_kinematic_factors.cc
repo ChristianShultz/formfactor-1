@@ -6,7 +6,7 @@
 
  * Creation Date : 18-03-2014
 
- * Last Modified : Tue 29 Apr 2014 12:48:14 PM EDT
+ * Last Modified : Tue 29 Apr 2014 03:38:57 PM EDT
 
  * Created By : shultz
 
@@ -32,7 +32,7 @@
 
 
 // zero variance decomp 
-#define MEAN_KINEMATIC_FACTORS
+// #define MEAN_KINEMATIC_FACTORS
 
 namespace radmat
 {
