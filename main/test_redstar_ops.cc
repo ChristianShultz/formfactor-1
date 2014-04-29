@@ -6,7 +6,7 @@
 
  * Creation Date : 8-122013
 
- * Last Modified : Mon 14 Apr 2014 06:03:52 PM EDT
+ * Last Modified : Mon 28 Apr 2014 04:26:30 PM EDT
 
  * Created By : shultz
 
@@ -1005,7 +1005,7 @@ void related_by_rotation(int argc, char *argv[])
   std::vector<radmat::mom_pair_key> frames; 
   std::vector<radmat::mom_pair_key>::const_iterator frame_it; 
   std::map<radmat::mom_pair_key,radmat::mom_pair_key,radmat::mom_key_comp>::const_iterator it; 
-  std::pair<radmat::mom_t,radmat::mom_t> canonical = radmat::LatticeRotationEnv::rotation_group_key(p1,p2); 
+  std::pair<radmat::mom_t,radmat::mom_t> canonical = radmat::LatticeRotationEnv::rotation_group_can_mom(p1,p2); 
   radmat::mom_pair_key canonical_key( radmat::mom_key(canonical.first) , radmat::mom_key(canonical.second)); 
 
   typedef radmat::LatticeRotationEnv::TheRotationGroupGenerator RG; 

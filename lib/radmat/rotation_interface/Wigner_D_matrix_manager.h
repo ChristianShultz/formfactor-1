@@ -8,6 +8,7 @@
 #include "hadron/irrep_util.h"
 #include "radmat/utils/tensor.h"
 #include "radmat/utils/euler_angles.h"
+#include "rotation_group_generator.h"
 #include <complex>
 #include <sstream>
 
@@ -27,7 +28,7 @@ namespace radmat
       return ss.str(); 
     }
 
-    virtual std::pair<mom_t,mom_t> 
+    mom_pair_key
       get_frame(const mom_t &l, 
           const mom_t &r) const ;
 

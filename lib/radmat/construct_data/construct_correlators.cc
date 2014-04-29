@@ -6,7 +6,7 @@
 
  * Creation Date : 04-12-2012
 
- * Last Modified : Thu 24 Apr 2014 11:33:51 AM EDT
+ * Last Modified : Tue 29 Apr 2014 12:53:06 PM EDT
 
  * Created By : shultz
 
@@ -32,6 +32,7 @@
 #define TIME_CONSTRUCT_SINGLE_CORRS
 #define TIME_CONSTRUCT_ALL_CORRS
 
+// actually uses a subset since fitting fails with zero variance 
 #define USE_MEAN_CORRS_DEBUG_MODE 
 
 namespace radmat

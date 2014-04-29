@@ -28,7 +28,7 @@ namespace radmat
 
 
   struct RhoRhoG1
-    : public FormFacRotationManager<RhoRhoG1, std::complex<double> , 1, 1>,
+    : public FormFacRotationManager<RhoRhoG1, std::complex<double> , 1, 1, AVERAGE_MASSES >,
     public leftSpinPTensor<1> , 
     public rightSpinPTensor<1>
   {
@@ -60,7 +60,7 @@ namespace radmat
         ret = convertTensorUnderlyingType<std::complex<double>, double,1>(p_f + p_i); 
 
 #ifdef PRINT_RR_DECOMP
-        std::cout << "RRG1:" << " val " << val.value() << " pp " << ret << std::endl; 
+        //  std::cout << "RRG1:" << " val " << val.value() << " pp " << ret << std::endl; 
 #endif
 
         return -( val.value() * ret ); 
@@ -74,7 +74,7 @@ namespace radmat
   REGISTER_STRINGIFY_TYPE( RhoRhoG2 ); 
 
   struct RhoRhoG2 
-    : public FormFacRotationManager<RhoRhoG2, std::complex<double> , 1 , 1>,
+    : public FormFacRotationManager<RhoRhoG2, std::complex<double> , 1 , 1,AVERAGE_MASSES>,
     public leftSpinPTensor<1> , 
     public rightSpinPTensor<1>
   {
@@ -109,12 +109,12 @@ namespace radmat
         val_b = contract(eps_right, applyMetric(p_left,metric,0),0,0);  
 
 #ifdef PRINT_RR_DECOMP
-        std::cout << "RRG2:" << ": pleft = " << p_left 
-          << " pright = " << p_right 
-          << " epsl = " << eps_left 
-          << " epsr = " << eps_right 
-          << " el.pr = " << val_a.value() << "     er.pl = " << val_b.value() 
-          << std::endl;  
+        //  std::cout << "RRG2:" << ": pleft = " << p_left 
+        //    << " pright = " << p_right 
+        //    << " epsl = " << eps_left 
+        //    << " epsr = " << eps_right 
+        //    << " el.pr = " << val_a.value() << "     er.pl = " << val_b.value() 
+        //    << std::endl;  
 #endif 
 
         ret = val_a.value() * eps_right + val_b.value() * eps_left; 
@@ -131,7 +131,7 @@ namespace radmat
   REGISTER_STRINGIFY_TYPE(RhoRhoG3); 
 
   struct RhoRhoG3 
-    : public FormFacRotationManager<RhoRhoG3, std::complex<double> , 1, 1>,
+    : public FormFacRotationManager<RhoRhoG3, std::complex<double> , 1, 1,AVERAGE_MASSES>,
     public leftSpinPTensor<1> , 
     public rightSpinPTensor<1>
   {
@@ -170,9 +170,11 @@ namespace radmat
 
 #ifdef PRINT_RR_DECOMP
         std::cout << "RRG3:" << " lh " << lh << " rh " << rh << std::endl;
-        std::cout << "pl " << p_f << " pr " << p_i << std::endl;
-        std::cout << " eps_left " << eps_left << " eps_r " << eps_right << std::endl; 
-        std::cout << "pp " << ret << std::endl; 
+        std::cout << "pl " << p_f 
+          << " pr " << p_i 
+          << " eps_left " << eps_left 
+          << " eps_r " << eps_right 
+          << " pp " << ret << std::endl; 
 #endif 
 
         // return - val_a.value() * val_b.value() * ret;
@@ -254,214 +256,214 @@ namespace radmat
     RhoRho(const LorentzFFAbsBase_t::LorentzFFAbs_list ); 
   };
 
-//
-// MULTIPOLE BASIS
-//
+  //
+  // MULTIPOLE BASIS
+  //
 
-//  //////////////////////////////////////////////////////////////////
-//  //////////////////////////////////////////////////////////////////
-//
-//  struct RhoRhoEtaGen
-//  {
-//    double operator()(const Tensor<double,1> &l, const Tensor<double,1> &r)
-//    {
-//      Tensor<double,2 > metric = g_dd(); 
-//      Tensor<double,0 > Q2 = contract( l-r, applyMetric(l-r,metric,0) , 0, 0); 
-//      Tensor<double,0 > mass = contract(r, applyMetric(l,metric,0) ,0,0); 
-//
-//      //  Tensor<double,0 > ml = contract(l, applyMetric(l,metric,0) ,0,0); 
-//      //  Tensor<double,0 > mr = contract(r, applyMetric(r,metric,0) ,0,0); 
-//      //  // average over irrep splitting ( Q^2 / 4 m^2 ) 
-//      //  return -Q2.value() / ( 2. *( ml.value() + mr.value() ) );  
-//      
-//      return -Q2.value() / ( 4. * mass.value() ) ;  
-//    }
-//  }; 
-//
-//  //////////////////////////////////////////////////////////////////
-//  //////////////////////////////////////////////////////////////////
-//
-//
-//  struct RhoRhoGC; 
-//  REGISTER_STRINGIFY_TYPE( RhoRhoGC ); 
-//
-//  struct RhoRhoGC
-//    : public FFAbsBlockBase_t<std::complex<double> >
-//  {
-//    typedef std::complex<double> Data_t;
-//    virtual ~RhoRhoGC() {}
-//
-//    virtual std::string ff() const {return "";}
-//
-//    virtual std::string id() const {return Stringify<RhoRhoGC>(); }
-//
-//    virtual Tensor<Data_t,1> 
-//      operator()(const MomRowPair_t &lefty, 
-//          const MomRowPair_t &righty, 
-//          const double mom_fac) const
-//      {
-//        RhoRhoEtaGen eg; 
-//        double eta = eg(lefty.first,righty.first); 
-//        double two_thirds_eta = eta*2./3.;
-//
-//        std::complex<double> g1coeff = std::complex<double>( 1. + two_thirds_eta, 0.); 
-//        std::complex<double> g2coeff = std::complex<double>( -two_thirds_eta, 0.); 
-//        std::complex<double> g3coeff = std::complex<double>( two_thirds_eta*( 1. + eta), 0.); 
-//
-//        RhoRhoG1 G1; 
-//        RhoRhoG2 G2; 
-//        RhoRhoG3 G3; 
-//
-//        return g1coeff * G1(lefty,righty,mom_fac) 
-//          + g2coeff * G2(lefty,righty,mom_fac)
-//          + g3coeff * G3(lefty,righty,mom_fac); 
-//      }
-//
-//  };
-//
-//
-//
-//  //////////////////////////////////////////////////////////////////
-//  //////////////////////////////////////////////////////////////////
-//
-//
-//  struct RhoRhoGM; 
-//  REGISTER_STRINGIFY_TYPE( RhoRhoGM ); 
-//
-//  struct RhoRhoGM
-//    : public FFAbsBlockBase_t<std::complex<double> >
-//  {
-//    typedef std::complex<double> Data_t;
-//    virtual ~RhoRhoGM() {}
-//
-//    virtual std::string ff() const {return "";}
-//
-//    virtual std::string id() const {return Stringify<RhoRhoGM>(); }
-//
-//    virtual Tensor<Data_t,1> 
-//      operator()(const MomRowPair_t &lefty, 
-//          const MomRowPair_t &righty, 
-//          const double mom_fac) const
-//      {
-//        std::complex<double> g2coeff = std::complex<double>( -1., 0.); 
-//
-//        RhoRhoG2 G2; 
-//
-//        return g2coeff * G2(lefty,righty,mom_fac);
-//      }
-//
-//  };
-//
-//
-//  //////////////////////////////////////////////////////////////////
-//  //////////////////////////////////////////////////////////////////
-//
-//
-//  struct RhoRhoGQ; 
-//  REGISTER_STRINGIFY_TYPE( RhoRhoGQ ); 
-//
-//  struct RhoRhoGQ
-//    : public FFAbsBlockBase_t<std::complex<double> >
-//  {
-//    typedef std::complex<double> Data_t;
-//    virtual ~RhoRhoGQ() {}
-//
-//    virtual std::string ff() const {return "";}
-//
-//    virtual std::string id() const {return Stringify<RhoRhoGQ>(); }
-//
-//    virtual Tensor<Data_t,1> 
-//      operator()(const MomRowPair_t &lefty, 
-//          const MomRowPair_t &righty, 
-//          const double mom_fac) const
-//      {
-//        RhoRhoEtaGen eg; 
-//        double eta = eg(lefty.first,righty.first); 
-//
-//        std::complex<double> g1coeff = std::complex<double>( 1. , 0.); 
-//        std::complex<double> g2coeff = std::complex<double>( -1., 0.); 
-//        std::complex<double> g3coeff = std::complex<double>(  1. + eta, 0.); 
-//
-//        RhoRhoG1 G1; 
-//        RhoRhoG2 G2; 
-//        RhoRhoG3 G3; 
-//
-//        return g1coeff * G1(lefty,righty,mom_fac) 
-//          + g2coeff * G2(lefty,righty,mom_fac)
-//          + g3coeff * G3(lefty,righty,mom_fac); 
-//      }
-//
-//  };
-//
-//  //////////////////////////////////////////////////////////////////
-//  //////////////////////////////////////////////////////////////////
-//
-//  template<int embedl, int embedr>
-//    LorentzFFAbsBase_t::LorentzFFAbs_list RhoRhoGenListMultipole()
-//    {
-//      LorentzFFAbsBase_t::LorentzFFAbs_list retRhoRho; 
-//      LorentzFFAbsBase_t::BBType *gc , *gm, *gq; 
-//
-//      try
-//      {
-//        gc = new radmat::RhoRhoGC();
-//        gm = new radmat::RhoRhoGM();
-//        gq = new radmat::RhoRhoGQ();
-//
-//        POW2_ASSERT( gc );
-//        POW2_ASSERT( gm );
-//        POW2_ASSERT( gq );
-//
-//        retRhoRho.push_back(LorentzFFAbsBase_t::BBHandle_t(gc)); 
-//        retRhoRho.push_back(LorentzFFAbsBase_t::BBHandle_t(gm)); 
-//        retRhoRho.push_back(LorentzFFAbsBase_t::BBHandle_t(gq)); 
-//      }
-//      catch(...)
-//      {
-//        POW2_ASSERT(false); 
-//      } 
-//
-//      return retRhoRho;
-//    }
-//
-//
-//
-//  template<int embedl,int embedr> struct RhoRhoMultipole; 
-//  REGISTER_STRINGIFY_TYPE2( RhoRhoMultipole<1,1> ); 
-//
-//
-//  //////////////////////////////////////////////////////////////////
-//  //////////////////////////////////////////////////////////////////
-//  template<int embedl, int embedr>
-//    struct RhoRhoMultipole : public LorentzFFAbsBase_t
-//  {
-//    RhoRhoMultipole()
-//      : LorentzFFAbsBase_t(radmat::RhoRhoGenListMultipole<embedl,embedr>())
-//    { }
-//
-//    RhoRhoMultipole& operator=(const RhoRhoMultipole &o)
-//    {
-//      if (this != &o)
-//        LorentzFFAbsBase_t::operator=(o);
-//
-//      return *this; 
-//    }
-//
-//    RhoRhoMultipole(const RhoRhoMultipole &o)
-//      : LorentzFFAbsBase_t(o)
-//    {  }
-//
-//    virtual ~RhoRhoMultipole() {}
-//
-//    virtual std::string reg_id() const { return Stringify< RhoRhoMultipole<embedl,embedr> >(); }
-//    virtual int left_spin() const { return embedl; }
-//    virtual int right_spin() const { return embedr; }
-//    virtual LorentzFFAbsBase_t * clone() const { return new RhoRhoMultipole(); }
-//
-//    private: 
-//    RhoRhoMultipole(const LorentzFFAbsBase_t::LorentzFFAbs_list &); 
-//    RhoRhoMultipole(const LorentzFFAbsBase_t::LorentzFFAbs_list ); 
-//  };
+  //////////////////////////////////////////////////////////////////
+  //////////////////////////////////////////////////////////////////
+
+  struct RhoRhoEtaGen
+  {
+    double operator()(const Tensor<double,1> &l, const Tensor<double,1> &r)
+    {
+      Tensor<double,2 > metric = g_dd(); 
+      Tensor<double,0 > Q2 = contract( l-r, applyMetric(l-r,metric,0) , 0, 0); 
+      Tensor<double,0 > mass = contract(r, applyMetric(l,metric,0) ,0,0); 
+
+      //  Tensor<double,0 > ml = contract(l, applyMetric(l,metric,0) ,0,0); 
+      //  Tensor<double,0 > mr = contract(r, applyMetric(r,metric,0) ,0,0); 
+      //  // average over irrep splitting ( Q^2 / 4 m^2 ) 
+      //  return -Q2.value() / ( 2. *( ml.value() + mr.value() ) );  
+
+      return -Q2.value() / ( 4. * mass.value() ) ;  
+    }
+  }; 
+
+  //////////////////////////////////////////////////////////////////
+  //////////////////////////////////////////////////////////////////
+
+
+  struct RhoRhoGC; 
+  REGISTER_STRINGIFY_TYPE( RhoRhoGC ); 
+
+  struct RhoRhoGC
+    : public FFAbsBlockBase_t<std::complex<double> >
+  {
+    typedef std::complex<double> Data_t;
+    virtual ~RhoRhoGC() {}
+
+    virtual std::string ff() const {return "";}
+
+    virtual std::string id() const {return Stringify<RhoRhoGC>(); }
+
+    virtual Tensor<Data_t,1> 
+      operator()(const MomRowPair_t &lefty, 
+          const MomRowPair_t &righty, 
+          const double mom_fac) const
+      {
+        RhoRhoEtaGen eg; 
+        double eta = eg(lefty.first,righty.first); 
+        double two_thirds_eta = eta*2./3.;
+
+        std::complex<double> g1coeff = std::complex<double>( 1. + two_thirds_eta, 0.); 
+        std::complex<double> g2coeff = std::complex<double>( -two_thirds_eta, 0.); 
+        std::complex<double> g3coeff = std::complex<double>( two_thirds_eta*( 1. + eta), 0.); 
+
+        RhoRhoG1 G1; 
+        RhoRhoG2 G2; 
+        RhoRhoG3 G3; 
+
+        return g1coeff * G1(lefty,righty,mom_fac) 
+          + g2coeff * G2(lefty,righty,mom_fac)
+          + g3coeff * G3(lefty,righty,mom_fac); 
+      }
+
+  };
+
+
+
+  //////////////////////////////////////////////////////////////////
+  //////////////////////////////////////////////////////////////////
+
+
+  struct RhoRhoGM; 
+  REGISTER_STRINGIFY_TYPE( RhoRhoGM ); 
+
+  struct RhoRhoGM
+    : public FFAbsBlockBase_t<std::complex<double> >
+  {
+    typedef std::complex<double> Data_t;
+    virtual ~RhoRhoGM() {}
+
+    virtual std::string ff() const {return "";}
+
+    virtual std::string id() const {return Stringify<RhoRhoGM>(); }
+
+    virtual Tensor<Data_t,1> 
+      operator()(const MomRowPair_t &lefty, 
+          const MomRowPair_t &righty, 
+          const double mom_fac) const
+      {
+        std::complex<double> g2coeff = std::complex<double>( -1., 0.); 
+
+        RhoRhoG2 G2; 
+
+        return g2coeff * G2(lefty,righty,mom_fac);
+      }
+
+  };
+
+
+  //////////////////////////////////////////////////////////////////
+  //////////////////////////////////////////////////////////////////
+
+
+  struct RhoRhoGQ; 
+  REGISTER_STRINGIFY_TYPE( RhoRhoGQ ); 
+
+  struct RhoRhoGQ
+    : public FFAbsBlockBase_t<std::complex<double> >
+  {
+    typedef std::complex<double> Data_t;
+    virtual ~RhoRhoGQ() {}
+
+    virtual std::string ff() const {return "";}
+
+    virtual std::string id() const {return Stringify<RhoRhoGQ>(); }
+
+    virtual Tensor<Data_t,1> 
+      operator()(const MomRowPair_t &lefty, 
+          const MomRowPair_t &righty, 
+          const double mom_fac) const
+      {
+        RhoRhoEtaGen eg; 
+        double eta = eg(lefty.first,righty.first); 
+
+        std::complex<double> g1coeff = std::complex<double>( 1. , 0.); 
+        std::complex<double> g2coeff = std::complex<double>( -1., 0.); 
+        std::complex<double> g3coeff = std::complex<double>(  1. + eta, 0.); 
+
+        RhoRhoG1 G1; 
+        RhoRhoG2 G2; 
+        RhoRhoG3 G3; 
+
+        return g1coeff * G1(lefty,righty,mom_fac) 
+          + g2coeff * G2(lefty,righty,mom_fac)
+          + g3coeff * G3(lefty,righty,mom_fac); 
+      }
+
+  };
+
+  //////////////////////////////////////////////////////////////////
+  //////////////////////////////////////////////////////////////////
+
+  template<int embedl, int embedr>
+    LorentzFFAbsBase_t::LorentzFFAbs_list RhoRhoGenListMultipole()
+    {
+      LorentzFFAbsBase_t::LorentzFFAbs_list retRhoRho; 
+      LorentzFFAbsBase_t::BBType *gc , *gm, *gq; 
+
+      try
+      {
+        gc = new radmat::RhoRhoGC();
+        gm = new radmat::RhoRhoGM();
+        gq = new radmat::RhoRhoGQ();
+
+        POW2_ASSERT( gc );
+        POW2_ASSERT( gm );
+        POW2_ASSERT( gq );
+
+        retRhoRho.push_back(LorentzFFAbsBase_t::BBHandle_t(gc)); 
+        retRhoRho.push_back(LorentzFFAbsBase_t::BBHandle_t(gm)); 
+        retRhoRho.push_back(LorentzFFAbsBase_t::BBHandle_t(gq)); 
+      }
+      catch(...)
+      {
+        POW2_ASSERT(false); 
+      } 
+
+      return retRhoRho;
+    }
+
+
+
+  template<int embedl,int embedr> struct RhoRhoMultipole; 
+  REGISTER_STRINGIFY_TYPE2( RhoRhoMultipole<1,1> ); 
+
+
+  //////////////////////////////////////////////////////////////////
+  //////////////////////////////////////////////////////////////////
+  template<int embedl, int embedr>
+    struct RhoRhoMultipole : public LorentzFFAbsBase_t
+  {
+    RhoRhoMultipole()
+      : LorentzFFAbsBase_t(radmat::RhoRhoGenListMultipole<embedl,embedr>())
+    { }
+
+    RhoRhoMultipole& operator=(const RhoRhoMultipole &o)
+    {
+      if (this != &o)
+        LorentzFFAbsBase_t::operator=(o);
+
+      return *this; 
+    }
+
+    RhoRhoMultipole(const RhoRhoMultipole &o)
+      : LorentzFFAbsBase_t(o)
+    {  }
+
+    virtual ~RhoRhoMultipole() {}
+
+    virtual std::string reg_id() const { return Stringify< RhoRhoMultipole<embedl,embedr> >(); }
+    virtual int left_spin() const { return embedl; }
+    virtual int right_spin() const { return embedr; }
+    virtual LorentzFFAbsBase_t * clone() const { return new RhoRhoMultipole(); }
+
+    private: 
+    RhoRhoMultipole(const LorentzFFAbsBase_t::LorentzFFAbs_list &); 
+    RhoRhoMultipole(const LorentzFFAbsBase_t::LorentzFFAbs_list ); 
+  };
 
 
 } // namespace radmat

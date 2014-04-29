@@ -5,22 +5,22 @@
     <origin>J1m</origin>
     <data>J1m</data>
     <mass>0.216</mass>
-    <row>1</row>
-    <mom>0 0 0</mom>
+    <row>0</row>
+    <mom>1 0 0</mom>
   </left>
   <gamma>
     <origin>J1m</origin>
     <data>J1m</data>
     <mass>0.</mass>
     <row>1</row>
-    <mom>-1 0 1</mom>
+    <mom>-1 0 0</mom>
   </gamma>
   <right>
     <origin>J1m</origin>
     <data>J1m</data>
     <mass>0.216</mass>
     <row>0</row>
-    <mom>1 0 -1</mom>
+    <mom>2 0 0</mom>
   </right>
   <tran>diag</tran>
   <mom_fac>0.11</mom_fac>

@@ -17,7 +17,7 @@ namespace radmat
 
   // actual implementation of the kinematic factor
   struct PiRhoF1
-    : public FormFacRotationManager<PiRhoF1, std::complex<double> , 0 , 1 > , 
+    : public FormFacRotationManager<PiRhoF1, std::complex<double> , 0 , 1 , DONT_AVERAGE_MASSES> , 
     public rightSpinPTensor<1>
   {
     typedef std::complex<double> Data_t; 

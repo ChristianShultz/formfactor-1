@@ -6,7 +6,7 @@
 
  * Creation Date : 25-02-2013
 
- * Last Modified : Wed 23 Apr 2014 11:07:39 AM EDT
+ * Last Modified : Mon 28 Apr 2014 04:03:29 PM EDT
 
  * Created By : shultz
 
@@ -728,6 +728,7 @@ namespace radmat
       std::stringstream data_buffer; 
 
       data_buffer << "# Q2  Q2err FF FFerr | <left_rep> <left_mom> <right_rep> <right_mom> " << std::endl; 
+      int count = 0; 
 
 
       // some cute little vector thingy 
@@ -747,12 +748,13 @@ namespace radmat
         // if people pay attention then they will know that the llsq 
         // has been averaged over equivalent frames 
         std::pair<mom_t,mom_t> canonical_momentum; 
-        canonical_momentum = radmat::LatticeRotationEnv::rotation_group_key(t.left_mom,t.right_mom);  
+        canonical_momentum = radmat::LatticeRotationEnv::rotation_group_can_mom(t.left_mom,t.right_mom);  
         mom_t lp = canonical_momentum.first; 
         mom_t rp = canonical_momentum.second; 
 
         // have all the data, put it into a useful log form 
-        data_buffer << "q2 " << q[i] << " " << qerr[i]; 
+        data_buffer << ++count; 
+        data_buffer << " q2 " << q[i] << " " << qerr[i]; 
         data_buffer << " ff " << ff << " " << fferr; 
         data_buffer << " | " << t.rep_id(data_rep,data_rep.l) 
           << " " << lp[0] << " " << lp[1] << " " << lp[2]; 

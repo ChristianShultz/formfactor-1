@@ -6,6 +6,7 @@
 #include "radmat/utils/tensor.h"
 #include "radmat/rotation_interface/rotation_interface.h"
 #include "lorentzff_formfac_utils.h"
+#include "mass_averager.h"
 #include <complex>
 #include <sstream>
 
@@ -17,7 +18,11 @@
 namespace radmat
 {
 
-  template<class DerivedFF, typename Data_t, int J_left , int J_right>
+  template<class DerivedFF, 
+    typename Data_t, 
+    int J_left , 
+    int J_right,
+    class MASS_AVERAGER >  // not being used 
     struct FormFacRotationManager
     : public FFAbsBlockBase_t<Data_t>,
     public DMatrixManager
@@ -42,9 +47,30 @@ namespace radmat
         Tensor<double,1> ll( (TensorShape<1>())[4], 0.);
         Tensor<double,1> rr( (TensorShape<1>())[4], 0.);
         std::pair<mom_t,mom_t> fmom = pair_mom(l,r,kick); 
-        std::pair<mom_t,mom_t> cmom = this->get_frame(fmom.first,fmom.second); 
+        mom_pair_key frame = this->get_frame(fmom.first,fmom.second); 
+        std::pair<mom_t,mom_t> cmom = frame.moms(); 
+
         mom_t cl = cmom.first; 
         mom_t cr = cmom.second; 
+
+#ifdef BREAK_ROTATIONS_REST
+        mom_pair_key k = mom_pair_key(fmom.first,fmom.second); 
+        fmom = k.frame_orientation(); 
+        cmom = frame.frame_orientation(); 
+#endif 
+        // NB: do the check with the frame orientation
+        // are these the momentum i think that they are? 
+        if ( !!! check_total_frame_transformation( R, fmom.first,fmom.second,cmom.first,cmom.second,true ) )
+        {
+          std::cout << __func__ << ": frame transformation error" << std::endl;
+
+          std::cout << "int moms l" << string_mom(fmom.first) << " r " << string_mom(fmom.second)
+            << " ll " << string_mom(cl) << " rr " << string_mom(cr) << std::endl;
+
+          std::cout << "pl " << l << " pll " << ll << " pr " << r << " prr "
+            << rr << " R " << *R << std::endl;
+          throw std::string("frame remap error"); 
+        }
 
         ll[0] = l[0];
         ll[1] = cl[0]*kick;
@@ -64,19 +90,7 @@ namespace radmat
         //      rr[j] += (*R)[i][j] * r[i];
         //    }
 
-
-        // are these the momentum i think that they are? 
-        if ( !!! check_total_frame_transformation( R, fmom.first,fmom.second,cl,cr,true ) )
-        {
-          std::cout << __func__ << ": frame transformation error" << std::endl;
-
-          std::cout << "int moms l" << string_mom(fmom.first) << " r " << string_mom(fmom.second)
-            << " ll " << string_mom(cl) << " rr " << string_mom(cr) << std::endl;
-
-          std::cout << "pl " << l << " pll " << ll << " pr " << r << " prr "
-            << rr << " R " << *R << std::endl;
-          throw std::string("frame remap error"); 
-        }
+        // MASS_AVERAGER::operate(ll,rr); 
 
         return std::pair<p4_t,p4_t>(ll,rr); 
       }
@@ -113,8 +127,12 @@ namespace radmat
         rCompEulAngles eul = rotation_matrix(moms.first,moms.second); 
         RotationMatrix_t *R = new RotationMatrix_t( genRotationMatrix(eul) );  
         std::pair<p4_t,p4_t> can_moms = can_mom(R,lefty.first,righty.first,kick); 
+
         WignerMatrix_t * Wl = left_wigner_matrix(eul,moms.first,moms.second,J_left);
         WignerMatrix_t * Wr = right_wigner_matrix(eul,moms.first,moms.second,J_right);
+
+        //  WignerMatrix_t * Wl = left_wigner_matrix(eul,moms.first,moms.second,J_left,false,1);
+        //  WignerMatrix_t * Wr = right_wigner_matrix(eul,moms.first,moms.second,J_right,false,1);
 
         this->conjugate(Wl); 
         this->conjugate(Wr); 

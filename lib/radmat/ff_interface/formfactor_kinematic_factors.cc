@@ -6,7 +6,7 @@
 
  * Creation Date : 18-03-2014
 
- * Last Modified : Mon 28 Apr 2014 11:21:52 AM EDT
+ * Last Modified : Tue 29 Apr 2014 12:48:14 PM EDT
 
  * Created By : shultz
 
@@ -29,6 +29,10 @@
 #include <sstream>
 #include <string>
 #include <list>
+
+
+// zero variance decomp 
+#define MEAN_KINEMATIC_FACTORS
 
 namespace radmat
 {
@@ -54,13 +58,15 @@ namespace radmat
     struct kgen_info_printer
     {
       static void print(const std::string &msg)
-      { std::cout << "kgen_info_printer " << msg << std::endl;}
+      {}
+      // { std::cout << "kgen_info_printer " << msg << std::endl;}
     };
 
     struct helicity_printer
     {
       static void print(const std::string &msg) 
-      { std::cout << "helicity_printer " << msg << std::endl; }
+      {}
+      // { std::cout << "helicity_printer " << msg << std::endl; }
     }; 
 
     std::string to_string(const int i)
@@ -112,7 +118,7 @@ namespace radmat
         mom_t q,qc; 
         q = tag->q; 
 
-        std::pair<mom_t,mom_t>  canonical_momentum = RG::Instance().canonical_frame(tag->left_mom,tag->right_mom); 
+        std::pair<mom_t,mom_t>  canonical_momentum = RG::Instance().canonical_frame_moms(tag->left_mom,tag->right_mom); 
         qc = canonical_momentum.first - canonical_momentum.second;
 
 
@@ -162,7 +168,7 @@ namespace radmat
         double tolerance = 1e-6; 
 
         // first find the polarization in the original frame 
-        std::pair<mom_t,mom_t>  canonical_momentum = RG::Instance().canonical_frame(tag->left_mom,tag->right_mom); 
+        std::pair<mom_t,mom_t>  canonical_momentum = RG::Instance().canonical_frame_moms(tag->left_mom,tag->right_mom); 
         mom_t qc = canonical_momentum.first - canonical_momentum.second;
 
         // rows are + 0 -  , cols are x y z 
@@ -361,75 +367,6 @@ namespace radmat
           return handle_three_point_lorentz_insertion( KF , tag); 
       }
 
-
-    FFKinematicFactors_t::KinematicFactorRow 
-      generate_three_point_factors( const DataTagPrimitive *ptr)
-      {
-        const ThreePointDataTag * tag = dynamic_cast<const ThreePointDataTag*>(ptr); 
-        rHandle<FormFactorBase_t> mat_elem; 
-        mat_elem = FormFactorDecompositionFactoryEnv::callFactory( tag->mat_elem_id); 
-
-        // size params 
-        int nfacs = mat_elem->nFacs(); 
-        int nbins = tag->left_E.size(); 
-        FFKinematicFactors_t::KinematicFactorMatrix KF(nbins,4,nfacs); 
-        KF.zeros(); 
-
-        // scale down the energies, momentum have zero variance 
-        //   NB: need to use assignment here
-        ENSEM::EnsemReal left_E , right_E; 
-        left_E = ENSEM::rescaleEnsemDown( tag->left_E ); 
-        right_E = ENSEM::rescaleEnsemDown( tag->right_E ); 
-
-        // mom and row params 
-        ADATXML::Array<double> left_mom(3),right_mom(3); 
-        int left_row, right_row; 
-        left_row = tag->left_row; 
-        right_row = tag->right_row; 
-
-        // the momentum unit
-        double mom_factor = tag->mom_fac; 
-
-        for(int i =0; i < 3; ++i )
-        {
-          left_mom[i] = mom_factor * tag->left_mom[i]; 
-          right_mom[i] = mom_factor * tag->right_mom[i]; 
-        }
-
-        // this also checks size of righty vs size of lefty
-        POW2_ASSERT_DEBUG( (nbins == right_E.size()) && (nfacs > 0) );
-
-        printer_function<kgen_info_printer>(tag->mat_elem_id); 
-        printer_function<kgen_info_printer>("left_row " + to_string(left_row)); 
-        printer_function<kgen_info_printer>("right_row " + to_string(right_row)); 
-        printer_function<kgen_info_printer>("gamma_row " + to_string(tag->gamma_row)); 
-
-        //   // loop over cfgs and use the wrapper to operator()
-        //   for(int bin = 0; bin < nbins; bin++)
-        //     KF[bin] = mat_elem->wrapper( left_E.elem(bin) , left_mom , left_row,
-        //         right_E.elem(bin) , right_mom , right_row , mom_factor);
-
-        for(int bin = 0; bin < nbins; bin++)
-          KF[bin] = mat_elem->generate_ffs( 
-              mat_elem->to_mom_row_pair( ENSEM::toDouble(left_E.elem(bin)), left_mom, left_row), 
-              mat_elem->to_mom_row_pair( ENSEM::toDouble(right_E.elem(bin)), right_mom, right_row), 
-              mom_factor); 
-
-
-        // scale up return data
-        KF.rescaleSembleUp();
-
-        // now handle the representation of the photon 
-        //     remember that all decomps return a lorentz
-        //     vector 
-
-        return handle_three_point_insertion( KF, tag ); 
-      }
-
-
-
-
-
   }
 
 
@@ -437,32 +374,9 @@ namespace radmat
   FFKinematicFactors_t::KinematicFactorRow 
     FFKinematicFactors_t::genFactors(const DataTagPrimitive * ptr)
     {
-
-      typedef KinematicFactorRow (*ptr_type)(const DataTagPrimitive *); 
-      std::map<std::string, ptr_type> options_map; 
-
-      // may someday try nucleon types or some fancy luscher garbage?
-      options_map.insert( std::make_pair( Stringify<ThreePointDataTag>(), 
-            &generate_three_point_factors ) ) ; 
-
-      std::map<std::string,ptr_type>::const_iterator it; 
-      it = options_map.find( ptr->type() ); 
-
-      if( it == options_map.end() )
-      {
-        std::cout << __PRETTY_FUNCTION__ << ": error," 
-          << " I dont know what a " << ptr->type() 
-          << " is, options were " << std::endl;
-
-        for(it = options_map.begin(); it != options_map.end(); ++it)
-          std::cout << it->first << std::endl; 
-
-        exit(1); 
-      }
-
-      ptr_type foo = it->second; 
-
-      return (*foo)(ptr); 
+      FFKinematicFactors_t::KinematicFactorMatrix KF = genFactorsMat(ptr); 
+      const ThreePointDataTag * tag = dynamic_cast<const ThreePointDataTag*>(ptr); 
+      return handle_three_point_insertion( KF, tag ); 
     }
 
 
@@ -509,16 +423,29 @@ namespace radmat
       printer_function<kgen_info_printer>("right_row " + to_string(right_row)); 
       printer_function<kgen_info_printer>("gamma_row " + to_string(tag->gamma_row)); 
 
-      //   // loop over cfgs and use the wrapper to operator()
-      //   for(int bin = 0; bin < nbins; bin++)
-      //     KF[bin] = mat_elem->wrapper( left_E.elem(bin) , left_mom , left_row,
-      //         right_E.elem(bin) , right_mom , right_row , mom_factor);
 
+#ifdef MEAN_KINEMATIC_FACTORS
+
+      std::cout << __func__ << ": WARNING, using MEAN_KINEMATIC_FACTORS" << std::endl;
+
+      // throw the mean into the zero bin then copy it to the whole ensemble 
+      KF[0] = mat_elem->generate_ffs( 
+            mat_elem->to_mom_row_pair( ENSEM::toDouble(ENSEM::mean(left_E)), left_mom, left_row), 
+            mat_elem->to_mom_row_pair( ENSEM::toDouble(ENSEM::mean(right_E)), right_mom, right_row), 
+            mom_factor); 
+
+      for(int bin = 1; bin < nbins; ++bin)
+        KF[bin] = KF[0]; 
+
+
+#else
+      // do the proper thing 
       for(int bin = 0; bin < nbins; bin++)
         KF[bin] = mat_elem->generate_ffs( 
             mat_elem->to_mom_row_pair( ENSEM::toDouble(left_E.elem(bin)), left_mom, left_row), 
             mat_elem->to_mom_row_pair( ENSEM::toDouble(right_E.elem(bin)), right_mom, right_row), 
             mom_factor); 
+#endif 
 
 
       // scale up return data

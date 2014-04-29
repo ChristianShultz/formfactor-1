@@ -6,7 +6,7 @@
 
 * Creation Date : 14-04-2014
 
-* Last Modified : Wed 16 Apr 2014 09:17:43 AM EDT
+* Last Modified : Mon 28 Apr 2014 04:53:01 PM EDT
 
 * Created By : shultz
 
@@ -21,10 +21,15 @@ namespace radmat
 {
 
   std::ostream & operator<<(std::ostream &o, const mom_key &k)
-  { return o << k.x << k.y << k.z ;}
+  { 
+    if( k.isOh )
+      return o << "R" << k.x << k.y << k.z ;
+    else 
+      return o << "F" << k.x << k.y << k.z; 
+  }
 
   std::ostream & operator<<(std::ostream &o, const mom_pair_key &k)
-  { return o << "l" << k.l << " r" << k.r; }
+  { return o << "l" << k.l << "_r" << k.r; }
 
 
   namespace LatticeRotationEnv
@@ -57,19 +62,24 @@ namespace radmat
 
     //////////////////////////////////////////////////////////////////////
 
-    std::pair<mom_t,mom_t>
+    mom_pair_key 
       rotation_group_key(const mom_t &l, const mom_t &r)
       {
         return TheRotationGroupGenerator::Instance().canonical_frame(l,r);  
       }
-  
+    std::pair<mom_t,mom_t>  
+      rotation_group_can_mom(const mom_t &l, const mom_t &r)
+      {
+        return TheRotationGroupGenerator::Instance().canonical_frame_moms(l,r);  
+      }
+
+
     std::string 
       rotation_group_label(const mom_t &l, const mom_t &r)
       {
-        std::pair<mom_t,mom_t> k = rotation_group_key(l,r); 
+        mom_pair_key k = rotation_group_key(l,r); 
         std::stringstream ss; 
-        ss << "lefty" << k.first[0] << k.first[1] << k.first[2] 
-          << "righty" << k.second[0] << k.second[1] << k.second[2]; 
+        ss << k;  
         return ss.str(); 
       }
 

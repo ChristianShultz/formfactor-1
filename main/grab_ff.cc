@@ -6,7 +6,7 @@
 
  * Creation Date : 22-04-2013
 
- * Last Modified : Thu 24 Apr 2014 10:36:46 AM EDT
+ * Last Modified : Mon 28 Apr 2014 06:18:29 PM EDT
 
  * Created By : shultz
 
@@ -18,6 +18,7 @@
 
 #include "radmat/register_all/register_all.h"
 #include "radmat/ff_interface/ff_interface.h"
+#include "radmat/rotation_interface/rotation_interface.h"
 #include "io/adat_xmlio.h"
 
 
@@ -163,6 +164,12 @@ int main(int argc, char *argv[])
 
   std::cout << r.mean() << std::endl; 
 
+  radmat::DMatrixManager Wig; 
+  std::pair<radmat::mom_t,radmat::mom_t> can = Wig.get_frame(foo.left_mom,foo.right_mom).moms(); 
+
+  std::cout << " canonical frame was " 
+    << " lefty p" << can.first[0] << can.first[1] << can.first[2] 
+    << " righty p" << can.second[0] << can.second[1] << can.second[2] << std::endl;
 
   return 0;
 }

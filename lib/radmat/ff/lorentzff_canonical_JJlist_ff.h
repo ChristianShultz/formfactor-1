@@ -85,7 +85,7 @@ namespace radmat
 
   template<int j_l, int j_r> 
   struct JJFFimpl
-    : public FormFacRotationManager<JJFFimpl<j_l,j_r>, canIdx_t, j_l, j_r>
+    : public FormFacRotationManager<JJFFimpl<j_l,j_r>, canIdx_t, j_l, j_r, DONT_AVERAGE_MASSES>
   {
     typedef canIdx_t Data_t; 
     virtual ~JJFFimpl() {}

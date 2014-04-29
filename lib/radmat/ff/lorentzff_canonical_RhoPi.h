@@ -17,7 +17,7 @@ namespace radmat
     REGISTER_STRINGIFY_TYPE( RhoPiF1 ); 
 
     struct RhoPiF1
-      : public FormFacRotationManager<RhoPiF1,std::complex<double>, 1 , 0 >,
+      : public FormFacRotationManager<RhoPiF1,std::complex<double>, 1 , 0 , DONT_AVERAGE_MASSES>,
       public leftSpinPTensor<1>
     {
       typedef std::complex<double> Data_t; 

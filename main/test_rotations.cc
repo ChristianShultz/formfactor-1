@@ -6,7 +6,7 @@
 
 * Creation Date : 11-12-2013
 
-* Last Modified : Mon 28 Apr 2014 12:39:19 PM EDT
+* Last Modified : Mon 28 Apr 2014 06:17:52 PM EDT
 
 * Created By : shultz
 
@@ -389,7 +389,7 @@ void get_left_triad_wigner(int argc, char *argv[])
   clean_up_rot_mat(Rtriad);
   Wig.clean(D); 
 
-  std::pair<radmat::mom_t,radmat::mom_t> can_frame = Wig.get_frame(l,r); 
+  std::pair<radmat::mom_t,radmat::mom_t> can_frame = Wig.get_frame(l,r).moms(); 
   std::cout << "canonical frame: l " << string_mom(l) << " r " << string_mom(r) << std::endl;
 
   std::cout << "l " << string_mom(l) << " r " << string_mom(r)
@@ -434,7 +434,7 @@ void get_right_triad_wigner(int argc, char *argv[])
   clean_up_rot_mat(Rtriad);
   Wig.clean(D); 
 
-  std::pair<radmat::mom_t,radmat::mom_t> can_frame = Wig.get_frame(l,r); 
+  std::pair<radmat::mom_t,radmat::mom_t> can_frame = Wig.get_frame(l,r).moms(); 
   std::cout << "canonical frame: l " << string_mom(l) << " r " << string_mom(r) << std::endl;
 
   std::cout << "l " << string_mom(l) << " r " << string_mom(r)
@@ -467,7 +467,7 @@ void get_triad_rotation(int argc, char *argv[])
   radmat::RotationMatrix_t * Rtriad( new RotationMatrix_t( genRotationMatrix(eul) ) ); 
 
   std::pair<radmat::mom_t,radmat::mom_t> frame; 
-  frame = Wig.get_frame(l,r);
+  frame = Wig.get_frame(l,r).moms();
   std::cout << "canonical frame " << string_mom(frame.first) << " " 
     << string_mom(frame.second) << std::endl;
 

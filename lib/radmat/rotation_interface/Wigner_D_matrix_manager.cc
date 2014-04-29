@@ -6,7 +6,7 @@
 
  * Creation Date : 14-04-2014
 
- * Last Modified : Mon 28 Apr 2014 12:54:19 PM EDT
+ * Last Modified : Mon 28 Apr 2014 06:15:28 PM EDT
 
  * Created By : shultz
 
@@ -27,6 +27,25 @@ namespace radmat
 {
   namespace
   {
+
+
+    std::pair<mom_t,mom_t> bb_rot_rest(const mom_t &l, const mom_t &r)
+    {
+      std::pair<mom_t,mom_t> moms; 
+
+#ifdef BREAK_ROTATIONS_REST
+      mom_pair_key ky = mom_pair_key( mom_key(l) , mom_key(r) ); 
+      moms =  ky.frame_orientation(); 
+#else 
+      moms = std::make_pair(l,r);  
+#endif 
+
+      return moms; 
+    }
+
+
+
+
     std::complex<double> complex_zero(0.,0.); 
 
     std::complex<double> round_to_zero(const std::complex<double> &cd, const double thresh=1e-6)
@@ -145,6 +164,7 @@ namespace radmat
         rCompEulAngles eul = Wigner.rotation_matrix(l,r); 
         WignerMatrix_t * left = Wigner.left_wigner_matrix(eul,l,r,J); 
         WignerMatrix_t *right = Wigner.right_wigner_matrix(eul,l,r,J); 
+
         wig_pair_key key(l,r,J); 
 
         //  std::stringstream ss; 
@@ -201,7 +221,7 @@ namespace radmat
   } // anonomyous 
 
 
-  std::pair<mom_t,mom_t>
+  mom_pair_key
     DMatrixManager::get_frame(const mom_t &l, const mom_t &r) const
     {
       return radmat::LatticeRotationEnv::rotation_group_key(l,r); 
@@ -271,8 +291,16 @@ namespace radmat
   rCompEulAngles 
     DMatrixManager::rotation_matrix(const mom_t &l, const mom_t &r) const
     {
-      std::pair<mom_t,mom_t> f  = get_frame(l,r); 
-      return generate_rotation_matrix(l,r,f.first,f.second); 
+      mom_pair_key frame = get_frame(l,r); 
+      std::pair<mom_t,mom_t> f; 
+#ifdef BREAK_ROTATIONS_REST 
+      f = frame.frame_orientation(); 
+#else
+      f = frame.moms();
+#endif
+      std::pair<mom_t,mom_t> moms = bb_rot_rest(l,r); 
+
+      return generate_rotation_matrix(moms.first,moms.second,f.first,f.second); 
     }
 
   WignerMatrix_t*
@@ -317,7 +345,7 @@ namespace radmat
       {
         // grab the pointer
         tmp1 = wigner_matrix( *e, J ); 
-        
+
         // make an actual copy 
         tmp2 = *W ** tmp1 ; 
 
@@ -361,13 +389,21 @@ namespace radmat
       }
       else
       {
-        std::pair<mom_t,mom_t> can = get_frame(l,r); 
-        check_throw_frame_err(eul,std::make_pair(l,r),can);
+        mom_pair_key ky = get_frame(l,r); 
+        std::pair<mom_t,mom_t> can;
+#ifdef BREAK_ROTATIONS_REST
+        can = ky.frame_orientation(); 
+#else
+        can = ky.moms(); 
+#endif 
+
+        std::pair<mom_t,mom_t> moms = bb_rot_rest(l,r); 
+        check_throw_frame_err(eul,moms,can);
 
         WignerMatrix_t *Wt,*Wn,*Wi; 
 
         Wt = wigner_matrix(eul,J); 
-        Wn = radmat::WignerDMatrixEnv::call_factory(l,J);
+        Wn = radmat::WignerDMatrixEnv::call_factory(moms.first,J);
         Wi = radmat::WignerDMatrixEnv::call_factory(can.first,J);
 
         dagger(Wi); 
@@ -386,9 +422,9 @@ namespace radmat
           clean(Wi); 
           clean(Wt); 
           clean(Wn); 
-          std::cout <<  "(*W)[i][l] += (*Wi)[i][j] * (*Wt)[j][k] * (*Wn)[k][l] "
-            << "\nWi: " << *Wi << "\nWt:" << *Wt << "\nWn:" << *Wn << std::endl;
-          std::cout << "W:" << *W << std::endl;
+          //std::cout <<  "(*W)[i][l] += (*Wi)[i][j] * (*Wt)[j][k] * (*Wn)[k][l] "
+          //  << "\nWi: " << *Wi << "\nWt:" << *Wt << "\nWn:" << *Wn << std::endl;
+          std::cout << __func__ << " W:" << *W << std::endl;
         }
 
         delete Wt;
@@ -428,13 +464,21 @@ namespace radmat
       }
       else
       {
-        std::pair<mom_t,mom_t> can = get_frame(l,r); 
-        check_throw_frame_err(eul,std::make_pair(l,r),can);
+        mom_pair_key ky = get_frame(l,r); 
+        std::pair<mom_t,mom_t> can;
+#ifdef BREAK_ROTATIONS_REST
+        can = ky.frame_orientation(); 
+#else
+        can = ky.moms(); 
+#endif 
+
+        std::pair<mom_t,mom_t> moms = bb_rot_rest(l,r); 
+        check_throw_frame_err(eul,moms,can);
 
         WignerMatrix_t *Wt,*Wk,*Wl; 
 
         Wt = wigner_matrix(eul,J); 
-        Wl = radmat::WignerDMatrixEnv::call_factory(r,J);
+        Wl = radmat::WignerDMatrixEnv::call_factory(moms.second,J);
         Wk = radmat::WignerDMatrixEnv::call_factory(can.second,J);
 
         dagger(Wl); 
@@ -452,9 +496,9 @@ namespace radmat
           clean(Wl); 
           clean(Wt); 
           clean(Wk); 
-          std::cout <<  "(*W)[i][l] += (*Wl)[i][j] * (*Wt)[j][k] * (*Wk)[k][l] "
-            << "\nWl: " << *Wl << "\nWt:" << *Wt << "\nWk:" << *Wk << std::endl;
-          std::cout << "W:" << *W << std::endl;
+          // std::cout <<  "(*W)[i][l] += (*Wl)[i][j] * (*Wt)[j][k] * (*Wk)[k][l] "
+          //   << "\nWl: " << *Wl << "\nWt:" << *Wt << "\nWk:" << *Wk << std::endl;
+          std::cout << __func__ <<  " W:" << *W << std::endl;
         }
 
         delete Wt;

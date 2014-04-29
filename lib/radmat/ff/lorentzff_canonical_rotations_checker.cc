@@ -6,7 +6,7 @@
 
  * Creation Date : 24-12-2013
 
- * Last Modified : Mon 28 Apr 2014 11:23:23 AM EDT
+ * Last Modified : Mon 28 Apr 2014 01:29:34 PM EDT
 
  * Created By : shultz
 
@@ -224,8 +224,8 @@ namespace radmat
         std::cout << __func__ << ": imag = " << const_imag << " +/- " << const_imag_var << std::endl;
 
         // zero vy value
-        if( fabs(const_real) < 1e-3 ) 
-          if( fabs(const_imag) < 1e-3)
+        if( fabs(const_real) < 1e-2 ) 
+          if( fabs(const_imag) < 1e-2)
             return true; 
 
         // inverse covariance was singular
@@ -233,10 +233,10 @@ namespace radmat
           if( isnan(const_imag) )
             return true; 
 
-        // zero w/ in err
-        if( fabs(const_real) - 1.*sqrt(fabs(const_real_var)) < 0.)
-          if( fabs(const_imag) - 1.*sqrt(fabs(const_imag_var)) < 0.)
-            return true; 
+     //   // zero w/ in err
+     //   if( fabs(const_real) - 1.*sqrt(fabs(const_real_var)) < 0.)
+     //     if( fabs(const_imag) - 1.*sqrt(fabs(const_imag_var)) < 0.)
+     //       return true; 
 
         std::stringstream cnt; 
         cnt << ++local_count; 

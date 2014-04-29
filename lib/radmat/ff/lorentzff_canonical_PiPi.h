@@ -16,7 +16,7 @@ namespace radmat
 
   // only one ff
   struct PiPiF1
-    : public FormFacRotationManager<PiPiF1, std::complex<double>, 0 , 0 >
+    : public FormFacRotationManager<PiPiF1, std::complex<double>, 0 , 0 , AVERAGE_MASSES>
   {
     virtual ~PiPiF1() {}
 

@@ -21,6 +21,7 @@ bin_PROGRAMS =   \
 								 radmat_util		\
 								 simple_test		\
 								 single_plot		\
+								 subduce 				\
 								 test_levi_civita \
 								 test_redstar_ops		\
 								 test_rotations \
@@ -38,6 +39,7 @@ radmat_SOURCES = radmat.cc
 radmat_util_SOURCES = radmat_util.cc
 simple_test_SOURCES = simple_test.cc
 single_plot_SOURCES = single_plot.cc
+subduce_SOURCES = subduce.cc
 test_levi_civita_SOURCES = test_levi_civita.cc
 test_redstar_ops_SOURCES = test_redstar_ops.cc
 test_rotations_SOURCES = test_rotations.cc

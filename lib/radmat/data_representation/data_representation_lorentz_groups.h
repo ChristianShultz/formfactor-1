@@ -39,16 +39,16 @@ namespace radmat
   REGISTER_STRINGIFY_TYPE( J4p ); 
   REGISTER_STRINGIFY_TYPE( J4m ); 
 
-  struct J0p : public LorentzRepEmbedType<J0p> {};  
-  struct J0m : public LorentzRepEmbedType<J0m> {};
-  struct J1p : public LorentzRepEmbedType<J1p> {};  
-  struct J1m : public LorentzRepEmbedType<J1m> {};
-  struct J2p : public LorentzRepEmbedType<J2p> {};  
-  struct J2m : public LorentzRepEmbedType<J2m> {};
-  struct J3p : public LorentzRepEmbedType<J3p> {};  
-  struct J3m : public LorentzRepEmbedType<J3m> {};
-  struct J4p : public LorentzRepEmbedType<J4p> {};  
-  struct J4m : public LorentzRepEmbedType<J4m> {};  
+  struct J0p : public LorentzRepEmbedType<J0p> { enum{ SPIN = 0}; };  
+  struct J0m : public LorentzRepEmbedType<J0m> { enum{ SPIN = 0}; };
+  struct J1p : public LorentzRepEmbedType<J1p> { enum{ SPIN = 1}; };  
+  struct J1m : public LorentzRepEmbedType<J1m> { enum{ SPIN = 1}; };
+  struct J2p : public LorentzRepEmbedType<J2p> { enum{ SPIN = 2}; };  
+  struct J2m : public LorentzRepEmbedType<J2m> { enum{ SPIN = 2}; };
+  struct J3p : public LorentzRepEmbedType<J3p> { enum{ SPIN = 3}; };  
+  struct J3m : public LorentzRepEmbedType<J3m> { enum{ SPIN = 3}; };
+  struct J4p : public LorentzRepEmbedType<J4p> { enum{ SPIN = 4}; };  
+  struct J4m : public LorentzRepEmbedType<J4m> { enum{ SPIN = 4}; };  
 
 
   // base class 
@@ -64,34 +64,34 @@ namespace radmat
   }; 
 
   // template instantion of parameters 
-  template<typename T, int spin, int parity> 
+  template<typename T, int parity> 
     struct LorentzRep_type
     : public LorentzRep
     {
       virtual ~LorentzRep_type() {}
       virtual std::string rep_id() const { return Stringify<T>(); }
       virtual int rep_parity() const { return parity; }
-      virtual int rep_spin() const { return spin; }
+      virtual int rep_spin() const { return T::SPIN; }
       virtual int rep_eta_p() const 
       { return (rep_spin() % 2 == 0) ? rep_parity() : -rep_parity();}
       virtual LorentzRep* clone() const { return new LorentzRep_type(*this); }
     };
 
 
-  struct J0pRep_t : public LorentzRep_type<J0p,0,1>  { virtual ~J0pRep_t() {} };
-  struct J0mRep_t : public LorentzRep_type<J0m,0,-1> { virtual ~J0mRep_t() {} };
+  struct J0pRep_t : public LorentzRep_type<J0p,1>  { virtual ~J0pRep_t() {} };
+  struct J0mRep_t : public LorentzRep_type<J0m,-1> { virtual ~J0mRep_t() {} };
 
-  struct J1pRep_t : public LorentzRep_type<J1p,1,1>  { virtual ~J1pRep_t() {} };
-  struct J1mRep_t : public LorentzRep_type<J1m,1,-1> { virtual ~J1mRep_t() {} };
+  struct J1pRep_t : public LorentzRep_type<J1p,1>  { virtual ~J1pRep_t() {} };
+  struct J1mRep_t : public LorentzRep_type<J1m,-1> { virtual ~J1mRep_t() {} };
 
-  struct J2pRep_t : public LorentzRep_type<J2p,2,1>  { virtual ~J2pRep_t() {} };
-  struct J2mRep_t : public LorentzRep_type<J2m,2,-1> { virtual ~J2mRep_t() {} };
+  struct J2pRep_t : public LorentzRep_type<J2p,1>  { virtual ~J2pRep_t() {} };
+  struct J2mRep_t : public LorentzRep_type<J2m,-1> { virtual ~J2mRep_t() {} };
 
-  struct J3pRep_t : public LorentzRep_type<J3p,3,1>  { virtual ~J3pRep_t() {} };
-  struct J3mRep_t : public LorentzRep_type<J3m,3,-1> { virtual ~J3mRep_t() {} };
+  struct J3pRep_t : public LorentzRep_type<J3p,1>  { virtual ~J3pRep_t() {} };
+  struct J3mRep_t : public LorentzRep_type<J3m,-1> { virtual ~J3mRep_t() {} };
 
-  struct J4pRep_t : public LorentzRep_type<J4p,4,1>  { virtual ~J4pRep_t() {} };
-  struct J4mRep_t : public LorentzRep_type<J4m,4,-1> { virtual ~J4mRep_t() {} };
+  struct J4pRep_t : public LorentzRep_type<J4p,1>  { virtual ~J4pRep_t() {} };
+  struct J4mRep_t : public LorentzRep_type<J4m,-1> { virtual ~J4mRep_t() {} };
 
 
   namespace LorentzRepresentationFactoryEnv

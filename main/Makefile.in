@@ -37,9 +37,9 @@ bin_PROGRAMS = grab_ff$(EXEEXT) grab_pol$(EXEEXT) \
 	mass_overlap_db_combine$(EXEEXT) \
 	mass_overlap_db_create$(EXEEXT) mass_overlap_db_util$(EXEEXT) \
 	radmat$(EXEEXT) radmat_util$(EXEEXT) simple_test$(EXEEXT) \
-	single_plot$(EXEEXT) test_levi_civita$(EXEEXT) \
-	test_redstar_ops$(EXEEXT) test_rotations$(EXEEXT) \
-	test_tens$(EXEEXT)
+	single_plot$(EXEEXT) subduce$(EXEEXT) \
+	test_levi_civita$(EXEEXT) test_redstar_ops$(EXEEXT) \
+	test_rotations$(EXEEXT) test_tens$(EXEEXT)
 subdir = main
 DIST_COMMON = $(srcdir)/Makefile.am $(srcdir)/Makefile.in
 ACLOCAL_M4 = $(top_srcdir)/aclocal.m4
@@ -98,6 +98,10 @@ am_single_plot_OBJECTS = single_plot.$(OBJEXT)
 single_plot_OBJECTS = $(am_single_plot_OBJECTS)
 single_plot_LDADD = $(LDADD)
 single_plot_DEPENDENCIES =
+am_subduce_OBJECTS = subduce.$(OBJEXT)
+subduce_OBJECTS = $(am_subduce_OBJECTS)
+subduce_LDADD = $(LDADD)
+subduce_DEPENDENCIES =
 am_test_levi_civita_OBJECTS = test_levi_civita.$(OBJEXT)
 test_levi_civita_OBJECTS = $(am_test_levi_civita_OBJECTS)
 test_levi_civita_LDADD = $(LDADD)
@@ -129,18 +133,18 @@ SOURCES = $(grab_ff_SOURCES) $(grab_pol_SOURCES) \
 	$(mass_overlap_db_create_SOURCES) \
 	$(mass_overlap_db_util_SOURCES) $(radmat_SOURCES) \
 	$(radmat_util_SOURCES) $(simple_test_SOURCES) \
-	$(single_plot_SOURCES) $(test_levi_civita_SOURCES) \
-	$(test_redstar_ops_SOURCES) $(test_rotations_SOURCES) \
-	$(test_tens_SOURCES)
+	$(single_plot_SOURCES) $(subduce_SOURCES) \
+	$(test_levi_civita_SOURCES) $(test_redstar_ops_SOURCES) \
+	$(test_rotations_SOURCES) $(test_tens_SOURCES)
 DIST_SOURCES = $(grab_ff_SOURCES) $(grab_pol_SOURCES) \
 	$(grab_vector_mean_cmp_SOURCES) $(invert_subduced_SOURCES) \
 	$(mass_overlap_db_combine_SOURCES) \
 	$(mass_overlap_db_create_SOURCES) \
 	$(mass_overlap_db_util_SOURCES) $(radmat_SOURCES) \
 	$(radmat_util_SOURCES) $(simple_test_SOURCES) \
-	$(single_plot_SOURCES) $(test_levi_civita_SOURCES) \
-	$(test_redstar_ops_SOURCES) $(test_rotations_SOURCES) \
-	$(test_tens_SOURCES)
+	$(single_plot_SOURCES) $(subduce_SOURCES) \
+	$(test_levi_civita_SOURCES) $(test_redstar_ops_SOURCES) \
+	$(test_rotations_SOURCES) $(test_tens_SOURCES)
 ETAGS = etags
 CTAGS = ctags
 DISTFILES = $(DIST_COMMON) $(DIST_SOURCES) $(TEXINFOS) $(EXTRA_DIST)
@@ -268,6 +272,7 @@ radmat_SOURCES = radmat.cc
 radmat_util_SOURCES = radmat_util.cc
 simple_test_SOURCES = simple_test.cc
 single_plot_SOURCES = single_plot.cc
+subduce_SOURCES = subduce.cc
 test_levi_civita_SOURCES = test_levi_civita.cc
 test_redstar_ops_SOURCES = test_redstar_ops.cc
 test_rotations_SOURCES = test_rotations.cc
@@ -381,6 +386,9 @@ simple_test$(EXEEXT): $(simple_test_OBJECTS) $(simple_test_DEPENDENCIES)
 single_plot$(EXEEXT): $(single_plot_OBJECTS) $(single_plot_DEPENDENCIES) 
 	@rm -f single_plot$(EXEEXT)
 	$(CXXLINK) $(single_plot_OBJECTS) $(single_plot_LDADD) $(LIBS)
+subduce$(EXEEXT): $(subduce_OBJECTS) $(subduce_DEPENDENCIES) 
+	@rm -f subduce$(EXEEXT)
+	$(CXXLINK) $(subduce_OBJECTS) $(subduce_LDADD) $(LIBS)
 test_levi_civita$(EXEEXT): $(test_levi_civita_OBJECTS) $(test_levi_civita_DEPENDENCIES) 
 	@rm -f test_levi_civita$(EXEEXT)
 	$(CXXLINK) $(test_levi_civita_OBJECTS) $(test_levi_civita_LDADD) $(LIBS)
@@ -411,6 +419,7 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/radmat_util.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/simple_test.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/single_plot.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/subduce.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/test_levi_civita.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/test_redstar_ops.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/test_rotations.Po@am__quote@
