@@ -7,6 +7,4 @@
 #include "construct_data.h"
 #include "data_tag_redstar_interface.h"
 #include "lattice_multi_data_object.h"
-#include "radmat_database_interface.h"
-#include "radmat_overlap_key_val_db.h"
 #endif

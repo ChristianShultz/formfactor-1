@@ -6,7 +6,7 @@
 
  * Creation Date : 21-03-2014
 
- * Last Modified : Wed 26 Mar 2014 10:44:58 AM EDT
+ * Last Modified : Wed 30 Apr 2014 12:55:19 PM EDT
 
  * Created By : shultz
 
@@ -38,11 +38,11 @@ namespace radmat
 
       if( !!! r.data.begin()->m_obj.irrep.creation_op )
         rs = - 1 ; 
-  
+
       for(int i =0; i < 3; ++i)
         if( ls*ll[i] + gs*gg[i] + rs*rr[i] != 0 )
-         return false;  
-    
+          return false;  
+
       return true; 
     }
 
@@ -56,22 +56,22 @@ namespace radmat
         EnsemRedstarBlock::const_iterator l,g,r;
 
         for( l = lefty.begin(); l != lefty.end(); ++l)
-         for( g = gamma.begin(); g != gamma.end(); ++g)
-          for( r = righty.begin(); r != righty.end(); ++r)  
-          {
-            ENSEM::Complex coeff;
-            Hadron::KeyHadronNPartNPtCorr_t npt; 
-            coeff = l->m_coeff * g->m_coeff * r->m_coeff; 
-            npt.npoint.resize(3); 
+          for( g = gamma.begin(); g != gamma.end(); ++g)
+            for( r = righty.begin(); r != righty.end(); ++r)  
+            {
+              ENSEM::Complex coeff;
+              Hadron::KeyHadronNPartNPtCorr_t npt; 
+              coeff = l->m_coeff * g->m_coeff * r->m_coeff; 
+              npt.npoint.resize(3); 
 
-            // arrays are FORTRAN style 
-            npt.npoint[1] = l->m_obj;
-            npt.npoint[2] = g->m_obj;
-            npt.npoint[3] = r->m_obj;
-            npt.ensemble = ensemble; 
+              // arrays are FORTRAN style 
+              npt.npoint[1] = l->m_obj;
+              npt.npoint[2] = g->m_obj;
+              npt.npoint[3] = r->m_obj;
+              npt.ensemble = ensemble; 
 
-            ret = ret + EnsemRedstarNPtBlock::ListObj_t(coeff,npt); 
-          }
+              ret = ret + EnsemRedstarNPtBlock::ListObj_t(coeff,npt); 
+            }
 
         return ret; 
       } 
@@ -99,9 +99,14 @@ namespace radmat
         return ret; 
       }
 
-
   } // anonomyous 
 
+
+  //
+  //
+  // MERGE THE EASY UNINPROVED STUFF 
+  //
+  //
   std::vector<ThreePointData>
     merge_blocks(const std::vector<BlockData> &lefty, 
         const std::vector<BlockData> &gamma,
@@ -122,6 +127,412 @@ namespace radmat
             if( check_mom(*l,*g,*r) )
               ret.push_back( make_data(*l,*g,*r,ensemble) ); 
           }
+
+      return ret; 
+    }
+
+
+  // the harder problem 
+  namespace 
+  {
+
+    typedef ADAT::MapObject<Hadron::KeyHadronNPartIrrep_t,double> singleThreadMassCache; 
+    typedef std::pair<ThreePointData,RedstarInprovedVectorCurrentXML::improvement>
+      ImprovedThreePointData; 
+
+
+    ImprovedThreePointData 
+      make_data(const BlockData &l, 
+          const VectorCurrentImprovedBlockData &g, 
+          const BlockData &r, 
+          const std::string &ensemble)
+      {
+        ThreePointData ret; 
+        ret.origin_rep = DataRep3pt(l.origin_rep,
+            g.origin_rep,
+            r.origin_rep);
+        ret.data_rep = DataRep3pt(l.data_rep,
+            g.data_rep,
+            r.data_rep);
+        ret.left_row = l.row;
+        ret.gamma_row = g.row;
+        ret.right_row = r.row; 
+
+        ret.data = merge_ensem_blocks( l.data,g.data,r.data,ensemble);
+
+        return std::make_pair<ret,g.imp>; 
+      }
+
+    // the database type we will be using 
+    typedef radmatAllConfDatabaseInterface< Hadron::KeyHadronNPartNPtCorr_t,
+            ENSEM::EnsemVectorComplex,
+            RadmatExtendedKeyHadronNPartIrrep_t,
+            RadmatMassOverlapData_t> DBType_t;
+
+    // key type
+    typedef RadmatExtendedKeyHadronNPartIrrep_t DBKeyType_t; 
+
+    // get all of the keys from a single data -- may be more than one pair  
+    std::vector< std::pair<DBKeyType_t,DBKeyType_t> > 
+      make_keys(const ThreePointData &d,const RedstarThreePointXMLInput &inp)
+      {
+        std::vector<std::pair<DBKeyType_t,DBKeyType_t> > ret; 
+
+        EnsemRedstarNPtBlock::const_iterator it; 
+        for(it = d.data.begin(); it != d.data.end(); ++it)
+        {
+          Hadron::KeyHadronNPartNPtCorr_t npt = it->m_obj; 
+
+          ret.push_back( std::make_pair( DBKeyType_t(inp.pid_left,npt.npoint[1].irrep), 
+                DBKeyType_t(inp.pid_right,npt.npoint[3].irrep)) ); 
+        }
+
+        return ret; 
+      }
+
+
+    singleThreadMassCache generate_mass_cache( const std::vector<ImprovedThreePointData> &d, 
+        const RedstarThreePointXMLInput &inp)
+    {
+      singleThreadMassCache cache; 
+
+      DBType_t db(inp.db_props); 
+      std::vector<ImprovedThreePointData>::const_iterator it; 
+
+      // loop the data and pull the relevant masses
+      for(it = d.begin(); it != d.end(); ++it)
+      {
+        std::vector< std::pair<DBKeyType_t,DBKeyType_t> > keys = make_keys(it->first,inp); 
+        std::vector< std::pair<DBKeyType_t,DBKeyType_t> >::const_iterator k;
+
+        // loop the set of keys on this bit of data 
+        for(k = keys.begin(); k != keys.end(); ++k)
+        {
+          DBKeyType_t left = k->first; 
+          DBKeyType_t right = k->second; 
+
+          double l = 1.;
+          double r = 2.;
+
+          // check insert left
+          if( !!! cache.exists(left.m_basic_key) )
+          {
+            // update or use default
+            if(db.exists(left) )
+            {
+              RadmatMassOverlapData_t tmp = db.fetch(left); 
+              l = SEMBLE::toScalar(ENSEM::mean(tmp.E())); 
+            }
+
+            cache.insert(left.m_basic_key,l); 
+          }
+
+          // check insert right
+          if( !!! cache.exists(right.m_basic_key) )
+          {
+            // update or use default 
+            if(db.exists(right) )
+            {
+              RadmatMassOverlapData_t tmp = db.fetch(right); 
+              r = SEMBLE::toScalar(ENSEM::mean(tmp.E())); 
+            }
+
+            cache.insert(right.m_basic_key,r); 
+          }
+
+        } // k 
+      } // it 
+
+      return cache; 
+    }
+
+    /////////////////////////
+    /////////////////////////
+
+    Hadron::KeyHadronNPartNPtCorr_t::NPoint_t
+      make_npt( const std::string &name, 
+          const ADATXML::Array<int> &mom,
+          const int row, 
+          const int twoI_z,
+          const bool creation_op,
+          const bool smearedP,
+          const int t_slice )
+      {
+
+        Hadron::KeyHadronNPartIrrep_t base; 
+
+        //    IN WITH THAT NEW STUFF
+        base.op.ops.resize(1); 
+        base.op.ops[1].name = name;
+        base.op.ops[1].mom_type = FF::canonicalOrder(mom); 
+
+        base.row = row;
+        base.twoI_z = twoI_z;
+        base.mom = mom;
+        base.creation_op = creation_op;
+        base.smearedP = smearedP;
+
+        Hadron::KeyHadronNPartNPtCorr_t::NPoint_t npt; 
+        npt.t_slice = t_slice; 
+        npt.irrep = base; 
+
+        return npt;
+      }
+
+    /////////////////////////
+    /////////////////////////
+
+    EnsemRedstarBlock
+      make_ensem_improvement_block( const std::string &name, 
+          const ADATXML::Array<int> &mom,
+          const int twoI_z,
+          const bool creation_op,
+          const bool smearedP,
+          const int t_slice,
+          const int hel, 
+          const bool parity)
+      {
+        EnsemRedstarBlock ret; 
+
+        // play the subduction dance
+        ContinuumBosonExprPrimitive meson(1,parity,hel,Hadron::generateLittleGroup(mom)); 
+
+        // the lattice version 
+        ListLatticeIrrepExpr_t lattice_meson;
+
+        // handle conventions
+        if(creation_op)
+          lattice_meson = invertSubduction(meson); 
+        else
+          lattice_meson = conj(invertSubduction(meson)); 
+
+        // do this sum
+        // O_{J,H} \sim \sum_{\lambda,\mu} S_{J,H}^{\lambda,\mu} O^{\lambda,\mu}
+        ListLatticeIrrepExpr_t::const_iterator it; 
+        for(it = lattice_meson.begin(); it != lattice_meson.end(); ++it)
+        {
+          std::stringstream op_name;
+          op_name << name << "_" << it->m_obj.irrep; 
+
+          Hadron::KeyHadronNPartNPtCorr_t::NPoint_t npt; 
+          npt = make_npt( op_name.str(), 
+              mom, 
+              it->m_obj.row, 
+              twoI_z,
+              creation_op,
+              smearedP,
+              t_slice );
+
+          ret = ret + EnsemRedstarBlock::ListObj_t(it->m_coeff,npt); 
+        }
+
+        return ret; 
+      }
+
+    /////////////////////////
+    /////////////////////////
+    itpp::Vec< EnsemRedstarBlock >
+      make_ensem_improvement_blocks( const std::string &name, 
+          const ADATXML::Array<int> &mom,
+          const int twoI_z,
+          const bool creation_op,
+          const bool smearedP)
+      {
+        itpp::Vec<EnsemRedstarBlock> ret(3); 
+        for(int i = 0; i < 3; ++i)
+          ret[i] = make_ensem_improvement_block(name,mom,twoI_z,
+              PHOTON_CREATE,smearedP,-3,1-i,false);
+        return ret; 
+      }
+
+    itpp::Vec<EnsemRedstarBlock>
+      make_cart_ensem_improvement_blocks(const std::string &name, 
+          const Hadron::KeyHadronNPartIrrep_t &base,
+          const int t_slice)
+      {
+        itpp::Vec<EnsemRedstarBlock> hel;
+        hel = make_ensem_improvement_blocks( name, 
+            base.mom, 
+            base.twoI_z,
+            base.smearedP);
+
+        itpp::Mat<std::complex<double> > M = invert2Cart(base.mom,PHOTON_CREATE); 
+
+        return M * hel; 
+      } 
+
+    EnsemRedstarBlock 
+      temporal_improvement( const std::string &name, 
+          const Hadron::KeyHadronNPartNPtCorr_t::NPoint_t &base,
+          const double pre_factor, 
+          const double mom_fac)
+      {
+        EnsemRedstarBlock ret; 
+
+        itpp::Vec<EnsemRedstarBlock> cart;
+        cart = make_cart_ensem_improvement_blocks(name,base.irrep,base.t_slice); 
+        ADATXML::Array<int> mom = base.irrep.mom; 
+
+        for(int i = 0; i < 3; ++i)
+        {
+          ENSEM::Complex weight; 
+          weight = SEMBLE::toScalar(std::complex<double>(pre_factor*mom_fac*mom[i],0.)); 
+          ret = ret + weight * cart[i]; 
+        }
+
+        return ret;  
+      }
+
+
+    // this one is a bit harder, lets do it using cartesian components 
+    ThreePointData apply_temporal_improvement(const ThreePointData &d, 
+        const RedstarImprovedVectorCurrentXML::improvement &inp, 
+        const double mom_fac)
+    {
+      ThreePointData ret; 
+      ret.origin_rep = d.origin_rep; 
+      ret.data_rep = d.data_rep; 
+      ret.left_row = d.left_row; 
+      ret.right_row = d.right_row; 
+      ret.gamma_row = d.gamma_row; 
+      ret.data = d.data; 
+
+      double Omega_s = inp.Omega_s; 
+      double Omega_t = inp.Omega_t; 
+      std::string op_stem = inp.name; 
+      double pre_factor = ( Omega_s / 2. + Omega_s*Omega_t ); 
+
+
+      EnsemRedstarNPtBlock::const_iterator it; 
+      // loop the data, find the terms then simply stick in the 
+      // improvement name with an updated weight 
+      for(it = d.data.begin(); it != d.data.end(); ++it)
+      {
+        // the key sits in the xml, use it to find the momentum 
+        Hadron::KeyHadronNPartNPtCorr_t npt = it->m_obj; 
+        ENSEM::Complex weight = it->m_coeff; 
+
+        EnsemRedstarBlock improvement = temporal_improvement( op_stem, 
+            npt.npoint[2], pre_factor,mom_fac); 
+
+        EnsemRedstarBlock::const_iterator bit; 
+        for(bit = improvement.begin(); bit != improvement.end(); ++bit)
+        {
+          ENSEM::Complex w = weight * bit->m_coeff; 
+          Hadron::KeyHadronNPartNPtCorr_t corr = npt; 
+          corr.npoint[2] = bit->m_obj; 
+          ret.push_back( EnsemRedstarNPtBlock::ListObj_t(w,corr)); 
+        }
+
+      }
+
+
+      return ret; 
+    }
+
+    // do spatial improvement, the easy case 
+    ThreePointData apply_spatial_improvement(const ThreePointData &d, 
+        const RedstarImprovedVectorCurrentXML::improvement &inp, 
+        const singleThreadMassCache &cache, 
+        const double mom_fac)
+    {
+      ThreePointData ret; 
+      ret.origin_rep = d.origin_rep; 
+      ret.data_rep = d.data_rep; 
+      ret.left_row = d.left_row; 
+      ret.right_row = d.right_row; 
+      ret.gamma_row = d.gamma_row; 
+      ret.data = d.data; 
+
+      double Omega_s = inp.Omega_s; 
+      double Omega_t = inp.Omega_t; 
+      std::string op_stem = inp.name; 
+      double pre_factor = ( Omega_t / 2. + 0.25 ); 
+
+      EnsemRedstarNPtBlock::const_iterator it; 
+      // loop the data, find the terms then simply stick in the 
+      // improvement name with an updated weight 
+      for(it = d.data.begin(); it != d.data.end(); ++it)
+      {
+        // the key sits in the xml, use it to find the zero component 
+        // of the momentum transfer 
+        Hadron::KeyHadronNPartNPtCorr_t npt = it->m_obj; 
+        ENSEM::Complex weight = it->m_coeff; 
+        double l = cache[npt.npoint[1].irrep];
+        double r = cache[npt.npoint[3].irrep]; 
+        double q0 = l - r; 
+
+        // update the weight to be prefactor * q_0
+        weight = weight * SEMBLE::toScalar( std::complex<double>(pre_factor*q0,0.)); 
+
+        // find the photon name 
+        std::string phot_op_name = npt.npoint[2].irrep.op.ops[1].name; 
+
+        // tokenize it, last one is the rep 
+        std::vector<std::string> tokens = tokenize(phot_op_name,"_"); 
+        std::string imp_op_name = op_stem + * ( tokens.end() -1); 
+
+        // update npt to have the improvement as the name
+        npt.npoint[2].irrep.op.ops[1].name = imp_op_name; 
+
+        // throw it back into the data list 
+        ret.data.push_back( EnsemRedstarNPtBlock::ListObj_t(weight,npt) ); 
+      }
+
+      return ret; 
+    }
+
+
+    // break on time vs space  
+    ThreePointData apply_improvement(const ImprovedThreePointData &d, 
+        const singleThreadMassCache &cache, 
+        const double mom_fac)
+    {
+      if( d.first.orgin_rep.g == "J0p" )
+        return apply_temporal_improvement(d.first,d.second,mom_fac); 
+      else if (d.first.origin_rep.g == "J1m")
+        return apply_spatial_improvemen(d.first,d.second,cache,mom_fac); 
+      else
+      {
+        std::cout << "unknown rep " << d.first.origin_rep.g << std::endl;
+        POW2_ASSERT(false); 
+      }
+
+      return d.first; 
+    }
+
+  } // anonomyous 
+
+  std::vector<ThreePointData> 
+    merge_blocks(const std::vector<BlockData> &lefty, 
+        const std::vector<VectorCurrentImprovedBlockData> &gamma, 
+        const std::vector<BlockData> &righty, 
+        const std::string &ensemble,
+        const RedstarThreePointXMLInput &inp)
+    {
+      std::vector<ThreePointData> ret; 
+      std::vector<ImprovedThreePointData> merge; 
+      std::vector<BlockData>::const_iterator l,r,g;
+
+      // some poor estimate of the size, lots of them are removed via 
+      // momentum conservation
+      ret.reserve( lefty.size() * righty.size() / 2 ); 
+
+      for( l = lefty.begin(); l != lefty.end(); ++l)
+        for( g = gamma.begin(); g != gamma.end(); ++g)
+          for(r = righty.begin(); r != righty.end(); ++r)
+          {
+            if( check_mom(*l,*g,*r) )
+              merge.push_back( make_data(*l,*g,*r,ensemble) ); 
+          }
+
+      ret.reserve(merge.size()); 
+      singleThreadMassCache cache; 
+      cache = generate_mass_cache(merge,inp); 
+
+      std::vector<ImprovedThreePointData>::const_iterator it; 
+      for(it = merge.begin(); it != merge.end(); ++it)
+        ret.push_back( apply_improvement( *it, cache, inp.mom_fac ) ); 
 
       return ret; 
     }

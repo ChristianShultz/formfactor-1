@@ -10,7 +10,7 @@ set guard = ${hg}_H
 echo "#ifndef $guard" > $ff
 echo "#define $guard" >> $ff
 
-ls *.h | awk '{ print "#include \"" $1 "\"" }' >>  $ff 
+ls *.h | grep -v $ff |  awk '{ print "#include \"" $1 "\"" }' >>  $ff 
 
 echo "#endif" >> $ff
 

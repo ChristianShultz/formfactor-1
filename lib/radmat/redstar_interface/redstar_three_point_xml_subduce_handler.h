@@ -20,7 +20,7 @@ namespace radmat
     { return Stringify<RedstarThreePointXMLSubduceHandler>(); }
 
     virtual std::vector<ThreePointData>
-      handle_work(); 
+      handle_work(const RedstarThreePointXMLInput &); 
   }; 
 
 

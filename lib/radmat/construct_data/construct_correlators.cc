@@ -6,7 +6,7 @@
 
  * Creation Date : 04-12-2012
 
- * Last Modified : Tue 29 Apr 2014 03:38:47 PM EDT
+ * Last Modified : Wed 30 Apr 2014 12:59:17 PM EDT
 
  * Created By : shultz
 
@@ -167,9 +167,15 @@ namespace radmat
         const radmatDBProp_t *db_prop = &ini.radmatDBProp; 
         const ThreePointCorrXMLIni_t *three_pt = &ini.threePointCorrXMLIni; 
 
+        RedstarThreePointXMLInput input; 
+        input.db_props = ini.radmatDBProps; 
+        input.pid_left = ini.threePointCorrXMLIni.sink_id; 
+        input.pid_right = ini.threePointCorrXMLIni.source_id; 
+        input.mom_fac = p_factor; 
+
 
         return tag_lattice_xml(
-            red->handle_work(),
+            red->handle_work(input),
             p_factor, 
             three_pt->maSink, 
             three_pt->maSource, 
@@ -191,10 +197,17 @@ namespace radmat
         const radmatDBProp_t *db_prop = &ini.radmatDBProp; 
         const ThreePointCorrXMLIni_t *three_pt = &ini.threePointCorrXMLIni; 
 
+
+        RedstarThreePointXMLInput input; 
+        input.db_props = ini.radmatDBProps; 
+        input.pid_left = ini.threePointCorrXMLIni.sink_id; 
+        input.pid_right = ini.threePointCorrXMLIni.source_id; 
+        input.mom_fac = p_factor; 
+
         // this must pick out the correct matrix element
         std::vector<TaggedEnsemRedstarNPtBlock> lorentz_tagged_data;
         lorentz_tagged_data =  tag_lattice_xml(
-            red->handle_work(),
+            red->handle_work(input),
             p_factor, 
             three_pt->maSink, 
             three_pt->maSource, 
@@ -231,10 +244,16 @@ namespace radmat
         const radmatDBProp_t *db_prop = &ini.radmatDBProp; 
         const ThreePointCorrXMLIni_t *three_pt = &ini.threePointCorrXMLIni; 
 
+        RedstarThreePointXMLInput input; 
+        input.db_props = ini.radmatDBProps; 
+        input.pid_left = ini.threePointCorrXMLIni.sink_id; 
+        input.pid_right = ini.threePointCorrXMLIni.source_id; 
+        input.mom_fac = p_factor; 
+
         // this must pick out the correct matrix element
         std::vector<TaggedEnsemRedstarNPtBlock> lorentz_tagged_data;
         lorentz_tagged_data =  tag_lattice_xml(
-            red->handle_work(),
+            red->handle_work(input),
             p_factor, 
             three_pt->maSink, 
             three_pt->maSource, 

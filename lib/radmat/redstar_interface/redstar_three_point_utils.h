@@ -35,7 +35,8 @@ namespace radmat
     merge_blocks(const std::vector<BlockData> &lefty,
         const std::vector<VectorCurrentImprovedBlockData> &gamma,
         const std::vector<BlockData> &righty,
-        const std::string &ensemble); 
+        const std::string &ensemble,
+        const RedstarThreePointXMLInput &); 
 
 }
 
