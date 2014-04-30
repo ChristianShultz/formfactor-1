@@ -1,8 +1,7 @@
 #ifndef BUILD_CORRELATORS_BAD_DATA_REPOSITORY_H
 #define BUILD_CORRELATORS_BAD_DATA_REPOSITORY_H 
 
-
-#include "radmat_overlap_key_val_db.h"
+#include "radmat/database/database.h"
 #include "hadron/hadron_npart_npt_corr.h"
 #include <omp.h>
 #include <vector>

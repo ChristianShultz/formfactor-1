@@ -3,7 +3,7 @@
 
 
 
-#include "radmat_database_interface.h"
+#include "radmat/database/database.h"
 #include "hadron/hadron_npart_npt_corr.h"
 #include "radmat/redstar_interface/redstar_interface.h"
 #include "io/adat_xmlio.h"

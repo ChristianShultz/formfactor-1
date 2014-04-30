@@ -6,7 +6,7 @@
 
  * Creation Date : 21-03-2014
 
- * Last Modified : Wed 30 Apr 2014 12:55:19 PM EDT
+ * Last Modified : Wed 30 Apr 2014 01:46:06 PM EDT
 
  * Created By : shultz
 
@@ -14,6 +14,15 @@
 
 
 #include "redstar_three_point_utils.h"
+#include "redstar_improved_vector_current_xml_interface.h"
+#include "redstar_cartesian_interface.h"
+#include "adat/map_obj.h"
+#include "semble/semble_meta.h"
+#include "formfac/formfac_qsq.h"
+#include "redstar_invert_subduction.h"
+#include "hadron/irrep_util.h"
+#include "redstar_photon_props.h"
+#include "radmat/utils/tokenize.h"
 
 
 namespace radmat
@@ -45,6 +54,33 @@ namespace radmat
 
       return true; 
     }
+
+    // returns true if momentum is conserved
+    bool check_mom(const BlockData &l, const VectorCurrentImprovedBlockData &g, const BlockData &r)
+    {
+      ADATXML::Array<int> ll,gg,rr;
+      ll = l.data.begin()->m_obj.irrep.mom;
+      gg = g.data.begin()->m_obj.irrep.mom;
+      rr = r.data.begin()->m_obj.irrep.mom;
+
+      int ls(1),gs(1),rs(1); 
+
+      if( !!! l.data.begin()->m_obj.irrep.creation_op )
+        ls = - 1 ; 
+
+      if( !!! g.data.begin()->m_obj.irrep.creation_op )
+        gs = - 1 ; 
+
+      if( !!! r.data.begin()->m_obj.irrep.creation_op )
+        rs = - 1 ; 
+
+      for(int i =0; i < 3; ++i)
+        if( ls*ll[i] + gs*gg[i] + rs*rr[i] != 0 )
+          return false;  
+
+      return true; 
+    }
+
 
     EnsemRedstarNPtBlock 
       merge_ensem_blocks( const EnsemRedstarBlock &lefty,
@@ -137,7 +173,7 @@ namespace radmat
   {
 
     typedef ADAT::MapObject<Hadron::KeyHadronNPartIrrep_t,double> singleThreadMassCache; 
-    typedef std::pair<ThreePointData,RedstarInprovedVectorCurrentXML::improvement>
+    typedef std::pair<ThreePointData,RedstarImprovedVectorCurrentXML::improvement>
       ImprovedThreePointData; 
 
 
@@ -160,7 +196,7 @@ namespace radmat
 
         ret.data = merge_ensem_blocks( l.data,g.data,r.data,ensemble);
 
-        return std::make_pair<ret,g.imp>; 
+        return std::make_pair(ret,g.imp); 
       }
 
     // the database type we will be using 
@@ -215,7 +251,7 @@ namespace radmat
           double r = 2.;
 
           // check insert left
-          if( !!! cache.exists(left.m_basic_key) )
+          if( !!! cache.exist(left.m_basic_key) )
           {
             // update or use default
             if(db.exists(left) )
@@ -228,7 +264,7 @@ namespace radmat
           }
 
           // check insert right
-          if( !!! cache.exists(right.m_basic_key) )
+          if( !!! cache.exist(right.m_basic_key) )
           {
             // update or use default 
             if(db.exists(right) )
@@ -354,6 +390,7 @@ namespace radmat
         hel = make_ensem_improvement_blocks( name, 
             base.mom, 
             base.twoI_z,
+            base.creation_op,
             base.smearedP);
 
         itpp::Mat<std::complex<double> > M = invert2Cart(base.mom,PHOTON_CREATE); 
@@ -421,7 +458,7 @@ namespace radmat
           ENSEM::Complex w = weight * bit->m_coeff; 
           Hadron::KeyHadronNPartNPtCorr_t corr = npt; 
           corr.npoint[2] = bit->m_obj; 
-          ret.push_back( EnsemRedstarNPtBlock::ListObj_t(w,corr)); 
+          ret.data.push_back( EnsemRedstarNPtBlock::ListObj_t(w,corr)); 
         }
 
       }
@@ -488,10 +525,10 @@ namespace radmat
         const singleThreadMassCache &cache, 
         const double mom_fac)
     {
-      if( d.first.orgin_rep.g == "J0p" )
+      if( d.first.origin_rep.g == "J0p" )
         return apply_temporal_improvement(d.first,d.second,mom_fac); 
       else if (d.first.origin_rep.g == "J1m")
-        return apply_spatial_improvemen(d.first,d.second,cache,mom_fac); 
+        return apply_spatial_improvement(d.first,d.second,cache,mom_fac); 
       else
       {
         std::cout << "unknown rep " << d.first.origin_rep.g << std::endl;
@@ -512,7 +549,8 @@ namespace radmat
     {
       std::vector<ThreePointData> ret; 
       std::vector<ImprovedThreePointData> merge; 
-      std::vector<BlockData>::const_iterator l,r,g;
+      std::vector<BlockData>::const_iterator l,r;
+      std::vector<VectorCurrentImprovedBlockData>::const_iterator g; 
 
       // some poor estimate of the size, lots of them are removed via 
       // momentum conservation

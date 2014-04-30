@@ -3,12 +3,29 @@
 
 #include "redstar_particle_handler_utils.h"
 #include "radmat/data_representation/data_representation.h"
+#include "radmat/database/database.h"
 
 namespace radmat
 {
   // the fundamental xml work unit 
   typedef ListObjExpr_t<ENSEM::Complex,
           Hadron::KeyHadronNPartNPtCorr_t> EnsemRedstarNPtBlock; 
+
+  // hold params for improvement 
+  struct RedstarThreePointXMLInput
+  {
+    RedstarThreePointXMLInput() {}
+    RedstarThreePointXMLInput(const radmatDBProp_t &db, 
+        const std::string &lpid, 
+        const std::string &rpid)
+      : db_props(db) , pid_left(lpid) , pid_right(rpid)
+    { }
+
+    radmatDBProp_t db_props; 
+    std::string pid_left; 
+    std::string pid_right; 
+    double mom_fac; 
+  }; 
 
 
   // the origin_rep is some lorentz info 

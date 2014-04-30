@@ -16,8 +16,10 @@ nobase_include_HEADERS =   \
 													 radmat/construct_data/data_tag_redstar_interface.h    \
 													 radmat/construct_data/lattice_multi_data_object.h    \
 													 radmat/construct_data/make_head.csh    \
-													 radmat/construct_data/radmat_database_interface.h    \
-													 radmat/construct_data/radmat_overlap_key_val_db.h    \
+													 radmat/database/database.h    \
+													 radmat/database/make_head.csh    \
+													 radmat/database/radmat_database_interface.h    \
+													 radmat/database/radmat_overlap_key_val_db.h    \
 													 radmat/data_representation/data_representation_cubic_groups.h    \
 													 radmat/data_representation/data_representation_factory.h    \
 													 radmat/data_representation/data_representation.h    \
@@ -64,6 +66,7 @@ nobase_include_HEADERS =   \
 													 radmat/ff/lorentzff_polarization_embedding_old.h    \
 													 radmat/ff/lorentzff_polarization_tensors.h    \
 													 radmat/ff/make_head.csh    \
+													 radmat/ff/mass_averager.h    \
 													 radmat/fitting/fitting.h    \
 													 radmat/fitting/fit_tins.h    \
 													 radmat/fitting/make_head.csh    \
@@ -138,8 +141,8 @@ libradmat_a_SOURCES =	\
 											radmat/construct_data/construct_correlators_utils.cc    \
 											radmat/construct_data/construct_correlators_xml.cc    \
 											radmat/construct_data/data_tag_redstar_interface.cc    \
-											radmat/construct_data/radmat_database_interface.cc    \
-											radmat/construct_data/radmat_overlap_key_val_db.cc    \
+											radmat/database/radmat_database_interface.cc    \
+											radmat/database/radmat_overlap_key_val_db.cc    \
 											radmat/data_representation/data_representation_cubic_groups.cc    \
 											radmat/data_representation/data_representation_factory.cc    \
 											radmat/data_representation/data_representation_lorentz_groups.cc    \

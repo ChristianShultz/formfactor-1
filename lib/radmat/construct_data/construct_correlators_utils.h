@@ -4,10 +4,9 @@
 
 #include "construct_correlators_xml.h"
 #include "data_tag_redstar_interface.h"
+#include "radmat/database/database.h"
 #include "lattice_multi_data_object.h"
 #include "hadron/hadron_npart_npt_corr.h"
-#include "radmat_database_interface.h"
-#include "radmat_overlap_key_val_db.h"
 #include "radmat/utils/mink_qsq.h"
 #include "ensem/ensem.h"
 #include "adat/map_obj.h"

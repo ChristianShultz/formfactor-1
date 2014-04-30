@@ -6,7 +6,7 @@
 
  * Creation Date : 04-12-2012
 
- * Last Modified : Wed 30 Apr 2014 12:59:17 PM EDT
+ * Last Modified : Wed 30 Apr 2014 01:31:56 PM EDT
 
  * Created By : shultz
 
@@ -168,7 +168,7 @@ namespace radmat
         const ThreePointCorrXMLIni_t *three_pt = &ini.threePointCorrXMLIni; 
 
         RedstarThreePointXMLInput input; 
-        input.db_props = ini.radmatDBProps; 
+        input.db_props = ini.radmatDBProp; 
         input.pid_left = ini.threePointCorrXMLIni.sink_id; 
         input.pid_right = ini.threePointCorrXMLIni.source_id; 
         input.mom_fac = p_factor; 
@@ -199,7 +199,7 @@ namespace radmat
 
 
         RedstarThreePointXMLInput input; 
-        input.db_props = ini.radmatDBProps; 
+        input.db_props = ini.radmatDBProp; 
         input.pid_left = ini.threePointCorrXMLIni.sink_id; 
         input.pid_right = ini.threePointCorrXMLIni.source_id; 
         input.mom_fac = p_factor; 
@@ -245,7 +245,7 @@ namespace radmat
         const ThreePointCorrXMLIni_t *three_pt = &ini.threePointCorrXMLIni; 
 
         RedstarThreePointXMLInput input; 
-        input.db_props = ini.radmatDBProps; 
+        input.db_props = ini.radmatDBProp; 
         input.pid_left = ini.threePointCorrXMLIni.sink_id; 
         input.pid_right = ini.threePointCorrXMLIni.source_id; 
         input.mom_fac = p_factor; 
