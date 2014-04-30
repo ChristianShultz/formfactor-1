@@ -118,8 +118,8 @@
 
       <renormalization>
         <RGE_prop>4</RGE_prop>
-        <Z_t>1.039</Z_t>
-        <Z_s>1.184</Z_s> 
+        <Z_t>1.039362</Z_t>
+        <Z_s>1.159378</Z_s> 
       </renormalization>
 
       <sink_id>rho_proj0</sink_id>

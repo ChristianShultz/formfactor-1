@@ -25,7 +25,7 @@
 
       <redstar>
 
-        <object_name>RedstarThreePointXMLLorentzHandler</object_name>
+        <object_name>RedstarThreePointXMLSubduceHandler</object_name>
         <param>
           <ensemble>szscl3_16_128_b1p50_t_x4p300_um0p0743_n1p265_per</ensemble>
           <npt>
@@ -36,7 +36,7 @@
                 <H></H>
                 <!-- do we want to consider all the 
                 rotations of the provided momentum -->
-                <fill_star>false</fill_star>    
+                <fill_star>true</fill_star>    
                 <mom>
                   <elem>0 0 0</elem>
                   <elem>1 0 0</elem>
@@ -53,12 +53,18 @@
               </param>
             </elem>
             <elem>
-              <object_name>RedstarVectorCurrentXML</object_name>
+              <object_name>RedstarImprovedVectorCurrentXML</object_name>
               <param>
                 <!-- integer momentum cuts -->
                 <pmin>0</pmin>
                 <pmax>4</pmax>
                 <t_slice>-3</t_slice>
+
+                <improvement>
+                  <Omega_s>-90.514701</Omega_s>
+                  <Omega_t>-90.25</Omega_t>
+                  <name>rho_rho_2xD0_J0__J1</name>
+                </improvement>
 
                 <time>
                   <active>false</active>               <!-- on or off -->
@@ -123,10 +129,10 @@
       </renormalization>
 
       <sink_id>pion_proj0</sink_id>
-      <maSink>0.148</maSink>
+      <maSink>0.1483</maSink>
 
       <source_id>pion_proj0</source_id>
-      <maSource>0.148</maSource>
+      <maSource>0.1483</maSource>
 
     </threePointCorrXMLIni>
 
@@ -137,6 +143,7 @@
       <threePointDatabase>
         <dbname>
           <elem>szscl3_16_128_b1p50_t_x4p300_um0p0743_n1p265_per.qq_0_1_2_3_4.dt28.sdb</elem>
+          <elem>szscl3_16_128_b1p50_t_x4p300_um0p0743_n1p265_per.improvement.qq_1_2_3_4.dt28.sdb</elem>
         </dbname>
         <badlist>bad_corrs.xml</badlist>
       </threePointDatabase>
@@ -169,11 +176,11 @@
 
   <chisq>none</chisq>
 
-  <maxThread>11</maxThread>
+  <maxThread>10</maxThread>
 
   <!-- energy of lightest vector or branch cut from two pions -->
   <poleMass>0.216166</poleMass>
 
-  <tolerance>1e-3</tolerance>
+  <tolerance>1e-6</tolerance>
 
 </DriverProps>
