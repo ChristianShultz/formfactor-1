@@ -6,7 +6,7 @@
 
  * Creation Date : 31-03-2014
 
- * Last Modified : Wed 30 Apr 2014 01:59:47 PM EDT
+ * Last Modified : Wed 30 Apr 2014 02:16:57 PM EDT
 
  * Created By : shultz
 
@@ -60,6 +60,7 @@ namespace radmat
       else if( xml_int[1].param->type() == Stringify<RedstarImprovedVectorCurrentXML>() )
       {
         const RedstarImprovedVectorCurrentXML *gammay; 
+        gammay = dynamic_cast<const RedstarImprovedVectorCurrentXML *>(xml_int[1].param.get_ptr());
         std::vector<VectorCurrentImprovedBlockData> gamma = generate_cubic_block(gammay); 
         timesliz[1] = gammay->t_slice; 
         this->set_timeslice(timesliz); 

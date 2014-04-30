@@ -6,7 +6,7 @@
 
 * Creation Date : 12-11-2013
 
-* Last Modified : Wed 23 Apr 2014 11:23:55 AM EDT
+* Last Modified : Wed 30 Apr 2014 02:09:37 PM EDT
 
 * Created By : shultz
 
@@ -25,6 +25,7 @@ _._._._._._._._._._._._._._._._._._._._._.*/
 #include "redstar_three_point_xml_subduce_handler.h"
 #include "redstar_single_particle_meson_xml_interface.h"
 #include "redstar_vector_current_xml_interface.h"
+#include "redstar_improved_vector_current_xml_interface.h"
 
 namespace FacEnv = radmat::TheRedstarAbstractXMLFactoryEnv;
 typedef radmat::TheRedstarAbstractXMLFactory Factory; 
@@ -72,6 +73,7 @@ namespace radmat
         success &= do_reg<RedstarThreePointXMLLorentzHandler>(); 
         success &= do_reg<RedstarThreePointXMLSubduceHandler>(); 
         success &= do_reg<RedstarThreePointXMLMixedHandler>(); 
+        success &= do_reg<RedstarImprovedVectorCurrentXML>(); 
         local_registration = true; 
       }
 

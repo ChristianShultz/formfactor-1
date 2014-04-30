@@ -6,7 +6,7 @@
 
 * Creation Date : 14-04-2014
 
-* Last Modified : Mon 14 Apr 2014 12:15:02 PM EDT
+* Last Modified : Wed 30 Apr 2014 04:58:57 PM EDT
 
 * Created By : shultz
 
@@ -95,6 +95,8 @@ namespace radmat
       ADATXML::write(xml,"Omega_s",i.Omega_s);
       ADATXML::write(xml,"Omega_t",i.Omega_t); 
       ADATXML::write(xml,"name",i.name); 
+      ADATXML::write(xml,"coeff_r",i.coeff_r); 
+      ADATXML::write(xml,"coeff_i",i.coeff_i); 
       ADATXML::pop(xml);
     }
 
@@ -106,6 +108,8 @@ namespace radmat
       doXMLRead(ptop,"Omega_s",i.Omega_s,__PRETTY_FUNCTION__); 
       doXMLRead(ptop,"Omega_t",i.Omega_t,__PRETTY_FUNCTION__); 
       doXMLRead(ptop,"name",i.name,__PRETTY_FUNCTION__); 
+      doXMLRead(ptop,"coeff_r",i.coeff_r,__PRETTY_FUNCTION__); 
+      doXMLRead(ptop,"coeff_i",i.coeff_i,__PRETTY_FUNCTION__); 
     }
 
 } // radmat

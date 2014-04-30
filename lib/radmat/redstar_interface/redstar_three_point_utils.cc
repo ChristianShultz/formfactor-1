@@ -6,7 +6,7 @@
 
  * Creation Date : 21-03-2014
 
- * Last Modified : Wed 30 Apr 2014 01:46:06 PM EDT
+ * Last Modified : Wed 30 Apr 2014 05:02:29 PM EDT
 
  * Created By : shultz
 
@@ -21,6 +21,7 @@
 #include "formfac/formfac_qsq.h"
 #include "redstar_invert_subduction.h"
 #include "hadron/irrep_util.h"
+#include "hadron/ensem_filenames.h"
 #include "redstar_photon_props.h"
 #include "radmat/utils/tokenize.h"
 
@@ -135,6 +136,71 @@ namespace radmat
         return ret; 
       }
 
+    EnsemRedstarNPtBlock 
+      resum_ensem_npt_block(const EnsemRedstarNPtBlock &b)
+      {
+        EnsemRedstarNPtBlock ret; 
+
+        typedef std::pair<EnsemRedstarNPtBlock::Coeff_t, 
+                EnsemRedstarNPtBlock::Obj_t> coeff_object; 
+        std::map<std::string,coeff_object> coeff_map; 
+        EnsemRedstarNPtBlock::const_iterator it; 
+
+        for(it = b.begin(); it != b.end(); ++it)
+        {
+          EnsemRedstarNPtBlock::Coeff_t coeff = it->m_coeff; 
+          std::string key = Hadron::ensemFileName(it->m_obj); 
+
+          if(coeff_map.find(key) != coeff_map.end())
+            coeff += coeff_map[key].first; 
+          
+          // reinsert 
+          coeff_map[key] = std::make_pair(coeff,it->m_obj); 
+        }
+
+        std::map<std::string,coeff_object>::const_iterator map_it; 
+        for(map_it = coeff_map.begin(); map_it != coeff_map.end(); ++map_it)
+          if( fabs(SEMBLE::toScalar(map_it->second.first) ) > 1e-6)
+            ret = ret + EnsemRedstarNPtBlock::ListObj_t(map_it->second.first, 
+                map_it->second.second); 
+
+        return ret; 
+      }
+
+
+    ThreePointData
+      resum_three_point_data(const ThreePointData &d)
+      {
+        ThreePointData ret; 
+        ret.origin_rep = d.origin_rep; 
+        ret.data_rep = d.data_rep; 
+        ret.left_row = d.left_row; 
+        ret.right_row = d.right_row; 
+        ret.gamma_row = d.gamma_row; 
+        ret.data = resum_ensem_npt_block(d.data); 
+
+        return ret; 
+      }
+
+    std::vector<ThreePointData>
+      resum_three_point_data(const std::vector<ThreePointData> &d)
+      {
+        std::vector<ThreePointData> ret; 
+        std::vector<ThreePointData>::const_iterator it; 
+        ret.reserve(d.size()); 
+
+        for(it = d.begin(); it != d.end(); ++it)
+        {
+          ThreePointData tmp = resum_three_point_data(*it); 
+          if( tmp.data.size() == 0 )
+            continue; 
+          ret.push_back(tmp); 
+        }
+
+        return ret; 
+      }
+
+
   } // anonomyous 
 
 
@@ -164,7 +230,7 @@ namespace radmat
               ret.push_back( make_data(*l,*g,*r,ensemble) ); 
           }
 
-      return ret; 
+      return resum_three_point_data( ret ); 
     }
 
 
@@ -244,36 +310,45 @@ namespace radmat
         // loop the set of keys on this bit of data 
         for(k = keys.begin(); k != keys.end(); ++k)
         {
-          DBKeyType_t left = k->first; 
-          DBKeyType_t right = k->second; 
+          DBKeyType_t left_cache_key = k->first; 
+          DBKeyType_t right_cache_key = k->second; 
+
+          DBKeyType_t left_db_key = left_cache_key; 
+          DBKeyType_t right_db_key = right_cache_key; 
+
+          // the radmat database keys are hacked to condense 
+          // the number of copies, eg rows collapse to 0, 
+          // and the stars of p collapse to a single ref
+          left_db_key.doLG_symmetry(); 
+          right_db_key.doLG_symmetry(); 
 
           double l = 1.;
           double r = 2.;
 
           // check insert left
-          if( !!! cache.exist(left.m_basic_key) )
+          if( !!! cache.exist(left_cache_key.m_basic_key) )
           {
             // update or use default
-            if(db.exists(left) )
+            if(db.exists(left_db_key) )
             {
-              RadmatMassOverlapData_t tmp = db.fetch(left); 
+              RadmatMassOverlapData_t tmp = db.fetch(left_db_key); 
               l = SEMBLE::toScalar(ENSEM::mean(tmp.E())); 
             }
 
-            cache.insert(left.m_basic_key,l); 
+            cache.insert(left_cache_key.m_basic_key,l); 
           }
 
           // check insert right
-          if( !!! cache.exist(right.m_basic_key) )
+          if( !!! cache.exist(right_cache_key.m_basic_key) )
           {
             // update or use default 
-            if(db.exists(right) )
+            if(db.exists(right_db_key) )
             {
-              RadmatMassOverlapData_t tmp = db.fetch(right); 
+              RadmatMassOverlapData_t tmp = db.fetch(right_db_key); 
               r = SEMBLE::toScalar(ENSEM::mean(tmp.E())); 
             }
 
-            cache.insert(right.m_basic_key,r); 
+            cache.insert(right_cache_key.m_basic_key,r); 
           }
 
         } // k 
@@ -401,7 +476,7 @@ namespace radmat
     EnsemRedstarBlock 
       temporal_improvement( const std::string &name, 
           const Hadron::KeyHadronNPartNPtCorr_t::NPoint_t &base,
-          const double pre_factor, 
+          const std::complex<double> pre_factor, 
           const double mom_fac)
       {
         EnsemRedstarBlock ret; 
@@ -413,7 +488,7 @@ namespace radmat
         for(int i = 0; i < 3; ++i)
         {
           ENSEM::Complex weight; 
-          weight = SEMBLE::toScalar(std::complex<double>(pre_factor*mom_fac*mom[i],0.)); 
+          weight = SEMBLE::toScalar(pre_factor*mom_fac*double(mom[i])); 
           ret = ret + weight * cart[i]; 
         }
 
@@ -436,8 +511,10 @@ namespace radmat
 
       double Omega_s = inp.Omega_s; 
       double Omega_t = inp.Omega_t; 
+      double coeff_r = inp.coeff_r; 
+      double coeff_i = inp.coeff_i; 
       std::string op_stem = inp.name; 
-      double pre_factor = ( Omega_s / 2. + Omega_s*Omega_t ); 
+      std::complex<double> pre_factor = ( Omega_s / 2. + Omega_s*Omega_t )*std::complex<double>(coeff_r,coeff_i); 
 
 
       EnsemRedstarNPtBlock::const_iterator it; 
@@ -483,8 +560,10 @@ namespace radmat
 
       double Omega_s = inp.Omega_s; 
       double Omega_t = inp.Omega_t; 
+      double coeff_r = inp.coeff_r; 
+      double coeff_i = inp.coeff_i; 
       std::string op_stem = inp.name; 
-      double pre_factor = ( Omega_t / 2. + 0.25 ); 
+      std::complex<double> pre_factor = ( Omega_t / 2. + 0.25 )*std::complex<double>(coeff_r,coeff_i); 
 
       EnsemRedstarNPtBlock::const_iterator it; 
       // loop the data, find the terms then simply stick in the 
@@ -500,14 +579,14 @@ namespace radmat
         double q0 = l - r; 
 
         // update the weight to be prefactor * q_0
-        weight = weight * SEMBLE::toScalar( std::complex<double>(pre_factor*q0,0.)); 
+        weight = weight * SEMBLE::toScalar( pre_factor*q0); 
 
         // find the photon name 
         std::string phot_op_name = npt.npoint[2].irrep.op.ops[1].name; 
 
         // tokenize it, last one is the rep 
         std::vector<std::string> tokens = tokenize(phot_op_name,"_"); 
-        std::string imp_op_name = op_stem + * ( tokens.end() -1); 
+        std::string imp_op_name = op_stem + "_" + * ( tokens.end() -1); 
 
         // update npt to have the improvement as the name
         npt.npoint[2].irrep.op.ops[1].name = imp_op_name; 
@@ -572,7 +651,7 @@ namespace radmat
       for(it = merge.begin(); it != merge.end(); ++it)
         ret.push_back( apply_improvement( *it, cache, inp.mom_fac ) ); 
 
-      return ret; 
+      return resum_three_point_data( ret ); 
     }
 
 

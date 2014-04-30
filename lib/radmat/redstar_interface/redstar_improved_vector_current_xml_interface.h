@@ -41,6 +41,8 @@ namespace radmat
      double Omega_s;
      double Omega_t; 
      std::string name; 
+     double coeff_r; 
+     double coeff_i; 
     };
 
     int pmin; 
