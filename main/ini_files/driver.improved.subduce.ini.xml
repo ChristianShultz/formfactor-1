@@ -61,17 +61,19 @@
                 <t_slice>-3</t_slice>
 
                 <improvement>
-                  <Omega_s>-90.514701</Omega_s>
-                  <Omega_t>-90.25</Omega_t>
+                  <Omega_s>-0.514701</Omega_s>
+                  <Omega_t>-0.25</Omega_t>
                   <name>rho_rho_2xD0_J0__J1</name>
+                  <coeff_r>1</coeff_r>
+                  <coeff_i>0</coeff_i>
                 </improvement>
 
                 <time>
-                  <active>false</active>               <!-- on or off -->
+                  <active>true</active>               <!-- on or off -->
                   <photons>
                     <elem> 
-                      <coeff_r>1</coeff_r>
-                      <coeff_i>0</coeff_i>
+                      <coeff_r>0</coeff_r>
+                      <coeff_i>1</coeff_i>
                       <name>b_b0xD0_J0__J0</name>
                     </elem>            
                   </photons>
@@ -80,7 +82,7 @@
                 </time>
 
                 <space>
-                  <active>true</active>               <!-- on or off -->
+                  <active>false</active>               <!-- on or off -->
                   <photons>
                     <elem> 
                       <coeff_r>1</coeff_r>
