@@ -6,7 +6,7 @@
 
  * Creation Date : 20-03-2014
 
- * Last Modified : Mon 14 Apr 2014 12:29:02 PM EDT
+ * Last Modified : Thu 01 May 2014 02:35:34 PM EDT
 
  * Created By : shultz
 
@@ -206,35 +206,47 @@ namespace radmat
     /////////////////////////
     /////////////////////////
 
+    struct lor_2_cub_printer
+    {
+      static void print(const std::string &msg)
+      {}
+      // {std::cout << "lor_2_cub_printer " << msg << std::endl;}
+    };
+
     std::vector<BlockData>
       conv_lorentz_to_cubic_block(const std::vector<BlockData> &d)
       {
         std::vector<BlockData> ret; 
 
-        typedef Hadron::KeyHadronNPartNPtCorr_t::NPoint_t key_t; 
+        typedef std::pair<Hadron::KeyHadronNPartNPtCorr_t::NPoint_t,std::string> data_t; 
 
-        std::string origin = d.begin()->origin_rep; 
-        std::map<std::string,key_t> seen;  
+        std::map<std::string,data_t> seen;  
         std::vector<BlockData>::const_iterator big_it; 
         EnsemRedstarBlock::const_iterator little_it; 
 
+        // need to be careful about the origin in case we pass two types 
+        // when building xml files!!
         for(big_it = d.begin(); big_it != d.end(); ++big_it)
+        {
+          std::string origin = big_it->origin_rep; 
           for(little_it = big_it->data.begin(); little_it != big_it->data.end(); ++little_it)
           {
-            seen[ Hadron::ensemFileName(little_it->m_obj.irrep) ] = little_it->m_obj; 
+            seen[ Hadron::ensemFileName(little_it->m_obj.irrep) + origin ] 
+              = std::make_pair(little_it->m_obj,origin); 
           }
+        }
 
         ENSEM::Complex one( cmplx(ENSEM::Real(1.),ENSEM::Real(0.))); 
-        std::map<std::string,key_t>::const_iterator it; 
+        std::map<std::string,data_t>::const_iterator it; 
         for(it = seen.begin(); it != seen.end(); ++it)
         {
-          std::string name = it->second.irrep.op.ops[1].name; 
-          int row = it->second.irrep.row; 
+          std::string name = it->second.first.irrep.op.ops[1].name; 
+          int row = it->second.first.irrep.row; 
           std::vector<std::string> tokens = tokenize(name, "_" ); 
           std::string rep = * ( tokens.end() -1 ); 
           EnsemRedstarBlock data; 
-          data = convert_to_list( EnsemRedstarBlock::ListObj_t(one,it->second) );
-          ret.push_back( make_block_data(origin,rep,row,data) ); 
+          data = convert_to_list( EnsemRedstarBlock::ListObj_t(one,it->second.first) );
+          ret.push_back( make_block_data(it->second.second,rep,row,data) ); 
         }
 
         return ret; 
@@ -357,11 +369,20 @@ namespace radmat
     /////////////////////////
     /////////////////////////
 
+    struct resum_printer_2
+    {
+      static void print(const std::string &msg)
+      {}
+      // {std::cout << "resum_printer_2 " << msg << std::endl; }
+    }; 
+
     BlockData
       resum_ensem_redstar_block(const BlockData &d)
       {
         BlockData ret; 
         ret = d; 
+
+        printer_function<resum_printer_2>( " origin: " + d.origin_rep); 
 
         EnsemRedstarBlock::const_iterator it; 
         std::map<std::string, 
@@ -463,6 +484,13 @@ namespace radmat
       return conv_lorentz_to_cubic_block(cont); 
     }
 
+  struct vc_lor_printer
+  {
+    static void print(const std::string &msg)
+    {}
+    // {std::cout << "vc_lor_printer " << msg << std::endl;}
+  };
+
   std::vector<BlockData>
     generate_lorentz_block( const RedstarVectorCurrentXML * const ptr)
     {
@@ -505,8 +533,20 @@ namespace radmat
         ret.insert( ret.end() , bar.begin() , bar.end() ); 
       }
 
+      std::vector<BlockData>::const_iterator it; 
+      for(it = ret.begin(); it != ret.end(); ++it)
+        printer_function<vc_lor_printer>(it->origin_rep); 
+
       return resum_ensem_redstar_blocks(ret); 
     }
+
+
+  struct vc_cub_printer
+  {
+    static void print(const std::string &msg)
+    {}
+    // {std::cout << "vc_cub_printer " << msg << std::endl;}
+  };
 
   std::vector<BlockData>
     generate_cubic_block( const RedstarVectorCurrentXML * const ptr)
@@ -548,6 +588,8 @@ namespace radmat
       // reweight them for the photon weight 
       for( it = resum.begin(); it != resum.end(); ++it)
       {
+        printer_function<vc_cub_printer>( it->origin_rep ); 
+
         EnsemRedstarBlock update; 
         for( block_it = it->data.begin(); block_it != it->data.end(); ++block_it)
         {
@@ -611,11 +653,17 @@ namespace radmat
         foo.imp = ptr->imp; 
         ret.push_back(foo); 
       }
-      
+
       return ret; 
     }
 
 
+  struct improved_vc_printer
+  {
+    static void print(const std::string &msg)
+    {}
+    // {std::cout << "improved_vc_printer " << msg << std::endl;}
+  };
 
   std::vector<VectorCurrentImprovedBlockData>
     generate_cubic_block(const RedstarImprovedVectorCurrentXML *const ptr)
@@ -642,8 +690,10 @@ namespace radmat
         foo.data = it->data; 
         foo.imp = ptr->imp; 
         ret.push_back(foo); 
+
+        printer_function<improved_vc_printer>( " origin " + foo.origin_rep ); 
       }
-      
+
       return ret; 
     }
 } 

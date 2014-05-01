@@ -6,7 +6,7 @@
 
  * Creation Date : 21-03-2014
 
- * Last Modified : Thu 01 May 2014 11:30:46 AM EDT
+ * Last Modified : Thu 01 May 2014 02:36:52 PM EDT
 
  * Created By : shultz
 
@@ -24,6 +24,7 @@
 #include "hadron/ensem_filenames.h"
 #include "redstar_photon_props.h"
 #include "radmat/utils/tokenize.h"
+#include "radmat/utils/printer.h"
 
 
 namespace radmat
@@ -136,6 +137,13 @@ namespace radmat
         return ret; 
       }
 
+    struct resum_printer
+    {
+      static void print(const std::string &msg)
+      {}
+      // {  std::cout << "resum_printer " << msg << std::endl; } 
+    };
+
     EnsemRedstarNPtBlock 
       resum_ensem_npt_block(const EnsemRedstarNPtBlock &b)
       {
@@ -161,8 +169,11 @@ namespace radmat
         std::map<std::string,coeff_object>::const_iterator map_it; 
         for(map_it = coeff_map.begin(); map_it != coeff_map.end(); ++map_it)
           if( fabs(SEMBLE::toScalar(map_it->second.first) ) > 1e-6)
+          {
             ret = ret + EnsemRedstarNPtBlock::ListObj_t(map_it->second.first, 
                 map_it->second.second); 
+            printer_function<resum_printer>(map_it->first); 
+          }
 
         return ret; 
       }
@@ -495,6 +506,12 @@ namespace radmat
         return ret;  
       }
 
+    struct temporal_printer
+    {
+      static void print(const std::string &msg)
+      {}
+      // {std::cout << "temporal_printer " << msg << std::endl;}
+    };
 
     // this one is a bit harder, lets do it using cartesian components 
     ThreePointData apply_temporal_improvement(const ThreePointData &d, 
@@ -533,9 +550,14 @@ namespace radmat
         for(bit = improvement.begin(); bit != improvement.end(); ++bit)
         {
           ENSEM::Complex w = weight * bit->m_coeff; 
+          
+          if(std::norm( SEMBLE::toScalar(w) ) < 1e-6)
+            continue; 
+
           Hadron::KeyHadronNPartNPtCorr_t corr = npt; 
           corr.npoint[2] = bit->m_obj; 
           ret.data.push_back( EnsemRedstarNPtBlock::ListObj_t(w,corr)); 
+          printer_function<temporal_printer>( ensemFileName(corr) ); 
         }
 
       }
@@ -543,6 +565,14 @@ namespace radmat
 
       return ret; 
     }
+
+
+    struct spatial_printer
+    {
+      static void print(const std::string &msg)
+      {}
+      // { std::cout << "spatial_printer " << msg << std::endl;}
+    };
 
     // do spatial improvement, the easy case 
     ThreePointData apply_spatial_improvement(const ThreePointData &d, 
@@ -581,6 +611,9 @@ namespace radmat
         // update the weight to be prefactor * q_0
         weight = weight * SEMBLE::toScalar( pre_factor*q0); 
 
+        if( std::norm( SEMBLE::toScalar(weight) ) < 1e-6)
+          continue;
+
         // find the photon name 
         std::string phot_op_name = npt.npoint[2].irrep.op.ops[1].name; 
 
@@ -593,6 +626,8 @@ namespace radmat
 
         // throw it back into the data list 
         ret.data.push_back( EnsemRedstarNPtBlock::ListObj_t(weight,npt) ); 
+
+        printer_function<spatial_printer>( Hadron::ensemFileName(npt) ); 
       }
 
       return ret; 

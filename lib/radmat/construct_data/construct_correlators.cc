@@ -6,7 +6,7 @@
 
  * Creation Date : 04-12-2012
 
- * Last Modified : Wed 30 Apr 2014 01:31:56 PM EDT
+ * Last Modified : Thu 01 May 2014 12:51:46 PM EDT
 
  * Created By : shultz
 
@@ -20,6 +20,7 @@
 #include "radmat/utils/printer.h"
 #include "adat/adat_stopwatch.h"
 #include "adat/map_obj.h"
+#include "hadron/ensem_filenames.h"
 #include <string>
 #include <vector>
 #include <utility>
@@ -423,20 +424,25 @@ namespace radmat
 
       std::vector<TaggedEnsemRedstarNPtBlock>::const_iterator block;
       EnsemRedstarNPtBlock::const_iterator npt; 
-      ADAT::MapObject<EnsemRedstarNPtBlock::Obj_t,int> hash; 
-
+      std::map<std::string,EnsemRedstarNPtBlock::Obj_t> pull; 
       for(block = unsorted_elems.begin(); block != unsorted_elems.end(); ++block)
         for(npt = block->coeff_lattice_xml.begin(); npt != block->coeff_lattice_xml.end(); ++npt)
-          if(!!! hash.exist(npt->m_obj) )
-            hash.insert(npt->m_obj,1); 
+          pull[Hadron::ensemFileName(npt->m_obj)] = npt->m_obj; 
+
+
+    std::vector<Hadron::KeyHadronNPartNPtCorr_t> keys; 
+    keys.reserve(pull.size()); 
+    std::map<std::string,EnsemRedstarNPtBlock::Obj_t>::const_iterator it; 
+    for(it = pull.begin(); it != pull.end(); ++it)
+      keys.push_back(it->second); 
 
 #ifdef TIME_CONSTRUCT_ALL_CORRS
       snoop.stop(); 
-      std::cout << " ** time to build xml for " <<  hash.size() 
+      std::cout << " ** time to build xml for " <<  keys.size() 
         << " correlators " << snoop.getTimeInSeconds() << " seconds" << std::endl;
 #endif
 
-      return hash.keys(); 
+      return keys; 
     }
 
 } // radmat
