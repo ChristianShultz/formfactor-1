@@ -6,7 +6,7 @@
 
  * Creation Date : 21-03-2014
 
- * Last Modified : Thu 01 May 2014 11:15:54 AM EDT
+ * Last Modified : Thu 01 May 2014 11:30:46 AM EDT
 
  * Created By : shultz
 
@@ -510,7 +510,7 @@ namespace radmat
       ret.data = d.data; 
 
       double nu = inp.Nu_s; 
-      double xi = inp.xi_0; 
+      double xi = inp.Xi_0; 
       double coeff_r = inp.coeff_r; 
       double coeff_i = inp.coeff_i; 
       std::string op_stem = inp.name; 
@@ -559,11 +559,11 @@ namespace radmat
       ret.data = d.data; 
 
       double nu = inp.Nu_s; 
-      double xi = inp.xi_0; 
+      double xi = inp.Xi_0; 
       double coeff_r = inp.coeff_r; 
       double coeff_i = inp.coeff_i; 
       std::string op_stem = inp.name; 
-      std::complex<double> pre_factor = 0.25( 1 - xi )*std::complex<double>(coeff_r,coeff_i); 
+      std::complex<double> pre_factor = 0.25*( 1 - xi )*std::complex<double>(coeff_r,coeff_i); 
 
       EnsemRedstarNPtBlock::const_iterator it; 
       // loop the data, find the terms then simply stick in the 

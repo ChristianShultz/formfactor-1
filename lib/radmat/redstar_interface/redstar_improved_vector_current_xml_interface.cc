@@ -6,7 +6,7 @@
 
 * Creation Date : 14-04-2014
 
-* Last Modified : Thu 01 May 2014 11:11:15 AM EDT
+* Last Modified : Thu 01 May 2014 11:29:49 AM EDT
 
 * Created By : shultz
 
@@ -92,8 +92,8 @@ namespace radmat
         const RedstarImprovedVectorCurrentXML::improvement &i)
     {
       ADATXML::push(xml,path);
-      ADATXML::write(xml,"Omega_s",i.Omega_s);
-      ADATXML::write(xml,"Omega_t",i.Omega_t); 
+      ADATXML::write(xml,"Nu_s",i.Nu_s);
+      ADATXML::write(xml,"Xi_0",i.Xi_0); 
       ADATXML::write(xml,"name",i.name); 
       ADATXML::write(xml,"coeff_r",i.coeff_r); 
       ADATXML::write(xml,"coeff_i",i.coeff_i); 
