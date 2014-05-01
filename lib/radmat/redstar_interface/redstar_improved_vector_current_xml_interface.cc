@@ -6,7 +6,7 @@
 
 * Creation Date : 14-04-2014
 
-* Last Modified : Wed 30 Apr 2014 04:58:57 PM EDT
+* Last Modified : Thu 01 May 2014 11:11:15 AM EDT
 
 * Created By : shultz
 
@@ -105,8 +105,8 @@ namespace radmat
         RedstarImprovedVectorCurrentXML::improvement &i)  
     {
       ADATXML::XMLReader ptop(xml,path); 
-      doXMLRead(ptop,"Omega_s",i.Omega_s,__PRETTY_FUNCTION__); 
-      doXMLRead(ptop,"Omega_t",i.Omega_t,__PRETTY_FUNCTION__); 
+      doXMLRead(ptop,"Nu_s",i.Nu_s,__PRETTY_FUNCTION__); 
+      doXMLRead(ptop,"Xi_0",i.Xi_0,__PRETTY_FUNCTION__); 
       doXMLRead(ptop,"name",i.name,__PRETTY_FUNCTION__); 
       doXMLRead(ptop,"coeff_r",i.coeff_r,__PRETTY_FUNCTION__); 
       doXMLRead(ptop,"coeff_i",i.coeff_i,__PRETTY_FUNCTION__); 

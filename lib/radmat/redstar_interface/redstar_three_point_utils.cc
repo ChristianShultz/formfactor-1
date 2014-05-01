@@ -6,7 +6,7 @@
 
  * Creation Date : 21-03-2014
 
- * Last Modified : Wed 30 Apr 2014 05:02:29 PM EDT
+ * Last Modified : Thu 01 May 2014 11:15:54 AM EDT
 
  * Created By : shultz
 
@@ -509,12 +509,12 @@ namespace radmat
       ret.gamma_row = d.gamma_row; 
       ret.data = d.data; 
 
-      double Omega_s = inp.Omega_s; 
-      double Omega_t = inp.Omega_t; 
+      double nu = inp.Nu_s; 
+      double xi = inp.xi_0; 
       double coeff_r = inp.coeff_r; 
       double coeff_i = inp.coeff_i; 
       std::string op_stem = inp.name; 
-      std::complex<double> pre_factor = ( Omega_s / 2. + Omega_s*Omega_t )*std::complex<double>(coeff_r,coeff_i); 
+      std::complex<double> pre_factor = -0.24*nu*(1. - 1./xi)*std::complex<double>(coeff_r,coeff_i); 
 
 
       EnsemRedstarNPtBlock::const_iterator it; 
@@ -558,12 +558,12 @@ namespace radmat
       ret.gamma_row = d.gamma_row; 
       ret.data = d.data; 
 
-      double Omega_s = inp.Omega_s; 
-      double Omega_t = inp.Omega_t; 
+      double nu = inp.Nu_s; 
+      double xi = inp.xi_0; 
       double coeff_r = inp.coeff_r; 
       double coeff_i = inp.coeff_i; 
       std::string op_stem = inp.name; 
-      std::complex<double> pre_factor = ( Omega_t / 2. + 0.25 )*std::complex<double>(coeff_r,coeff_i); 
+      std::complex<double> pre_factor = 0.25( 1 - xi )*std::complex<double>(coeff_r,coeff_i); 
 
       EnsemRedstarNPtBlock::const_iterator it; 
       // loop the data, find the terms then simply stick in the 

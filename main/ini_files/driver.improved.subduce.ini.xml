@@ -61,8 +61,8 @@
                 <t_slice>-3</t_slice>
 
                 <improvement>
-                  <Omega_s>-0.514701</Omega_s>
-                  <Omega_t>-0.25</Omega_t>
+                  <Nu_s>1.26</Nu_s>
+                  <Xi_0>4.3</Xi_0>
                   <name>rho_rho_2xD0_J0__J1</name>
                   <coeff_r>0</coeff_r>
                   <coeff_i>1</coeff_i>

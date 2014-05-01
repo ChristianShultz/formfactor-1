@@ -38,8 +38,8 @@ namespace radmat
 
     struct improvement
     {
-     double Omega_s;
-     double Omega_t; 
+     double Nu_s;      // tuning parameter 
+     double Xi_0;      // bare anisotropy  
      std::string name; 
      double coeff_r; 
      double coeff_i; 
