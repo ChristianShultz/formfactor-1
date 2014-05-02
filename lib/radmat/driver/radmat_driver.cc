@@ -6,7 +6,7 @@
 
  * Creation Date : 25-02-2013
 
- * Last Modified : Mon 28 Apr 2014 04:03:29 PM EDT
+ * Last Modified : Fri 02 May 2014 03:58:15 PM EDT
 
  * Created By : shultz
 
@@ -756,9 +756,9 @@ namespace radmat
         data_buffer << ++count; 
         data_buffer << " q2 " << q[i] << " " << qerr[i]; 
         data_buffer << " ff " << ff << " " << fferr; 
-        data_buffer << " | " << t.rep_id(data_rep,data_rep.l) 
+        data_buffer << " | " << t.full_irrep_id(data_rep,data_rep.l) 
           << " " << lp[0] << " " << lp[1] << " " << lp[2]; 
-        data_buffer << " " << t.rep_id(data_rep,data_rep.r) 
+        data_buffer << " " << t.full_irrep_id(data_rep,data_rep.r) 
           << " " << rp[0] << " " << rp[1] << " " << rp[2]; 
 
         data_buffer << std::endl; 

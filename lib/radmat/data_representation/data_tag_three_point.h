@@ -41,7 +41,25 @@ namespace radmat
       return b ? rot_qsq_tag(origin_rep) : rot_qsq_tag(data_rep); 
     }
 
-    std::string rep_id( const DataRep3pt &d, const std::string &s) const
+    std::string full_irrep_id( const DataRep3pt &d, const std::string &s) const
+    {
+      std::stringstream ss; 
+
+      if( d.is_cubic( s ) )
+      {
+        rHandle<CubicRep> foo = d.call_rep_cub(s); 
+        ss <<  foo->rep_id(); 
+      }
+      else
+      {
+        rHandle<LorentzRep> foo = d.call_rep_lor(s); 
+        ss <<  foo->rep_id(); 
+      }
+
+      return ss.str(); 
+    }
+
+    std::string irrep_id( const DataRep3pt &d, const std::string &s) const
     {
       std::stringstream ss; 
 
@@ -62,7 +80,7 @@ namespace radmat
     std::string rot_qsq_tag( const DataRep3pt &d) const
     {
       std::stringstream ss; 
-      ss << "l" +  rep_id(d,d.l) + "xr" + rep_id(d,d.r) + "xg" + rep_id(d,d.g);
+      ss << "l" +  irrep_id(d,d.l) + "xr" + irrep_id(d,d.r) + "xg" + irrep_id(d,d.g);
       return ss.str();  
     }
 
