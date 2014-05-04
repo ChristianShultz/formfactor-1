@@ -6,7 +6,7 @@
 
  * Creation Date : 04-05-2013
 
- * Last Modified : Mon 28 Apr 2014 11:35:11 AM EDT
+ * Last Modified : Sun 04 May 2014 02:50:30 PM EDT
 
  * Created By : shultz
 
@@ -24,9 +24,6 @@ namespace radmat
 {
   namespace
   {
-    // match to the Rho_J1_Op in adat, phase is -complex_one * complex_i
-    std::complex<double> phase_hack(std::complex<double>(0.,-1.)); 
-
 
     // 1 based
     itpp::Vec<std::complex<double> > epsz3(int m_row)
@@ -53,8 +50,7 @@ namespace radmat
           exit(1); 
       }
 
-      // match to the Rho_J1_Op in adat, phase is -complex_one * complex_i
-      return phase_hack * ret;  
+      return  ret;  
     }
 
 
@@ -129,8 +125,7 @@ namespace radmat
 
       }
 
-      // undo the phase hack from the redstar op eps3
-      return std::conj(phase_hack) * ret; 
+      return ret; 
     }
 
 

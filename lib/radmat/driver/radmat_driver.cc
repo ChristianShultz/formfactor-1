@@ -6,7 +6,7 @@
 
  * Creation Date : 25-02-2013
 
- * Last Modified : Fri 02 May 2014 07:35:15 PM EDT
+ * Last Modified : Sun 04 May 2014 02:57:47 PM EDT
 
  * Created By : shultz
 
@@ -752,15 +752,20 @@ namespace radmat
         mom_t lp = canonical_momentum.first; 
         mom_t rp = canonical_momentum.second; 
 
+        // bung in an overall phase 
+        int bigPhase = m_ini.bigPhase; 
+        double dphase = double(bigPhase); 
+
         // have all the data, put it into a useful log form 
         data_buffer << ++count; 
         data_buffer << " q2 " << q[i] << " " << qerr[i]; 
-        data_buffer << " ff " << ff << " " << fferr; 
+        data_buffer << " ff " << dphase*ff << " " << fferr; 
         data_buffer << " | " << t.full_irrep_id(data_rep,data_rep.l) 
           << " " << lp[0] << " " << lp[1] << " " << lp[2]; 
         data_buffer << " " << t.full_irrep_id(data_rep,data_rep.r) 
           << " " << rp[0] << " " << rp[1] << " " << rp[2]; 
         data_buffer << " g " << t.full_irrep_id(data_rep,data_rep.g); 
+        data_buffer << " bigPhase " << dphase; 
 
         data_buffer << std::endl; 
       }

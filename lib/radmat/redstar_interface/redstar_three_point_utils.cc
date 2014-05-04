@@ -6,7 +6,7 @@
 
  * Creation Date : 21-03-2014
 
- * Last Modified : Thu 01 May 2014 02:36:52 PM EDT
+ * Last Modified : Sun 04 May 2014 12:08:28 PM EDT
 
  * Created By : shultz
 
@@ -333,8 +333,9 @@ namespace radmat
           left_db_key.doLG_symmetry(); 
           right_db_key.doLG_symmetry(); 
 
-          double l = 1.;
-          double r = 2.;
+          // stupid large 
+          double l = 1000; 
+          double r = 2000;
 
           // check insert left
           if( !!! cache.exist(left_cache_key.m_basic_key) )
@@ -344,6 +345,12 @@ namespace radmat
             {
               RadmatMassOverlapData_t tmp = db.fetch(left_db_key); 
               l = SEMBLE::toScalar(ENSEM::mean(tmp.E())); 
+            }
+            else
+            {
+              std::cout << "Error: missing db key " 
+                  << Hadron::ensemFileName(left_cache_key.m_basic_key) << std::endl;
+              POW2_ASSERT(false); 
             }
 
             cache.insert(left_cache_key.m_basic_key,l); 
@@ -357,6 +364,12 @@ namespace radmat
             {
               RadmatMassOverlapData_t tmp = db.fetch(right_db_key); 
               r = SEMBLE::toScalar(ENSEM::mean(tmp.E())); 
+            }
+            else
+            {
+              std::cout << "Error: missing db key " 
+                  << Hadron::ensemFileName(right_cache_key.m_basic_key) << std::endl;
+              POW2_ASSERT(false); 
             }
 
             cache.insert(right_cache_key.m_basic_key,r); 
@@ -593,7 +606,9 @@ namespace radmat
       double coeff_r = inp.coeff_r; 
       double coeff_i = inp.coeff_i; 
       std::string op_stem = inp.name; 
-      std::complex<double> pre_factor = 0.25*( 1 - xi )*std::complex<double>(coeff_r,coeff_i); 
+
+
+      std::complex<double> pre_factor = -0.25*( 1 - xi )*std::complex<double>(coeff_r,coeff_i); 
 
       EnsemRedstarNPtBlock::const_iterator it; 
       // loop the data, find the terms then simply stick in the 

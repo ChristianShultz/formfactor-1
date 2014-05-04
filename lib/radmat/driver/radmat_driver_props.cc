@@ -6,7 +6,7 @@
 
  * Creation Date : 29-11-2012
 
- * Last Modified : Fri 14 Mar 2014 12:27:01 PM EDT
+ * Last Modified : Sun 04 May 2014 02:53:47 PM EDT
 
  * Created By : shultz
 
@@ -45,6 +45,7 @@ namespace radmat
   {
     std::stringstream ss;
     ss << "version = " << prop.version; 
+    ss << "\nbigPhase = " << prop.bigPhase; 
     ss << "\nthreePointComparatorProps = " << prop.threePointComparatorProps;
     ss << "\nthreePointIni = " << prop.threePointIni;
     ss << "\nchisq = " << prop.chisq; 
@@ -93,11 +94,20 @@ namespace radmat
 
     check_version(prop.version); 
 
+    // default to no phase
+    if(ptop.count("bigPhase") > 0)
+      read(ptop,"bigPhase",prop.bigPhase);
+    else
+    {
+      prop.bigPhase = 1; 
+    }
+
+
     doXMLRead(ptop,"threePointComparatorProps",prop.threePointComparatorProps,__PRETTY_FUNCTION__);
     doXMLRead(ptop,"chisq",prop.chisq,__PRETTY_FUNCTION__);
     doXMLRead(ptop,"threePointIni",prop.threePointIni,__PRETTY_FUNCTION__);
     doXMLRead(ptop,"maxThread",prop.maxThread,__PRETTY_FUNCTION__);
-      doXMLRead(ptop,"tolerance",prop.tolerance,__PRETTY_FUNCTION__); 
+    doXMLRead(ptop,"tolerance",prop.tolerance,__PRETTY_FUNCTION__); 
 
     // NB: we square the mass here!
     double pole_mass; 

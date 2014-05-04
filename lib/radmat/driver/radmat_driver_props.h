@@ -15,6 +15,7 @@ namespace radmat
     
     std::string chisq;
     int version; 
+    int bigPhase;                         // an overall plus or minus 
     int maxThread;                        // # < 1 does nothing , #>= 1 sets nthread to # 
     double poleMass;                      // does the analytic continuation exist?  this is the lightest vector state
     double tolerance; 
