@@ -6,7 +6,7 @@
 
  * Creation Date : 21-03-2014
 
- * Last Modified : Sun 04 May 2014 12:08:28 PM EDT
+ * Last Modified : Mon 05 May 2014 05:40:35 PM EDT
 
  * Created By : shultz
 
@@ -349,7 +349,8 @@ namespace radmat
             else
             {
               std::cout << "Error: missing db key " 
-                  << Hadron::ensemFileName(left_cache_key.m_basic_key) << std::endl;
+                  << Hadron::ensemFileName(left_db_key.m_basic_key) << std::endl;
+              std::cout << "Key: \n" << left_db_key << std::endl;
               POW2_ASSERT(false); 
             }
 
@@ -368,7 +369,8 @@ namespace radmat
             else
             {
               std::cout << "Error: missing db key " 
-                  << Hadron::ensemFileName(right_cache_key.m_basic_key) << std::endl;
+                  << Hadron::ensemFileName(right_db_key.m_basic_key) << std::endl;
+              std::cout << "Key: \n" << right_db_key << std::endl;
               POW2_ASSERT(false); 
             }
 
@@ -544,7 +546,7 @@ namespace radmat
       double coeff_r = inp.coeff_r; 
       double coeff_i = inp.coeff_i; 
       std::string op_stem = inp.name; 
-      std::complex<double> pre_factor = -0.24*nu*(1. - 1./xi)*std::complex<double>(coeff_r,coeff_i); 
+      std::complex<double> pre_factor = -0.25*nu*(1. - 1./xi)*std::complex<double>(coeff_r,coeff_i); 
 
 
       EnsemRedstarNPtBlock::const_iterator it; 
@@ -608,7 +610,7 @@ namespace radmat
       std::string op_stem = inp.name; 
 
 
-      std::complex<double> pre_factor = -0.25*( 1 - xi )*std::complex<double>(coeff_r,coeff_i); 
+      std::complex<double> pre_factor = 0.25*( 1 - xi )*std::complex<double>(coeff_r,coeff_i); 
 
       EnsemRedstarNPtBlock::const_iterator it; 
       // loop the data, find the terms then simply stick in the 
@@ -622,6 +624,9 @@ namespace radmat
         double l = cache[npt.npoint[1].irrep];
         double r = cache[npt.npoint[3].irrep]; 
         double q0 = l - r; 
+
+        if( !!! PHOTON_CREATE )
+          q0 = -q0; 
 
         // update the weight to be prefactor * q_0
         weight = weight * SEMBLE::toScalar( pre_factor*q0); 

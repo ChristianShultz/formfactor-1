@@ -6,7 +6,7 @@
 
  * Creation Date : 02-10-2012
 
- * Last Modified : Fri Apr 26 18:05:08 2013
+ * Last Modified : Sun 04 May 2014 04:20:22 PM EDT
 
  * Created By : shultz
 
@@ -66,7 +66,8 @@ namespace radmat
 
   std::ostream& operator<<(std::ostream& os, const RadmatExtendedKeyHadronNPartIrrep_t &op)
   {
-    os << "particle id - " << op.m_particle_id << "\n";
+    os << "particle id - " << op.m_particle_id << " fn->  " 
+      << Hadron::ensemFileName(op.m_basic_key) << "\n";
     os << op.m_basic_key;
     return os; 
   }

@@ -65,7 +65,10 @@ namespace radmat
 
  // there can be an arbitray overall phase, get rid of it
  LLSQRealFormFactorData_t 
-   rephase_formfactor_data( const LLSQComplexFormFactorData_t &); 
+   rephase_formfactor_data( const LLSQComplexFormFactorData_t &, 
+       const int tlow, 
+       const int thigh, 
+       const std::string &filebase); 
 
 } // radmat
 

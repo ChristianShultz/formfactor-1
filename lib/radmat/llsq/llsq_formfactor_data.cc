@@ -6,7 +6,7 @@
 
  * Creation Date : 21-02-2014
 
- * Last Modified : Wed 16 Apr 2014 01:12:31 PM EDT
+ * Last Modified : Sun 04 May 2014 06:21:13 PM EDT
 
  * Created By : shultz
 
@@ -24,6 +24,10 @@
 #include "radmat/utils/pow2assert.h"
 #include "radmat/utils/printer.h"
 #include "adat/handle.h"
+
+#include "jackFitter/ensem_data.h"
+#include "jackFitter/jackknife_fitter.h"
+#include "jackFitter/three_point_fit_forms.h"
 
 
 
@@ -107,49 +111,90 @@ namespace radmat
 
     // run an avg fit on the real and imag bits
     //      to try to find a phase
-    phase_pair
+    
+    std::pair<phase_pair,std::string>
       convert_to_real(const ENSEM::EnsemVectorComplex & in, 
           const int tlow,
           const int thigh)
       {
+        std::stringstream fit_log; 
+
+        fit_log << "tlow " << tlow << "   thigh " << thigh << std::endl;
+
         ENSEM::EnsemVectorReal real, imag;
 
         real = ENSEM::real(in);
         imag = ENSEM::imag(in);
 
-        // mid plus offset (th-tl)/2 + tl
-        int t_sample = int( double(thigh + tlow)/2. ); 
+        //  be smarter and use a fit 
+        //
+        //        // mid plus offset (th-tl)/2 + tl
+        //        int t_sample = int( double(thigh + tlow)/2. ); 
+        //        double const_real = SEMBLE::toScalar( ENSEM::mean( ENSEM::peekObs(real,t_sample)));
+        //        double const_imag = SEMBLE::toScalar( ENSEM::mean( ENSEM::peekObs(imag,t_sample)));
+        //        double const_real_var = SEMBLE::toScalar( ENSEM::variance( ENSEM::peekObs(real,t_sample)));
+        //        double const_imag_var = SEMBLE::toScalar( ENSEM::variance( ENSEM::peekObs(imag,t_sample)));
 
-        // tried to do this with fitting but had issues, in practice the form factors 
-        // are fairly flat about the mid point, can come back to this an do something 
-        // smarter if it becomes a practical issue, JJD can do it since he may actually
-        // understand the nonsense that sits in jackFitter 
-        double const_real = SEMBLE::toScalar( ENSEM::mean( ENSEM::peekObs(real,t_sample)));
-        double const_imag = SEMBLE::toScalar( ENSEM::mean( ENSEM::peekObs(imag,t_sample)));
-        double const_real_var = SEMBLE::toScalar( ENSEM::variance( ENSEM::peekObs(real,t_sample)));
-        double const_imag_var = SEMBLE::toScalar( ENSEM::variance( ENSEM::peekObs(imag,t_sample)));
 
-        // is the constant consistent with zero?
-        if( fabs(const_real) - 3.*sqrt(fabs(const_real_var)) < 0.)
+        std::vector<double> t; 
+        for(int i = 0; i < in.numElem(); ++i)
+          t.push_back(double(i)); 
+
+
+        EnsemData ereal(t,real), eimag(t,imag); 
+
+        ereal.hideDataAboveX(thigh + 0.1);
+        ereal.hideDataBelowX(tlow -0.1);
+
+        eimag.hideDataAboveX(thigh + 0.1);
+        eimag.hideDataBelowX(tlow -0.1);
+
+        // run avg fits
+        ADAT::Handle<FitFunction> freal(new ThreePointConstant()), fimag(new ThreePointConstant());
+        JackFit fit_real(ereal,freal) , fit_imag(eimag,fimag); 
+
+        fit_real.runAvgFit();
+        fit_imag.runAvgFit(); 
+
+        // pull average 
+        double const_real = fit_real.getAvgFitParValue(0);
+        double const_real_var = fit_real.getAvgFitParError(0);
+
+        double const_imag = fit_imag.getAvgFitParValue(0);
+        double const_imag_var = fit_imag.getAvgFitParError(0);
+
+        // sometimes needs some fine tuning
+        double consistent_with_zero = 1.;
+
+        fit_log << "consistency with zero set at " << consistent_with_zero << std::endl;
+        fit_log << "const_real " << const_real 
+          << "  +/-  " << const_real_var << std::endl;
+        fit_log << "const_imag " << const_imag 
+          << "  +/-  " << const_imag_var << std::endl;
+
+        // is the constant consistent with zero? 
+        if( fabs(const_real) - consistent_with_zero*sqrt(fabs(const_real_var)) < 0.)
         {
+          fit_log << "* decided it was imag" << std::endl;
           printer_function<case_printer>("real is consistent with zero");
           printer_function<case_printer>("real = " + to_string(const_real) 
               + "+/-" + to_string(sqrt(fabs(const_real_var)))); 
           printer_function<case_printer>("imag = " + to_string(const_imag) 
               + "+/-" + to_string(sqrt(fabs(const_imag_var)))); 
           if (const_imag > 0. )
-            return phase_pair(IP,imag); 
-          return phase_pair(IM,imag);
+            return std::make_pair(phase_pair(IP,imag),fit_log.str()); 
+          return std::make_pair(phase_pair(IM,imag),fit_log.str());
         }
 
-        if( fabs(const_imag) - 3.*sqrt(fabs(const_imag_var)) < 0.)
+        if( fabs(const_imag) - consistent_with_zero*sqrt(fabs(const_imag_var)) < 0.)
         {
+          fit_log << "* decided it was real " << std::endl;
           printer_function<case_printer>("imag is consistent with zero");
           printer_function<case_printer>("imag = " + to_string(const_imag) 
               + "+/-" + to_string(sqrt(fabs(const_imag_var)))); 
           if( const_real > 0. )
-            return phase_pair(RP,real); 
-          return phase_pair(RM,real);
+            return std::make_pair(phase_pair(RP,real),fit_log.str()); 
+          return std::make_pair(phase_pair(RM,real),fit_log.str());
         }
 
         // what if it is a longitudial factor or crossing 
@@ -157,9 +202,10 @@ namespace radmat
         //    assume a FF of O(1)
         if( (const_real < 2e-2) && (const_imag < 2e-2) ) 
         {
+          fit_log << "* decided overall consistent with zero" << std::endl;
           printer_function<case_printer>("ff is consistent with zero");
           // doesn't matter, both are zero to precision  
-          return phase_pair(ZERO,real);
+          return std::make_pair(phase_pair(ZERO,real),fit_log.str());
         }
 
 
@@ -167,6 +213,7 @@ namespace radmat
         // something unexpected happened
         if ( isnan(const_real) || isnan(const_imag))
         {
+          fit_log << "foung nan, doing a dance " << std::endl;
           // the fitter seems to fail on ensembles with zero variance??
           // 
           // with svd resetting it is very easy to get an ensemble 
@@ -196,12 +243,16 @@ namespace radmat
               bazr = foor.mean(); 
               bazi = fooi.mean(); 
               if ( ( bazr == bar ) && ( bazi == bar ) )
-                return phase_pair(ZERO,real); 
+                return std::make_pair(phase_pair(ZERO,real),fit_log.str()); 
               if ( bazr == bar )
-                return bazi(0) > 0 ? phase_pair(IP,imag) : phase_pair(IM,imag);
+                return bazi(0) > 0 ? std::make_pair(phase_pair(IP,imag),fit_log.str())
+                  : std::make_pair(phase_pair(IM,imag),fit_log.str());
               if( bazi == bar )
-                return bazr(0) > 0 ? phase_pair(RP,real) : phase_pair(RM,real); 
+                return bazr(0) > 0 ? std::make_pair(phase_pair(RP,real),fit_log.str()) 
+                  : std::make_pair(phase_pair(RM,real),fit_log.str()); 
             }
+
+          fit_log << " i quit " << std::endl;
 
           // otherwise die one function up since this is stupid 
 
@@ -214,9 +265,10 @@ namespace radmat
 
           ENSEM::write("bad_corr.nan.jack",in); 
 
-          return phase_pair(ERROR,real); 
+          return std::make_pair(phase_pair(ERROR,real),fit_log.str()); 
         }
 
+        
 
         double fit_phase = std::arg(std::complex<double>(const_real,const_imag)); 
 
@@ -226,30 +278,33 @@ namespace radmat
 
         double phase = fit_phase ; 
 
+        fit_log << " general cases, found a phase of " << phase << std::endl;
+
         printer_function<case_printer>("general cases encountered"); 
 
         if( (phase < 0.174528) && (phase > -0.174708) ) // +/- 10 degree about 0 in rad
         {
           printer_function<case_printer>("RP encountered"); 
-          return phase_pair(RP,real);
+          return std::make_pair(phase_pair(RP,real),fit_log.str());
         }
         else if( (phase > 1.39622) && (phase < 1.74528)) // 90deg
         {
           printer_function<case_printer>("IP encountered"); 
-          return phase_pair(IP,imag);
+          return std::make_pair(phase_pair(IP,imag),fit_log.str());
         }
         else if( (phase > 2.96697) || (phase < -2.96715))  //180deg // this is atan2 specific, it returns (-pi,pi)
         {
           printer_function<case_printer>("RM encountered"); 
-          return phase_pair(RM,real);
+          return std::make_pair(phase_pair(RM,real),fit_log.str());
         }
         else if( (phase > -1.74546) && (phase < -1.3964)) // 270 deg
         {
           printer_function<case_printer>("IM encountered"); 
-          return phase_pair(IM,imag);
+          return std::make_pair(phase_pair(IM,imag),fit_log.str());
         }
         else
         {
+          fit_log << " got a baddie " << std::endl;
           printer_function<case_printer>("unknown phase encountered"); 
           std::cout << "The calculated phase was " << phase*180./3.14159 << " (deg)" << std::endl;
           std::cout << "rl = " << const_real << " im = " << const_imag << std::endl;
@@ -265,13 +320,17 @@ namespace radmat
 
         }
 
-        return phase_pair( ERROR, SEMBLE::toScalar( double(0.) ) * real ); 
+        fit_log << " you really mucked this up " << std::endl;
+
+        return std::make_pair( phase_pair( ERROR, SEMBLE::toScalar( double(0.) ) * real ), fit_log.str()); 
       }
 
 
     // find the phase for a single vector
-    phase_pair
-      find_phase( const SEMBLE::SembleVector<std::complex<double> > &d)
+    std::pair<phase_pair,std::string>
+      find_phase( const SEMBLE::SembleVector<std::complex<double> > &d, 
+          const int tlow, 
+          const int thigh)
       {
         ENSEM::EnsemVectorComplex e; 
         int bns = d.getB(); 
@@ -287,9 +346,13 @@ namespace radmat
       }
 
     // fine the phase for all of the vectors
-    std::map<std::string, phase_pair> 
-      find_phases( const LLSQComplexFormFactorData_t &d )
+    std::pair< std::map<std::string, phase_pair> , std::string >
+      find_phases( const LLSQComplexFormFactorData_t &d , 
+          const int tlow, 
+          const int thigh)
       {
+        std::stringstream log; 
+
         std::map<std::string,phase_pair> ret; 
         LLSQComplexFormFactorData_t::const_iterator it; 
         for(it = d.begin(); it != d.end(); ++it)
@@ -302,10 +365,17 @@ namespace radmat
           printer_function<mean_printer>(
               "input_corr " +  it->first 
               + to_string( it->second.mean() ) ); 
-          ret.insert( std::make_pair(it->first, find_phase(it->second) ) ); 
+          
+          log << "input: " << it->first << std::endl;
+        
+          std::pair<phase_pair,std::string> foo = find_phase(it->second,tlow,thigh); 
+
+          log << foo.second << "\n\n" << std::endl;
+
+          ret.insert( std::make_pair(it->first, foo.first ) ); 
         }
 
-        return ret; 
+        return std::make_pair(ret,log.str()); 
       }
 
     // check that all phases are consistent
@@ -363,15 +433,18 @@ namespace radmat
 
     // run checks then push the result into the return data
     LLSQRealFormFactorData_t
-      do_work_local(const LLSQComplexFormFactorData_t &d)
+      do_work_local(const LLSQComplexFormFactorData_t &d, 
+          const int tlow,
+          const int thigh, 
+          const std::string &fbase)
       {
         printer_function<inp_dimension_printer>("entering rephase"); 
 
-        std::map<std::string, phase_pair> mappy = find_phases(d); 
-        check_phases(mappy); 
+        std::pair<std::map<std::string, phase_pair>,std::string> mappy = find_phases(d,tlow,thigh); 
+        check_phases(mappy.first); 
 
         printer_function<ret_dimension_printer>(
-            " map size " + to_string(mappy.size()) ); 
+            " map size " + to_string(mappy.first.size()) ); 
 
         LLSQRealFormFactorData_t ret; 
 
@@ -380,7 +453,7 @@ namespace radmat
 
         // load elements for fit
         std::map<std::string,phase_pair>::const_iterator it; 
-        for(it = mappy.begin(); it != mappy.end(); ++it)
+        for(it = mappy.first.begin(); it != mappy.first.end(); ++it)
         {
           printer_function<ret_dimension_printer>( 
               "output " + it->first 
@@ -398,6 +471,12 @@ namespace radmat
 
         printer_function<ret_dimension_printer>("exiting rephase");
 
+        std::stringstream output_f;
+        output_f << fbase + "fit_log.txt";
+        std::ofstream out(output_f.str().c_str());
+        out << mappy.second;
+        out.close(); 
+
         return ret; 
       }
 
@@ -408,9 +487,12 @@ namespace radmat
 
   // callback 
   LLSQRealFormFactorData_t 
-    rephase_formfactor_data( const LLSQComplexFormFactorData_t &d)
+    rephase_formfactor_data( const LLSQComplexFormFactorData_t &d, 
+        const int tlow, 
+        const int thigh,
+        const std::string &fbase)
     {
-      return do_work_local(d); 
+      return do_work_local(d,tlow,thigh,fbase); 
     }
 
 } // radmat

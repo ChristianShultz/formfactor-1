@@ -34,7 +34,7 @@ namespace radmat
         const int tsrc,
         const int tsnk)
     {
-      fit(filenameBase, rephase_formfactor_data( data ), fitProps, tsrc, tsnk); 
+      fit(filenameBase, rephase_formfactor_data( data , fitProps.tlow, fitProps.thigh, filenameBase ), fitProps, tsrc, tsnk); 
     }
 
     void fit( const std::string &filenameBase, 

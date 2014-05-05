@@ -33,20 +33,21 @@ namespace radmat
           int h_f,
           int h_i) const
       {
+        Tensor<std::complex<double>,2> metric; 
         Tensor<std::complex<double>,1> pp,pm;
-        pp = convertTensorUnderlyingType<std::complex<double>,double,1>(pPlus(p_f,p_i));
+        Tensor<std::complex<double>,0> num,denom; 
+
+        metric = convertTensorUnderlyingType<std::complex<double>,double,2>(g_dd()); 
         pm = convertTensorUnderlyingType<std::complex<double>,double,1>(pMinus(p_f,p_i));
+        pp = convertTensorUnderlyingType<std::complex<double>,double,1>(pPlus(p_f,p_i));
+        num = contract(pm,applyMetric(pm,metric,0),0,0);
+        denom = contract(pm,applyMetric(pp,metric,0),0,0); 
+        
+        POW2_ASSERT_DEBUG(std::norm(denom.value()) > 1e-14);
 
-        // double num = (p_f - p_i) * (g_dd() * (p_f - p_i));
-        // double denom = (p_f - p_i) * (g_dd() * (p_f + p_i));
+        std::complex<double> coeff = -num.value() / denom.value(); 
 
-        double num = value(contract(p_f-p_i,p_f-p_i,g_dd(),0,0));
-        double denom = value(contract(p_f-p_i,p_f+p_i,g_dd(),0,0));
-
-
-        POW2_ASSERT_DEBUG(fabs(denom) > 1e-14);
-
-        return ( -(num/denom)*pp +  pm);
+        return coeff * pp + pm; 
       }
   };
 

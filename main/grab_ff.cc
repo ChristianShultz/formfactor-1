@@ -6,7 +6,7 @@
 
  * Creation Date : 22-04-2013
 
- * Last Modified : Mon 28 Apr 2014 06:18:29 PM EDT
+ * Last Modified : Sun 04 May 2014 05:14:59 PM EDT
 
  * Created By : shultz
 
@@ -161,7 +161,11 @@ int main(int argc, char *argv[])
 
   radmat::FFKinematicFactors_t KK; 
   radmat::FFKinematicFactors_t::KinematicFactorRow r = KK.genFactors( &foo ); 
+  radmat::FFKinematicFactors_t::KinematicFactorMatrix rm = KK.genFactorsMat( &foo ); 
 
+  std::cout << "mat:\n" << rm.mean() << std::endl;
+ 
+  std::cout << "pulled:" << std::endl;
   std::cout << r.mean() << std::endl; 
 
   radmat::DMatrixManager Wig; 
