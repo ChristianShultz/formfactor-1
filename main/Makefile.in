@@ -36,8 +36,8 @@ bin_PROGRAMS = grab_ff$(EXEEXT) grab_pol$(EXEEXT) \
 	grab_vector_mean_cmp$(EXEEXT) invert_subduced$(EXEEXT) \
 	mass_overlap_db_combine$(EXEEXT) \
 	mass_overlap_db_create$(EXEEXT) mass_overlap_db_util$(EXEEXT) \
-	radmat$(EXEEXT) radmat_util$(EXEEXT) simple_test$(EXEEXT) \
-	single_plot$(EXEEXT) subduce$(EXEEXT) \
+	pole_enhancement$(EXEEXT) radmat$(EXEEXT) radmat_util$(EXEEXT) \
+	simple_test$(EXEEXT) single_plot$(EXEEXT) subduce$(EXEEXT) \
 	test_levi_civita$(EXEEXT) test_redstar_ops$(EXEEXT) \
 	test_rotations$(EXEEXT) test_tens$(EXEEXT)
 subdir = main
@@ -82,6 +82,10 @@ am_mass_overlap_db_util_OBJECTS = mass_overlap_db_util.$(OBJEXT)
 mass_overlap_db_util_OBJECTS = $(am_mass_overlap_db_util_OBJECTS)
 mass_overlap_db_util_LDADD = $(LDADD)
 mass_overlap_db_util_DEPENDENCIES =
+am_pole_enhancement_OBJECTS = pole_enhancement.$(OBJEXT)
+pole_enhancement_OBJECTS = $(am_pole_enhancement_OBJECTS)
+pole_enhancement_LDADD = $(LDADD)
+pole_enhancement_DEPENDENCIES =
 am_radmat_OBJECTS = radmat.$(OBJEXT)
 radmat_OBJECTS = $(am_radmat_OBJECTS)
 radmat_LDADD = $(LDADD)
@@ -131,20 +135,22 @@ SOURCES = $(grab_ff_SOURCES) $(grab_pol_SOURCES) \
 	$(grab_vector_mean_cmp_SOURCES) $(invert_subduced_SOURCES) \
 	$(mass_overlap_db_combine_SOURCES) \
 	$(mass_overlap_db_create_SOURCES) \
-	$(mass_overlap_db_util_SOURCES) $(radmat_SOURCES) \
-	$(radmat_util_SOURCES) $(simple_test_SOURCES) \
-	$(single_plot_SOURCES) $(subduce_SOURCES) \
-	$(test_levi_civita_SOURCES) $(test_redstar_ops_SOURCES) \
-	$(test_rotations_SOURCES) $(test_tens_SOURCES)
+	$(mass_overlap_db_util_SOURCES) $(pole_enhancement_SOURCES) \
+	$(radmat_SOURCES) $(radmat_util_SOURCES) \
+	$(simple_test_SOURCES) $(single_plot_SOURCES) \
+	$(subduce_SOURCES) $(test_levi_civita_SOURCES) \
+	$(test_redstar_ops_SOURCES) $(test_rotations_SOURCES) \
+	$(test_tens_SOURCES)
 DIST_SOURCES = $(grab_ff_SOURCES) $(grab_pol_SOURCES) \
 	$(grab_vector_mean_cmp_SOURCES) $(invert_subduced_SOURCES) \
 	$(mass_overlap_db_combine_SOURCES) \
 	$(mass_overlap_db_create_SOURCES) \
-	$(mass_overlap_db_util_SOURCES) $(radmat_SOURCES) \
-	$(radmat_util_SOURCES) $(simple_test_SOURCES) \
-	$(single_plot_SOURCES) $(subduce_SOURCES) \
-	$(test_levi_civita_SOURCES) $(test_redstar_ops_SOURCES) \
-	$(test_rotations_SOURCES) $(test_tens_SOURCES)
+	$(mass_overlap_db_util_SOURCES) $(pole_enhancement_SOURCES) \
+	$(radmat_SOURCES) $(radmat_util_SOURCES) \
+	$(simple_test_SOURCES) $(single_plot_SOURCES) \
+	$(subduce_SOURCES) $(test_levi_civita_SOURCES) \
+	$(test_redstar_ops_SOURCES) $(test_rotations_SOURCES) \
+	$(test_tens_SOURCES)
 ETAGS = etags
 CTAGS = ctags
 DISTFILES = $(DIST_COMMON) $(DIST_SOURCES) $(TEXINFOS) $(EXTRA_DIST)
@@ -268,6 +274,7 @@ invert_subduced_SOURCES = invert_subduced.cc
 mass_overlap_db_combine_SOURCES = mass_overlap_db_combine.cc
 mass_overlap_db_create_SOURCES = mass_overlap_db_create.cc
 mass_overlap_db_util_SOURCES = mass_overlap_db_util.cc
+pole_enhancement_SOURCES = pole_enhancement.cc
 radmat_SOURCES = radmat.cc
 radmat_util_SOURCES = radmat_util.cc
 simple_test_SOURCES = simple_test.cc
@@ -374,6 +381,9 @@ mass_overlap_db_create$(EXEEXT): $(mass_overlap_db_create_OBJECTS) $(mass_overla
 mass_overlap_db_util$(EXEEXT): $(mass_overlap_db_util_OBJECTS) $(mass_overlap_db_util_DEPENDENCIES) 
 	@rm -f mass_overlap_db_util$(EXEEXT)
 	$(CXXLINK) $(mass_overlap_db_util_OBJECTS) $(mass_overlap_db_util_LDADD) $(LIBS)
+pole_enhancement$(EXEEXT): $(pole_enhancement_OBJECTS) $(pole_enhancement_DEPENDENCIES) 
+	@rm -f pole_enhancement$(EXEEXT)
+	$(CXXLINK) $(pole_enhancement_OBJECTS) $(pole_enhancement_LDADD) $(LIBS)
 radmat$(EXEEXT): $(radmat_OBJECTS) $(radmat_DEPENDENCIES) 
 	@rm -f radmat$(EXEEXT)
 	$(CXXLINK) $(radmat_OBJECTS) $(radmat_LDADD) $(LIBS)
@@ -415,6 +425,7 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/mass_overlap_db_combine.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/mass_overlap_db_create.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/mass_overlap_db_util.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/pole_enhancement.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/radmat.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/radmat_util.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/simple_test.Po@am__quote@

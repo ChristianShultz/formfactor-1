@@ -101,6 +101,7 @@ namespace radmat
 
   namespace TheSmarterSubduceTableMapFactoryEnv
   {
+    std::vector<std::string> all_keys(); 
     bool registerAll(); 
   }
 

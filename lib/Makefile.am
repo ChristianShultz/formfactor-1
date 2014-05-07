@@ -110,6 +110,11 @@ nobase_include_HEADERS =   \
 													 radmat/rotation_interface/rotation_utils.h    \
 													 radmat/rotation_interface/Wigner_D_matrix_factory.h    \
 													 radmat/rotation_interface/Wigner_D_matrix_manager.h    \
+													 radmat/spectrum/make_head.csh    \
+													 radmat/spectrum/spectrum_3F_743.h    \
+													 radmat/spectrum/spectrum_factory.h    \
+													 radmat/spectrum/spectrum.h    \
+													 radmat/spectrum/spectrum_state.h    \
 													 radmat/utils/aux.h    \
 													 radmat/utils/debug_handler.h    \
 													 radmat/utils/euler_angles.h    \
@@ -187,6 +192,8 @@ libradmat_a_SOURCES =	\
 											radmat/rotation_interface/rotation_utils.cc    \
 											radmat/rotation_interface/Wigner_D_matrix_factory.cc    \
 											radmat/rotation_interface/Wigner_D_matrix_manager.cc    \
+											radmat/spectrum/spectrum_3F_743.cc    \
+											radmat/spectrum/spectrum_factory.cc    \
 											radmat/utils/aux.cc    \
 											radmat/utils/euler_angles.cc    \
 											radmat/utils/harmonic.cc    \

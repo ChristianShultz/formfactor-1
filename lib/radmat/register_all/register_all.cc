@@ -6,7 +6,7 @@
 
  * Creation Date : 10-12-2013
 
- * Last Modified : Wed 16 Apr 2014 04:31:46 PM EDT
+ * Last Modified : Tue 06 May 2014 06:38:36 PM EDT
 
  * Created By : shultz
 
@@ -25,6 +25,7 @@
 #include "radmat/redstar_interface/redstar_canonical_lattice_rotations.h"
 #include "radmat/redstar_interface/redstar_canonical_rotations.h"
 #include "radmat/redstar_interface/redstar_invert_subduction.h"
+#include "radmat/spectrum/spectrum_factory.h"
 #include "radmat/utils/printer.h"
 #include <exception>
 
@@ -72,6 +73,8 @@ namespace radmat
           success &= radmat::WignerDMatrixEnv::registerAll(4); // up to J = 2 
           // pre allocate thread storage 
           success &= radmat::WignerThreadMapEnv::registerAll(); 
+          // spectral info 
+          success &= radmat::TheSpectrumFactoryEnv::registerAll( LATTICE::L_3F_743);
         }
         catch(std::exception &e)
         {

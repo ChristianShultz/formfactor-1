@@ -118,7 +118,8 @@ am_libradmat_a_OBJECTS =  \
 	redstar_vector_current_xml_interface.$(OBJEXT) \
 	register_all.$(OBJEXT) rotation_group_generator.$(OBJEXT) \
 	rotation_utils.$(OBJEXT) Wigner_D_matrix_factory.$(OBJEXT) \
-	Wigner_D_matrix_manager.$(OBJEXT) aux.$(OBJEXT) \
+	Wigner_D_matrix_manager.$(OBJEXT) spectrum_3F_743.$(OBJEXT) \
+	spectrum_factory.$(OBJEXT) aux.$(OBJEXT) \
 	euler_angles.$(OBJEXT) harmonic.$(OBJEXT) mink_qsq.$(OBJEXT) \
 	polarization_tensors.$(OBJEXT) pow2assert.$(OBJEXT) \
 	splash.$(OBJEXT) tensor.$(OBJEXT)
@@ -348,6 +349,11 @@ nobase_include_HEADERS = \
 													 radmat/rotation_interface/rotation_utils.h    \
 													 radmat/rotation_interface/Wigner_D_matrix_factory.h    \
 													 radmat/rotation_interface/Wigner_D_matrix_manager.h    \
+													 radmat/spectrum/make_head.csh    \
+													 radmat/spectrum/spectrum_3F_743.h    \
+													 radmat/spectrum/spectrum_factory.h    \
+													 radmat/spectrum/spectrum.h    \
+													 radmat/spectrum/spectrum_state.h    \
 													 radmat/utils/aux.h    \
 													 radmat/utils/debug_handler.h    \
 													 radmat/utils/euler_angles.h    \
@@ -424,6 +430,8 @@ libradmat_a_SOURCES = \
 											radmat/rotation_interface/rotation_utils.cc    \
 											radmat/rotation_interface/Wigner_D_matrix_factory.cc    \
 											radmat/rotation_interface/Wigner_D_matrix_manager.cc    \
+											radmat/spectrum/spectrum_3F_743.cc    \
+											radmat/spectrum/spectrum_factory.cc    \
 											radmat/utils/aux.cc    \
 											radmat/utils/euler_angles.cc    \
 											radmat/utils/harmonic.cc    \
@@ -567,6 +575,8 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/register_all.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/rotation_group_generator.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/rotation_utils.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/spectrum_3F_743.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/spectrum_factory.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/splash.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/tensor.Po@am__quote@
 
@@ -1297,6 +1307,34 @@ Wigner_D_matrix_manager.obj: radmat/rotation_interface/Wigner_D_matrix_manager.c
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='radmat/rotation_interface/Wigner_D_matrix_manager.cc' object='Wigner_D_matrix_manager.obj' libtool=no @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCXX_FALSE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o Wigner_D_matrix_manager.obj `if test -f 'radmat/rotation_interface/Wigner_D_matrix_manager.cc'; then $(CYGPATH_W) 'radmat/rotation_interface/Wigner_D_matrix_manager.cc'; else $(CYGPATH_W) '$(srcdir)/radmat/rotation_interface/Wigner_D_matrix_manager.cc'; fi`
+
+spectrum_3F_743.o: radmat/spectrum/spectrum_3F_743.cc
+@am__fastdepCXX_TRUE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT spectrum_3F_743.o -MD -MP -MF $(DEPDIR)/spectrum_3F_743.Tpo -c -o spectrum_3F_743.o `test -f 'radmat/spectrum/spectrum_3F_743.cc' || echo '$(srcdir)/'`radmat/spectrum/spectrum_3F_743.cc
+@am__fastdepCXX_TRUE@	$(am__mv) $(DEPDIR)/spectrum_3F_743.Tpo $(DEPDIR)/spectrum_3F_743.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='radmat/spectrum/spectrum_3F_743.cc' object='spectrum_3F_743.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o spectrum_3F_743.o `test -f 'radmat/spectrum/spectrum_3F_743.cc' || echo '$(srcdir)/'`radmat/spectrum/spectrum_3F_743.cc
+
+spectrum_3F_743.obj: radmat/spectrum/spectrum_3F_743.cc
+@am__fastdepCXX_TRUE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT spectrum_3F_743.obj -MD -MP -MF $(DEPDIR)/spectrum_3F_743.Tpo -c -o spectrum_3F_743.obj `if test -f 'radmat/spectrum/spectrum_3F_743.cc'; then $(CYGPATH_W) 'radmat/spectrum/spectrum_3F_743.cc'; else $(CYGPATH_W) '$(srcdir)/radmat/spectrum/spectrum_3F_743.cc'; fi`
+@am__fastdepCXX_TRUE@	$(am__mv) $(DEPDIR)/spectrum_3F_743.Tpo $(DEPDIR)/spectrum_3F_743.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='radmat/spectrum/spectrum_3F_743.cc' object='spectrum_3F_743.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o spectrum_3F_743.obj `if test -f 'radmat/spectrum/spectrum_3F_743.cc'; then $(CYGPATH_W) 'radmat/spectrum/spectrum_3F_743.cc'; else $(CYGPATH_W) '$(srcdir)/radmat/spectrum/spectrum_3F_743.cc'; fi`
+
+spectrum_factory.o: radmat/spectrum/spectrum_factory.cc
+@am__fastdepCXX_TRUE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT spectrum_factory.o -MD -MP -MF $(DEPDIR)/spectrum_factory.Tpo -c -o spectrum_factory.o `test -f 'radmat/spectrum/spectrum_factory.cc' || echo '$(srcdir)/'`radmat/spectrum/spectrum_factory.cc
+@am__fastdepCXX_TRUE@	$(am__mv) $(DEPDIR)/spectrum_factory.Tpo $(DEPDIR)/spectrum_factory.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='radmat/spectrum/spectrum_factory.cc' object='spectrum_factory.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o spectrum_factory.o `test -f 'radmat/spectrum/spectrum_factory.cc' || echo '$(srcdir)/'`radmat/spectrum/spectrum_factory.cc
+
+spectrum_factory.obj: radmat/spectrum/spectrum_factory.cc
+@am__fastdepCXX_TRUE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT spectrum_factory.obj -MD -MP -MF $(DEPDIR)/spectrum_factory.Tpo -c -o spectrum_factory.obj `if test -f 'radmat/spectrum/spectrum_factory.cc'; then $(CYGPATH_W) 'radmat/spectrum/spectrum_factory.cc'; else $(CYGPATH_W) '$(srcdir)/radmat/spectrum/spectrum_factory.cc'; fi`
+@am__fastdepCXX_TRUE@	$(am__mv) $(DEPDIR)/spectrum_factory.Tpo $(DEPDIR)/spectrum_factory.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='radmat/spectrum/spectrum_factory.cc' object='spectrum_factory.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o spectrum_factory.obj `if test -f 'radmat/spectrum/spectrum_factory.cc'; then $(CYGPATH_W) 'radmat/spectrum/spectrum_factory.cc'; else $(CYGPATH_W) '$(srcdir)/radmat/spectrum/spectrum_factory.cc'; fi`
 
 aux.o: radmat/utils/aux.cc
 @am__fastdepCXX_TRUE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT aux.o -MD -MP -MF $(DEPDIR)/aux.Tpo -c -o aux.o `test -f 'radmat/utils/aux.cc' || echo '$(srcdir)/'`radmat/utils/aux.cc

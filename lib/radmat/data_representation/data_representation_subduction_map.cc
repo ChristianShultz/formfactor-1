@@ -6,7 +6,7 @@
 
  * Creation Date : 19-03-2014
 
- * Last Modified : Mon 28 Apr 2014 01:53:43 PM EDT
+ * Last Modified : Tue 06 May 2014 06:07:23 PM EDT
 
  * Created By : shultz
 
@@ -258,6 +258,17 @@ namespace radmat
       bool local_registration = false; 
     }
 
+    std::vector<std::string> all_keys()
+    {
+      std::vector<std::string> ret; 
+      SubduceTableMap::map_t::const_iterator it; 
+      typedef TheSmarterSubduceTableMap sstm; 
+      ret.reserve(sstm::Instance().mappy.size()); 
+      for(it = sstm::Instance().mappy.begin(); it != sstm::Instance().mappy.end(); ++it)
+        ret.push_back(it->first); 
+
+      return ret; 
+    }
 
     bool registerAll()
     {

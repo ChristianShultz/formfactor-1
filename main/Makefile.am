@@ -17,6 +17,7 @@ bin_PROGRAMS =   \
 								 mass_overlap_db_combine		\
 								 mass_overlap_db_create		\
 								 mass_overlap_db_util		\
+								 pole_enhancement			\
 								 radmat		\
 								 radmat_util		\
 								 simple_test		\
@@ -35,6 +36,7 @@ invert_subduced_SOURCES = invert_subduced.cc
 mass_overlap_db_combine_SOURCES = mass_overlap_db_combine.cc
 mass_overlap_db_create_SOURCES = mass_overlap_db_create.cc
 mass_overlap_db_util_SOURCES = mass_overlap_db_util.cc
+pole_enhancement_SOURCES = pole_enhancement.cc
 radmat_SOURCES = radmat.cc
 radmat_util_SOURCES = radmat_util.cc
 simple_test_SOURCES = simple_test.cc
