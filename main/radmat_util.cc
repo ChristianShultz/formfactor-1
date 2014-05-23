@@ -6,7 +6,7 @@
 
  * Creation Date : 25-02-2013
 
- * Last Modified : Fri 25 Apr 2014 12:57:37 PM EDT
+ * Last Modified : Fri 23 May 2014 02:00:51 PM EDT
 
  * Created By : shultz
 
@@ -28,7 +28,6 @@
 #include "radmat/construct_data/lattice_multi_data_object.h"
 #include "radmat/llsq/llsq_multi_data_serialize.h"
 #include "radmat/llsq/llsq_solution.h"
-#include "radmat/utils/pow2assert.h"
 #include "radmat/utils/splash.h"
 #include "radmat/utils/handle.h"
 
@@ -72,13 +71,13 @@ namespace
 
   struct SingleQ2Prop_t
   {
-    int ff;                                                 // which form factor are we refitting
+    std::string ff;                                                 // which form factor are we refitting
     ThreePointComparatorProps_t threePointComparatorProps;  // how are we fitting it
   };
 
   struct ArrSingleQ2Prop_t
   {
-    ADATXML::Array<SingleQ2Prop_t>  ffs;                  // the list of ffs that we want to refit
+    ADATXML::Array<SingleQ2Prop_t>  ffs;                    // the list of ffs that we want to refit
     int tsrc;                                               // some duplicate info
     int tsnk;                                               
     std::string dbfile;                                     // where does it live
@@ -307,32 +306,32 @@ void Q2_llsq(int argc, char *argv[])
     exit(1);
   }
 
-  // driver
-  radmat::RadmatSingleQ2Driver my_driver;
-
-  // get the lattice elems as a function of insertion time from 
-  // the database that was saved in the orig run 
-  pull_elems(foo,arr_ini); 
-
-  // check that we can load the thing
-  POW2_ASSERT( my_driver.load_llsq(foo,arr_ini.tolerance) ); 
-
-  // solve the linear system 
-  my_driver.solve_llsq(arr_ini.solnID); 
-
-  // loop them 
-  for (int elem = 0; elem < arr_ini.ffs.size(); ++elem)
-  {
-    std::cout << "\n\n** refiting ff_" << arr_ini.ffs[elem].ff << std::endl;
-    std::cout << "*********************************" << std::endl;
-    // fit out the insertion time dependence
-    my_driver.fit_and_dump_single_ffs(
-        arr_ini.ffs[elem].threePointComparatorProps,
-        arr_ini.tsrc,
-        arr_ini.tsnk,
-        arr_ini.ffs[elem].ff,
-        ffmax);
-  } // ff loop
+  // stubbed !! 
+//  // driver
+//  radmat::RadmatSingleQ2Driver my_driver;
+//
+//  // get the lattice elems as a function of insertion time from 
+//  // the database that was saved in the orig run 
+//  pull_elems(foo,arr_ini); 
+//
+//  // check that we can load the thing
+//  POW2_ASSERT( my_driver.load_llsq(foo,arr_ini.tolerance) ); 
+//
+//  // solve the linear system 
+//  my_driver.solve_llsq(arr_ini.solnID); 
+//
+//  // loop them 
+//  for (int elem = 0; elem < arr_ini.ffs.size(); ++elem)
+//  {
+//    std::cout << "\n\n** refiting ff_" << arr_ini.ffs[elem].ff << std::endl;
+//    std::cout << "*********************************" << std::endl;
+//    // fit out the insertion time dependence
+//    my_driver.fit_and_dump_single_ffs(
+//        arr_ini.ffs[elem].threePointComparatorProps,
+//        arr_ini.tsrc,
+//        arr_ini.tsnk,
+//        arr_ini.ffs[elem].ff);
+//  } // ff loop
 
 }
 
@@ -340,13 +339,14 @@ void Q2_llsq(int argc, char *argv[])
 
 
 //    go back and refit form factors 
+//        -- leave the llsq alone here 
 //
 /////////////////////////////////////////////////////
 void refit_ffs(int argc, char *argv[])
 {
-  if(argc != 4)
+  if(argc != 3)
   {
-    std::cerr << "usage: radmat_util: refit_ffs <xmlinifile> <ffmax> " << std::endl;
+    std::cerr << "usage: radmat_util: refit_ffs <xmlinifile> " << std::endl;
     exit(1); 
   }
 
@@ -356,9 +356,6 @@ void refit_ffs(int argc, char *argv[])
   std::istringstream val(argv[2]);
   val >> xmlini;
 
-  int ffmax; 
-  std::istringstream val1(argv[3]); 
-  val1 >> ffmax; 
 
   // read the xml array of ffs that we want to refit
   ArrSingleQ2Prop_t arr_ini; 
@@ -401,20 +398,18 @@ void refit_ffs(int argc, char *argv[])
   // driver
   radmat::RadmatSingleQ2Driver my_driver;
 
-  // loop them 
+  
   for (int elem = 0; elem < arr_ini.ffs.size(); ++elem)
   {
-    std::cout << "\n\n** refiting ff_" << arr_ini.ffs[elem].ff << std::endl;
+    std::cout << "\n\n** refiting ff: " << arr_ini.ffs[elem].ff << std::endl;
     std::cout << "*********************************" << std::endl;
     // fit out the insertion time dependence
     my_driver.fit_and_dump_single_ffs(
         arr_ini.ffs[elem].threePointComparatorProps,
-        FF_of_t.FF_t,
-        FF_of_t.Ingredients.begin()->Q2(),
+        FF_of_t,
         arr_ini.tsrc,
         arr_ini.tsnk,
-        arr_ini.ffs[elem].ff,
-        ffmax);
+        arr_ini.ffs[elem].ff);
   } // ff loop
 
 }

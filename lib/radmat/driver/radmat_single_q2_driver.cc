@@ -6,7 +6,7 @@
 
  * Creation Date : 25-02-2013
 
- * Last Modified : Thu 17 Apr 2014 04:27:40 PM EDT
+ * Last Modified : Fri 23 May 2014 03:16:31 PM EDT
 
  * Created By : shultz
 
@@ -36,7 +36,7 @@ namespace radmat
     {
       static void print(const std::string &msg)
       {}
-//      { std::cout << msg << std::endl; }
+      //      { std::cout << msg << std::endl; }
     };
 
     template<typename T>
@@ -46,7 +46,7 @@ namespace radmat
         ss << t ;
         return ss.str(); 
       }
-  
+
 
     template<typename T>
       typename SEMBLE::PromoteEnsemVec<T>::Type
@@ -60,7 +60,7 @@ namespace radmat
 
         return out;
       }
-  
+
     void write_jackfile_fit_report ( const TinsFitter &fits, const std::string &bpth)
     {
       std::vector<std::string> keys = fits.ff_ids(); 
@@ -141,7 +141,7 @@ namespace radmat
 
     // append the label
     append_rotation_group_label(rotation_group_label(mix_irreps)); 
-    
+
 
     init_linear_system = true; 
 
@@ -234,43 +234,80 @@ namespace radmat
 
   void 
     RadmatSingleQ2Driver::fit_and_dump_single_ffs(const ThreePointComparatorProps_t &fit_props, 
-        const SEMBLE::SembleMatrix<std::complex<double> > &FF_of_t,
-        const ENSEM::EnsemReal &Q2,
+        const FormFacSolutions<std::complex<double> > &ff_soln,
         const int tsrc,
         const int tsnk,
-        const int ff,
-        const int ff_max) const
+        const std::string ff) const
     {
-      // stub
-//      // snarf (RGEism)  ffs
-//      LLSQRet_ff_Q2Pack<std::complex<double> > tmp;
-//
-//      // build a "fake" pack
-//      tmp.insert(ff,get_ensem_row(ff,FF_of_t));
-//      tmp.setQ2(Q2); 
-//
-//      // i/o junk 
-//      std::string base_p = std::string("REFIT/");
-//      SEMBLE::SEMBLEIO::makeDirectoryPath(base_p); 
-//      SEMBLE::SEMBLEIO::makeDirectoryPath(base_p + std::string("t_ins_fits/"));
-//
-//      // run a fit on this ff 
-//      TinsFitter local_fit_across_time; 
-//      local_fit_across_time.single_fit<std::complex<double> >(base_p + std::string("t_ins_fits/"),
-//          tmp,
-//          ff_max, 
-//          fit_props,
-//          tsrc,
-//          tsnk);
-//
-//
-//      // dump results
-//      SEMBLE::SEMBLEIO::makeDirectoryPath(base_p + std::string("fit_logs/"));
-//      local_fit_across_time.writeFitLogs(base_p + std::string("fit_logs/"));
-//      SEMBLE::SEMBLEIO::makeDirectoryPath(base_p + std::string("component_fits/")); 
-//      local_fit_across_time.writeFitPlotsWithComponents(base_p + std::string("component_fits/"));
-//      SEMBLE::SEMBLEIO::makeDirectoryPath(base_p + std::string("jack_files/")); 
-//      write_single_jackfile_fit_report ( local_fit_across_time, base_p + std::string("jack_files/"), ff);
+      LLSQComplexFormFactorData_t tmp; 
+
+      // load up data
+      bool found = false; 
+      for(int row = 0; row < ff_soln.FF_t.getN(); ++row)
+      {
+        if( ff_soln.Names[row] == ff ) 
+        {
+          tmp.insert(ff,ff_soln.FF_t.getRow(row));
+          found = true; 
+          break; 
+        }
+      }
+
+      // std::cout << "fitting " << ff << std::endl;
+      // std::cout << ff_soln.FF_t.mean() << std::endl;
+
+
+      if( !!! found )
+      {
+        std::cout << "couldnt find " << ff << " did you mean one of:" << std::endl;
+        std::vector<std::string>::const_iterator nit; 
+        for(nit = ff_soln.Names.begin(); nit != ff_soln.Names.end(); ++nit)
+          std::cout << *nit << std::endl;
+        std::cout << "skipping" << std::endl; 
+        return; 
+      }
+
+      std::string pth = std::string("");
+
+      // run the fit
+      TinsFitter lcl_fit_across_time;
+      lcl_fit_across_time.fit(pth,tmp,fit_props,tsrc,tsnk);
+
+      ENSEM::EnsemReal this_ff = lcl_fit_across_time.getFF(ff); 
+      ThreePointDataTag t = *(ff_soln.Ingredients.begin()); 
+      ENSEM::EnsemReal this_Q2 = t.Q2(); 
+      std::stringstream res; 
+      res << "1 q2 " 
+       << SEMBLE::toScalar(ENSEM::mean(this_Q2)) << " " 
+       << sqrt(SEMBLE::toScalar(ENSEM::variance(this_Q2))); 
+      res << " ff " 
+       << SEMBLE::toScalar(ENSEM::mean(this_ff)) << " " 
+       << sqrt(SEMBLE::toScalar(ENSEM::variance(this_ff))); 
+     
+      DataRep3pt dr = t.data_rep; 
+      std::pair<mom_t,mom_t> c_mom; 
+      c_mom = radmat::LatticeRotationEnv::rotation_group_can_mom(t.left_mom,t.right_mom);
+
+      res << " | " << t.full_irrep_id(dr,dr.l) 
+        << " " << c_mom.first[0]
+        << " " << c_mom.first[1]
+        << " " << c_mom.first[2];
+
+      res << " " << t.full_irrep_id(dr,dr.r) 
+        << " " << c_mom.second[0]
+        << " " << c_mom.second[1]
+        << " " << c_mom.second[2];
+
+      res << " g " << t.full_irrep_id(dr,dr.g); 
+      res << std::endl; 
+
+      std::string fout; 
+      fout = ff + ".refit.dat"; 
+      std::ofstream out(fout.c_str());
+      out << res.str(); 
+      out.close(); 
+
+
     }
 
   void RadmatSingleQ2Driver::chisq_analysis(const int tlows, const int thighs)
@@ -322,24 +359,24 @@ namespace radmat
       return fit_across_time.fetchFF(); 
     }
 
-    
-    RadmatSingleQ2Solution RadmatSingleQ2Driver::fetchSolution(void) const
-    {
-      check_exit_fits(); 
 
-      RadmatSingleQ2Solution ret; 
-     
-      // yoink the data from the fit across time class 
-      std::pair<ENSEM::EnsemReal,std::map<std::string,ENSEM::EnsemReal> > d; 
-      d = fit_across_time.fetchNamedFF(); 
-     
-      // bung it into this silly solution thingy 
-      ret.Q2 = d.first; 
-      ret.ff_map = d.second; 
-      ret.tags = linear_system.peek_tags(); 
+  RadmatSingleQ2Solution RadmatSingleQ2Driver::fetchSolution(void) const
+  {
+    check_exit_fits(); 
 
-      return ret; 
-    }
+    RadmatSingleQ2Solution ret; 
+
+    // yoink the data from the fit across time class 
+    std::pair<ENSEM::EnsemReal,std::map<std::string,ENSEM::EnsemReal> > d; 
+    d = fit_across_time.fetchNamedFF(); 
+
+    // bung it into this silly solution thingy 
+    ret.Q2 = d.first; 
+    ret.ff_map = d.second; 
+    ret.tags = linear_system.peek_tags(); 
+
+    return ret; 
+  }
 
 
   std::string RadmatSingleQ2Driver::tags_at_this_Q2(void) const
@@ -360,7 +397,7 @@ namespace radmat
   {
     // check_exit_linear_system(); 
     std::vector<ThreePointDataTag> tt = linear_system.peek_tags(); 
-  
+
     if( tt.empty() )
       return std::string(); 
 

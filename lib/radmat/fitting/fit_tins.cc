@@ -6,7 +6,7 @@
 
  * Creation Date : 01-08-2012
 
- * Last Modified : Thu 17 Apr 2014 03:26:38 PM EDT
+ * Last Modified : Fri 23 May 2014 02:50:55 PM EDT
 
  * Created By : shultz
 
@@ -52,15 +52,13 @@ namespace radmat
     struct to_ensem_printer
     {
       static void print(const std::string &s)
-            {} 
-      //      { std::cout << s << std::endl; }
+      {} //  { std::cout << s << std::endl; }
     };
 
     struct dimension_printer
     {
       static void print(const std::string &s)
-      {}
-      //      { std::cout << s << std::endl; }
+      {} //  { std::cout << s << std::endl; }
     };
 
     template<typename T> 
@@ -112,6 +110,9 @@ namespace radmat
       const int tsrc,
       const int tsnk)
   {
+    //  std::cout << __PRETTY_FUNCTION__ << ": entering " << std::endl;
+    //  std::cout << "tsrc " << tsrc << "   tsnk " << tsnk << std::endl;
+
     std::stringstream ss,jack,ax,fit;
     ss << filenameBase;
     fit << ss.str() << ffid << "_fit.jack";
@@ -145,6 +146,8 @@ namespace radmat
 
     printer_function<dimension_printer>(
         "inserting a fit into index " + to_string(index));
+
+    //  ff.dimensions(__func__); 
 
     ff.loadEnsemElement(index,fitCorr->getFF());
     write(fit.str(),fitCorr->getFF()); 

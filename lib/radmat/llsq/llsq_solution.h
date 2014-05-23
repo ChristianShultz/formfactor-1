@@ -15,8 +15,9 @@ namespace radmat
       FormFacSolutions() {}
 
       FormFacSolutions(const SEMBLE::SembleMatrix<T> &ff, 
-          const std::vector<ThreePointDataTag> &i)
-        : FF_t(ff) , Ingredients(i) 
+          const std::vector<ThreePointDataTag> &i,
+          const std::vector<std::string> &names)
+        : FF_t(ff) , Ingredients(i) , Names(names)
       { }
 
       void append_ingredients(const ThreePointDataTag &t)
@@ -24,8 +25,14 @@ namespace radmat
         Ingredients.push_back(t); 
       }
 
+      void append_name(const std::string &n)
+      {
+        Names.push_back(n); 
+      }
+
       SEMBLE::SembleMatrix<T> FF_t; 
       std::vector<ThreePointDataTag> Ingredients; 
+      std::vector<std::string> Names; 
     }; 
 
   template<typename T> 
@@ -45,6 +52,8 @@ namespace radmat
           ENSEM::pokeObs(e,foo.getEnsemElement(n),n); 
 
         ENSEM::write(bin,e); 
+
+        writeDesc(bin,f.Names[ff]); 
       }
   
       int nt = f.Ingredients.size(); 
@@ -65,6 +74,11 @@ namespace radmat
         typename SEMBLE::PromoteEnsemVec<T>::Type e; 
         SEMBLE::SembleVector<T> foo; 
         ENSEM::read(bin,e); 
+
+        std::string n; 
+        readDesc(bin,n); 
+        f.append_name(n); 
+
         foo = e; 
         if( ff == 0 ) // first append 
           f.FF_t.reDim(foo.getB(),0,foo.getN()); 

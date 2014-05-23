@@ -6,7 +6,7 @@
 
  * Creation Date : 22-02-2013
 
- * Last Modified : Fri 25 Apr 2014 12:42:23 PM EDT
+ * Last Modified : Fri 23 May 2014 02:06:18 PM EDT
 
  * Created By : shultz
 
@@ -588,8 +588,18 @@ namespace radmat
     ss << path << "ff_database.rad"; 
     ADATIO::BinaryFileWriter bin(ss.str());
 
+    std::vector<std::string> ffnames ;
+    std::vector<ThreePointDataTag> fftags ; 
+    SEMBLE::SembleMatrix<std::complex<double> > ffs; 
+    
+    ffs = peek_FF(); 
+    fftags = peek_tags(); 
+
+    for(int i = 0; i < ffs.getN(); ++i)
+      ffnames.push_back(ff_id(i)); 
+
     FormFacSolutions<std::complex<double> >
-      ff(peek_FF(),peek_tags()); 
+      ff(ffs,fftags,ffnames); 
 
     write(bin,ff); 
     bin.close();

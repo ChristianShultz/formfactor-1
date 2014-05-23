@@ -51,7 +51,7 @@ namespace radmat
     const_iterator end() const { return mappy.end(); }
     ENSEM::EnsemReal Q2() const { return Qsq; }
     unsigned int size() const { return mappy.size(); }
-    int esize() const { return Qsq.size(); }
+    int esize() const { return mappy.begin()->second.getB(); }
     
     ENSEM::EnsemReal Qsq; 
     map_t mappy; 

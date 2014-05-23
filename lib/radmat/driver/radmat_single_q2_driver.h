@@ -6,6 +6,7 @@
 #include "radmat/fitting/fit_tins.h"
 #include "ensem/ensem.h"
 #include "radmat/data_representation/data_representation.h"
+#include "radmat/llsq/llsq_solution.h"
 
 #include <string>
 #include <utility>
@@ -57,30 +58,10 @@ namespace radmat
 
     // single q2 fit individual ffs
     void fit_and_dump_single_ffs(const ThreePointComparatorProps_t &props,
-        const SEMBLE::SembleMatrix<std::complex<double> > &F_t,
-        const ENSEM::EnsemReal &Q2,
+        const FormFacSolutions<std::complex<double> > &ff_soln,
         const int tsrc, 
         const int tsnk,
-        const int ff,
-        const int ff_max) const;
-
-    void fit_and_dump_single_ffs(const ThreePointComparatorProps_t &props,
-        const int tsrc, 
-        const int tsnk,
-        const int ff,
-        const int ff_max) const
-    {
-      // do we have a solved llsq system
-      check_exit_linear_system();
-      check_exit_solved_llsq(); 
-      fit_and_dump_single_ffs(props,
-          linear_system.peek_FF(),
-          linear_system.Q2(),
-          tsrc,
-          tsnk,
-          ff,
-          ff_max);
-    }
+        const std::string ffid) const;
 
     void chisq_analysis(const int tlow, const int thigh);
 

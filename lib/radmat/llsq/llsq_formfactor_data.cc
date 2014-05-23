@@ -6,7 +6,7 @@
 
  * Creation Date : 21-02-2014
 
- * Last Modified : Sun 04 May 2014 06:21:13 PM EDT
+ * Last Modified : Fri 23 May 2014 03:21:10 PM EDT
 
  * Created By : shultz
 
@@ -132,8 +132,8 @@ namespace radmat
         //        int t_sample = int( double(thigh + tlow)/2. ); 
         //        double const_real = SEMBLE::toScalar( ENSEM::mean( ENSEM::peekObs(real,t_sample)));
         //        double const_imag = SEMBLE::toScalar( ENSEM::mean( ENSEM::peekObs(imag,t_sample)));
-        //        double const_real_var = SEMBLE::toScalar( ENSEM::variance( ENSEM::peekObs(real,t_sample)));
-        //        double const_imag_var = SEMBLE::toScalar( ENSEM::variance( ENSEM::peekObs(imag,t_sample)));
+        //        double const_real_err = SEMBLE::toScalar( ENSEM::variance( ENSEM::peekObs(real,t_sample)));
+        //        double const_imag_err = SEMBLE::toScalar( ENSEM::variance( ENSEM::peekObs(imag,t_sample)));
 
 
         std::vector<double> t; 
@@ -158,40 +158,40 @@ namespace radmat
 
         // pull average 
         double const_real = fit_real.getAvgFitParValue(0);
-        double const_real_var = fit_real.getAvgFitParError(0);
+        double const_real_err = fit_real.getAvgFitParError(0);
 
         double const_imag = fit_imag.getAvgFitParValue(0);
-        double const_imag_var = fit_imag.getAvgFitParError(0);
+        double const_imag_err = fit_imag.getAvgFitParError(0);
 
         // sometimes needs some fine tuning
         double consistent_with_zero = 1.;
 
         fit_log << "consistency with zero set at " << consistent_with_zero << std::endl;
         fit_log << "const_real " << const_real 
-          << "  +/-  " << const_real_var << std::endl;
+          << "  +/-  " << const_real_err << std::endl;
         fit_log << "const_imag " << const_imag 
-          << "  +/-  " << const_imag_var << std::endl;
+          << "  +/-  " << const_imag_err << std::endl;
 
         // is the constant consistent with zero? 
-        if( fabs(const_real) - consistent_with_zero*sqrt(fabs(const_real_var)) < 0.)
+        if( fabs(const_real) - consistent_with_zero*fabs(const_real_err) < 0.)
         {
           fit_log << "* decided it was imag" << std::endl;
           printer_function<case_printer>("real is consistent with zero");
           printer_function<case_printer>("real = " + to_string(const_real) 
-              + "+/-" + to_string(sqrt(fabs(const_real_var)))); 
+              + "+/-" + to_string(sqrt(fabs(const_real_err)))); 
           printer_function<case_printer>("imag = " + to_string(const_imag) 
-              + "+/-" + to_string(sqrt(fabs(const_imag_var)))); 
+              + "+/-" + to_string(sqrt(fabs(const_imag_err)))); 
           if (const_imag > 0. )
             return std::make_pair(phase_pair(IP,imag),fit_log.str()); 
           return std::make_pair(phase_pair(IM,imag),fit_log.str());
         }
 
-        if( fabs(const_imag) - consistent_with_zero*sqrt(fabs(const_imag_var)) < 0.)
+        if( fabs(const_imag) - consistent_with_zero*fabs(const_imag_err) < 0.)
         {
           fit_log << "* decided it was real " << std::endl;
           printer_function<case_printer>("imag is consistent with zero");
           printer_function<case_printer>("imag = " + to_string(const_imag) 
-              + "+/-" + to_string(sqrt(fabs(const_imag_var)))); 
+              + "+/-" + to_string(sqrt(fabs(const_imag_err)))); 
           if( const_real > 0. )
             return std::make_pair(phase_pair(RP,real),fit_log.str()); 
           return std::make_pair(phase_pair(RM,real),fit_log.str());
