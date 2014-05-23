@@ -85,7 +85,7 @@ foreach dir ( `ls -al | grep ^d  | grep -v refit | grep -v FF | awk '{print $9}'
       # sed to sub in on the ini
       echo " cat ../../$ini | sed 's/@@@@/$lats/g' > $xml " | $SHELL -x
 
-
+      $exe refit_ffs $xml  
 
       # pop group 
       popd
