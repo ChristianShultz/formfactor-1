@@ -28,6 +28,9 @@ namespace radmat
     //! split up xml on p^2
     void build_xml_split_p2(const std::string &inifile);  
 
+    //! split up xml on octant 
+    void build_xml_split(const std::string &inifile); 
+
     //! two point xml hack
     void build_xml_twopoint(const std::string &inifile);
 

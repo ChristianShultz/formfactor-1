@@ -32,16 +32,20 @@ namespace radmat
         const LLSQComplexFormFactorData_t &data,
         const ThreePointComparatorProps_t &fitProps, 
         const int tsrc,
-        const int tsnk)
+        const int tsnk,
+        const bool usePars=false,
+        const FitParValue fp=FitParValue())
     {
-      fit(filenameBase, rephase_formfactor_data( data , fitProps.tlow, fitProps.thigh, filenameBase ), fitProps, tsrc, tsnk); 
+      fit(filenameBase, rephase_formfactor_data( data , fitProps.tlow, fitProps.thigh, filenameBase ), fitProps, tsrc, tsnk,usePars,fp); 
     }
 
     void fit( const std::string &filenameBase, 
         const LLSQRealFormFactorData_t &data,
         const ThreePointComparatorProps_t &fitProps, 
         const int tsrc,
-        const int tsnk);
+        const int tsnk,
+        const bool usePars=false,
+        const FitParValue=FitParValue());
 
     // get the form factors at this q2
     std::pair<ENSEM::EnsemReal, SEMBLE::SembleVector<double> > fetchFF(void) const;
@@ -78,7 +82,9 @@ namespace radmat
         const std::string &ffid,
         const ThreePointComparatorProps_t &fitProps,
         const int tsrc, 
-        const int tsnk);
+        const int tsnk,
+        const bool usePars=false,
+        const FitParValue=FitParValue());
 
     // data store
     bool didFit;

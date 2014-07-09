@@ -61,7 +61,8 @@ namespace radmat
         const FormFacSolutions<std::complex<double> > &ff_soln,
         const int tsrc, 
         const int tsnk,
-        const std::string ffid) const;
+        const std::string &ffid,
+        const FitParValue &) const;
 
     void chisq_analysis(const int tlow, const int thigh);
 

@@ -6,7 +6,7 @@
 
  * Creation Date : 25-02-2013
 
- * Last Modified : Fri 23 May 2014 03:13:44 PM EDT
+ * Last Modified : Wed 09 Jul 2014 10:38:41 AM EDT
 
  * Created By : shultz
 
@@ -144,6 +144,8 @@ namespace radmat
     handler["all"] = &RadmatDriver::build_xml; 
     handler["split_mom"] = &RadmatDriver::build_xml_split_p2;
     handler["two_point"] = &RadmatDriver::build_xml_twopoint;
+    handler["split"] = &RadmatDriver::build_xml_split;
+
 
     it = handler.find(mode); 
 
@@ -207,6 +209,85 @@ namespace radmat
       ss << "p" << p[0] << p[1] << p[2]; 
       return ss.str(); 
     }
+
+
+    template<int,int,int> 
+      int split_mom_key(void)
+      {
+        __builtin_trap(); 
+      }
+
+    int modulus = 10; 
+
+    // D3
+    template<> int split_mom_key<1,1,1>()   { return  1 % modulus; }
+    template<> int split_mom_key<-1,-1,-1>(){ return  2 % modulus; }
+    template<> int split_mom_key<1,1,-1>()  { return  3 % modulus; }
+    template<> int split_mom_key<1,-1,1>()  { return  4 % modulus; }
+    template<> int split_mom_key<-1,1,1>()  { return  5 % modulus; }
+    template<> int split_mom_key<1,-1,-1>() { return  6 % modulus; }
+    template<> int split_mom_key<-1,-1,1>() { return  7 % modulus; }
+    template<> int split_mom_key<-1,1,-1>() { return  8 % modulus; }
+
+    // D2
+    template<> int split_mom_key<1,1,0>()   { return  9 % modulus; }
+    template<> int split_mom_key<1,0,1>()   { return 10 % modulus; }
+    template<> int split_mom_key<0,1,1>()   { return 11 % modulus; }
+    template<> int split_mom_key<1,-1,0>()  { return 12 % modulus; }
+    template<> int split_mom_key<1,0,-1>()  { return 13 % modulus; }
+    template<> int split_mom_key<0,1,-1>()  { return 14 % modulus; }
+    template<> int split_mom_key<-1,1,0>()  { return 15 % modulus; }
+    template<> int split_mom_key<-1,0,1>()  { return 16 % modulus; }
+    template<> int split_mom_key<0,-1,1>()  { return 17 % modulus; }
+    template<> int split_mom_key<-1,-1,0>() { return 18 % modulus; }
+    template<> int split_mom_key<-1,0,-1>() { return 19 % modulus; }
+    template<> int split_mom_key<0,-1,-1>() { return 20 % modulus; }
+
+    // D4
+    template<> int split_mom_key<0,0,1>()   { return 21 % modulus; }
+    template<> int split_mom_key<0,0,-1>()  { return 22 % modulus; }
+    template<> int split_mom_key<0,1,0>()   { return 23 % modulus; }
+    template<> int split_mom_key<0,-1,0>()  { return 24 % modulus; }
+    template<> int split_mom_key<1,0,0>()   { return 25 % modulus; }
+    template<> int split_mom_key<-1,0,0>()  { return 26 % modulus; }
+
+    // Oh
+    template<> int split_mom_key<0,0,0>()   { return 27 % modulus; }
+
+
+    template<int A,int B> 
+      int split_mom_key(const ADATXML::Array<int> &i)
+      {
+        if( i[2] > 0 ) 
+          return split_mom_key<A,B,1>(); 
+        else if( i[2] == 0 )
+          return split_mom_key<A,B,0>();
+        else
+          return split_mom_key<A,B,-1>(); 
+      }
+
+
+    template<int A> 
+      int split_mom_key(const ADATXML::Array<int> &i)
+      {
+        if( i[1] > 0 ) 
+          return split_mom_key<A,1>(i); 
+        else if( i[1] == 0 )
+          return split_mom_key<A,0>(i);
+        else
+          return split_mom_key<A,-1>(i); 
+      }
+
+    int split_mom_key(const ADATXML::Array<int> &i)
+    {
+      if( i[0] > 0 ) 
+        return split_mom_key<1>(i); 
+      else if( i[0] == 0 )
+        return split_mom_key<0>(i);
+      else
+        return split_mom_key<-1>(i); 
+    }
+
 
     Hadron::KeyHadronNPartNPtCorr_t
       twoPointCorr(const Hadron::KeyHadronNPartNPtCorr_t::NPoint_t &npt1,
@@ -296,6 +377,61 @@ namespace radmat
 
       std::stringstream ss; 
       ss << "npt.list." << sorted_it->first << ".xml"; 
+
+      std::ofstream out(ss.str().c_str());
+      corrs.print(out);
+      out.close();
+    }
+  }
+
+
+
+  void RadmatDriver::build_xml_split(const std::string &inifile)
+  {
+    read_xmlini(inifile);
+
+    std::vector<Hadron::KeyHadronNPartNPtCorr_t> keys;
+    std::vector<Hadron::KeyHadronNPartNPtCorr_t>::const_iterator unsorted_it;
+    std::map<int,std::vector<Hadron::KeyHadronNPartNPtCorr_t> > sorted; 
+    std::map<int,std::vector<Hadron::KeyHadronNPartNPtCorr_t> >::iterator sorted_it; 
+
+    keys = m_correlators.construct_correlator_xml(m_ini.threePointIni); 
+
+    std::cout << __PRETTY_FUNCTION__ << " writing xml for " 
+      << keys.size() << " correlators" << std::endl; 
+
+    // sort them based on momentum -- some integer that comes from above (in a non biblical sense)
+    for(unsorted_it = keys.begin(); unsorted_it != keys.end(); ++unsorted_it)
+    {
+      sorted_it = sorted.find(split_mom_key(unsorted_it->npoint[2].irrep.mom)); 
+      if (sorted_it != sorted.end())
+        sorted_it->second.push_back(*unsorted_it); 
+      else
+        sorted.insert(
+            std::pair<int,std::vector<Hadron::KeyHadronNPartNPtCorr_t> >
+            (
+             split_mom_key(unsorted_it->npoint[2].irrep.mom),
+             std::vector<Hadron::KeyHadronNPartNPtCorr_t>(1,*unsorted_it) 
+            )
+            );
+    }
+
+
+    // now run them with some unique ids 
+    for(sorted_it = sorted.begin(); sorted_it != sorted.end(); ++sorted_it)
+    {
+      ADATXML::XMLBufferWriter corrs;
+      ADATXML::Array<Hadron::KeyHadronNPartNPtCorr_t> bc;
+      keys = sorted_it->second; 
+
+      bc.resize(keys.size()); 
+      for(unsigned int i = 0; i < keys.size(); ++i)
+        bc[i] = keys[i];
+
+      write(corrs,"NPointList",bc);
+
+      std::stringstream ss; 
+      ss << "npt.list.q" << sorted_it->first << ".xml"; 
 
       std::ofstream out(ss.str().c_str());
       corrs.print(out);

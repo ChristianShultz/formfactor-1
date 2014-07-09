@@ -6,7 +6,7 @@
 
  * Creation Date : 25-02-2013
 
- * Last Modified : Fri 23 May 2014 03:16:31 PM EDT
+ * Last Modified : Wed 28 May 2014 01:13:43 PM EDT
 
  * Created By : shultz
 
@@ -237,7 +237,8 @@ namespace radmat
         const FormFacSolutions<std::complex<double> > &ff_soln,
         const int tsrc,
         const int tsnk,
-        const std::string ff) const
+        const std::string &ff,
+        const FitParValue &v) const
     {
       LLSQComplexFormFactorData_t tmp; 
 
@@ -271,7 +272,13 @@ namespace radmat
 
       // run the fit
       TinsFitter lcl_fit_across_time;
-      lcl_fit_across_time.fit(pth,tmp,fit_props,tsrc,tsnk);
+      lcl_fit_across_time.fit(pth,tmp,fit_props,tsrc,tsnk,true,v);
+
+      // overwrite fit result with component fit 
+      lcl_fit_across_time.writeFitPlotsWithComponents(pth); 
+
+      // report fits 
+      lcl_fit_across_time.writeFitLogs(pth);
 
       ENSEM::EnsemReal this_ff = lcl_fit_across_time.getFF(ff); 
       ThreePointDataTag t = *(ff_soln.Ingredients.begin()); 
@@ -317,18 +324,19 @@ namespace radmat
     int tlow = tlows; 
     int thigh = thighs; 
 
-    std::vector<std::string> ids = fit_across_time.ff_ids(); 
-    std::vector<std::string>::const_iterator it; 
-    for(it = ids.begin(); it != ids.end(); ++it)
-    {
-      rHandle<FitThreePoint> some_fit = fit_across_time.getFit(*it); 
-      if ( some_fit->tlow() > tlow) 
-        tlow = some_fit->tlow(); 
-
-      if ( some_fit->thigh() < thigh)
-        thigh = some_fit->thigh();
-
-    }
+    // screw it, lets just always run the chisq since it is the correct thing to do
+    //    std::vector<std::string> ids = fit_across_time.ff_ids(); 
+    //    std::vector<std::string>::const_iterator it; 
+    //    for(it = ids.begin(); it != ids.end(); ++it)
+    //    {
+    //      rHandle<FitThreePoint> some_fit = fit_across_time.getFit(*it); 
+    //      if ( some_fit->tlow() > tlow) 
+    //        tlow = some_fit->tlow(); 
+    //
+    //      if ( some_fit->thigh() < thigh)
+    //        thigh = some_fit->thigh();
+    //
+    //    }
 
     if ( thigh < tlow ) 
     {

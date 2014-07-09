@@ -8,7 +8,7 @@
 
 namespace radmat
 {
-  
+
   template<typename T> 
     struct FormFacSolutions
     {
@@ -38,9 +38,11 @@ namespace radmat
   template<typename T> 
     void 
     write(ADATIO::BinaryWriter &bin, const FormFacSolutions<T> &f)
-   {
-     int nr = f.FF_t.getN(); 
-     write(bin,nr); 
+    {
+      int nr = f.FF_t.getN(); 
+
+      //      std::cout << __func__ << ": nr = " << nr << std::endl; 
+      write(bin,nr); 
       for(int ff = 0; ff < nr; ++ff)
       {
         typename SEMBLE::PromoteEnsemVec<T>::Type e; 
@@ -54,13 +56,17 @@ namespace radmat
         ENSEM::write(bin,e); 
 
         writeDesc(bin,f.Names[ff]); 
+
+        //        std::cout << __func__ << ": n = " << f.Names[ff] << std::endl; 
       }
-  
+
       int nt = f.Ingredients.size(); 
+
+      //      std::cout << __func__ << ": nt = " << nt << std::endl; 
       write(bin,nt); 
       for(int i =0; i < nt; ++i)
         write(bin,f.Ingredients[i]); 
-   } 
+    } 
 
   template<typename T> 
     void 
@@ -69,14 +75,21 @@ namespace radmat
       FormFacSolutions<T> f; 
       int nr;
       read(bin,nr); 
+
+      //      std::cout << __func__ << ": nr = " << nr << std::endl; 
+
       for(int ff = 0; ff < nr; ++ff)
       {
         typename SEMBLE::PromoteEnsemVec<T>::Type e; 
         SEMBLE::SembleVector<T> foo; 
         ENSEM::read(bin,e); 
 
+
         std::string n; 
         readDesc(bin,n); 
+
+        //        std::cout << __func__ << ": n = " << n << std::endl; 
+
         f.append_name(n); 
 
         foo = e; 
@@ -87,6 +100,9 @@ namespace radmat
 
       int nt; 
       read(bin,nt); 
+
+      //      std::cout << __func__ << ": nt = " << nt << std::endl; 
+
       f.Ingredients.resize(nt);
       for(int i =0; i < nt; ++i)
         read(bin,f.Ingredients[i]); 

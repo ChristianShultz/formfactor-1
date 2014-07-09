@@ -6,7 +6,7 @@
 
  * Creation Date : 25-02-2013
 
- * Last Modified : Fri 23 May 2014 02:00:51 PM EDT
+ * Last Modified : Wed 28 May 2014 12:01:39 PM EDT
 
  * Created By : shultz
 
@@ -73,6 +73,7 @@ namespace
   {
     std::string ff;                                                 // which form factor are we refitting
     ThreePointComparatorProps_t threePointComparatorProps;  // how are we fitting it
+    FitParValue fitParameterValues; 
   };
 
   struct ArrSingleQ2Prop_t
@@ -94,6 +95,7 @@ namespace
 
     doXMLRead(ptop,"ff",p.ff,__PRETTY_FUNCTION__); 
     doXMLRead(ptop,"threePointComparatorProps",p.threePointComparatorProps,__PRETTY_FUNCTION__); 
+    doXMLRead(ptop,"fitParameterValues",p.fitParameterValues,__PRETTY_FUNCTION__); 
   }
 
 
@@ -409,7 +411,8 @@ void refit_ffs(int argc, char *argv[])
         FF_of_t,
         arr_ini.tsrc,
         arr_ini.tsnk,
-        arr_ini.ffs[elem].ff);
+        arr_ini.ffs[elem].ff,
+        arr_ini.ffs[elem].fitParameterValues);
   } // ff loop
 
 }

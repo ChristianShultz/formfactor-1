@@ -6,7 +6,7 @@
 
  * Creation Date : 21-02-2014
 
- * Last Modified : Fri 23 May 2014 03:21:10 PM EDT
+ * Last Modified : Mon 16 Jun 2014 11:29:30 AM EDT
 
  * Created By : shultz
 
@@ -70,8 +70,7 @@ namespace radmat
     struct case_printer
     {
       static void print(const std::string &s)
-      {}
-      // { std::cout << s << std::endl;}
+       { std::cout << s << std::endl;}
     };
 
     struct ensem_printer
@@ -111,7 +110,7 @@ namespace radmat
 
     // run an avg fit on the real and imag bits
     //      to try to find a phase
-    
+
     std::pair<phase_pair,std::string>
       convert_to_real(const ENSEM::EnsemVectorComplex & in, 
           const int tlow,
@@ -172,9 +171,37 @@ namespace radmat
         fit_log << "const_imag " << const_imag 
           << "  +/-  " << const_imag_err << std::endl;
 
+
+        // what if it is a longitudial factor or crossing 
+        //    we are only getting about 2% precision, 
+        //    assume a FF of O(1)
+        if( (fabs(const_real) < 2e-2) && (fabs(const_imag) < 2e-2) ) 
+        {
+          fit_log << "* decided overall consistent with zero" << std::endl;
+          printer_function<case_printer>("ff is consistent with zero");
+          // doesn't matter, both are zero to precision  
+          return std::make_pair(phase_pair(ZERO,real),fit_log.str());
+        }
+
         // is the constant consistent with zero? 
         if( fabs(const_real) - consistent_with_zero*fabs(const_real_err) < 0.)
         {
+
+          // need to be careful about just returning imag here since it can 
+          // muck up the phase check later, if in fact the correlator is consistent 
+          // with zero via ERROR, not VALUE, then we can guard here 
+          if( fabs(const_imag) - consistent_with_zero*fabs(const_imag_err) < 0.)
+          {
+            fit_log << "* decided overall consistent with zero" << std::endl;
+            printer_function<case_printer>("ff is consistent with zero");
+            printer_function<case_printer>("imag is consistent with zero");
+            printer_function<case_printer>("imag = " + to_string(const_imag) 
+                + "+/-" + to_string(sqrt(fabs(const_imag_err)))); 
+            // doesn't matter, both are zero to precision  
+            return std::make_pair(phase_pair(ZERO,real),fit_log.str());
+          }
+
+
           fit_log << "* decided it was imag" << std::endl;
           printer_function<case_printer>("real is consistent with zero");
           printer_function<case_printer>("real = " + to_string(const_real) 
@@ -197,18 +224,6 @@ namespace radmat
           return std::make_pair(phase_pair(RM,real),fit_log.str());
         }
 
-        // what if it is a longitudial factor or crossing 
-        //    we are only getting about 2% precision, 
-        //    assume a FF of O(1)
-        if( (const_real < 2e-2) && (const_imag < 2e-2) ) 
-        {
-          fit_log << "* decided overall consistent with zero" << std::endl;
-          printer_function<case_printer>("ff is consistent with zero");
-          // doesn't matter, both are zero to precision  
-          return std::make_pair(phase_pair(ZERO,real),fit_log.str());
-        }
-
-
 
         // something unexpected happened
         if ( isnan(const_real) || isnan(const_imag))
@@ -219,6 +234,8 @@ namespace radmat
           // with svd resetting it is very easy to get an ensemble 
           // with mean zero and variance zero thus we have to 
           // work harder which makes christian cranky since its sunday 
+          // 
+          // the next time he read this it was a monday and he was still cranky
 
           // guard zero variance here.. 
           // this is completely nuts, someone needs to update the stupid fitter
@@ -268,7 +285,8 @@ namespace radmat
           return std::make_pair(phase_pair(ERROR,real),fit_log.str()); 
         }
 
-        
+        // move to simple things where we just check what axis the result is along 
+        // and decide the phase based on the phase angle
 
         double fit_phase = std::arg(std::complex<double>(const_real,const_imag)); 
 
@@ -285,21 +303,25 @@ namespace radmat
         if( (phase < 0.174528) && (phase > -0.174708) ) // +/- 10 degree about 0 in rad
         {
           printer_function<case_printer>("RP encountered"); 
+          fit_log << " decided RP " << std::endl;
           return std::make_pair(phase_pair(RP,real),fit_log.str());
         }
         else if( (phase > 1.39622) && (phase < 1.74528)) // 90deg
         {
           printer_function<case_printer>("IP encountered"); 
+          fit_log << " decided IP " << std::endl;
           return std::make_pair(phase_pair(IP,imag),fit_log.str());
         }
         else if( (phase > 2.96697) || (phase < -2.96715))  //180deg // this is atan2 specific, it returns (-pi,pi)
         {
           printer_function<case_printer>("RM encountered"); 
+          fit_log << " decided RM " << std::endl;
           return std::make_pair(phase_pair(RM,real),fit_log.str());
         }
         else if( (phase > -1.74546) && (phase < -1.3964)) // 270 deg
         {
           printer_function<case_printer>("IM encountered"); 
+          fit_log << " decided IM " << std::endl;
           return std::make_pair(phase_pair(IM,imag),fit_log.str());
         }
         else
@@ -345,7 +367,7 @@ namespace radmat
         return convert_to_real( e, int(sz*0.15) , int(sz*0.85) ); 
       }
 
-    // fine the phase for all of the vectors
+    // find the phase for all of the vectors
     std::pair< std::map<std::string, phase_pair> , std::string >
       find_phases( const LLSQComplexFormFactorData_t &d , 
           const int tlow, 
@@ -365,9 +387,9 @@ namespace radmat
           printer_function<mean_printer>(
               "input_corr " +  it->first 
               + to_string( it->second.mean() ) ); 
-          
+
           log << "input: " << it->first << std::endl;
-        
+
           std::pair<phase_pair,std::string> foo = find_phase(it->second,tlow,thigh); 
 
           log << foo.second << "\n\n" << std::endl;
@@ -379,7 +401,7 @@ namespace radmat
       }
 
     // check that all phases are consistent
-    void check_phases( const std::map<std::string, phase_pair> &mappy)
+    bool check_phases( const std::map<std::string, phase_pair> &mappy)
     {
       std::map<std::string,phase_pair>::const_iterator it; 
       for(it = mappy.begin(); it != mappy.end(); ++it)
@@ -387,7 +409,7 @@ namespace radmat
         {
           std::cout << __PRETTY_FUNCTION__ << ": error encountered, exiting" << std::endl;
           std::cout << it->first << " was bad" << std::endl;
-          exit(1); 
+          return false; 
         }
 
       // above guards ERROR
@@ -417,7 +439,7 @@ namespace radmat
             &&(it->second.first != ZERO) )
         {
           std::cout << __PRETTY_FUNCTION__ 
-            << "\nerror: encountered, unexpected phases, exiting" << std::endl;
+            << "\nerror: encountered, unexpected phases, returning failure" << std::endl;
           std::cout << "expected " << expectedA << " " << expectedB 
             << " or " << ZERO << " got " << it->second.first << std::endl;
           std::cout << "keys \nRP->" << RP 
@@ -426,9 +448,12 @@ namespace radmat
             << "\nIM->" << IM
             << "\nZZ->" << ZERO 
             << std::endl;
-          exit(1); 
+          std::cout << it->first << " was bad" << std::endl;
+          return false; 
         }
       }
+
+      return true; 
     }
 
     // run checks then push the result into the return data
@@ -441,7 +466,34 @@ namespace radmat
         printer_function<inp_dimension_printer>("entering rephase"); 
 
         std::pair<std::map<std::string, phase_pair>,std::string> mappy = find_phases(d,tlow,thigh); 
-        check_phases(mappy.first); 
+        bool passed = check_phases(mappy.first); 
+
+        if( !!! passed ) 
+        {
+          std::cout << __PRETTY_FUNCTION__ << ": received failure \n Q2 = " 
+            << SEMBLE::toScalar(ENSEM::mean(d.Q2())) << " exiting.. " << std::endl;
+          std::cout << "fbase = " << fbase << std::endl;
+          std::cout << "logs \n\n" << mappy.second << std::endl; 
+          std::cout << "dumping results to run dir " << std::endl;
+
+
+          LLSQComplexFormFactorData_t::const_iterator corr_it; 
+
+          // write out what we had
+          for(corr_it = d.begin(); corr_it != d.end(); ++corr_it)
+          {
+            ENSEM::EnsemVectorComplex e; 
+            int bns = corr_it->second.getB(); 
+            int sz = corr_it->second.getN(); 
+            e.resize(bns); 
+            e.resizeObs(sz); 
+            for(int i = 0; i < sz; ++i)
+              ENSEM::pokeObs( e, corr_it->second.getEnsemElement(i) , i);
+            ENSEM::write( corr_it->first , e );
+          }
+
+          exit(1); 
+        }
 
         printer_function<ret_dimension_printer>(
             " map size " + to_string(mappy.first.size()) ); 

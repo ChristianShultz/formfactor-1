@@ -6,7 +6,7 @@
 
  * Creation Date : 01-08-2012
 
- * Last Modified : Fri 23 May 2014 02:50:55 PM EDT
+ * Last Modified : Fri 30 May 2014 02:05:13 PM EDT
 
  * Created By : shultz
 
@@ -83,7 +83,9 @@ namespace radmat
       const LLSQRealFormFactorData_t &data, 
       const ThreePointComparatorProps_t &fitProps,
       const int tsrc, 
-      const int tsnk)
+      const int tsnk,
+      const bool usePars,
+      const FitParValue fp)
   {
     const unsigned int sz = data.size();
     const int nbins = data.esize();
@@ -98,7 +100,7 @@ namespace radmat
     LLSQRealFormFactorData_t::const_iterator it;
 
     for(it = data.begin(); it != data.end(); ++it)
-      doFit(fname,to_ensem(it->second),it->first,fitProps,tsrc,tsnk);
+      doFit(fname,to_ensem(it->second),it->first,fitProps,tsrc,tsnk,usePars,fp);
 
     didFit = true;
   }
@@ -108,7 +110,9 @@ namespace radmat
       const std::string &ffid,
       const ThreePointComparatorProps_t &fitProps,
       const int tsrc,
-      const int tsnk)
+      const int tsnk,
+      const bool usePars,
+      const FitParValue fp)
   {
     //  std::cout << __PRETTY_FUNCTION__ << ": entering " << std::endl;
     //  std::cout << "tsrc " << tsrc << "   tsnk " << tsnk << std::endl;
@@ -126,11 +130,12 @@ namespace radmat
       time.push_back(t);
 
     EnsemData corrData(time,data);
+    corrData.setSVCutoff(fitProps.SVCutOff); 
 
     ADAT::Handle<FitComparator> fitComp = constructThreePointFitComparator(fitProps);
     // NB: I Have assumed that no chopping has gone on in the data
     rHandle<FitThreePoint> fitCorr (new FitThreePoint(corrData,tsnk,tsrc,
-          fitProps.thigh,fitProps.tlow,fitComp,fitProps.minTSlice,fitProps.fit_type));
+          fitProps.thigh,fitProps.tlow,fitComp,fitProps.minTSlice,fitProps.fit_type,usePars,fp));
 
     // send to files
     fitCorr->saveFitPlot(ax.str());
