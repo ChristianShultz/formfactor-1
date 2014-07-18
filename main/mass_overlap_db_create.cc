@@ -6,7 +6,7 @@
 
  * Creation Date : 08-01-2013
 
- * Last Modified : Wed 30 Apr 2014 02:01:41 PM EDT
+ * Last Modified : Fri 11 Jul 2014 03:58:30 PM EDT
 
  * Created By : shultz
 
@@ -46,7 +46,6 @@ struct XML_input_t
   bool isProjected;
   double phase_real;
   double phase_imag; 
-  std::string Z_type;
   std::string dbname;
   std::string pid; 
   KeyHadronNPartIrrep_t redstar;
@@ -83,7 +82,6 @@ void read(ADATXML::XMLReader &xml, const std::string &path, XML_input_t &prop)
   doXMLRead(ptop,"isProjected",prop.isProjected,__PRETTY_FUNCTION__); 
   doXMLRead(ptop,"phase_real",prop.phase_real,__PRETTY_FUNCTION__);
   doXMLRead(ptop,"phase_imag",prop.phase_imag,__PRETTY_FUNCTION__); 
-  doXMLRead(ptop,"Z_type",prop.Z_type,__PRETTY_FUNCTION__);
 // use redstar instead..  doXMLRead(ptop,"dbname",prop.dbname,__PRETTY_FUNCTION__);
   doXMLRead(ptop,"pid",prop.pid,__PRETTY_FUNCTION__);
   doXMLRead(ptop,"redstar",prop.redstar,__PRETTY_FUNCTION__);
@@ -182,21 +180,6 @@ struct dbInterface
         data.data().E() = ENSEM::rescaleEnsemUp(tmpEE); 
         data.data().Z() = ENSEM::rescaleEnsemUp(tmpZZ); 
       }
-
-    if(m_xml.isProjected)  
-    { 
-      if(m_xml.Z_type == "one")
-        data.data().Z() = SEMBLE::toScalar(1.); 
-      else if(m_xml.Z_type == "root2E")
-        data.data().Z() = ENSEM::sqrt(SEMBLE::toScalar(2.)*data.data().E());
-      else if(m_xml.Z_type == "2E")
-        data.data().Z() = SEMBLE::toScalar(2.) * data.data().E(); 
-      else
-      {
-        std::cerr << __func__ <<  ": error: Z_type unrecognized, options are \"one\", \"2E\" and \"root2E\" " << std::endl;
-        exit(1);
-      }
-    }
 
     data.data().Z() = SEMBLE::toScalar(m_xml.phase_real) * data.data().Z();
 
