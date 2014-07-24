@@ -39,7 +39,7 @@
 #include <complex>
 #include "io/adat_xmlio.h"
 
-#define BREAK_ROTATIONS_REST
+// #define BREAK_ROTATIONS_REST
 
 
 namespace radmat
