@@ -22,7 +22,8 @@ namespace radmat
 
     virtual  std::string ff_impl() const
     {
-      return std::string("F_1(Q^2)\\left(- p_+^{\\mu}\frac{Q^2}{m_{\\pi*}^2 -m_{\\pi}^2} + p_-\\right)");
+      return std::string("F_1(Q^2) \\left( p_+^{\\mu} + \\frac{m_l^2 - m_r^2}{Q^2}p_i^{\\mu} \\right)"); 
+//      return std::string("F_1(Q^2)\\left(- p_+^{\\mu}\frac{Q^2}{m_{\\pi*}^2 -m_{\\pi}^2} + p_-\\right)");
     }
 
     // return a complex version of p_+
@@ -40,14 +41,19 @@ namespace radmat
         metric = convertTensorUnderlyingType<std::complex<double>,double,2>(g_dd()); 
         pm = convertTensorUnderlyingType<std::complex<double>,double,1>(pMinus(p_f,p_i));
         pp = convertTensorUnderlyingType<std::complex<double>,double,1>(pPlus(p_f,p_i));
-        num = contract(pm,applyMetric(pm,metric,0),0,0);
-        denom = contract(pm,applyMetric(pp,metric,0),0,0); 
-        
+
+        num = contract(pm,applyMetric(pp,metric,0),0,0);
+        denom = contract(pm,applyMetric(pm,metric,0),0,0);
+
+        // Q2 = 0 is a problem 
+        // if( std::norm(denom.value()) < 1e-14 )
+        //  denom.value() = std::complex<double>(1e-14,0);  
+
         POW2_ASSERT_DEBUG(std::norm(denom.value()) > 1e-14);
 
         std::complex<double> coeff = -num.value() / denom.value(); 
 
-        return coeff * pp + pm; 
+        return coeff * pm + pp;  
       }
   };
 

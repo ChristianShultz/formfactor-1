@@ -12,7 +12,7 @@
 #include <complex>
 
 // #define PRINT_RR_DECOMP_G1
-#define PRINT_RR_DECOMP_G2
+// #define PRINT_RR_DECOMP_G2
 // #define PRINT_RR_DECOMP_G3
 
 namespace radmat
@@ -348,7 +348,7 @@ namespace radmat
           const MomRowPair_t &righty, 
           const double mom_fac) const
       {
-        std::complex<double> g2coeff = std::complex<double>( -1., 0.); 
+        std::complex<double> g2coeff = std::complex<double>( 1., 0.); 
 
         RhoRhoG2 G2; 
 

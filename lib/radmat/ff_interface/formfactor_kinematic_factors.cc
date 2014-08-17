@@ -6,7 +6,7 @@
 
  * Creation Date : 18-03-2014
 
- * Last Modified : Tue 29 Apr 2014 03:38:57 PM EDT
+ * Last Modified : Fri 01 Aug 2014 03:43:43 PM EDT
 
  * Created By : shultz
 
@@ -148,6 +148,9 @@ namespace radmat
         delete Dq;
         delete Dqc; 
 
+        
+       // std::cout << __func__ << ": returning a wigner matrix \n" << *Dret << std::endl;
+
 
         return Dret; 
       }
@@ -244,12 +247,11 @@ namespace radmat
         }
 
 
-        //  printer_function<helicity_printer>( "\nmomc: " +  to_string(qc) ) ; 
-        //  printer_function<helicity_printer>( "\nmom: " +  to_string(tag->q) ) ; 
-        //  printer_function<helicity_printer>( "\n" +  to_string(eps) ) ; 
-        //  printer_function<helicity_printer>( " - KF \n" + to_string( KF.mean() ) ); 
-        //  printer_function<helicity_printer>( " - eps * KF\n" + to_string( ret.mean() ) ); 
-        //  std::cout << "D " << *D << std::endl;
+          printer_function<helicity_printer>( "\nmomc: " +  to_string(qc) ) ; 
+          printer_function<helicity_printer>( "\nmom: " +  to_string(tag->q) ) ; 
+          printer_function<helicity_printer>( "\neps: " +  to_string(eps) ) ; 
+          printer_function<helicity_printer>( " - KF \n" + to_string( KF.mean() ) ); 
+          printer_function<helicity_printer>( " - eps * KF\n" + to_string( ret.mean() ) ); 
 
         // clean up 
         delete D; 

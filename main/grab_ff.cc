@@ -6,7 +6,7 @@
 
  * Creation Date : 22-04-2013
 
- * Last Modified : Sun 04 May 2014 05:14:59 PM EDT
+ * Last Modified : Fri 25 Jul 2014 02:04:47 PM EDT
 
  * Created By : shultz
 
@@ -160,8 +160,8 @@ int main(int argc, char *argv[])
   radmat::ThreePointDataTag foo = generate_tag( inp.left , inp.gamma , inp.right , inp.tran , inp.mom_fac ); 
 
   radmat::FFKinematicFactors_t KK; 
-  radmat::FFKinematicFactors_t::KinematicFactorRow r = KK.genFactors( &foo ); 
   radmat::FFKinematicFactors_t::KinematicFactorMatrix rm = KK.genFactorsMat( &foo ); 
+  radmat::FFKinematicFactors_t::KinematicFactorRow r = KK.genFactors( &foo ); 
 
   std::cout << "mat:\n" << rm.mean() << std::endl;
  

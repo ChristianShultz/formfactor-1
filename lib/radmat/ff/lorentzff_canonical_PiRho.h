@@ -41,15 +41,15 @@ namespace radmat
       {
         // come up with the ingredient list
         Tensor<std::complex<double>, 1> epsilon = this->right_p_tensor(p_f,p_i,mom_fac,rhohel); 
-        Tensor<std::complex<double>, 1> pplus, pminus;
-        pplus = convertTensorUnderlyingType<std::complex<double>,double,1>( pPlus(p_f,p_i) );
-        pminus = convertTensorUnderlyingType<std::complex<double>,double,1>( pMinus(p_f,p_i) );
+        Tensor<std::complex<double>, 1> pleft , pright;
+        pleft = convertTensorUnderlyingType<std::complex<double>,double,1>( p_f );
+        pright = convertTensorUnderlyingType<std::complex<double>,double,1>( p_i );
         Tensor<std::complex<double>,4> levi = levi_civita<std::complex<double>,4>(); ; 
         Tensor<std::complex<double>, 2> gdd;
         gdd = convertTensorUnderlyingType<std::complex<double>,double,2>(g_dd());
 
-        pminus = applyMetric(pminus,gdd,0); 
-        pplus = applyMetric(pplus,gdd,0); 
+        pleft = applyMetric(pleft,gdd,0); 
+        pright = applyMetric(pright,gdd,0); 
         epsilon = applyMetric(epsilon,gdd,0); 
 
 
@@ -59,7 +59,7 @@ namespace radmat
         m_right = contract(p_i,applyMetric(p_i,g_dd(),0),0,0);
         norm = std::complex<double>( 2./( sqrt(m_left.value()) + sqrt(m_right.value()) ), 0.); 
 
-#if 1
+#if 0
         Tensor<std::complex<double> , 0> inner_prod = contract( epsilon, p_i , 0 , 0 ) ; 
         if ( std::norm ( inner_prod.value() ) >  1e-6 ) 
           std::cout << "mom dotted into polarization was " << inner_prod.value() << std::endl; 
@@ -68,8 +68,8 @@ namespace radmat
         return  norm * contract(
             contract(
               contract(levi,
-                pminus , 3 , 0),
-              pplus , 2 , 0 ),
+                pleft , 3 , 0),
+              pright , 2 , 0 ),
             epsilon , 1 , 0 );
       }
   };

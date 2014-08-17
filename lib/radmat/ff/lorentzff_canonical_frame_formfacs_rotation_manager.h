@@ -16,7 +16,7 @@
 #include "lorentzff_formfactor_abs_base_cfg.h"
 
 // print on helicity 
-#define LORENTZFF_CAN_PRINT_HELICITY
+// #define LORENTZFF_CAN_PRINT_HELICITY
 
 namespace radmat
 {
@@ -150,10 +150,10 @@ namespace radmat
 
 #ifdef LORENTZFF_CAN_PRINT_HELICITY
               std::cout << "**************************** " << __func__ 
-                << ": " << Stringify<DerivedFF>() << std::endl;
-
-              std::cout << __func__ << ": constructing hl = " << J_left - lh 
+                << ": constructing hl = " << J_left - lh 
                 << " hr = " << J_right - rh << std::endl; 
+              std::cout << "left_weight = " << (*Wl)[lh][left_h] 
+                << "\nright_weight = " << (*Wr)[right_h][rh] << std::endl;
 #endif 
 
               Tensor<Data_t, 1> tmp = this->impl(can_moms.first,can_moms.second,kick,J_left-lh,J_right-rh); 

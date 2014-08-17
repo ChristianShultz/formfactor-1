@@ -6,7 +6,7 @@
 
  * Creation Date : 25-02-2013
 
- * Last Modified : Wed 28 May 2014 01:13:43 PM EDT
+ * Last Modified : Thu 24 Jul 2014 04:47:44 PM EDT
 
  * Created By : shultz
 
@@ -316,6 +316,7 @@ namespace radmat
 
 
     }
+
 
   void RadmatSingleQ2Driver::chisq_analysis(const int tlows, const int thighs)
   {

@@ -6,7 +6,7 @@
 
  * Creation Date : 21-03-2014
 
- * Last Modified : Mon 05 May 2014 05:40:35 PM EDT
+ * Last Modified : Wed 13 Aug 2014 08:31:15 PM EDT
 
  * Created By : shultz
 
@@ -25,6 +25,9 @@
 #include "redstar_photon_props.h"
 #include "radmat/utils/tokenize.h"
 #include "radmat/utils/printer.h"
+
+
+#define ALLOW_CACHE_STUB
 
 
 namespace radmat
@@ -351,7 +354,11 @@ namespace radmat
               std::cout << "Error: missing db key " 
                   << Hadron::ensemFileName(left_db_key.m_basic_key) << std::endl;
               std::cout << "Key: \n" << left_db_key << std::endl;
+#ifdef ALLOW_CACHE_STUB
+              std::cout << "continuuing with a stub value of " << l << std::endl;
+#else
               POW2_ASSERT(false); 
+#endif
             }
 
             cache.insert(left_cache_key.m_basic_key,l); 
@@ -371,7 +378,11 @@ namespace radmat
               std::cout << "Error: missing db key " 
                   << Hadron::ensemFileName(right_db_key.m_basic_key) << std::endl;
               std::cout << "Key: \n" << right_db_key << std::endl;
+#ifdef ALLOW_CACHE_STUB
+              std::cout << "continuuing with a stub value of " << r << std::endl;
+#else
               POW2_ASSERT(false); 
+#endif
             }
 
             cache.insert(right_cache_key.m_basic_key,r); 
