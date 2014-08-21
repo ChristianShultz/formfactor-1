@@ -6,7 +6,7 @@
 
  * Creation Date : 01-08-2012
 
- * Last Modified : Thu 24 Jul 2014 04:46:37 PM EDT
+ * Last Modified : Mon 18 Aug 2014 06:56:58 PM EDT
 
  * Created By : shultz
 
@@ -167,7 +167,7 @@ namespace radmat
     for(it = fitters.begin(); it != fitters.end(); ++it)
     {
       std::stringstream ss;
-      ss << path << it->first << ".fitlog";
+      ss << path << it->first << ".fitlog.summary";
       std::ofstream out(ss.str().c_str());
       out << it->second->getFitSummary();
       out.close();

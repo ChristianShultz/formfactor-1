@@ -6,7 +6,7 @@
 
  * Creation Date : 21-02-2014
 
- * Last Modified : Mon 16 Jun 2014 11:29:30 AM EDT
+ * Last Modified : Sun 17 Aug 2014 04:25:20 PM EDT
 
  * Created By : shultz
 
@@ -177,10 +177,25 @@ namespace radmat
         //    assume a FF of O(1)
         if( (fabs(const_real) < 2e-2) && (fabs(const_imag) < 2e-2) ) 
         {
-          fit_log << "* decided overall consistent with zero" << std::endl;
+          // this is a bit unsatisfactory in some cases but we can 
+          // deal with those by hand, can't make the code too smart 
+          // or the collaborators won't pay attention to what is 
+          // actually happening under the hood, sign if you've seen 
+          // this statement 
+          //
+          // CJS 
+          fit_log << "* decided too small to resolve automatically " << std::endl;
+          fit_log << "making an arbitrary choice to return the larger" << std::endl;
           printer_function<case_printer>("ff is consistent with zero");
-          // doesn't matter, both are zero to precision  
-          return std::make_pair(phase_pair(ZERO,real),fit_log.str());
+          // return whichever is bigger?
+          if( fabs(const_real) > fabs(const_imag) )
+          {
+            return std::make_pair(phase_pair(ZERO,real),fit_log.str());
+          }
+          else
+          {
+            return std::make_pair(phase_pair(ZERO,imag),fit_log.str());
+          }
         }
 
         // is the constant consistent with zero? 

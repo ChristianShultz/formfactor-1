@@ -45,12 +45,15 @@ namespace radmat
 
     // single q2 backdoor
     bool load_llsq(const rHandle<LLSQLatticeMultiData> &lattice_data,
-        const double tolerance);
+        const double tolerance, const bool save_state=true);
 
     void solve_llsq(const std::string &soln_ID);
 
     void save_llsq_state(void) const;
     void save_ff_of_t(void) const; 
+
+    FormFacSolutions<std::complex<double> > 
+      grab_ff_solution(void) const;
 
     void fit_data(const ThreePointComparatorProps_t &fitProps, 
         const int tsrc,

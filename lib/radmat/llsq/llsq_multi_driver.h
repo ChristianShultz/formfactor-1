@@ -4,6 +4,7 @@
 
 #include "llsq_solvers.h"
 #include "llsq_gen_system.h"
+#include "llsq_solution.h"
 #include "radmat/construct_data/lattice_multi_data_object.h"
 #include "radmat/utils/pow2assert.h"
 #include <complex>
@@ -46,6 +47,8 @@ namespace radmat
 
     void save_llsq_state(const std::string &path) const; 
     void save_ff_state(const std::string &path) const; 
+
+    FormFacSolutions<std::complex<double> > grab_ff_solution(void) const;
 
     SEMBLE::SembleMatrix<T> get_rephase_FF(void) const; 
 

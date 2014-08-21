@@ -6,7 +6,7 @@
 
  * Creation Date : 25-02-2013
 
- * Last Modified : Thu 24 Jul 2014 04:47:44 PM EDT
+ * Last Modified : Tue 19 Aug 2014 11:46:08 AM EDT
 
  * Created By : shultz
 
@@ -152,7 +152,8 @@ namespace radmat
   }
 
   bool RadmatSingleQ2Driver::load_llsq(const rHandle<LLSQLatticeMultiData> &d, 
-      const double tolerance)
+      const double tolerance,
+      const bool save_state)
   {
     if(!!!linear_system.load_data(d,tolerance))
       return false;
@@ -165,8 +166,11 @@ namespace radmat
 
     init_linear_system = true; 
 
-    SEMBLE::SEMBLEIO::makeDirectoryPath(base_path() + std::string("llsq"));
-    linear_system.dump_llsq_lattice(base_path() + std::string("llsq/"));
+    if(save_state)
+    {
+      SEMBLE::SEMBLEIO::makeDirectoryPath(base_path() + std::string("llsq"));
+      linear_system.dump_llsq_lattice(base_path() + std::string("llsq/"));
+    }
     return true;
   }
 
@@ -200,8 +204,15 @@ namespace radmat
       id << path << "unphasedFF_" << row << ".jack"; 
       ENSEM::write( id.str() , get_ensem_row(row,FF_of_t)); 
     }
-
   }
+
+  FormFacSolutions<std::complex<double> > 
+    RadmatSingleQ2Driver::grab_ff_solution(void) const
+  {
+    check_exit_solved_llsq(); 
+    return linear_system.grab_ff_solution(); 
+  }
+
 
   void RadmatSingleQ2Driver::fit_data(const ThreePointComparatorProps_t &fit_props, 
       const int tsrc,
