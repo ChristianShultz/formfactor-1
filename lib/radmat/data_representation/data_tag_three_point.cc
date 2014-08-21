@@ -6,7 +6,7 @@
 
 * Creation Date : 24-03-2014
 
-* Last Modified : Wed 20 Aug 2014 08:35:17 PM EDT
+* Last Modified : Wed 20 Aug 2014 08:37:22 PM EDT
 
 * Created By : shultz
 
@@ -103,7 +103,7 @@ namespace radmat
     ADATIO::read(bin,d.gamma_row);
     ADATIO::read(bin,d.right_row);
     ADATIO::read(bin,d.left_mom);
-    ADATIO::read(bin,q); 
+    ADATIO::read(bin,d.q); 
     ADATIO::read(bin,d.right_mom);
     ENSEM::read(bin,d.left_E);
     ENSEM::read(bin,d.right_E); 
