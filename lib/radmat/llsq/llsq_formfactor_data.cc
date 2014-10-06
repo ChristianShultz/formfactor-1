@@ -6,7 +6,7 @@
 
  * Creation Date : 21-02-2014
 
- * Last Modified : Sun 17 Aug 2014 04:25:20 PM EDT
+ * Last Modified : Mon 06 Oct 2014 09:47:10 AM EDT
 
  * Created By : shultz
 
@@ -177,16 +177,30 @@ namespace radmat
         //    assume a FF of O(1)
         if( (fabs(const_real) < 2e-2) && (fabs(const_imag) < 2e-2) ) 
         {
-          // this is a bit unsatisfactory in some cases but we can 
-          // deal with those by hand, can't make the code too smart 
-          // or the collaborators won't pay attention to what is 
-          // actually happening under the hood, sign if you've seen 
-          // this statement 
-          //
-          // CJS 
           fit_log << "* decided too small to resolve automatically " << std::endl;
           fit_log << "making an arbitrary choice to return the larger" << std::endl;
           printer_function<case_printer>("ff is consistent with zero");
+
+          std::stringstream corr_foor, corr_fooc; 
+
+          for(int i = 0; i < in.numElem(); ++i)
+          {
+            ENSEM::EnsemReal foor,fooc; 
+            foor = ENSEM::real(ENSEM::peekObs(in,i));
+            fooc = ENSEM::imag(ENSEM::peekObs(in,i));
+
+            corr_foor << i  << " " << ENSEM::toDouble(ENSEM::mean(foor)) << " " 
+              << ENSEM::toDouble(ENSEM::sqrt(ENSEM::variance(foor))) << "\n"; 
+
+            corr_fooc << i  << " " << ENSEM::toDouble(ENSEM::mean(fooc)) << " " 
+              << ENSEM::toDouble(ENSEM::sqrt(ENSEM::variance(fooc))) << "\n"; 
+          }
+
+          fit_log << "corr.real = " << corr_foor.str() << std::endl; 
+          fit_log << "corr.imag = " << corr_fooc.str() << std::endl;
+
+
+
           // return whichever is bigger?
           if( fabs(const_real) > fabs(const_imag) )
           {
@@ -443,6 +457,7 @@ namespace radmat
       if( expectedA == IM )
         expectedB = IP; 
 
+      bool pass = true; 
       // check that they are all either real , imag , or zero
       for(it = mappy.begin(); it != mappy.end(); ++it)
       {
@@ -464,11 +479,11 @@ namespace radmat
             << "\nZZ->" << ZERO 
             << std::endl;
           std::cout << it->first << " was bad" << std::endl;
-          return false; 
+          pass = false; 
         }
       }
 
-      return true; 
+      return pass; 
     }
 
     // run checks then push the result into the return data

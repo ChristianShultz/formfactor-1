@@ -6,7 +6,7 @@
 
  * Creation Date : 04-05-2013
 
- * Last Modified : Sun 04 May 2014 02:50:30 PM EDT
+ * Last Modified : Mon 29 Sep 2014 05:50:41 PM EDT
 
  * Created By : shultz
 
@@ -24,6 +24,8 @@ namespace radmat
 {
   namespace
   {
+
+    std::complex<double> complex_i(0.,1.); 
 
     // 1 based
     itpp::Vec<std::complex<double> > epsz3(int m_row)
@@ -50,7 +52,8 @@ namespace radmat
           exit(1); 
       }
 
-      return  ret;  
+      // this phase should match the definition inside of adat 
+      return  -complex_i*ret;  
     }
 
 

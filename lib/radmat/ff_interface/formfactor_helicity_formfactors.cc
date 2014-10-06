@@ -6,7 +6,7 @@
 
  * Creation Date : 22-02-2014
 
- * Last Modified : Mon 28 Apr 2014 01:02:58 PM EDT
+ * Last Modified : Fri 03 Oct 2014 11:06:52 AM EDT
 
  * Created By : shultz
 
@@ -225,6 +225,7 @@ namespace radmat
         {
           std::string tran_id = build_lorentz_spin_id( it->second ) + std::string("_tran");
           std::string diag_id = build_lorentz_spin_id( it->second ) + std::string("_diag");
+          std::string test_id = build_lorentz_spin_id( it->second ) + std::string("_test");
 
           if( std::find( ff_allowed_spin_keys.begin(), 
                 ff_allowed_spin_keys.end(), 
@@ -235,6 +236,11 @@ namespace radmat
                 ff_allowed_spin_keys.end(), 
                 diag_id) != ff_allowed_spin_keys.end() )
             success &= do_reg(diag_id, it->second); 
+
+          if( std::find( ff_allowed_spin_keys.begin(), 
+                ff_allowed_spin_keys.end(), 
+                test_id) != ff_allowed_spin_keys.end() )
+            success &= do_reg(test_id, it->second); 
         }
 
         registered = true; 

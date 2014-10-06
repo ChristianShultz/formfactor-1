@@ -6,7 +6,7 @@
 
  * Creation Date : 13-03-2014
 
- * Last Modified : Wed 23 Apr 2014 03:53:43 PM EDT
+ * Last Modified : Fri 03 Oct 2014 04:36:09 PM EDT
 
  * Created By : shultz
 
@@ -186,7 +186,7 @@ namespace radmat
       {
         static void print(const std::string &s)
         {}
-        //   { std::cout << "subduced form factors, regging  " << s << std::endl;}
+      //   { std::cout << "subduced form factors, regging  " << s << std::endl;}
       };
 
 

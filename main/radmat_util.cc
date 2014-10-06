@@ -6,7 +6,7 @@
 
  * Creation Date : 25-02-2013
 
- * Last Modified : Wed 20 Aug 2014 10:45:27 AM EDT
+ * Last Modified : Fri 03 Oct 2014 02:15:53 PM EDT
 
  * Created By : shultz
 
@@ -120,6 +120,8 @@ namespace
 
     radmat::LLSQLatticeMultiData trim;
 
+    std::cout << __func__ << ": pulled " << inout->tags().size() << " correlators from the dbase" << std::endl;
+
     // parse the list 
     if( p.lat_elems.size() > 0 )
     {
@@ -180,9 +182,9 @@ void do_registerAll(int argc , char *argv[] )
 /////////////////////////////////////////////////////
 void rot_llsq(int argc, char *argv[])
 {
-  if(argc != 5)
+  if(argc != 3)
   {
-    std::cerr << "usage: radmat_util: rot_llsq <xmlinifile> <Jl> <Jr> " << std::endl;
+    std::cerr << "usage: radmat_util: rot_llsq <xmlinifile> " << std::endl;
     exit(1); 
   }
 
@@ -191,14 +193,6 @@ void rot_llsq(int argc, char *argv[])
   std::string xmlini;
   std::istringstream val(argv[2]);
   val >> xmlini;
-
-  int Jl; 
-  std::istringstream val1(argv[3]); 
-  val1 >> Jl; 
-
-  int Jr; 
-  std::istringstream val2(argv[4]); 
-  val2 >> Jr; 
 
   // read the xml array of ffs that we want to refit
   ArrSingleQ2Prop_t arr_ini; 
@@ -243,7 +237,7 @@ void rot_llsq(int argc, char *argv[])
 
   try
   {
-    bar.check(foo,Jl,Jr); 
+    bar.check(foo); 
   }
   catch (std::string &s)
   {

@@ -6,7 +6,7 @@
 
  * Creation Date : 25-02-2013
 
- * Last Modified : Tue 19 Aug 2014 11:46:08 AM EDT
+ * Last Modified : Mon 06 Oct 2014 10:05:15 AM EDT
 
  * Created By : shultz
 
@@ -220,6 +220,10 @@ namespace radmat
   {
     check_exit_linear_system();
     check_exit_solved_llsq(); 
+
+    std::cout << "Fitting Q2 = " << linear_system.qsq_label() 
+      << "  " << linear_system.peek_tags().begin()->mom_string() << std::endl;
+
     SEMBLE::SembleMatrix<std::complex<double> > FF_of_t = linear_system.peek_FF(); 
     LLSQComplexFormFactorData_t tmp; 
 

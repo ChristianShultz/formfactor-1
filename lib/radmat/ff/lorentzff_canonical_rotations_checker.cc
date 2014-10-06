@@ -6,7 +6,7 @@
 
  * Creation Date : 24-12-2013
 
- * Last Modified : Mon 28 Apr 2014 01:29:34 PM EDT
+ * Last Modified : Fri 03 Oct 2014 04:50:43 PM EDT
 
  * Created By : shultz
 
@@ -14,9 +14,11 @@
 
 
 #include "radmat/rotation_interface/rotation_interface.h"
+#include "radmat/construct_data/construct_data.h"
 #include "lorentzff_canonical_rotations_checker.h"
 #include "lorentzff_canonical_frame_formfacs_rotation_manager.h"
 #include "lorentzff_canonical_JJlist_ff.h"
+#include "radmat/ff_interface/formfactor_kinematic_factors.h"
 #include "semble/semble_semble.h"
 #include <sstream>
 #include <string> 
@@ -51,136 +53,6 @@ namespace radmat
         return ss.str(); 
       }
 
-    ////////////////////////////////////////////////
-    mom_t 
-      mul_tran(const RotationMatrix_t* R, const mom_t &x)
-      {
-        mom_t chk = gen_mom<0,0,0>();
-
-        for(int i = 0; i < 3; ++i)
-        {
-          double res(0.); 
-          for(int j = 0; j < 3; ++j)
-            if ( fabs( (*R)[j+1][i+1] ) > 1e-6 )
-              res += (*R)[j+1][i+1] * double(x[j]); 
-
-          chk[i] = (res > 0.) ? int( fabs(res) + 0.5 ) : - int( fabs(res) + 0.5 ); 
-        }
-        return chk; 
-      }
-
-
-    ////////////////////////////////////////////////
-    ////////////////////////////////////////////////
-    struct KEY
-    {
-      KEY(const mom_t &l, const mom_t &r, const int hl, const int hr, const int mu)
-        : left(l) , right(r) , h_left(hl) , h_right(hr), jmu(mu)
-      {}
-
-      std::string key(void) const
-      {
-        std::stringstream ss; 
-        ss << "lefty_p" << string_mom(left) << ",H" <<h_left;
-        ss << ".V" << jmu; 
-        ss << ".righty_p" << string_mom(right) << ",H" <<h_right;
-        return ss.str();
-      }
-
-      mom_t left;
-      mom_t right; 
-      int h_left; 
-      int h_right; 
-      int jmu; 
-    };
-
-
-    ////////////////////////////////////////////////
-    ////////////////////////////////////////////////
-    struct map_holder
-    {
-      typedef ENSEM::EnsemVectorComplex DATA; 
-
-      void insert(const KEY &k , const DATA &d)
-      {
-        std::string key = k.key(); 
-        if(keys_map.find(key) != keys_map.end())
-        {
-          std::cout << __func__ << ": k " << key << std::endl; 
-          throw std::string("dub key err"); 
-        }
-
-        if(data_map.find(key) != data_map.end())
-        {
-          std::cout << __func__ << ": k " << key << std::endl; 
-          throw std::string("dub dat err"); 
-        }
-        keys_map.insert(std::pair<std::string,KEY>(key,k)); 
-        data_map.insert(std::pair<std::string,DATA>(key,d)); 
-      }
-
-      void init_map( const rHandle<LLSQLatticeMultiData> &d)
-      {
-        std::vector<ThreePointDataTag> tags = d->tags(); 
-
-        for(int i =0; i < tags.size(); ++i)
-        {
-          KEY foo(tags[i].left_mom, tags[i].right_mom, tags[i].left_row, tags[i].right_row,tags[i].gamma_row); 
-          std::cout << __func__ << " ky " << foo.key() << std::endl; 
-          DATA e = d->get_row_ensem(i); 
-          insert(foo,e); 
-        }
-
-        std::cout << "\n\n" << __func__ << ": finished map initialization" 
-          << "\n************************************************\n\n" << std::endl;
-      } 
-
-      DATA query(const KEY &k) const
-      {
-        std::string key = k.key(); 
-        std::map<std::string,DATA>::const_iterator it; 
-        it = data_map.find(key); 
-
-        if( it == data_map.end())
-        {
-          std::cout << __PRETTY_FUNCTION__ << "missing " << key << std::endl;
-          exit(1); 
-        }
-
-
-        return it->second; 
-      }
-
-      std::map<std::string,KEY> keys_map; 
-      std::map<std::string,DATA> data_map; 
-    }; 
-
-    ////////////////////////////////////////////////
-    KEY can_key(const KEY &k, const int hl, const int hr, const int jmu)
-    {
-      DMatrixManager D;
-      rCompEulAngles eul = D.rotation_matrix(k.left,k.right);
-      RotationMatrix_t *Rtriad = new RotationMatrix_t( genRotationMatrix(eul) ); 
-      mom_t ll = mul_tran(Rtriad,k.left); 
-      mom_t rr = mul_tran(Rtriad,k.right); 
-      delete  Rtriad; 
-
-      return KEY(ll,rr,hl,hr,jmu); 
-    } 
-
-    ////////////////////////////////////////////////
-    Tensor<double,1>
-      cook_p_tens(const double mass,
-          const mom_t &p,
-          const double kick)
-      {
-        Tensor<double,1> ret( (TensorShape<1>())[4], 0.); 
-        ret[0] = sqrt( mass*mass + kick*kick*( p[0]*p[0] + p[1]*p[1] + p[2]*p[2])); 
-        ret[1] = kick * p[0];
-        ret[2] = kick * p[1];
-        ret[3] = kick * p[2];
-        return ret; 
-      }
 
     int local_count = 0; 
 
@@ -233,15 +105,15 @@ namespace radmat
           if( isnan(const_imag) )
             return true; 
 
-     //   // zero w/ in err
-     //   if( fabs(const_real) - 1.*sqrt(fabs(const_real_var)) < 0.)
-     //     if( fabs(const_imag) - 1.*sqrt(fabs(const_imag_var)) < 0.)
-     //       return true; 
+        //   // zero w/ in err
+        //   if( fabs(const_real) - 1.*sqrt(fabs(const_real_var)) < 0.)
+        //     if( fabs(const_imag) - 1.*sqrt(fabs(const_imag_var)) < 0.)
+        //       return true; 
 
         std::stringstream cnt; 
         cnt << ++local_count; 
         std::string count = cnt.str(); 
-        
+
         std::cout << __func__ << ": reporting failure, C = A-B (should be zero) " << std::endl;
         std::cout << __func__ << ": real = " << const_real << " +/- " << const_real_var << std::endl;
         std::cout << __func__ << ": imag = " << const_imag << " +/- " << const_imag_var << std::endl;
@@ -254,135 +126,162 @@ namespace radmat
         return false; 
       }
 
-  
+
 
     ////////////////////////////////////////////////
-    
-    template<int Jl, int Jr>
-    bool 
-      do_work(const map_holder *mappy, 
-          const KEY &k)
+
+    typedef std::string KEY_t; 
+    typedef ENSEM::EnsemVectorComplex DATA_t; 
+    typedef std::map<KEY_t,DATA_t> MAP_t; 
+
+    MAP_t init_map(const rHandle<LLSQLatticeMultiData> &d) 
+    {
+      MAP_t ret; 
+
+      std::vector<ThreePointDataTag> tags = d->tags(); 
+      for(int i = 0; i < tags.size(); ++i)
       {
-        JJFFimpl<Jl,Jr> foo;  
+        ADATIO::BinaryBufferWriter binBuff; 
+        write(binBuff,tags[i]); 
+        KEY_t tag_key = binBuff.str(); 
+        DATA_t tag_data = d->get_row_ensem(i); 
 
-        // std::cout << __func__ << " attempting " << k.key() << std::endl; 
-
-        Tensor<canIdx_t,1> tens = foo.canonicalize(
-            std::make_pair( cook_p_tens(0.216,k.left,0.11), k.h_left ), 
-            std::make_pair( cook_p_tens(0.216,k.right,0.11), k.h_right ),
-            0.11);
-
-        canIdx_t chk = tens[ k.jmu ]; 
-
-        map_holder::DATA k_frame =  mappy->query(k); 
-        map_holder::DATA can_sum;
-        can_sum = SEMBLE::toScalar( std::complex<double>(0.,0.) )* k_frame; 
-        canIdx_t::const_iterator it; 
-        std::stringstream ss; 
-
-        for( it = chk.begin(); it != chk.end(); ++it)
+        if(ret.find(tag_key) != ret.end())
         {
-          int hl = it->m_obj.h_left;
-          int hr = it->m_obj.h_right;
-          int jmu = it->m_obj.idx;
-          KEY q_key = can_key(k,hl,hr,jmu);
-          ss << "[" << SEMBLE::toScalar(it->m_coeff) << "] * <" << q_key.key() << ">" << std::endl;
-          map_holder::DATA tmp = mappy->query(q_key);
-          can_sum = can_sum + SEMBLE::toScalar( it->m_coeff ) * tmp;  
+          std::cout << __func__ << ": key duplication error" << std::endl; 
+          throw std::string("duplicate key error"); 
         }
 
-        std::cout << "\n***************************************************" << std::endl;
-        std::cout << "testing " << k.key()  << std::endl;
-        std::cout << k.key() << " - ingredients:\n" <<  ss.str() << std::endl; 
-        bool success =  test_equivalence( k_frame, can_sum ); 
-
-        if( !!! success )
-        {
-          ENSEM::write( k.key() , k_frame ) ;
-          ENSEM::write( k.key() + std::string(".can_sum") , can_sum ); 
-          std::cout << "****** FAIL \n" << std::endl;
-        }
-        else
-        {
-          std::cout << "****** PASS \n" << std::endl;
-        }
-
-
-        return success; 
+        ret.insert(std::make_pair(tag_key,tag_data)); 
       }
 
-    bool  do_work(const map_holder *mappy, const KEY &k, const int Jl, const int Jr)
+      std::cout << __func__ << ": init map with " << ret.size() << " elements" << std::endl;
+
+      return ret; 
+    }
+
+    bool my_is_nan(const std::complex<double> d)
     {
-      if( (Jl == 0) && (Jr == 0) )
-        return do_work<0,0>(mappy,k); 
-      else if( (Jl == 1) && (Jr == 0) )
-        return do_work<1,0>(mappy,k); 
-      else if( (Jl == 2) && (Jr == 0) )
-        return do_work<2,0>(mappy,k); 
-      else if( (Jl == 3) && (Jr == 0) )
-        return do_work<3,0>(mappy,k); 
-      else if( (Jl == 0) && (Jr == 1) )
-        return do_work<0,1>(mappy,k); 
-      else if( (Jl == 1) && (Jr == 1) )
-        return do_work<1,1>(mappy,k); 
-      else if( (Jl == 2) && (Jr == 1) )
-        return do_work<2,1>(mappy,k); 
-      else if( (Jl == 3) && (Jr == 1) )
-        return do_work<3,1>(mappy,k); 
-      else if( (Jl == 0) && (Jr == 2) )
-        return do_work<0,2>(mappy,k); 
-      else if( (Jl == 1) && (Jr == 2) )
-        return do_work<1,2>(mappy,k); 
-      else if( (Jl == 2) && (Jr == 2) )
-        return do_work<2,2>(mappy,k); 
-      else if( (Jl == 3) && (Jr == 2) )
-        return do_work<3,2>(mappy,k); 
-      else if( (Jl == 0) && (Jr == 3) )
-        return do_work<0,3>(mappy,k); 
-      else if( (Jl == 1) && (Jr == 3) )
-        return do_work<1,3>(mappy,k); 
-      else if( (Jl == 2) && (Jr == 3) )
-        return do_work<2,3>(mappy,k); 
-      else if( (Jl == 3) && (Jr == 3) )
-        return do_work<3,3>(mappy,k); 
-      else
+      return (isnan(std::real(d)) && isnan(std::imag(d))); 
+    }
+
+    bool check_relation(const ThreePointDataTag &tc, 
+        const std::complex<double> &wc, 
+        const ENSEM::EnsemVectorComplex &ec, 
+        const ThreePointDataTag &t, 
+        const std::complex<double> &w, 
+        const ENSEM::EnsemVectorComplex &e)
+    {
+      // put the expected phase on the botom so that we divide / multiply by the conjugate 
+      std::complex<double> factor = wc/w; 
+
+      if( my_is_nan(factor) )
       {
-        std::cerr << "unsuported spin" << std::endl;
-        exit(1); 
+        // both of them are zero -- dont bother comparing corrs  
+        if(( fabs(std::real(wc)) < 1e-6) && ( fabs(std::imag(wc)) < 1e-6))
+          return true; 
+      } 
+
+      ENSEM::Complex efactor = ENSEM::cmplx( ENSEM::Real(std::real(factor)) , ENSEM::Real(std::imag(factor)));
+
+      // divide by the expected relative phase 
+      return test_equivalence(ec,efactor*e); 
+    } 
+
+
+
+    void check_relations(const MAP_t &mappy)
+    {
+      FFKinematicFactors_t KGen;
+
+      MAP_t::const_iterator it; 
+      for(it = mappy.begin(); it != mappy.end(); ++it)
+      {
+        ADATIO::BinaryBufferReader BinBuffReader(it->first); 
+        ThreePointDataTag t;
+        read(BinBuffReader,t); 
+
+        std::cout << __func__ << ": attempting " 
+          << t.file_id << std::endl;
+
+        // set up the canonical key  
+        ThreePointDataTag canonical =t; 
+
+        std::pair<mom_t,mom_t> canonical_mom_pair; 
+        canonical_mom_pair = LatticeRotationEnv::rotation_group_can_mom(canonical.left_mom,canonical.right_mom); 
+        mom_t qc = canonical_mom_pair.first - canonical_mom_pair.second; 
+        canonical.left_mom = canonical_mom_pair.first; 
+        canonical.q = qc; 
+        canonical.right_mom = canonical_mom_pair.second; 
+        canonical.file_id = generate_file_id(canonical); 
+
+        // make a key and look for it 
+        ADATIO::BinaryBufferWriter bar; 
+        write(bar,canonical); 
+        std::string canonical_key = bar.str(); 
+        MAP_t::const_iterator can_it; 
+        can_it = mappy.find(canonical_key); 
+
+        if(can_it == mappy.end())
+        {
+          std::cout << __func__ <<": error canonical key missing for " 
+            << canonical.rot_qsq_tag(true) << std::endl;
+
+          std::cout << "missing " << canonical.file_id << "\n  avail:\n" << std::endl;; 
+
+          // dump the map -- reuse the canonical iterator since 
+          //    we will throw right after the map dump 
+          for(can_it = mappy.begin(); can_it != mappy.end(); ++can_it)
+          {
+            ADATIO::BinaryBufferReader bark(can_it->first); 
+            ThreePointDataTag bite;
+            read(bark,bite); 
+            std::cout << bite.file_id << std::endl;
+          }
+
+          // break the loop and exit code  
+          throw std::string("canonical key missing"); 
+        }
+
+        ENSEM::EnsemVectorComplex data,can_data; 
+        data = it->second; 
+        can_data = can_it->second; 
+
+        rHandle<Rep_p> lrep,rrep; 
+        lrep = canonical.data_rep.lefty(); 
+        rrep = canonical.data_rep.righty(); 
+
+        // hardwire, recompile if you want to roll something else
+        canonical.mat_elem_id = "J1mJ1m_test"; 
+
+        // this convention must match the subduction convention 
+        if(lrep->rep_type() == Stringify<CubicRep_t>()); 
+        canonical.mat_elem_id += "__" + lrep->rep_id() + "," + rrep->rep_id(); 
+
+        t.mat_elem_id = canonical.mat_elem_id; 
+
+
+        FFKinematicFactors_t::KinematicFactorRow ffc,fft; 
+        ffc = KGen.genFactors(&canonical); 
+        fft = KGen.genFactors(&t); 
+
+        if( !!! (check_relation( canonical, ffc.mean()[0] , can_data, t, fft.mean()[0] , data ) ) )
+        {
+          // bad stuff 
+        }
+
       }
     }
 
 
+    void handle_work(const rHandle<LLSQLatticeMultiData> &d)
+    {
+      MAP_t mappy = init_map(d); 
+      check_relations(mappy); 
+    }
 
-    ////////////////////////////////////////////////
-    void
-      do_work(const rHandle<LLSQLatticeMultiData> &d, 
-          const int Jl,
-          const int Jr)
-      {
-        map_holder mappy;
-        try
-        {
-          mappy.init_map(d); 
-        }
-        catch(std::string &s)
-        {
-          std::cout << __func__ << ": caught " << s << std::endl;
-          exit(1); 
-        }
+  }
 
-        std::map<std::string,KEY>::const_iterator it; 
-        for (it = mappy.keys_map.begin(); it != mappy.keys_map.end(); ++it)
-        {
-          if( !!! do_work(&mappy,it->second,Jl,Jr) )
-          {
-            std::cout << it->first << ": failed!!!" << std::endl;
-          }
-        }
-
-      }
-
-  } // anonomyous 
 
 
   ////////////////////////////////////////////////
@@ -395,11 +294,9 @@ namespace radmat
   ////////////////////////////////////////////////
   void
     LatticeRotationRelationChecker::check(
-        const rHandle<LLSQLatticeMultiData> &d, 
-        const int Jl, 
-        const int Jr) const
+        const rHandle<LLSQLatticeMultiData> &d) const
     {
-      do_work(d,Jl,Jr); 
+      handle_work(d); 
     }
 
 

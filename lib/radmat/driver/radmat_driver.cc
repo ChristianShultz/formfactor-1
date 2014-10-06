@@ -6,7 +6,7 @@
 
  * Creation Date : 25-02-2013
 
- * Last Modified : Wed 09 Jul 2014 10:38:41 AM EDT
+ * Last Modified : Mon 06 Oct 2014 11:09:27 AM EDT
 
  * Created By : shultz
 
@@ -143,6 +143,7 @@ namespace radmat
     std::map<std::string, void (RadmatDriver::*)(const std::string &)>::iterator it; 
     handler["all"] = &RadmatDriver::build_xml; 
     handler["split_mom"] = &RadmatDriver::build_xml_split_p2;
+    handler["split_mom_N"] = &RadmatDriver::build_xml_split_p2_N;
     handler["two_point"] = &RadmatDriver::build_xml_twopoint;
     handler["split"] = &RadmatDriver::build_xml_split;
 
@@ -152,14 +153,6 @@ namespace radmat
     if (it != handler.end())
     {
       std::cout << __PRETTY_FUNCTION__ << ": FOUND " << mode << std::endl;
-      // easier to read -- call the member function on this instance
-      // void (RadmatDriver::*Fred)(const std::string &);
-      // Fred = it->second; 
-      // (this->*Fred)(ini); 
-      // or this way
-      // ((*this).*Fred)(ini); 
-
-      // way more fun way of doing the same bit of work
       (this->*(it->second))(ini);
     }
     else
@@ -202,13 +195,19 @@ namespace radmat
 
   namespace
   {
-    std::string can_mom_str(const Hadron::KeyHadronNPartNPtCorr_t &k)
+    std::string mom_str(const ADATXML::Array<int> &p)
     {
-      ADATXML::Array<int> p = FF::canonicalOrder(k.npoint[2].irrep.mom);
       std::stringstream ss; 
       ss << "p" << p[0] << p[1] << p[2]; 
       return ss.str(); 
     }
+
+    std::string can_mom_str(const Hadron::KeyHadronNPartNPtCorr_t &k)
+    {
+      return mom_str( FF::canonicalOrder(k.npoint[2].irrep.mom) );
+    }
+
+
 
 
     template<int,int,int> 
@@ -384,6 +383,103 @@ namespace radmat
     }
   }
 
+
+  void RadmatDriver::build_xml_split_p2_N(const std::string &inifile)
+  {
+    const int N = 7; 
+    read_xmlini(inifile);
+
+    std::vector<Hadron::KeyHadronNPartNPtCorr_t> keys;
+    std::vector<Hadron::KeyHadronNPartNPtCorr_t>::const_iterator unsorted_it;
+    std::map<std::string,std::vector<Hadron::KeyHadronNPartNPtCorr_t> > sorted; 
+    std::map<std::string,std::vector<Hadron::KeyHadronNPartNPtCorr_t> >::iterator sorted_it; 
+
+    keys = m_correlators.construct_correlator_xml(m_ini.threePointIni); 
+
+    std::cout << __PRETTY_FUNCTION__ << " writing xml for " 
+      << keys.size() << " correlators" << std::endl; 
+
+    std::map<std::string,std::vector<std::string> > seen; 
+    std::map<std::string,std::vector<std::string> >::const_iterator seen_it; 
+    std::map<std::string,char> letter_map; 
+    char letter_start = 'a';
+
+    //  now figure out how to split them up 
+    std::map<std::string,std::string> mom_split_map; 
+    std::map<std::string,std::string>::const_iterator mom_split_map_it; 
+
+    // sort them based on momentum
+    for(unsorted_it = keys.begin(); unsorted_it != keys.end(); ++unsorted_it)
+    {
+      std::string mom = mom_str(unsorted_it->npoint[2].irrep.mom); 
+      std::string can_mom = can_mom_str(*unsorted_it); 
+
+      if(letter_map.find(can_mom) == letter_map.end())
+        letter_map.insert(std::make_pair(can_mom,letter_start));  
+
+      mom_split_map_it = mom_split_map.find(mom); 
+
+      // do nothing 
+      if(mom_split_map_it != mom_split_map.end())
+      {
+        can_mom = mom_split_map_it->second; 
+      }
+      else
+      {
+        // check first time canonical mom 
+        seen_it = seen.find(can_mom); 
+        if(seen_it == seen.end())
+          seen.insert(std::make_pair(can_mom, std::vector<std::string>())); 
+
+        // add this momentum 
+        std::vector<std::string> *see = &( seen.find(can_mom)->second ); 
+        see->push_back(mom); 
+
+        // increment 
+        if(see->size() % N == 0)
+          ++letter_map[can_mom]; 
+
+        // redefine can mom 
+        can_mom.append(1u,letter_map[can_mom]); 
+
+        // now add it back to the mom_split map 
+        mom_split_map.insert(std::make_pair(mom,can_mom)); 
+      }
+
+      // can_mom is now p110a or p110b etc  
+      sorted_it = sorted.find(can_mom); 
+      if (sorted_it != sorted.end())
+        sorted_it->second.push_back(*unsorted_it); 
+      else
+        sorted.insert(
+            std::pair<std::string,std::vector<Hadron::KeyHadronNPartNPtCorr_t> >(can_mom,
+              std::vector<Hadron::KeyHadronNPartNPtCorr_t>(1,*unsorted_it) 
+              )
+            );
+    }
+
+
+    // now run them with some unique ids 
+    for(sorted_it = sorted.begin(); sorted_it != sorted.end(); ++sorted_it)
+    {
+      ADATXML::XMLBufferWriter corrs;
+      ADATXML::Array<Hadron::KeyHadronNPartNPtCorr_t> bc;
+      keys = sorted_it->second; 
+
+      bc.resize(keys.size()); 
+      for(unsigned int i = 0; i < keys.size(); ++i)
+        bc[i] = keys[i];
+
+      write(corrs,"NPointList",bc);
+
+      std::stringstream ss; 
+      ss << "npt.list." << sorted_it->first << ".xml"; 
+
+      std::ofstream out(ss.str().c_str());
+      corrs.print(out);
+      out.close();
+    }
+  }
 
 
   void RadmatDriver::build_xml_split(const std::string &inifile)

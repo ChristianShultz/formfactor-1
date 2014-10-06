@@ -6,7 +6,7 @@
 
  * Creation Date : 22-02-2013
 
- * Last Modified : Wed 20 Aug 2014 08:11:03 PM EDT
+ * Last Modified : Fri 03 Oct 2014 05:14:27 PM EDT
 
  * Created By : shultz
 
@@ -37,7 +37,7 @@
 #include "jackFitter/three_point_fit_forms.h"
 #include "jackFitter/plot.h"
 // #define DEBUG_AT_MAKE_MOM_INV_TAGS
- #define DEBUG_AT_ZERO_SORTING
+// #define DEBUG_AT_ZERO_SORTING
 
 
 
@@ -279,9 +279,10 @@ namespace radmat
       for(int i = 0; i < s.size(); ++i)
       {
         ss << s(i) << ", ";
-        if( s(i) > 1e-6 ) 
+        if( s(i) > tolerance )         
           ++non_zero_singular_values; 
       }
+
       ss << "]\n";
 
 
@@ -299,8 +300,8 @@ namespace radmat
         possible_extraction = ( count > possible_extraction ) ? count : possible_extraction; 
       }
 
-      std::cout << __func__ << ": " << ss.str() << "looking to extract " 
-        << possible_extraction << " N non zero singular values = " << non_zero_singular_values << std::endl;
+       std::cout << __func__ << ": " << ss.str() << "looking to extract " 
+         << possible_extraction << " N non zero singular values = " << non_zero_singular_values << std::endl;
 
       //  printer_function<is_solveable_printer>( "nnz sings " + number_to_string(non_zero_singular_values)); 
       // printer_function<is_solveable_printer>( "possible sings " + number_to_string(possible_extraction)); 
@@ -418,6 +419,7 @@ namespace radmat
       std::cout << __func__ << ": tag type " << (&old_tags[elem])->type() << std::endl; 
       std::cout << __func__ << ": tag -> " << old_tags[elem].mom_string() << std::endl;
       std::cout << __func__ << ": tag -> data_rep " << old_tags[elem].rot_qsq_tag(false) << std::endl;
+      std::cout << __func__ << ": tag -> file_id " << old_tags[elem].file_id << std::endl;
       std::cout << __func__ << ": Kinematic Matrix \n" << SEMBLE::mean(KMat) << std::endl;
 
       workV = Kt.genFactors(&old_tags[elem]); 
@@ -483,7 +485,7 @@ namespace radmat
 #endif
 
     // check that we can solve the llsq -- only move if we have some data 
-    bool solveable = (!!!first) ?  is_llsq_solveable( SEMBLE::mean( peek_K() ) , tolerance) : false; 
+    bool solveable = (!!!first) ?  is_llsq_solveable( SEMBLE::mean( peek_K() ) , 1e-5) : false; 
 
     // warn that we are killing this data point 
     if(!!!solveable)
@@ -622,13 +624,27 @@ namespace radmat
     //    std::cout << __func__ << ": entering" << std::endl; 
     check_exit_lat();
 
-    rHandle<LLSQLatticeMultiData> output_data = unique_data(lattice_data,zeroed_data); 
+    std::stringstream sslat,ssz; 
+    sslat << path << "state_database.rad";
+    ssz << path << "/zeroed_matrix_elems"; 
+    SEMBLE::SEMBLEIO::makeDirectoryPath(ssz.str()); 
+    ssz << "/zeroed_state_database.rad";
 
-    std::stringstream ss; 
-    ss << path << "state_database.rad"; 
-    ADATIO::BinaryFileWriter bin(ss.str());
-    write(bin,*output_data); 
-    bin.close();
+    std::stringstream all_data_name; 
+    all_data_name << path << "all_data.rad"; 
+
+    rHandle<LLSQLatticeMultiData> all_data = unique_data(lattice_data,zeroed_data); 
+
+
+    ADATIO::BinaryFileWriter binlat(sslat.str()) , binz(ssz.str()), binall(all_data_name.str()); 
+    write(binlat,*lattice_data); 
+    write(binz,zeroed_data); 
+    write(binall,*all_data); 
+
+    binlat.close(); 
+    binz.close(); 
+    binall.close(); 
+
   }
 
 

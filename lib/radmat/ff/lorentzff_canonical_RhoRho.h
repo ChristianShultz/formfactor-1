@@ -14,6 +14,9 @@
 // #define PRINT_RR_DECOMP_G1
 // #define PRINT_RR_DECOMP_G2
 // #define PRINT_RR_DECOMP_G3
+//
+
+#define ZERO_EXPLICIT_RHO_RHO
 
 namespace radmat
 {
@@ -90,6 +93,11 @@ namespace radmat
         return s;
       }
 
+    bool check_space(const Tensor<double,1> &lefty , const Tensor<double,1> &righty) const
+    {
+      return ( (lefty[1] == righty[1]) && (lefty[2] == righty[2]) && (lefty[3] == righty[3])); 
+    }
+
     virtual Tensor<std::complex<double> , 1> 
       impl(const Tensor<double,1> &p_f, 
           const Tensor<double,1> &p_i, 
@@ -109,6 +117,15 @@ namespace radmat
         p_right = convertTensorUnderlyingType< Data_t , double , 1>(p_i); 
         val_a = contract(eps_left, applyMetric(p_right,metric,0),0,0);  
         val_b = contract(eps_right, applyMetric(p_left,metric,0),0,0);  
+
+#ifdef ZERO_EXPLICIT_RHO_RHO
+        if (check_space(p_f,p_i))
+        {
+          val_a.value() = std::complex<double>(0.,0.); 
+          val_b.value() = std::complex<double>(0.,0.); 
+        }
+#endif 
+
 
         ret = val_a.value() * eps_right + val_b.value() * eps_left; 
 
@@ -148,6 +165,13 @@ namespace radmat
         s += " \\epsilon_\\alpha(p_i,\\lambda_f)p_f^\\alpha \\\\ ";
         return s; 
       }
+
+
+    bool check_space(const Tensor<double,1> &lefty , const Tensor<double,1> &righty) const 
+    {
+      return ( (lefty[1] == righty[1]) && (lefty[2] == righty[2]) && (lefty[3] == righty[3])); 
+    }
+
     virtual Tensor<std::complex<double> , 1> 
       impl(const Tensor<double,1> &p_f, 
           const Tensor<double,1> &p_i, 
@@ -170,6 +194,14 @@ namespace radmat
         mass = contract(p_right, applyMetric(p_right,metric,0),0,0); 
 
         ret = convertTensorUnderlyingType<std::complex<double>, double,1>(p_f + p_i); 
+
+#ifdef ZERO_EXPLICIT_RHO_RHO
+        if (check_space(p_f,p_i))
+        {
+          val_a.value() = std::complex<double>(0.,0.); 
+          val_b.value() = std::complex<double>(0.,0.); 
+        }
+#endif 
 
 #ifdef PRINT_RR_DECOMP_G3
         std::cout << "RRG3:" << " lh " << lh << " rh " << rh << std::endl;

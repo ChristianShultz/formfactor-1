@@ -6,7 +6,7 @@
 
  * Creation Date : 18-03-2014
 
- * Last Modified : Wed 20 Aug 2014 08:35:38 PM EDT
+ * Last Modified : Mon 06 Oct 2014 11:01:58 AM EDT
 
  * Created By : shultz
 
@@ -139,6 +139,11 @@ namespace radmat
           const ThreePointDataTag * tag, 
           const rCompEulAngles &eul)
       {
+        printer_function<wigner_factory_call_printer>("tag->left_mom.size() = " + to_string(tag->left_mom.size())); 
+        printer_function<wigner_factory_call_printer>("tag->left_mom " + to_string(tag->left_mom)); 
+        printer_function<wigner_factory_call_printer>("tag->right_mom.size() = " + to_string(tag->right_mom.size())); 
+        printer_function<wigner_factory_call_printer>("tag->right_mom " + to_string(tag->right_mom)); 
+
         typedef radmat::LatticeRotationEnv::TheRotationGroupGenerator RG;  
 
         WignerMatrix_t *Dret = new WignerMatrix_t( (TensorShape<2>())[3][3] , std::complex<double>(0.,0.)); 
@@ -153,11 +158,6 @@ namespace radmat
         mom_t q,qc; 
         q = tag->q; 
 
-        printer_function<wigner_factory_call_printer>("tag->left_mom.size() = " + to_string(tag->left_mom.size())); 
-        printer_function<wigner_factory_call_printer>("tag->left_mom " + to_string(tag->left_mom)); 
-
-        printer_function<wigner_factory_call_printer>("tag->right_mom.size() = " + to_string(tag->right_mom.size())); 
-        printer_function<wigner_factory_call_printer>("tag->right_mom " + to_string(tag->right_mom)); 
 
         std::pair<mom_t,mom_t>  canonical_momentum = RG::Instance().canonical_frame_moms(tag->left_mom,tag->right_mom); 
         qc = canonical_momentum.first - canonical_momentum.second;
@@ -445,6 +445,8 @@ namespace radmat
       const ThreePointDataTag * tag = dynamic_cast<const ThreePointDataTag*>(ptr); 
       rHandle<FormFactorBase_t> mat_elem; 
       mat_elem = FormFactorDecompositionFactoryEnv::callFactory( tag->mat_elem_id); 
+
+      printer_function<kgen_info_printer>("- made a " + tag->mat_elem_id); 
 
       // size params 
       int nfacs = mat_elem->nFacs(); 

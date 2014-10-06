@@ -40,6 +40,9 @@ namespace radmat
         const double m_righty, 
         const std::string &elem_id_base); 
 
+  
+  std::string generate_file_id(const ThreePointDataTag &t);
+
 }
 
 #endif /* DATA_TAG_REDSTAR_INTERFACE_H */

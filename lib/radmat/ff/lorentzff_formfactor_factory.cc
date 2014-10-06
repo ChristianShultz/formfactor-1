@@ -131,6 +131,9 @@ namespace radmat
         success &= do_reg<J0pJ1p_tran>();
         success &= do_reg<J1pJ1p_diag>();
         success &= do_reg<J1mJ1m_diag>();
+        
+        // test classes
+        success &= do_reg<J1mJ1m_test>(); 
 
 
         registered = true;
