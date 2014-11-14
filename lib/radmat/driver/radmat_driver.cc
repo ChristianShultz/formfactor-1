@@ -6,7 +6,7 @@
 
  * Creation Date : 25-02-2013
 
- * Last Modified : Mon 06 Oct 2014 11:09:27 AM EDT
+ * Last Modified : Mon 10 Nov 2014 10:24:37 AM EST
 
  * Created By : shultz
 
@@ -94,6 +94,12 @@ namespace radmat
       }
     } ff_data_sort;
 
+
+    bool is_canon_mom_insertion(const Hadron::KeyHadronNPartNPtCorr_t &npt)
+    {
+      return npt.npoint[2].irrep.mom == FF::canonicalOrder(npt.npoint[2].irrep.mom); 
+    }
+
   } // anonomyous 
 
 
@@ -143,6 +149,7 @@ namespace radmat
     std::map<std::string, void (RadmatDriver::*)(const std::string &)>::iterator it; 
     handler["all"] = &RadmatDriver::build_xml; 
     handler["split_mom"] = &RadmatDriver::build_xml_split_p2;
+    handler["canon_mom"] = &RadmatDriver::build_xml_canon_p2;
     handler["split_mom_N"] = &RadmatDriver::build_xml_split_p2_N;
     handler["two_point"] = &RadmatDriver::build_xml_twopoint;
     handler["split"] = &RadmatDriver::build_xml_split;
@@ -382,6 +389,42 @@ namespace radmat
       out.close();
     }
   }
+
+
+  void RadmatDriver::build_xml_canon_p2(const std::string &inifile)
+  {
+    read_xmlini(inifile);
+
+    std::vector<Hadron::KeyHadronNPartNPtCorr_t> all_keys,keys;
+    std::vector<Hadron::KeyHadronNPartNPtCorr_t>::const_iterator it;
+
+    all_keys = m_correlators.construct_correlator_xml(m_ini.threePointIni); 
+    for(it = all_keys.begin(); it != all_keys.end(); ++it)
+      if(is_canon_mom_insertion(*it))
+        keys.push_back(*it); 
+
+
+    ADATXML::XMLBufferWriter corrs;
+    ADATXML::Array<Hadron::KeyHadronNPartNPtCorr_t> bc;
+
+    bc.resize(keys.size()); 
+    for(unsigned int i = 0; i < keys.size(); ++i)
+      bc[i] = keys[i];
+
+    write(corrs,"NPointList",bc);
+
+    std::ofstream out("npt.list.canon.xml");
+    corrs.print(out);
+    out.close();
+
+    out.open("npt.ensemFileNames.list"); 
+    for(it = keys.begin(); it != keys.end(); ++it)
+      out << Hadron::ensemFileName(*it) << "\n";
+    out.close(); 
+
+  }
+
+
 
 
   void RadmatDriver::build_xml_split_p2_N(const std::string &inifile)

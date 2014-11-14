@@ -6,7 +6,7 @@
 
  * Creation Date : 25-02-2013
 
- * Last Modified : Fri 03 Oct 2014 02:15:53 PM EDT
+ * Last Modified : Fri 17 Oct 2014 11:38:26 AM EDT
 
  * Created By : shultz
 
@@ -146,6 +146,104 @@ namespace
 /////////////////////////////////////////////////////
 /////////////////////////////////////////////////////
 
+
+  
+// pull the arr_ini
+//
+/////////////////////////////////////////////////////
+ArrSingleQ2Prop_t 
+read_inifile(const std::string &xmlini)
+{
+// read the xml array of ffs that we want to refit
+  ArrSingleQ2Prop_t arr_ini; 
+
+  try
+  {
+    std::cout << "reading " << xmlini << std::endl;
+    ADATXML::XMLReader xml(xmlini); 
+    read(xml,"/props",arr_ini); 
+  }
+  catch( std::string &str) 
+  {
+    std::cout << "Error: " << str << std::endl; 
+    exit(1); 
+  }
+  catch( std::exception &e)
+  {
+    std::cout << "excep: " << e.what() << std::endl; 
+    exit(1);
+  }
+  catch ( ... ) 
+  {
+    SPLASH("An error occurred reading the inifile") ; 
+    exit(1); 
+  }
+
+  return arr_ini;
+}
+
+
+// pull the llsq database struct 
+//
+/////////////////////////////////////////////////////
+radmat::rHandle<radmat::LLSQLatticeMultiData> 
+pull_llsq_data(const std::string &xmlini)
+{
+  // read the xml array of ffs that we want to refit
+  ArrSingleQ2Prop_t arr_ini = read_inifile(xmlini);
+
+  radmat::rHandle< radmat::LLSQLatticeMultiData > foo( new radmat::LLSQLatticeMultiData() ); 
+  POW2_ASSERT( &*foo ) ; 
+
+  try
+  {
+    ADATIO::BinaryFileReader bread(arr_ini.s_dbfile); 
+    radmat::read(bread,*foo); 
+  }
+  catch ( ... ) 
+  {
+    SPLASH("An error occurred reading the state database");
+    exit(1);
+  }
+
+  // get the lattice elems as a function of insertion time from 
+  // the database that was saved in the orig run 
+  prune_llsq_elems(foo,arr_ini); 
+
+  return foo;
+}
+
+
+// pull the formfactor database struct 
+//
+/////////////////////////////////////////////////////
+radmat::FormFacSolutions<std::complex<double> > 
+pull_ff_soln(const std::string &xmlini)
+{
+
+  // read the xml array of ffs that we want to refit
+  ArrSingleQ2Prop_t arr_ini = read_inifile(xmlini);
+
+  radmat::FormFacSolutions<std::complex<double> > FF_of_t;
+
+  try
+  {
+    ADATIO::BinaryFileReader bread(arr_ini.ff_dbfile); 
+    radmat::read(bread,FF_of_t); 
+  }
+  catch ( ... ) 
+  {
+    SPLASH("An error occurred reading the state database");
+    exit(1);
+  }
+
+  return FF_of_t;
+}
+
+
+
+
+
 //    generate redstar xml from the inifile 
 //
 /////////////////////////////////////////////////////
@@ -194,44 +292,7 @@ void rot_llsq(int argc, char *argv[])
   std::istringstream val(argv[2]);
   val >> xmlini;
 
-  // read the xml array of ffs that we want to refit
-  ArrSingleQ2Prop_t arr_ini; 
-
-  try
-  {
-    std::cout << "reading " << xmlini << std::endl;
-    ADATXML::XMLReader xml(xmlini); 
-    read(xml,"/props",arr_ini); 
-  }
-  catch( std::string &str) 
-  {
-    std::cout << "Error: " << str << std::endl; 
-    exit(1); 
-  }
-  catch ( ... ) 
-  {
-    SPLASH("An error occurred reading the inifile") ; 
-    exit(1); 
-  }
-
-  radmat::rHandle< radmat::LLSQLatticeMultiData > foo( new radmat::LLSQLatticeMultiData() ); 
-  POW2_ASSERT( &*foo ) ; 
-
-  try
-  {
-    ADATIO::BinaryFileReader bread(arr_ini.s_dbfile); 
-    radmat::read(bread,*foo); 
-  }
-  catch ( ... ) 
-  {
-    SPLASH("An error occurred reading the state database");
-    exit(1);
-  }
-
-
-  // get the lattice elems as a function of insertion time from 
-  // the database that was saved in the orig run 
-  prune_llsq_elems(foo,arr_ini); 
+  radmat::rHandle< radmat::LLSQLatticeMultiData > foo = pull_llsq_data(xmlini);
 
   radmat::LatticeRotationRelationChecker bar;
 
@@ -260,55 +321,15 @@ void prune_llsq(int argc, char *argv[])
     exit(1); 
   }
 
-
   // read the name of the ini file 
   std::string xmlini;
   std::istringstream val(argv[2]);
   val >> xmlini;
 
 
-  // read the xml array of ffs that we want to refit
-  ArrSingleQ2Prop_t arr_ini; 
-
-  try
-  {
-    std::cout << "reading " << xmlini << std::endl;
-    ADATXML::XMLReader xml(xmlini); 
-    read(xml,"/props",arr_ini); 
-  }
-  catch( std::string &str) 
-  {
-    std::cout << "Error: " << str << std::endl; 
-    exit(1); 
-  }
-  catch( std::exception &e)
-  {
-    std::cout << "excep: " << e.what() << std::endl; 
-    exit(1);
-  }
-  catch ( ... ) 
-  {
-    SPLASH("An error occurred reading the inifile") ; 
-    exit(1); 
-  }
-
-  radmat::rHandle< radmat::LLSQLatticeMultiData > foo( new radmat::LLSQLatticeMultiData() ); 
-  POW2_ASSERT( &*foo ) ; 
-
-  try
-  {
-    ADATIO::BinaryFileReader bread(arr_ini.s_dbfile); 
-    radmat::read(bread,*foo); 
-  }
-  catch ( ... ) 
-  {
-    SPLASH("An error occurred reading the state database");
-    exit(1);
-  }
-
-  // get the lattice elems as a function of insertion time from 
-  // the database that was saved in the orig run 
-  prune_llsq_elems(foo,arr_ini); 
+  ArrSingleQ2Prop_t arr_ini = read_inifile(xmlini); 
+  radmat::rHandle< radmat::LLSQLatticeMultiData > foo = pull_llsq_data(xmlini);
+    
 
   radmat::RadmatSingleQ2Driver m_driver; 
   
@@ -348,8 +369,6 @@ void prune_llsq(int argc, char *argv[])
 }
 
 
-
-
 //    go back and refit form factors 
 //        -- leave the llsq alone here 
 //
@@ -370,42 +389,8 @@ void refit_ffs(int argc, char *argv[])
 
 
   // read the xml array of ffs that we want to refit
-  ArrSingleQ2Prop_t arr_ini; 
-
-  try
-  {
-    std::cout << "reading " << xmlini << std::endl;
-    ADATXML::XMLReader xml(xmlini); 
-    read(xml,"/props",arr_ini); 
-  }
-  catch( std::string &str) 
-  {
-    std::cout << "Error: " << str << std::endl; 
-    exit(1); 
-  }
-  catch( std::exception &e)
-  {
-    std::cout << "excep: " << e.what() << std::endl; 
-    exit(1);
-  }
-  catch ( ... ) 
-  {
-    SPLASH("An error occurred reading the inifile") ; 
-    exit(1); 
-  }
-
-  radmat::FormFacSolutions<std::complex<double> > FF_of_t;
-
-  try
-  {
-    ADATIO::BinaryFileReader bread(arr_ini.ff_dbfile); 
-    radmat::read(bread,FF_of_t); 
-  }
-  catch ( ... ) 
-  {
-    SPLASH("An error occurred reading the state database");
-    exit(1);
-  }
+  ArrSingleQ2Prop_t arr_ini = read_inifile(xmlini);
+  radmat::FormFacSolutions<std::complex<double> > FF_of_t = pull_ff_soln(xmlini); 
 
   // driver
   radmat::RadmatSingleQ2Driver my_driver;
@@ -425,6 +410,111 @@ void refit_ffs(int argc, char *argv[])
         arr_ini.ffs[elem].fitParameterValues);
   } // ff loop
 
+}
+
+
+//      convert G_i to multipole -- did the fit too
+//
+/////////////////////////////////////////////////////
+void conv_rho_multipole(int argc, char *argv[])
+{
+  if(argc != 3)
+  {
+    std::cerr << "usage: radmat_util: conv_rho_multipole <xmlinifile> " << std::endl;
+    exit(1); 
+  }
+
+
+  // read the name of the ini file 
+  std::string xmlini;
+  std::istringstream val(argv[2]);
+  val >> xmlini;
+
+
+  // read the xml array of ffs that we want to refit
+  ArrSingleQ2Prop_t arr_ini = read_inifile(xmlini);
+  radmat::FormFacSolutions<std::complex<double> > FF_of_t = pull_ff_soln(xmlini); 
+
+  // driver
+  radmat::RadmatSingleQ2Driver my_driver;
+  
+  // map 
+  std::map<std::string,ENSEM::EnsemReal> ff_map; 
+  std::map<std::string,ENSEM::EnsemReal>::const_iterator ff_it; 
+  ENSEM::EnsemReal Q2; 
+ 
+  // run some fake fits  
+  for (int elem = 0; elem < arr_ini.ffs.size(); ++elem)
+  {
+    std::cout << "\n\n** refiting ff: " << arr_ini.ffs[elem].ff << std::endl;
+    std::cout << "*********************************" << std::endl;
+
+    std::pair<ENSEM::EnsemReal,ENSEM::EnsemReal> bob; 
+
+    // fit out the insertion time dependence
+    bob = my_driver.fit_and_dump_single_ffs(
+        arr_ini.ffs[elem].threePointComparatorProps,
+        FF_of_t,
+        arr_ini.tsrc,
+        arr_ini.tsnk,
+        arr_ini.ffs[elem].ff,
+        arr_ini.ffs[elem].fitParameterValues);
+
+    ff_map.insert(std::make_pair(arr_ini.ffs[elem].ff, bob.first)); 
+    Q2 = bob.second; 
+  } // ff loop
+
+  ENSEM::EnsemReal GC,GQ,GM; 
+  ENSEM::EnsemReal G1,G2,G3; 
+  ENSEM::Real mrho(0.216292), one(1.), o6(1/6.), o4(1./4.);
+  ENSEM::EnsemReal Qdm = Q2/mrho/mrho; 
+
+  bool bG1(true),bG2(true),bG3(true); 
+
+  ff_it = ff_map.find("RhoRhoG1");
+  if(ff_it == ff_map.end())
+    bG1 = false;
+  else 
+    G1 = ff_it->second; 
+
+  ff_it = ff_map.find("RhoRhoG2");
+  if(ff_it == ff_map.end())
+    bG2 = false;
+  else 
+    G2 = ff_it->second; 
+
+  ff_it = ff_map.find("RhoRhoG3");
+  if(ff_it == ff_map.end())
+    bG3 = false;
+  else 
+    G3 = ff_it->second; 
+
+
+  if( bG1 && bG2 && bG3 )
+  {
+    GC = (one + Qdm*o6)*G1 
+        - Qdm*o6*G2
+        + Qdm*o6*(one + Qdm*o4)*G3; 
+    std::string s("RhoRhoGC_fit.jack");
+    ENSEM::write(s,GC); 
+  } 
+
+  if(  bG2  )
+  {
+    GM = G2;
+    std::string s("RhoRhoGM_fit.jack");
+    ENSEM::write(s,GM); 
+  } 
+
+  if( bG1 && bG2 && bG3 )
+  {
+    GQ = G1 
+        - G2
+        + (one + Qdm*o4)*G3; 
+    std::string s("RhoRhoGQ_fit.jack");
+    ENSEM::write(s,GQ); 
+  } 
+  
 }
 
 
@@ -448,6 +538,7 @@ void init_options(void)
   options.insert(std::pair<std::string,fptr>("prune_llsq",&prune_llsq)); 
   options.insert(std::pair<std::string,fptr>("refit_ffs",&refit_ffs)); 
   options.insert(std::pair<std::string,fptr>("registerAll",&do_registerAll));
+  options.insert(std::pair<std::string,fptr>("conv_rho_multipole",&conv_rho_multipole));
 }
 
 // pick appropriate function and pass on command line inputs 

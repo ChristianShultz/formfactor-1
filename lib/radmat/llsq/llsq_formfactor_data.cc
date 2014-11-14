@@ -6,7 +6,7 @@
 
  * Creation Date : 21-02-2014
 
- * Last Modified : Mon 06 Oct 2014 09:47:10 AM EDT
+ * Last Modified : Mon 27 Oct 2014 01:39:46 PM EDT
 
  * Created By : shultz
 
@@ -56,8 +56,8 @@ namespace radmat
     struct ret_dimension_printer
     {
       static void print(const std::string &msg)
-      {}
-      //      { std::cout << msg << std::endl; }
+      // {}
+       { std::cout << msg << std::endl; }
     };
 
     struct mean_printer
@@ -419,7 +419,11 @@ namespace radmat
 
           log << "input: " << it->first << std::endl;
 
+          std::cout << "finding phase on " << it->first << std::endl;
+
           std::pair<phase_pair,std::string> foo = find_phase(it->second,tlow,thigh); 
+
+          std::cout << "found phase for " << it->first << std::endl;
 
           log << foo.second << "\n\n" << std::endl;
 

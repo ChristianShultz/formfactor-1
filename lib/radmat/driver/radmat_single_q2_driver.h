@@ -59,8 +59,9 @@ namespace radmat
         const int tsrc,
         const int tsnk);
 
-    // single q2 fit individual ffs
-    void fit_and_dump_single_ffs(const ThreePointComparatorProps_t &props,
+    // single q2 fit individual ffs -- return <ff,Q2>
+    std::pair<ENSEM::EnsemReal,ENSEM::EnsemReal> 
+      fit_and_dump_single_ffs(const ThreePointComparatorProps_t &props,
         const FormFacSolutions<std::complex<double> > &ff_soln,
         const int tsrc, 
         const int tsnk,

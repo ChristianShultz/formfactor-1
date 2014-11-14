@@ -32,9 +32,9 @@ POST_INSTALL = :
 NORMAL_UNINSTALL = :
 PRE_UNINSTALL = :
 POST_UNINSTALL = :
-bin_PROGRAMS = grab_ff$(EXEEXT) grab_pol$(EXEEXT) \
-	grab_vector_mean_cmp$(EXEEXT) invert_subduced$(EXEEXT) \
-	mass_overlap_db_combine$(EXEEXT) \
+bin_PROGRAMS = estimate_error$(EXEEXT) grab_ff$(EXEEXT) \
+	grab_pol$(EXEEXT) grab_vector_mean_cmp$(EXEEXT) \
+	invert_subduced$(EXEEXT) mass_overlap_db_combine$(EXEEXT) \
 	mass_overlap_db_create$(EXEEXT) mass_overlap_db_util$(EXEEXT) \
 	pole_enhancement$(EXEEXT) radmat$(EXEEXT) radmat_util$(EXEEXT) \
 	simple_test$(EXEEXT) single_plot$(EXEEXT) subduce$(EXEEXT) \
@@ -52,6 +52,10 @@ CONFIG_CLEAN_FILES =
 CONFIG_CLEAN_VPATH_FILES =
 am__installdirs = "$(DESTDIR)$(bindir)"
 PROGRAMS = $(bin_PROGRAMS)
+am_estimate_error_OBJECTS = estimate_error.$(OBJEXT)
+estimate_error_OBJECTS = $(am_estimate_error_OBJECTS)
+estimate_error_LDADD = $(LDADD)
+estimate_error_DEPENDENCIES =
 am_grab_ff_OBJECTS = grab_ff.$(OBJEXT)
 grab_ff_OBJECTS = $(am_grab_ff_OBJECTS)
 grab_ff_LDADD = $(LDADD)
@@ -131,9 +135,9 @@ CXXCOMPILE = $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) \
 CXXLD = $(CXX)
 CXXLINK = $(CXXLD) $(AM_CXXFLAGS) $(CXXFLAGS) $(AM_LDFLAGS) $(LDFLAGS) \
 	-o $@
-SOURCES = $(grab_ff_SOURCES) $(grab_pol_SOURCES) \
-	$(grab_vector_mean_cmp_SOURCES) $(invert_subduced_SOURCES) \
-	$(mass_overlap_db_combine_SOURCES) \
+SOURCES = $(estimate_error_SOURCES) $(grab_ff_SOURCES) \
+	$(grab_pol_SOURCES) $(grab_vector_mean_cmp_SOURCES) \
+	$(invert_subduced_SOURCES) $(mass_overlap_db_combine_SOURCES) \
 	$(mass_overlap_db_create_SOURCES) \
 	$(mass_overlap_db_util_SOURCES) $(pole_enhancement_SOURCES) \
 	$(radmat_SOURCES) $(radmat_util_SOURCES) \
@@ -141,9 +145,9 @@ SOURCES = $(grab_ff_SOURCES) $(grab_pol_SOURCES) \
 	$(subduce_SOURCES) $(test_levi_civita_SOURCES) \
 	$(test_redstar_ops_SOURCES) $(test_rotations_SOURCES) \
 	$(test_tens_SOURCES)
-DIST_SOURCES = $(grab_ff_SOURCES) $(grab_pol_SOURCES) \
-	$(grab_vector_mean_cmp_SOURCES) $(invert_subduced_SOURCES) \
-	$(mass_overlap_db_combine_SOURCES) \
+DIST_SOURCES = $(estimate_error_SOURCES) $(grab_ff_SOURCES) \
+	$(grab_pol_SOURCES) $(grab_vector_mean_cmp_SOURCES) \
+	$(invert_subduced_SOURCES) $(mass_overlap_db_combine_SOURCES) \
 	$(mass_overlap_db_create_SOURCES) \
 	$(mass_overlap_db_util_SOURCES) $(pole_enhancement_SOURCES) \
 	$(radmat_SOURCES) $(radmat_util_SOURCES) \
@@ -267,6 +271,7 @@ AM_LDFLAGS = -L@top_builddir@/lib/ \
                @LDFLAGS@ @SEMBLE_LDFLAGS@ @JACKFITTER_LDFLAGS@ @ADAT_LDFLAGS@ 
 
 LDADD = -lradmat @SEMBLE_LIBS@ @JACKFITTER_LIBS@ @ADAT_LIBS@ @ITPP_LIBS@ @LIBS@ 
+estimate_error_SOURCES = estimate_error.cc
 grab_ff_SOURCES = grab_ff.cc
 grab_pol_SOURCES = grab_pol.cc
 grab_vector_mean_cmp_SOURCES = grab_vector_mean_cmp.cc
@@ -360,6 +365,9 @@ uninstall-binPROGRAMS:
 
 clean-binPROGRAMS:
 	-test -z "$(bin_PROGRAMS)" || rm -f $(bin_PROGRAMS)
+estimate_error$(EXEEXT): $(estimate_error_OBJECTS) $(estimate_error_DEPENDENCIES) 
+	@rm -f estimate_error$(EXEEXT)
+	$(CXXLINK) $(estimate_error_OBJECTS) $(estimate_error_LDADD) $(LIBS)
 grab_ff$(EXEEXT): $(grab_ff_OBJECTS) $(grab_ff_DEPENDENCIES) 
 	@rm -f grab_ff$(EXEEXT)
 	$(CXXLINK) $(grab_ff_OBJECTS) $(grab_ff_LDADD) $(LIBS)
@@ -418,6 +426,7 @@ mostlyclean-compile:
 distclean-compile:
 	-rm -f *.tab.c
 
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/estimate_error.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/grab_ff.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/grab_pol.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/grab_vector_mean_cmp.Po@am__quote@

@@ -6,7 +6,7 @@
 
  * Creation Date : 25-02-2013
 
- * Last Modified : Mon 06 Oct 2014 10:05:15 AM EDT
+ * Last Modified : Sat 18 Oct 2014 12:08:07 PM EDT
 
  * Created By : shultz
 
@@ -247,7 +247,7 @@ namespace radmat
     init_fits = true; 
   }
 
-  void 
+  std::pair<ENSEM::EnsemReal,ENSEM::EnsemReal>
     RadmatSingleQ2Driver::fit_and_dump_single_ffs(const ThreePointComparatorProps_t &fit_props, 
         const FormFacSolutions<std::complex<double> > &ff_soln,
         const int tsrc,
@@ -272,6 +272,8 @@ namespace radmat
       // std::cout << "fitting " << ff << std::endl;
       // std::cout << ff_soln.FF_t.mean() << std::endl;
 
+      ThreePointDataTag t = *(ff_soln.Ingredients.begin()); 
+      ENSEM::EnsemReal this_Q2 = t.Q2(); 
 
       if( !!! found )
       {
@@ -280,7 +282,7 @@ namespace radmat
         for(nit = ff_soln.Names.begin(); nit != ff_soln.Names.end(); ++nit)
           std::cout << *nit << std::endl;
         std::cout << "skipping" << std::endl; 
-        return; 
+        return std::make_pair(ENSEM::Real(0.)*this_Q2,ENSEM::Real(0.)*this_Q2);
       }
 
       std::string pth = std::string("");
@@ -294,18 +296,17 @@ namespace radmat
 
       // report fits 
       lcl_fit_across_time.writeFitLogs(pth);
+      ENSEM::write("Q2.jack",this_Q2);
 
       ENSEM::EnsemReal this_ff = lcl_fit_across_time.getFF(ff); 
-      ThreePointDataTag t = *(ff_soln.Ingredients.begin()); 
-      ENSEM::EnsemReal this_Q2 = t.Q2(); 
       std::stringstream res; 
       res << "1 q2 " 
-       << SEMBLE::toScalar(ENSEM::mean(this_Q2)) << " " 
-       << sqrt(SEMBLE::toScalar(ENSEM::variance(this_Q2))); 
+        << SEMBLE::toScalar(ENSEM::mean(this_Q2)) << " " 
+        << sqrt(SEMBLE::toScalar(ENSEM::variance(this_Q2))); 
       res << " ff " 
-       << SEMBLE::toScalar(ENSEM::mean(this_ff)) << " " 
-       << sqrt(SEMBLE::toScalar(ENSEM::variance(this_ff))); 
-     
+        << SEMBLE::toScalar(ENSEM::mean(this_ff)) << " " 
+        << sqrt(SEMBLE::toScalar(ENSEM::variance(this_ff))); 
+
       DataRep3pt dr = t.data_rep; 
       std::pair<mom_t,mom_t> c_mom; 
       c_mom = radmat::LatticeRotationEnv::rotation_group_can_mom(t.left_mom,t.right_mom);
@@ -330,6 +331,7 @@ namespace radmat
       out.close(); 
 
 
+      return std::make_pair(this_ff,this_Q2); 
     }
 
 
