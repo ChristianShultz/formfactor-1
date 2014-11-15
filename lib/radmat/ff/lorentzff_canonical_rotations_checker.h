@@ -12,9 +12,7 @@ namespace radmat
 
   struct LatticeRotationRelationChecker
   {
-    void check( const rHandle<LLSQLatticeMultiData> &,
-        const int Jl,
-        const int Jr) const; 
+    void check( const rHandle<LLSQLatticeMultiData> &) const; 
   }; 
 
 

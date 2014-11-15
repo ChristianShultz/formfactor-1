@@ -6,7 +6,7 @@
 
  * Creation Date : 25-02-2013
 
- * Last Modified : Wed 28 May 2014 01:13:43 PM EDT
+ * Last Modified : Sat 18 Oct 2014 12:08:07 PM EDT
 
  * Created By : shultz
 
@@ -152,7 +152,8 @@ namespace radmat
   }
 
   bool RadmatSingleQ2Driver::load_llsq(const rHandle<LLSQLatticeMultiData> &d, 
-      const double tolerance)
+      const double tolerance,
+      const bool save_state)
   {
     if(!!!linear_system.load_data(d,tolerance))
       return false;
@@ -165,8 +166,11 @@ namespace radmat
 
     init_linear_system = true; 
 
-    SEMBLE::SEMBLEIO::makeDirectoryPath(base_path() + std::string("llsq"));
-    linear_system.dump_llsq_lattice(base_path() + std::string("llsq/"));
+    if(save_state)
+    {
+      SEMBLE::SEMBLEIO::makeDirectoryPath(base_path() + std::string("llsq"));
+      linear_system.dump_llsq_lattice(base_path() + std::string("llsq/"));
+    }
     return true;
   }
 
@@ -200,8 +204,15 @@ namespace radmat
       id << path << "unphasedFF_" << row << ".jack"; 
       ENSEM::write( id.str() , get_ensem_row(row,FF_of_t)); 
     }
-
   }
+
+  FormFacSolutions<std::complex<double> > 
+    RadmatSingleQ2Driver::grab_ff_solution(void) const
+  {
+    check_exit_solved_llsq(); 
+    return linear_system.grab_ff_solution(); 
+  }
+
 
   void RadmatSingleQ2Driver::fit_data(const ThreePointComparatorProps_t &fit_props, 
       const int tsrc,
@@ -209,6 +220,10 @@ namespace radmat
   {
     check_exit_linear_system();
     check_exit_solved_llsq(); 
+
+    std::cout << "Fitting Q2 = " << linear_system.qsq_label() 
+      << "  " << linear_system.peek_tags().begin()->mom_string() << std::endl;
+
     SEMBLE::SembleMatrix<std::complex<double> > FF_of_t = linear_system.peek_FF(); 
     LLSQComplexFormFactorData_t tmp; 
 
@@ -232,7 +247,7 @@ namespace radmat
     init_fits = true; 
   }
 
-  void 
+  std::pair<ENSEM::EnsemReal,ENSEM::EnsemReal>
     RadmatSingleQ2Driver::fit_and_dump_single_ffs(const ThreePointComparatorProps_t &fit_props, 
         const FormFacSolutions<std::complex<double> > &ff_soln,
         const int tsrc,
@@ -257,6 +272,8 @@ namespace radmat
       // std::cout << "fitting " << ff << std::endl;
       // std::cout << ff_soln.FF_t.mean() << std::endl;
 
+      ThreePointDataTag t = *(ff_soln.Ingredients.begin()); 
+      ENSEM::EnsemReal this_Q2 = t.Q2(); 
 
       if( !!! found )
       {
@@ -265,7 +282,7 @@ namespace radmat
         for(nit = ff_soln.Names.begin(); nit != ff_soln.Names.end(); ++nit)
           std::cout << *nit << std::endl;
         std::cout << "skipping" << std::endl; 
-        return; 
+        return std::make_pair(ENSEM::Real(0.)*this_Q2,ENSEM::Real(0.)*this_Q2);
       }
 
       std::string pth = std::string("");
@@ -279,18 +296,17 @@ namespace radmat
 
       // report fits 
       lcl_fit_across_time.writeFitLogs(pth);
+      ENSEM::write("Q2.jack",this_Q2);
 
       ENSEM::EnsemReal this_ff = lcl_fit_across_time.getFF(ff); 
-      ThreePointDataTag t = *(ff_soln.Ingredients.begin()); 
-      ENSEM::EnsemReal this_Q2 = t.Q2(); 
       std::stringstream res; 
       res << "1 q2 " 
-       << SEMBLE::toScalar(ENSEM::mean(this_Q2)) << " " 
-       << sqrt(SEMBLE::toScalar(ENSEM::variance(this_Q2))); 
+        << SEMBLE::toScalar(ENSEM::mean(this_Q2)) << " " 
+        << sqrt(SEMBLE::toScalar(ENSEM::variance(this_Q2))); 
       res << " ff " 
-       << SEMBLE::toScalar(ENSEM::mean(this_ff)) << " " 
-       << sqrt(SEMBLE::toScalar(ENSEM::variance(this_ff))); 
-     
+        << SEMBLE::toScalar(ENSEM::mean(this_ff)) << " " 
+        << sqrt(SEMBLE::toScalar(ENSEM::variance(this_ff))); 
+
       DataRep3pt dr = t.data_rep; 
       std::pair<mom_t,mom_t> c_mom; 
       c_mom = radmat::LatticeRotationEnv::rotation_group_can_mom(t.left_mom,t.right_mom);
@@ -315,7 +331,9 @@ namespace radmat
       out.close(); 
 
 
+      return std::make_pair(this_ff,this_Q2); 
     }
+
 
   void RadmatSingleQ2Driver::chisq_analysis(const int tlows, const int thighs)
   {

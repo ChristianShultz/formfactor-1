@@ -6,7 +6,7 @@
 
 * Creation Date : 24-03-2014
 
-* Last Modified : Wed 02 Apr 2014 10:24:11 AM EDT
+* Last Modified : Fri 03 Oct 2014 01:54:46 PM EDT
 
 * Created By : shultz
 
@@ -69,12 +69,6 @@ namespace radmat
       ret.file_id = gen_file_id(ret); 
 
 
-      //////
-      //
-      //  HERE <-------------
-      //
-      // this needs to update the mat elem id for the subduction 
-      // pathway throught the code
       return ret; 
     }
 
@@ -113,6 +107,10 @@ namespace radmat
       return ret; 
     }
 
+  std::string generate_file_id(const ThreePointDataTag &t)
+  {
+    return gen_file_id(t); 
+  }
 
 } // radmat 
 

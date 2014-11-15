@@ -6,7 +6,7 @@
 
  * Creation Date : 18-03-2014
 
- * Last Modified : Tue 29 Apr 2014 03:38:57 PM EDT
+ * Last Modified : Mon 06 Oct 2014 11:01:58 AM EDT
 
  * Created By : shultz
 
@@ -34,6 +34,8 @@
 // zero variance decomp 
 // #define MEAN_KINEMATIC_FACTORS
 
+// #define FF_KINEMATIC_PRINTING_ON 
+
 namespace radmat
 {
 
@@ -44,30 +46,63 @@ namespace radmat
     struct three_point_tag_printer
     {
       static void print(const std::string &msg)
+#ifdef FF_KINEMATIC_PRINTING_ON 
+      { std::cout << "three_point_tag_printer " << msg << std::endl;}
+#else
       {}
-      // { std::cout << "three_point_tag_printer " << msg << std::endl;}
+#endif
     };
 
     struct subduce_info_printer
     {
       static void print(const std::string &msg)
+#ifdef FF_KINEMATIC_PRINTING_ON 
+       { std::cout << "subduce_info_printer " << msg << std::endl;}
+#else
       {}
-      // { std::cout << "subduce_info_printer " << msg << std::endl;}
+#endif
     };
 
     struct kgen_info_printer
     {
       static void print(const std::string &msg)
+#ifdef FF_KINEMATIC_PRINTING_ON 
+       { std::cout << "kgen_info_printer " << msg << std::endl;}
+#else
       {}
-      // { std::cout << "kgen_info_printer " << msg << std::endl;}
+#endif
     };
 
     struct helicity_printer
     {
       static void print(const std::string &msg) 
+#ifdef FF_KINEMATIC_PRINTING_ON 
+       { std::cout << "helicity_printer " << msg << std::endl; }
+#else
       {}
-      // { std::cout << "helicity_printer " << msg << std::endl; }
+#endif
     }; 
+
+    struct three_point_handle_decision_printer
+    {
+      static void print(const std::string &msg)
+#ifdef FF_KINEMATIC_PRINTING_ON 
+       { std::cout << "three_point_handle_decision_printer: " << msg << std::endl; } 
+#else
+      {}
+#endif
+    };
+
+
+    struct wigner_factory_call_printer
+    {
+      static void print(const std::string &msg)
+#ifdef FF_KINEMATIC_PRINTING_ON 
+       { std::cout << "wigner_factory_call_printer: " << msg << std::endl; } 
+#else
+      {}
+#endif
+    };
 
     std::string to_string(const int i)
     {std::stringstream ss; ss << i; return ss.str();}
@@ -104,6 +139,11 @@ namespace radmat
           const ThreePointDataTag * tag, 
           const rCompEulAngles &eul)
       {
+        printer_function<wigner_factory_call_printer>("tag->left_mom.size() = " + to_string(tag->left_mom.size())); 
+        printer_function<wigner_factory_call_printer>("tag->left_mom " + to_string(tag->left_mom)); 
+        printer_function<wigner_factory_call_printer>("tag->right_mom.size() = " + to_string(tag->right_mom.size())); 
+        printer_function<wigner_factory_call_printer>("tag->right_mom " + to_string(tag->right_mom)); 
+
         typedef radmat::LatticeRotationEnv::TheRotationGroupGenerator RG;  
 
         WignerMatrix_t *Dret = new WignerMatrix_t( (TensorShape<2>())[3][3] , std::complex<double>(0.,0.)); 
@@ -118,11 +158,16 @@ namespace radmat
         mom_t q,qc; 
         q = tag->q; 
 
+
         std::pair<mom_t,mom_t>  canonical_momentum = RG::Instance().canonical_frame_moms(tag->left_mom,tag->right_mom); 
         qc = canonical_momentum.first - canonical_momentum.second;
 
 
         WignerMatrix_t *Dq,*DR,*Dqc; 
+
+        printer_function<wigner_factory_call_printer>("q.size = " + to_string(q.size())); 
+        printer_function<wigner_factory_call_printer>("q " + to_string(q)); 
+
 
         DR = wig.wigner_matrix(eul,1); 
         Dq = radmat::WignerDMatrixEnv::call_factory(q,1); 
@@ -147,6 +192,9 @@ namespace radmat
         delete DR; 
         delete Dq;
         delete Dqc; 
+
+
+        // std::cout << __func__ << ": returning a wigner matrix \n" << *Dret << std::endl;
 
 
         return Dret; 
@@ -244,12 +292,11 @@ namespace radmat
         }
 
 
-        //  printer_function<helicity_printer>( "\nmomc: " +  to_string(qc) ) ; 
-        //  printer_function<helicity_printer>( "\nmom: " +  to_string(tag->q) ) ; 
-        //  printer_function<helicity_printer>( "\n" +  to_string(eps) ) ; 
-        //  printer_function<helicity_printer>( " - KF \n" + to_string( KF.mean() ) ); 
-        //  printer_function<helicity_printer>( " - eps * KF\n" + to_string( ret.mean() ) ); 
-        //  std::cout << "D " << *D << std::endl;
+        printer_function<helicity_printer>( "\nmomc: " +  to_string(qc) ) ; 
+        printer_function<helicity_printer>( "\nmom: " +  to_string(tag->q) ) ; 
+        printer_function<helicity_printer>( "\neps: " +  to_string(eps) ) ; 
+        printer_function<helicity_printer>( " - KF \n" + to_string( KF.mean() ) ); 
+        printer_function<helicity_printer>( " - eps * KF\n" + to_string( ret.mean() ) ); 
 
         // clean up 
         delete D; 
@@ -362,9 +409,20 @@ namespace radmat
       {
         rHandle<Rep_p> gamma = tag->data_rep.gamma(); 
         if( gamma->rep_type() == Stringify<CubicRep_t>() )
+        {
+          printer_function<three_point_handle_decision_printer>(" using a cubic photon"); 
           return handle_three_point_cubic_insertion( KF, tag, gamma); 
-        else
+        }
+        else if( gamma->rep_type() == Stringify<LorentzRep_t>())
+        {
+          printer_function<three_point_handle_decision_printer>(" using a lorentz photon"); 
           return handle_three_point_lorentz_insertion( KF , tag); 
+        }
+        else
+        {
+          std::cerr << __func__ << ": unknown rep " << gamma->rep_type() << std::endl;
+          exit(1); 
+        }
       }
 
   }
@@ -387,6 +445,8 @@ namespace radmat
       const ThreePointDataTag * tag = dynamic_cast<const ThreePointDataTag*>(ptr); 
       rHandle<FormFactorBase_t> mat_elem; 
       mat_elem = FormFactorDecompositionFactoryEnv::callFactory( tag->mat_elem_id); 
+
+      printer_function<kgen_info_printer>("- made a " + tag->mat_elem_id); 
 
       // size params 
       int nfacs = mat_elem->nFacs(); 
@@ -430,9 +490,9 @@ namespace radmat
 
       // throw the mean into the zero bin then copy it to the whole ensemble 
       KF[0] = mat_elem->generate_ffs( 
-            mat_elem->to_mom_row_pair( ENSEM::toDouble(ENSEM::mean(left_E)), left_mom, left_row), 
-            mat_elem->to_mom_row_pair( ENSEM::toDouble(ENSEM::mean(right_E)), right_mom, right_row), 
-            mom_factor); 
+          mat_elem->to_mom_row_pair( ENSEM::toDouble(ENSEM::mean(left_E)), left_mom, left_row), 
+          mat_elem->to_mom_row_pair( ENSEM::toDouble(ENSEM::mean(right_E)), right_mom, right_row), 
+          mom_factor); 
 
       for(int bin = 1; bin < nbins; ++bin)
         KF[bin] = KF[0]; 

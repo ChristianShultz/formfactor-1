@@ -28,6 +28,13 @@ namespace radmat
     //! split up xml on p^2
     void build_xml_split_p2(const std::string &inifile);  
 
+    //! only build canonical momenta at the insertion
+    void build_xml_canon_p2(const std::string &inifile);  
+
+    //! split up xml on p^2 then split into N sets 
+    //    -- N is set in the .cc file 
+    void build_xml_split_p2_N(const std::string &inifile);
+
     //! split up xml on octant 
     void build_xml_split(const std::string &inifile); 
 

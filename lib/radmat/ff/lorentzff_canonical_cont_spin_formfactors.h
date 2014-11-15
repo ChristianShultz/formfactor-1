@@ -6,6 +6,7 @@
 #include "lorentzff_canonical_PiRho.h"
 #include "lorentzff_canonical_RhoPi.h"
 #include "lorentzff_canonical_RhoRho.h"
+#include "lorentzff_canonical_one.h"
 #include "radmat/utils/stringify.h"
 
 
@@ -183,6 +184,19 @@ namespace radmat
   };
 
 #endif 
+
+
+  //  test classes 
+  ////////////////////////////
+  struct J1mJ1m_test;
+  REGISTER_STRINGIFY_TYPE(J1mJ1m_test); 
+  struct J1mJ1m_test : public ONE<1,1>
+  {
+    virtual ~J1mJ1m_test() {}; 
+    virtual LorentzFFAbsBase_t* clone() const {return new J1mJ1m_test();}
+    virtual std::string reg_id() const { return Stringify< J1mJ1m_test >();}
+  };
+
 
 
 } // radmat 

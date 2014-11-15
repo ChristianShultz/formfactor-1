@@ -6,7 +6,7 @@
 
  * Creation Date : 19-03-2014
 
- * Last Modified : Tue 06 May 2014 06:07:23 PM EDT
+ * Last Modified : Mon 29 Sep 2014 06:59:05 PM EDT
 
  * Created By : shultz
 
@@ -40,8 +40,8 @@ namespace radmat
     struct subduce_printer
     {
       static void print(const std::string &msg)
-      {}
-      //  { std::cout << "subduce_printer " << msg << std::endl;}
+       {}
+       //{ std::cout << "subduce_printer " << msg << std::endl;}
     };
 
     SubduceTableMap::irrep_sub_table*
@@ -55,12 +55,23 @@ namespace radmat
 
         tab.resize( cub->dim() ); 
 
+        POW2_ASSERT( &*sub); 
+
         for(int row = 0; row < cub->dim(); ++row )
         {
           SubduceTableMap::sub_list entry; 
           for(int lambda = 0; lambda < 2*cont->rep_spin() + 1; ++lambda)
           {
+
+         //  std::cout << __func__ << ": attempting " + table_id + " row " 
+         //   << row << " hel " << lambda << std::endl; 
+
+
             // subduce tables are FORTRAN based 
+            
+            ENSEM::Complex foo = (*sub)(row +1, lambda +1); 
+            std::complex<double> bar = SEMBLE::toScalar(foo); 
+
             std::complex<double> weight = SEMBLE::toScalar( (*sub)(row+1,lambda+1) ); 
             if(weight == zero)
               continue; 
@@ -90,6 +101,7 @@ namespace radmat
         tab.resize( cub->dim() ); 
         int helicity = cubb->helicity();
 
+        POW2_ASSERT( &*sub); 
 
         if ( helicity == 0 )
         {
@@ -147,6 +159,7 @@ namespace radmat
       if( TheSmarterSubduceTableMap::Instance().mappy.find(map_id)
           == TheSmarterSubduceTableMap::Instance().mappy.end() )
       {
+        printer_function<subduce_table_printer>( "attempting " + map_id ); 
         if( cub->rep_group() == Stringify<Oh>() )
           TheSmarterSubduceTableMap::Instance().mappy.insert(
               std::make_pair( map_id , subduce_rest(table_id, cont , cub ) ) ); 

@@ -6,7 +6,7 @@
 
  * Creation Date : 21-02-2014
 
- * Last Modified : Mon 16 Jun 2014 11:29:30 AM EDT
+ * Last Modified : Mon 27 Oct 2014 01:39:46 PM EDT
 
  * Created By : shultz
 
@@ -56,8 +56,8 @@ namespace radmat
     struct ret_dimension_printer
     {
       static void print(const std::string &msg)
-      {}
-      //      { std::cout << msg << std::endl; }
+      // {}
+       { std::cout << msg << std::endl; }
     };
 
     struct mean_printer
@@ -177,10 +177,39 @@ namespace radmat
         //    assume a FF of O(1)
         if( (fabs(const_real) < 2e-2) && (fabs(const_imag) < 2e-2) ) 
         {
-          fit_log << "* decided overall consistent with zero" << std::endl;
+          fit_log << "* decided too small to resolve automatically " << std::endl;
+          fit_log << "making an arbitrary choice to return the larger" << std::endl;
           printer_function<case_printer>("ff is consistent with zero");
-          // doesn't matter, both are zero to precision  
-          return std::make_pair(phase_pair(ZERO,real),fit_log.str());
+
+          std::stringstream corr_foor, corr_fooc; 
+
+          for(int i = 0; i < in.numElem(); ++i)
+          {
+            ENSEM::EnsemReal foor,fooc; 
+            foor = ENSEM::real(ENSEM::peekObs(in,i));
+            fooc = ENSEM::imag(ENSEM::peekObs(in,i));
+
+            corr_foor << i  << " " << ENSEM::toDouble(ENSEM::mean(foor)) << " " 
+              << ENSEM::toDouble(ENSEM::sqrt(ENSEM::variance(foor))) << "\n"; 
+
+            corr_fooc << i  << " " << ENSEM::toDouble(ENSEM::mean(fooc)) << " " 
+              << ENSEM::toDouble(ENSEM::sqrt(ENSEM::variance(fooc))) << "\n"; 
+          }
+
+          fit_log << "corr.real = " << corr_foor.str() << std::endl; 
+          fit_log << "corr.imag = " << corr_fooc.str() << std::endl;
+
+
+
+          // return whichever is bigger?
+          if( fabs(const_real) > fabs(const_imag) )
+          {
+            return std::make_pair(phase_pair(ZERO,real),fit_log.str());
+          }
+          else
+          {
+            return std::make_pair(phase_pair(ZERO,imag),fit_log.str());
+          }
         }
 
         // is the constant consistent with zero? 
@@ -390,7 +419,11 @@ namespace radmat
 
           log << "input: " << it->first << std::endl;
 
+          std::cout << "finding phase on " << it->first << std::endl;
+
           std::pair<phase_pair,std::string> foo = find_phase(it->second,tlow,thigh); 
+
+          std::cout << "found phase for " << it->first << std::endl;
 
           log << foo.second << "\n\n" << std::endl;
 
@@ -428,6 +461,7 @@ namespace radmat
       if( expectedA == IM )
         expectedB = IP; 
 
+      bool pass = true; 
       // check that they are all either real , imag , or zero
       for(it = mappy.begin(); it != mappy.end(); ++it)
       {
@@ -449,11 +483,11 @@ namespace radmat
             << "\nZZ->" << ZERO 
             << std::endl;
           std::cout << it->first << " was bad" << std::endl;
-          return false; 
+          pass = false; 
         }
       }
 
-      return true; 
+      return pass; 
     }
 
     // run checks then push the result into the return data

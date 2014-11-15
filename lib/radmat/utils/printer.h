@@ -55,8 +55,8 @@ namespace radmat
   struct debug_print_reg_all
   {
     static void print(const std::string &msg) 
-    {}
-    // { std::cout << msg << std::endl; }
+     {}
+    //{ std::cout << msg << std::endl; }
   };
 
   struct console_print

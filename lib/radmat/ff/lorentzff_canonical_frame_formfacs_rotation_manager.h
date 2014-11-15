@@ -15,6 +15,9 @@
 // lorentzff_canonical classes see it
 #include "lorentzff_formfactor_abs_base_cfg.h"
 
+// print on helicity 
+// #define LORENTZFF_CAN_PRINT_HELICITY
+
 namespace radmat
 {
 
@@ -22,7 +25,7 @@ namespace radmat
     typename Data_t, 
     int J_left , 
     int J_right,
-    class MASS_AVERAGER >  // not being used 
+    class MASS_AVERAGER >  // not being used -- could imagine averaging over irrep masses
     struct FormFacRotationManager
     : public FFAbsBlockBase_t<Data_t>,
     public DMatrixManager
@@ -82,13 +85,6 @@ namespace radmat
         rr[2] = cr[1]*kick;
         rr[3] = cr[2]*kick;
 
-        //  // rotate by the transpose
-        //  for( int i = 0; i < 4; ++i)
-        //    for(int j = 0; j < 4; ++j)
-        //    {
-        //      ll[j] += (*R)[i][j] * l[i]; 
-        //      rr[j] += (*R)[i][j] * r[i];
-        //    }
 
         // MASS_AVERAGER::operate(ll,rr); 
 
@@ -151,7 +147,16 @@ namespace radmat
 
             if( std::norm(weight) > 1e-6) 
             {
-              Tensor<Data_t, 1> tmp = impl(can_moms.first,can_moms.second,kick,J_left-lh,J_right-rh); 
+
+#ifdef LORENTZFF_CAN_PRINT_HELICITY
+              std::cout << "**************************** " << __func__ 
+                << ": constructing hl = " << J_left - lh 
+                << " hr = " << J_right - rh << std::endl; 
+              std::cout << "left_weight = " << (*Wl)[lh][left_h] 
+                << "\nright_weight = " << (*Wr)[right_h][rh] << std::endl;
+#endif 
+
+              Tensor<Data_t, 1> tmp = this->impl(can_moms.first,can_moms.second,kick,J_left-lh,J_right-rh); 
               for(int i = 0; i < 4; ++i)
                 sum[i] = sum[i] + weight * tmp[i] ; // do by hand for overloads
             }
@@ -168,10 +173,10 @@ namespace radmat
 
     // derived classes implement impl, ff_impl, id_impl 
     virtual Tensor<Data_t, 1> 
-      impl(const p4_t &l, const p4_t &r, const double kick, const int hl, const int hr) const
-      {
-        return static_cast<const DerivedFF*>(this)->impl(l,r,kick,hl,hr); 
-      } 
+      impl(const p4_t &l, const p4_t &r, const double kick, const int hl, const int hr) const = 0; 
+    //      {
+    //        return static_cast<const DerivedFF*>(this)->impl(l,r,kick,hl,hr); 
+    //      } 
 
     virtual std::string 
       ff_impl(void) const 

@@ -27,8 +27,8 @@ namespace radmat
       virtual std::string ff_impl() const
       {
         std::string s;
-        s += "F_1(Q^2) \\epsilon^{\\mu,\\nu,\\rho,\\sigma}\\epsilon^{*}_{\\nu}";
-        s += "(p,\\lambda)p_{\\rho}^{+}p_{\\sigma}^{-}";
+     //   s += "F_1(Q^2) \\epsilon^{\\mu,\\nu,\\rho,\\sigma}\\epsilon^{*}_{\\nu}";
+     //   s += "(p,\\lambda)p_{\\rho}^{+}p_{\\sigma}^{-}";
         return s; 
       }
 
@@ -41,15 +41,15 @@ namespace radmat
         {
           // come up with the ingredient list
           Tensor<std::complex<double>, 1> epsilon = this->left_p_tensor(p_f,p_i,mom_fac,hel);
-          Tensor<std::complex<double>, 1> pplus, pminus;
-          pplus = convertTensorUnderlyingType<std::complex<double>,double,1>( pPlus(p_f,p_i) );
-          pminus = convertTensorUnderlyingType<std::complex<double>,double,1>( pMinus(p_f,p_i) );
+          Tensor<std::complex<double>, 1> pleft, pright;
+          pleft = convertTensorUnderlyingType<std::complex<double>,double,1>( p_f );
+          pright = convertTensorUnderlyingType<std::complex<double>,double,1>( p_i );
           Tensor<std::complex<double>, 4>  levi = levi_civita<std::complex<double>,4>(); 
           Tensor<std::complex<double>, 2> gdd;
           gdd = convertTensorUnderlyingType<std::complex<double>,double,2>(g_dd());
 
-          pminus = applyMetric(pminus,gdd,0); 
-          pplus = applyMetric(pplus,gdd,0); 
+          pright = applyMetric(pright,gdd,0); 
+          pleft = applyMetric(pleft,gdd,0); 
           epsilon = applyMetric(epsilon,gdd,0); 
 
           Tensor<double, 0> m_left, m_right;
@@ -58,21 +58,11 @@ namespace radmat
           m_right = contract(p_i,applyMetric(p_i,g_dd(),0),0,0);
           norm = std::complex<double>( 2./( sqrt(m_left.value()) + sqrt(m_right.value()) ), 0.); 
 
-          //     std::cout << __func__ << "hl " << hel << " hr " << zzero << std::endl;
-          //
-          //     std::cout 
-          //      << __func__ << ": pleft " << p_f  
-          //      << __func__ << ": pright " << p_i 
-          //      << __func__ << ": pplus " << pplus 
-          //      << __func__ << ": minus " << pminus 
-          //      << __func__ << ": epsilon " << epsilon 
-          //      << std::endl;
-
           return norm * contract(
               contract(
                 contract(levi,
-                  pminus , 3 , 0),
-                pplus , 2 , 0 ),
+                  pright , 3 , 0),
+                pleft , 2 , 0 ),
               epsilon , 1 , 0 );
         }
     };
@@ -90,41 +80,41 @@ namespace radmat
       }
 
 
-  template<int embedl, int embedr> struct RhoPi;
-  REGISTER_STRINGIFY_TYPE2( RhoPi<1,0> ); 
+    template<int embedl, int embedr> struct RhoPi;
+    REGISTER_STRINGIFY_TYPE2( RhoPi<1,0> ); 
 
 
 
-  template<int embedl, int embedr>
-    struct RhoPi : public LorentzFFAbsBase_t
-  {
-    RhoPi() 
-      : LorentzFFAbsBase_t(radmat::RhoPiGenList<embedl,embedr>())
-    {   }
-
-    RhoPi& operator=(const RhoPi &o)
+    template<int embedl, int embedr>
+      struct RhoPi : public LorentzFFAbsBase_t
     {
-      if(this != &o)
-        LorentzFFAbsBase_t::operator=(o);
-      return *this; 
-    }
+      RhoPi() 
+        : LorentzFFAbsBase_t(radmat::RhoPiGenList<embedl,embedr>())
+      {   }
 
-    RhoPi(const RhoPi &o)
-      : LorentzFFAbsBase_t(o)
-    {  }
+      RhoPi& operator=(const RhoPi &o)
+      {
+        if(this != &o)
+          LorentzFFAbsBase_t::operator=(o);
+        return *this; 
+      }
 
-    virtual ~RhoPi() {}
+      RhoPi(const RhoPi &o)
+        : LorentzFFAbsBase_t(o)
+      {  }
 
-    virtual std::string reg_id() { return Stringify< RhoPi<embedl,embedr> >(); }
-    virtual int left_spin() const { return embedl; }
-    virtual int right_spin() const { return embedr; }
-    virtual LorentzFFAbsBase_t * clone() const { return new RhoPi(); }
+      virtual ~RhoPi() {}
 
-    private:
-    RhoPi(const LorentzFFAbsBase_t::LorentzFFAbs_list &);
-    RhoPi(const LorentzFFAbsBase_t::LorentzFFAbs_list); 
+      virtual std::string reg_id() { return Stringify< RhoPi<embedl,embedr> >(); }
+      virtual int left_spin() const { return embedl; }
+      virtual int right_spin() const { return embedr; }
+      virtual LorentzFFAbsBase_t * clone() const { return new RhoPi(); }
 
-  };
+      private:
+      RhoPi(const LorentzFFAbsBase_t::LorentzFFAbs_list &);
+      RhoPi(const LorentzFFAbsBase_t::LorentzFFAbs_list); 
+
+    };
 
 
 
