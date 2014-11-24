@@ -14,40 +14,35 @@ namespace radmat
 
   struct RadmatDriver
   {
+    typedef std::map<std::string, std::vector<Hadron::KeyHadronNPartNPtCorr_t> > xml_map_t; 
+
     RadmatDriver(void) {}
 
     //! do a three point analysis and extract form factors    
     void run_program(const std::string &inifile);
 
-    //! split work b/c qdp isn't playing nice 
-    void xml_handler(const std::string &inifile, const std::string &mode); 
+    //! run various incarnations of xml generation (check_op=true will only return xml of known ops)
+    void xml_handler(const std::string &inifile, const std::string &mode, bool check_op=false); 
 
     //! just run up to the point of building xml 
-    void build_xml(const std::string &inifile); 
+    xml_map_t build_xml(void); 
 
     //! split up xml on p^2
-    void build_xml_split_p2(const std::string &inifile);  
-
-    //! only build canonical momenta at the insertion
-    void build_xml_canon_p2(const std::string &inifile);  
+    xml_map_t build_xml_split_p2(void);
 
     //! split up xml on p^2 then split into N sets 
     //    -- N is set in the .cc file 
-    void build_xml_split_p2_N(const std::string &inifile);
+    xml_map_t build_xml_split_p2_N(void);
 
     //! split up xml on octant 
-    void build_xml_split(const std::string &inifile); 
+    xml_map_t build_xml_split(void); 
 
     //! two point xml hack
-    void build_xml_twopoint(const std::string &inifile);
+    xml_map_t build_xml_twopoint(void);
 
-    //    //! just figure out what disconnected graphs we have to nuke for redstar
-    //    void nuke_graph(const std::string &inifile ,
-    //                    const std::string &graph_db,
-    //                    const std::string &nuke_xml_out);   
-    //
-    //    //! stick in stubs for gen_prop generation
-    //    void build_stub_xml(const std::string &inifile); 
+    //! build 2 tsrc xml 
+    xml_map_t build_xml_2tsrc(void); 
+
 
     private:
 

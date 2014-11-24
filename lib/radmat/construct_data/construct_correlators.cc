@@ -6,7 +6,7 @@
 
  * Creation Date : 04-12-2012
 
- * Last Modified : Mon 16 Jun 2014 09:42:15 AM EDT
+ * Last Modified : Thu 20 Nov 2014 10:15:28 AM EST
 
  * Created By : shultz
 
@@ -21,6 +21,7 @@
 #include "adat/adat_stopwatch.h"
 #include "adat/map_obj.h"
 #include "hadron/ensem_filenames.h"
+#include "formfac/formfac_qsq.h"
 #include <string>
 #include <vector>
 #include <utility>
@@ -301,6 +302,25 @@ namespace radmat
         exit(1); 
       }
 
+    // match the momentum of index 2 to the canonical momentum as defined 
+    // by adat 
+    std::vector<TaggedEnsemRedstarNPtBlock> 
+      canonicalize( const std::vector<TaggedEnsemRedstarNPtBlock> &inp)
+     {
+        std::cout << __func__ << ": pre canonicalization #elems = " << inp.size() << std::endl;
+
+        std::vector<TaggedEnsemRedstarNPtBlock> ret; 
+        std::vector<TaggedEnsemRedstarNPtBlock>::const_iterator it; 
+       
+        // these are just coefficient lists so the copy is cheap 
+        for(it = inp.begin(); it != inp.end(); ++it)
+         if( it->data_tag.q ==  FF::canonicalOrder( it->data_tag.q ) ) 
+           ret.push_back(*it); 
+
+        std::cout << __func__ << ": post canonicalization #elems = " << ret.size() << std::endl;
+
+        return ret; 
+     } 
 
 
     ///////////////////////////////////////////////////////
@@ -324,6 +344,14 @@ namespace radmat
 
         unsorted_elems = pull_data_xml(ini); 
 
+        // run a version in which we do not do the momentum averaging 
+        if( ini.kanoni ) 
+        {
+          std::cout << __func__ << ": running canonical insertion momenta only" << std::endl;
+          unsorted_elems = canonicalize(unsorted_elems); 
+        }
+
+        // figure out if we want to do irrep averaging (ie: mix A1 with B1 and B2 )  
         bool sort_mode; 
         std::map<std::string,bool> sort_mode_map; 
         sort_mode_map.insert( std::make_pair( "subduce" , false ) ); 

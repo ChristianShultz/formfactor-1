@@ -6,7 +6,7 @@
 
  * Creation Date : 21-02-2014
 
- * Last Modified : Mon 27 Oct 2014 01:39:46 PM EDT
+ * Last Modified : Fri 21 Nov 2014 12:09:34 PM EST
 
  * Created By : shultz
 
@@ -163,7 +163,7 @@ namespace radmat
         double const_imag_err = fit_imag.getAvgFitParError(0);
 
         // sometimes needs some fine tuning
-        double consistent_with_zero = 1.;
+        double consistent_with_zero = 2.;
 
         fit_log << "consistency with zero set at " << consistent_with_zero << std::endl;
         fit_log << "const_real " << const_real 

@@ -6,7 +6,7 @@
 
  * Creation Date : 25-04-2013
 
- * Last Modified : Wed 26 Mar 2014 11:15:11 AM EDT
+ * Last Modified : Thu 20 Nov 2014 10:01:16 AM EST
 
  * Created By : shultz
 
@@ -136,6 +136,7 @@ namespace radmat
     doXMLRead(ptop,"radmatDBProp",prop.radmatDBProp,__PRETTY_FUNCTION__);
     doXMLRead(ptop,"matElemMode",prop.matElemMode,__PRETTY_FUNCTION__); 
     doXMLRead(ptop,"matElemID",prop.matElemID,__PRETTY_FUNCTION__);
+    doXMLRead(ptop,"kanoni",prop.kanoni,__PRETTY_FUNCTION__);
     doXMLRead(ptop,"xi",prop.xi,__PRETTY_FUNCTION__);
     doXMLRead(ptop,"L_s",prop.L_s,__PRETTY_FUNCTION__);
   }

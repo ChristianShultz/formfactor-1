@@ -6,7 +6,7 @@
 
  * Creation Date : 25-02-2013
 
- * Last Modified : Fri 17 Oct 2014 11:38:26 AM EDT
+ * Last Modified : Tue 18 Nov 2014 09:57:28 AM EST
 
  * Created By : shultz
 
@@ -265,6 +265,30 @@ void gen_xml(int argc , char *argv[] )
 
   radmat::RadmatDriver d; 
   d.xml_handler(ini,mode); 
+}
+
+//    generate redstar xml from the inifile then 
+//    parse the list and only include the ops we have xml for  
+//
+/////////////////////////////////////////////////////
+void gen_xml_check_op(int argc , char *argv[] )
+{
+  if(argc != 4)
+  {
+    std::cerr << "error: usage: radmat_util: gen_xml_check_op <xmlinifile> <mode> " << std::endl;
+    exit(1); 
+  }
+
+  std::istringstream val(argv[2]); 
+  std::string ini; 
+  val >> ini; 
+
+  std::istringstream val2(argv[3]); 
+  std::string mode; 
+  val2 >> mode; 
+
+  radmat::RadmatDriver d; 
+  d.xml_handler(ini,mode,true); 
 }
 
 
@@ -534,6 +558,7 @@ std::map<std::string , fptr> options;
 void init_options(void)
 {
   options.insert(std::pair<std::string,fptr>("gen_xml",&gen_xml)); 
+  options.insert(std::pair<std::string,fptr>("gen_xml_check_op",&gen_xml_check_op)); 
   options.insert(std::pair<std::string,fptr>("rot_llsq",&rot_llsq)); 
   options.insert(std::pair<std::string,fptr>("prune_llsq",&prune_llsq)); 
   options.insert(std::pair<std::string,fptr>("refit_ffs",&refit_ffs)); 

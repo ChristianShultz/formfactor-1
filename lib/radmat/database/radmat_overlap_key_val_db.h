@@ -39,6 +39,11 @@ namespace radmat
       m_basic_key.row = 0; 
     }
 
+    std::string op_name(void) const
+    {   
+      return m_basic_key.op.ops[1].name; 
+    }
+
     std::string m_particle_id;    
     Hadron::KeyHadronNPartIrrep_t m_basic_key;
   };

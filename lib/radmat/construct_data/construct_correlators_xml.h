@@ -63,6 +63,7 @@ namespace radmat
     radmatDBProp_t radmatDBProp;
     std::string matElemMode; 
     std::string matElemID;
+    bool kanoni;  // hungarian for canonical for RGE
     double xi;
     int L_s;   
   };

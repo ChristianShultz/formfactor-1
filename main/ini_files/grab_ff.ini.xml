@@ -3,26 +3,26 @@
 <Props>
   <left>
     <origin>J1m</origin>
-    <data>T1</data>
-    <mass>0.148</mass>
-    <row>1</row>
-    <mom>0 0 0</mom>
+    <data>H1D4E2</data>
+    <mass>0.36</mass>
+    <row>2</row>
+    <mom>-1 0 0</mom>
   </left>
   <gamma>
     <origin>J1m</origin>
-    <data>H0D4A1</data>
+    <data>H1D4E2</data>
     <mass>0.</mass>
     <row>1</row>
     <mom>1 0 0</mom>
   </gamma>
   <right>
-    <origin>J1m</origin>
-    <data>H0D4A1</data>
-    <mass>0.216</mass>
+    <origin>J0m</origin>
+    <data>H0D4A2</data>
+    <mass>0.148</mass>
     <row>1</row>
-    <mom>-1 0 0</mom>
+    <mom>-2 0 0</mom>
   </right>
-  <tran>diag</tran>
+  <tran>tran</tran>
   <mom_fac>0.11</mom_fac>
 </Props>
 
