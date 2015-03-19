@@ -6,7 +6,7 @@
 
  * Creation Date : 25-02-2013
 
- * Last Modified : Sat 18 Oct 2014 12:08:07 PM EDT
+ * Last Modified : Wed 03 Dec 2014 04:39:59 PM EST
 
  * Created By : shultz
 
@@ -178,7 +178,8 @@ namespace radmat
   {
     check_exit_linear_system();
     std::cout << "Solving Q2 = " << linear_system.qsq_label() 
-      << "  " << linear_system.peek_tags().begin()->mom_string() << std::endl;
+      << "  " << linear_system.peek_tags().begin()->mom_string() 
+      << " using a " << linear_system.K_dimensions() << " llsq system"  << std::endl;
 
     linear_system.solve_llsq(soln_ID);
     init_solved_llsq = true; 

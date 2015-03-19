@@ -40,8 +40,11 @@ namespace radmat
     //! two point xml hack
     xml_map_t build_xml_twopoint(void);
 
-    //! build 2 tsrc xml 
+    //! build 2 tsrc xml -- mod 128 
     xml_map_t build_xml_2tsrc(void); 
+
+    //! build 4 tsrc xml -- mod 128
+    xml_map_t build_xml_4tsrc(void); 
 
 
     private:

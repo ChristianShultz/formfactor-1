@@ -6,7 +6,7 @@
 
  * Creation Date : 21-02-2014
 
- * Last Modified : Fri 21 Nov 2014 12:09:34 PM EST
+ * Last Modified : Fri 05 Dec 2014 12:40:41 PM EST
 
  * Created By : shultz
 
@@ -163,7 +163,7 @@ namespace radmat
         double const_imag_err = fit_imag.getAvgFitParError(0);
 
         // sometimes needs some fine tuning
-        double consistent_with_zero = 2.;
+        double consistent_with_zero = 1.;
 
         fit_log << "consistency with zero set at " << consistent_with_zero << std::endl;
         fit_log << "const_real " << const_real 
@@ -237,19 +237,27 @@ namespace radmat
               + "+/-" + to_string(sqrt(fabs(const_real_err)))); 
           printer_function<case_printer>("imag = " + to_string(const_imag) 
               + "+/-" + to_string(sqrt(fabs(const_imag_err)))); 
+          
+          // decide if it is +ve or -ve imaginary  
           if (const_imag > 0. )
             return std::make_pair(phase_pair(IP,imag),fit_log.str()); 
+
           return std::make_pair(phase_pair(IM,imag),fit_log.str());
         }
 
+        // the real bit is not consistent with zero 
         if( fabs(const_imag) - consistent_with_zero*fabs(const_imag_err) < 0.)
         {
           fit_log << "* decided it was real " << std::endl;
           printer_function<case_printer>("imag is consistent with zero");
           printer_function<case_printer>("imag = " + to_string(const_imag) 
               + "+/-" + to_string(sqrt(fabs(const_imag_err)))); 
+
+          
+          // decide if it is +ve or -ve 
           if( const_real > 0. )
             return std::make_pair(phase_pair(RP,real),fit_log.str()); 
+
           return std::make_pair(phase_pair(RM,real),fit_log.str());
         }
 

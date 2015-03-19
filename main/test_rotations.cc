@@ -6,7 +6,7 @@
 
 * Creation Date : 11-12-2013
 
-* Last Modified : Mon 28 Apr 2014 06:17:52 PM EDT
+* Last Modified : Tue 27 Jan 2015 08:27:07 AM EST
 
 * Created By : shultz
 
@@ -555,6 +555,28 @@ void get_prod_wigner_matrix(int argc, char *argv[])
 
   delete W; 
   delete W2; 
+}
+
+//////////////////////////////////////////////////
+//////////////////////////////////////////////////
+//////////////////////////////////////////////////
+
+void get_CET_rotation(int argc, char *argv[])
+{
+  if( argc != 8 )
+  {
+    std::cout << "error usage: test_rotations [" << __func__ << "] "
+      << "<mom> <mom> " << std::endl; 
+    exit(1);
+  }
+
+  mom_t m1 = radmat::gen_mom<0,0,0>(); 
+  mom_t m2 = radmat::gen_mom<0,0,0>(); 
+
+  read_momentum(2,m1,argv);
+  read_momentum(5,m2,argv);
+
+
 }
 
 

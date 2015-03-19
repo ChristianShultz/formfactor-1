@@ -6,7 +6,7 @@
 
  * Creation Date : 25-02-2013
 
- * Last Modified : Fri 21 Nov 2014 03:20:49 PM EST
+ * Last Modified : Sun 04 Jan 2015 04:05:38 PM EST
 
  * Created By : shultz
 
@@ -120,7 +120,7 @@ namespace radmat
             std::cerr << __func__ << ": error opening database " << dbnames[i] << std::endl;
             exit(1); 
           }
-          
+
           std::vector<K> keys; 
           std::vector< std::vector<D> > data; 
           dbase->keysAndData(keys,data); 
@@ -132,7 +132,7 @@ namespace radmat
 
         std::vector<std::string> ret; 
         ret.assign( ops_list.begin() , ops_list.end() ); 
-        
+
         std::cout << "Known op list:" << std::endl;
         std::vector<std::string>::const_iterator it; 
         for(it = ret.begin(); it != ret.end(); ++it) 
@@ -153,7 +153,7 @@ namespace radmat
       {
         ADATXML::XMLBufferWriter corrs;
         ADATXML::Array<Hadron::KeyHadronNPartNPtCorr_t> bc;
-      
+
         unsigned int sz = it->second.size(); 
         bc.resize(sz);
         for(unsigned int i = 0; i < sz; ++i)
@@ -255,6 +255,7 @@ namespace radmat
     handler["two_point"] = &RadmatDriver::build_xml_twopoint;
     handler["split"] = &RadmatDriver::build_xml_split;
     handler["two_tsrc"] = &RadmatDriver::build_xml_2tsrc;
+    handler["four_tsrc"] = &RadmatDriver::build_xml_4tsrc;
 
 
     it = handler.find(mode); 
@@ -300,7 +301,7 @@ namespace radmat
           for(kanoni = all_keys.begin(); kanoni != all_keys.end(); ++kanoni)
             if(is_canon_mom_insertion(*kanoni))
               keys.push_back(*kanoni); 
-      
+
           bob[mit->first] = keys;   
         }
       }
@@ -458,6 +459,47 @@ namespace radmat
         return dest; 
       }
 
+    // a generic multi timesource function 
+    template<int N_SRC, int LT>
+      std::vector<Hadron::KeyHadronNPartNPtCorr_t>
+      build_xml_multi_tsrc_template(const std::vector<Hadron::KeyHadronNPartNPtCorr_t> &keys)
+      {
+        // determine size of shift
+        int chunk = int(double(LT)/double(N_SRC)); 
+      
+        std::vector<Hadron::KeyHadronNPartNPtCorr_t>::const_iterator it;
+        std::vector<Hadron::KeyHadronNPartNPtCorr_t>  mod;
+        std::vector<int> offsets; 
+        std::vector<int>::const_iterator offset; 
+
+        // where are the sources
+        for(int c = 0; c < N_SRC; ++c)
+          offsets.push_back(chunk*c); 
+
+        // slide the correlator arround the lattice with a chunk 
+        // sized shift in time 
+        mod.reserve(keys.size()*offsets.size()); 
+        for(it = keys.begin(); it != keys.end(); ++it) 
+          for(offset = offsets.begin(); offset != offsets.end(); ++offset)
+          {
+            Hadron::KeyHadronNPartNPtCorr_t k = *it;  
+            for( int i = 1; i <= k.npoint.size(); ++i)
+            {
+              // don't change negative times, ie leave -3 in insertion alone
+              if(k.npoint[i].t_slice >= 0 )
+                k.npoint[i].t_slice = ( (k.npoint[i].t_slice + *offset) % LT );
+            }
+
+            mod.push_back(k); 
+          }
+
+        // unnecessary printing so that people feel like they actually did something 
+        std::cout << keys.size() << " correlators before extra tsrcs " << std::endl; 
+        std::cout << mod.size() << " correlators after extra tsrcs " << std::endl; 
+
+        return mod; 
+      }
+
   } // anonomyous
 
 
@@ -476,34 +518,59 @@ namespace radmat
   RadmatDriver::xml_map_t 
     RadmatDriver::build_xml_2tsrc(void)
     {
-      std::vector<Hadron::KeyHadronNPartNPtCorr_t> keys, mod64;
+      std::vector<Hadron::KeyHadronNPartNPtCorr_t> keys;
       keys = m_correlators.construct_correlator_xml(m_ini.threePointIni); 
-      std::vector<Hadron::KeyHadronNPartNPtCorr_t>::const_iterator it;
-
-      mod64.reserve(keys.size()); 
-      for(it = keys.begin(); it != keys.end(); ++it) 
-      {
-        Hadron::KeyHadronNPartNPtCorr_t k = *it;  
-        for( int i = 1; i <= k.npoint.size(); ++i)
-          if(k.npoint[i].t_slice >= 0 )
-            k.npoint[i].t_slice = ( (k.npoint[i].t_slice + 64) % 128 );
-
-        mod64.push_back(k); 
-      }
-
-      std::cout << keys.size() << "correlators before second tsrc " << std::endl; 
-
-      // now put them in 
-      keys.reserve(2*keys.size()); 
-      keys.insert(keys.end(),mod64.begin(),mod64.end()); 
-
-      std::cout << keys.size() << "correlators after second tsrc " << std::endl; 
 
       RadmatDriver::xml_map_t ret; 
-      ret["npt.list.xml"] = keys; 
+      ret["npt.list.xml"] = build_xml_multi_tsrc_template<2,128>(keys);
 
       return ret; 
     }
+
+  RadmatDriver::xml_map_t 
+    RadmatDriver::build_xml_4tsrc(void)
+    {
+      std::vector<Hadron::KeyHadronNPartNPtCorr_t> keys;
+      keys = m_correlators.construct_correlator_xml(m_ini.threePointIni); 
+
+      RadmatDriver::xml_map_t ret; 
+      ret["npt.list.xml"] = build_xml_multi_tsrc_template<4,128>(keys);
+
+      return ret; 
+    }
+
+  //  RadmatDriver::xml_map_t 
+  //    RadmatDriver::build_xml_2tsrc(void)
+  //    {
+  //      std::vector<Hadron::KeyHadronNPartNPtCorr_t> keys, mod64;
+  //      keys = m_correlators.construct_correlator_xml(m_ini.threePointIni); 
+  //      std::vector<Hadron::KeyHadronNPartNPtCorr_t>::const_iterator it;
+  //
+  //      mod64.reserve(keys.size()); 
+  //      for(it = keys.begin(); it != keys.end(); ++it) 
+  //      {
+  //        Hadron::KeyHadronNPartNPtCorr_t k = *it;  
+  //        for( int i = 1; i <= k.npoint.size(); ++i)
+  //          if(k.npoint[i].t_slice >= 0 )
+  //            k.npoint[i].t_slice = ( (k.npoint[i].t_slice + 64) % 128 );
+  //
+  //        mod64.push_back(k); 
+  //      }
+  //
+  //      std::cout << keys.size() << "correlators before second tsrc " << std::endl; 
+  //
+  //      // now put them in 
+  //      keys.reserve(2*keys.size()); 
+  //      keys.insert(keys.end(),mod64.begin(),mod64.end()); 
+  //
+  //      std::cout << keys.size() << "correlators after second tsrc " << std::endl; 
+  //
+  //      RadmatDriver::xml_map_t ret; 
+  //      ret["npt.list.xml"] = keys; 
+  //
+  //      return ret; 
+  //    }
+
 
   RadmatDriver::xml_map_t 
     RadmatDriver::build_xml_split_p2(void)

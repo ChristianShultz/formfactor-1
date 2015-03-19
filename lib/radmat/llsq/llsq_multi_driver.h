@@ -78,6 +78,14 @@ namespace radmat
 
     std::string ff_id(const int i) const 
     { check_exit_FF(); return ff_ids.at(i);} // throws out_of_range if i is not present
+    
+    // some status output
+    std::string K_dimensions(void) const
+    {
+      std::stringstream ss; 
+      ss << K.getN() << "x" << K.getM(); 
+      return ss.str(); 
+    }
 
     private:
     void sort_data(void); 

@@ -1,0 +1,5 @@
+formfactor_cubic_formfactors.o: \
+ ../../lib/radmat/ff_interface/formfactor_cubic_formfactors.cc \
+ ../../lib/radmat/ff_interface/formfactor_cubic_formfactors.h
+
+../../lib/radmat/ff_interface/formfactor_cubic_formfactors.h:
